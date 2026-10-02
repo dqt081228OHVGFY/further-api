@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2041 (Xin-you  -  year of the Rooster)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2041/1/1          29                      Tuesday                            
+2041/1/2          30                      Wednesday                          
+2041/1/3          12th Lunar Month        Thursday                           
+2041/1/4          2                       Friday                             
+2041/1/5          3                       Saturday       Moderate Cold       
+2041/1/6          4                       Sunday                             
+2041/1/7          5                       Monday                             
+2041/1/8          6                       Tuesday                            
+2041/1/9          7                       Wednesday                          
+2041/1/10         8                       Thursday                           
+2041/1/11         9                       Friday                             
+2041/1/12         10                      Saturday                           
+2041/1/13         11                      Sunday                             
+2041/1/14         12                      Monday                             
+2041/1/15         13                      Tuesday                            
+2041/1/16         14                      Wednesday                          
+2041/1/17         15                      Thursday                           
+2041/1/18         16                      Friday                             
+2041/1/19         17                      Saturday                           
+2041/1/20         18                      Sunday         Severe Cold         
+2041/1/21         19                      Monday                             
+2041/1/22         20                      Tuesday                            
+2041/1/23         21                      Wednesday                          
+2041/1/24         22                      Thursday                           
+2041/1/25         23                      Friday                             
+2041/1/26         24                      Saturday                           
+2041/1/27         25                      Sunday                             
+2041/1/28         26                      Monday                             
+2041/1/29         27                      Tuesday                            
+2041/1/30         28                      Wednesday                          
+2041/1/31         29                      Thursday                           
+2041/2/1          1st Lunar Month         Friday                             
+2041/2/2          2                       Saturday                           
+2041/2/3          3                       Sunday         Spring Commences    
+2041/2/4          4                       Monday                             
+2041/2/5          5                       Tuesday                            
+2041/2/6          6                       Wednesday                          
+2041/2/7          7                       Thursday                           
+2041/2/8          8                       Friday                             
+2041/2/9          9                       Saturday                           
+2041/2/10         10                      Sunday                             
+2041/2/11         11                      Monday                             
+2041/2/12         12                      Tuesday                            
+2041/2/13         13                      Wednesday                          
+2041/2/14         14                      Thursday                           
+2041/2/15         15                      Friday                             
+2041/2/16         16                      Saturday                           
+2041/2/17         17                      Sunday                             
+2041/2/18         18                      Monday         Spring Showers      
+2041/2/19         19                      Tuesday                            
+2041/2/20         20                      Wednesday                          
+2041/2/21         21                      Thursday                           
+2041/2/22         22                      Friday                             
+2041/2/23         23                      Saturday                           
+2041/2/24         24                      Sunday                             
+2041/2/25         25                      Monday                             
+2041/2/26         26                      Tuesday                            
+2041/2/27         27                      Wednesday                          
+2041/2/28         28                      Thursday                           
+2041/3/1          29                      Friday                             
+2041/3/2          2nd Lunar Month         Saturday                           
+2041/3/3          2                       Sunday                             
+2041/3/4          3                       Monday                             
+2041/3/5          4                       Tuesday        Insects Waken       
+2041/3/6          5                       Wednesday                          
+2041/3/7          6                       Thursday                           
+2041/3/8          7                       Friday                             
+2041/3/9          8                       Saturday                           
+2041/3/10         9                       Sunday                             
+2041/3/11         10                      Monday                             
+2041/3/12         11                      Tuesday                            
+2041/3/13         12                      Wednesday                          
+2041/3/14         13                      Thursday                           
+2041/3/15         14                      Friday                             
+2041/3/16         15                      Saturday                           
+2041/3/17         16                      Sunday                             
+2041/3/18         17                      Monday                             
+2041/3/19         18                      Tuesday                            
+2041/3/20         19                      Wednesday      Vernal Equinox      
+2041/3/21         20                      Thursday                           
+2041/3/22         21                      Friday                             
+2041/3/23         22                      Saturday                           
+2041/3/24         23                      Sunday                             
+2041/3/25         24                      Monday                             
+2041/3/26         25                      Tuesday                            
+2041/3/27         26                      Wednesday                          
+2041/3/28         27                      Thursday                           
+2041/3/29         28                      Friday                             
+2041/3/30         29                      Saturday                           
+2041/3/31         30                      Sunday                             
+2041/4/1          3rd Lunar Month         Monday                             
+2041/4/2          2                       Tuesday                            
+2041/4/3          3                       Wednesday                          
+2041/4/4          4                       Thursday       Bright & Clear      
+2041/4/5          5                       Friday                             
+2041/4/6          6                       Saturday                           
+2041/4/7          7                       Sunday                             
+2041/4/8          8                       Monday                             
+2041/4/9          9                       Tuesday                            
+2041/4/10         10                      Wednesday                          
+2041/4/11         11                      Thursday                           
+2041/4/12         12                      Friday                             
+2041/4/13         13                      Saturday                           
+2041/4/14         14                      Sunday                             
+2041/4/15         15                      Monday                             
+2041/4/16         16                      Tuesday                            
+2041/4/17         17                      Wednesday                          
+2041/4/18         18                      Thursday                           
+2041/4/19         19                      Friday                             
+2041/4/20         20                      Saturday       Corn Rain           
+2041/4/21         21                      Sunday                             
+2041/4/22         22                      Monday                             
+2041/4/23         23                      Tuesday                            
+2041/4/24         24                      Wednesday                          
+2041/4/25         25                      Thursday                           
+2041/4/26         26                      Friday                             
+2041/4/27         27                      Saturday                           
+2041/4/28         28                      Sunday                             
+2041/4/29         29                      Monday                             
+2041/4/30         4th Lunar Month         Tuesday                            
+2041/5/1          2                       Wednesday                          
+2041/5/2          3                       Thursday                           
+2041/5/3          4                       Friday                             
+2041/5/4          5                       Saturday                           
+2041/5/5          6                       Sunday         Summer Commences    
+2041/5/6          7                       Monday                             
+2041/5/7          8                       Tuesday                            
+2041/5/8          9                       Wednesday                          
+2041/5/9          10                      Thursday                           
+2041/5/10         11                      Friday                             
+2041/5/11         12                      Saturday                           
+2041/5/12         13                      Sunday                             
+2041/5/13         14                      Monday                             
+2041/5/14         15                      Tuesday                            
+2041/5/15         16                      Wednesday                          
+2041/5/16         17                      Thursday                           
+2041/5/17         18                      Friday                             
+2041/5/18         19                      Saturday                           
+2041/5/19         20                      Sunday                             
+2041/5/20         21                      Monday         Corn Forms          
+2041/5/21         22                      Tuesday                            
+2041/5/22         23                      Wednesday                          
+2041/5/23         24                      Thursday                           
+2041/5/24         25                      Friday                             
+2041/5/25         26                      Saturday                           
+2041/5/26         27                      Sunday                             
+2041/5/27         28                      Monday                             
+2041/5/28         29                      Tuesday                            
+2041/5/29         30                      Wednesday                          
+2041/5/30         5th Lunar Month         Thursday                           
+2041/5/31         2                       Friday                             
+2041/6/1          3                       Saturday                           
+2041/6/2          4                       Sunday                             
+2041/6/3          5                       Monday                             
+2041/6/4          6                       Tuesday                            
+2041/6/5          7                       Wednesday      Corn on Ear         
+2041/6/6          8                       Thursday                           
+2041/6/7          9                       Friday                             
+2041/6/8          10                      Saturday                           
+2041/6/9          11                      Sunday                             
+2041/6/10         12                      Monday                             
+2041/6/11         13                      Tuesday                            
+2041/6/12         14                      Wednesday                          
+2041/6/13         15                      Thursday                           
+2041/6/14         16                      Friday                             
+2041/6/15         17                      Saturday                           
+2041/6/16         18                      Sunday                             
+2041/6/17         19                      Monday                             
+2041/6/18         20                      Tuesday                            
+2041/6/19         21                      Wednesday                          
+2041/6/20         22                      Thursday                           
+2041/6/21         23                      Friday         Summer Solstice     
+2041/6/22         24                      Saturday                           
+2041/6/23         25                      Sunday                             
+2041/6/24         26                      Monday                             
+2041/6/25         27                      Tuesday                            
+2041/6/26         28                      Wednesday                          
+2041/6/27         29                      Thursday                           
+2041/6/28         6th Lunar Month         Friday                             
+2041/6/29         2                       Saturday                           
+2041/6/30         3                       Sunday                             
+2041/7/1          4                       Monday                             
+2041/7/2          5                       Tuesday                            
+2041/7/3          6                       Wednesday                          
+2041/7/4          7                       Thursday                           
+2041/7/5          8                       Friday                             
+2041/7/6          9                       Saturday                           
+2041/7/7          10                      Sunday         Moderate Heat       
+2041/7/8          11                      Monday                             
+2041/7/9          12                      Tuesday                            
+2041/7/10         13                      Wednesday                          
+2041/7/11         14                      Thursday                           
+2041/7/12         15                      Friday                             
+2041/7/13         16                      Saturday                           
+2041/7/14         17                      Sunday                             
+2041/7/15         18                      Monday                             
+2041/7/16         19                      Tuesday                            
+2041/7/17         20                      Wednesday                          
+2041/7/18         21                      Thursday                           
+2041/7/19         22                      Friday                             
+2041/7/20         23                      Saturday                           
+2041/7/21         24                      Sunday                             
+2041/7/22         25                      Monday         Great Heat          
+2041/7/23         26                      Tuesday                            
+2041/7/24         27                      Wednesday                          
+2041/7/25         28                      Thursday                           
+2041/7/26         29                      Friday                             
+2041/7/27         30                      Saturday                           
+2041/7/28         7th Lunar Month         Sunday                             
+2041/7/29         2                       Monday                             
+2041/7/30         3                       Tuesday                            
+2041/7/31         4                       Wednesday                          
+2041/8/1          5                       Thursday                           
+2041/8/2          6                       Friday                             
+2041/8/3          7                       Saturday                           
+2041/8/4          8                       Sunday                             
+2041/8/5          9                       Monday                             
+2041/8/6          10                      Tuesday                            
+2041/8/7          11                      Wednesday      Autumn Commences    
+2041/8/8          12                      Thursday                           
+2041/8/9          13                      Friday                             
+2041/8/10         14                      Saturday                           
+2041/8/11         15                      Sunday                             
+2041/8/12         16                      Monday                             
+2041/8/13         17                      Tuesday                            
+2041/8/14         18                      Wednesday                          
+2041/8/15         19                      Thursday                           
+2041/8/16         20                      Friday                             
+2041/8/17         21                      Saturday                           
+2041/8/18         22                      Sunday                             
+2041/8/19         23                      Monday                             
+2041/8/20         24                      Tuesday                            
+2041/8/21         25                      Wednesday                          
+2041/8/22         26                      Thursday                           
+2041/8/23         27                      Friday         End of Heat         
+2041/8/24         28                      Saturday                           
+2041/8/25         29                      Sunday                             
+2041/8/26         30                      Monday                             
+2041/8/27         8th Lunar Month         Tuesday                            
+2041/8/28         2                       Wednesday                          
+2041/8/29         3                       Thursday                           
+2041/8/30         4                       Friday                             
+2041/8/31         5                       Saturday                           
+2041/9/1          6                       Sunday                             
+2041/9/2          7                       Monday                             
+2041/9/3          8                       Tuesday                            
+2041/9/4          9                       Wednesday                          
+2041/9/5          10                      Thursday                           
+2041/9/6          11                      Friday                             
+2041/9/7          12                      Saturday       White Dew           
+2041/9/8          13                      Sunday                             
+2041/9/9          14                      Monday                             
+2041/9/10         15                      Tuesday                            
+2041/9/11         16                      Wednesday                          
+2041/9/12         17                      Thursday                           
+2041/9/13         18                      Friday                             
+2041/9/14         19                      Saturday                           
+2041/9/15         20                      Sunday                             
+2041/9/16         21                      Monday                             
+2041/9/17         22                      Tuesday                            
+2041/9/18         23                      Wednesday                          
+2041/9/19         24                      Thursday                           
+2041/9/20         25                      Friday                             
+2041/9/21         26                      Saturday                           
+2041/9/22         27                      Sunday         Autumnal Equinox    
+2041/9/23         28                      Monday                             
+2041/9/24         29                      Tuesday                            
+2041/9/25         9th Lunar Month         Wednesday                          
+2041/9/26         2                       Thursday                           
+2041/9/27         3                       Friday                             
+2041/9/28         4                       Saturday                           
+2041/9/29         5                       Sunday                             
+2041/9/30         6                       Monday                             
+2041/10/1         7                       Tuesday                            
+2041/10/2         8                       Wednesday                          
+2041/10/3         9                       Thursday                           
+2041/10/4         10                      Friday                             
+2041/10/5         11                      Saturday                           
+2041/10/6         12                      Sunday                             
+2041/10/7         13                      Monday                             
+2041/10/8         14                      Tuesday        Cold Dew            
+2041/10/9         15                      Wednesday                          
+2041/10/10        16                      Thursday                           
+2041/10/11        17                      Friday                             
+2041/10/12        18                      Saturday                           
+2041/10/13        19                      Sunday                             
+2041/10/14        20                      Monday                             
+2041/10/15        21                      Tuesday                            
+2041/10/16        22                      Wednesday                          
+2041/10/17        23                      Thursday                           
+2041/10/18        24                      Friday                             
+2041/10/19        25                      Saturday                           
+2041/10/20        26                      Sunday                             
+2041/10/21        27                      Monday                             
+2041/10/22        28                      Tuesday                            
+2041/10/23        29                      Wednesday      Frost               
+2041/10/24        30                      Thursday                           
+2041/10/25        10th Lunar Month        Friday                             
+2041/10/26        2                       Saturday                           
+2041/10/27        3                       Sunday                             
+2041/10/28        4                       Monday                             
+2041/10/29        5                       Tuesday                            
+2041/10/30        6                       Wednesday                          
+2041/10/31        7                       Thursday                           
+2041/11/1         8                       Friday                             
+2041/11/2         9                       Saturday                           
+2041/11/3         10                      Sunday                             
+2041/11/4         11                      Monday                             
+2041/11/5         12                      Tuesday                            
+2041/11/6         13                      Wednesday                          
+2041/11/7         14                      Thursday       Winter Commences    
+2041/11/8         15                      Friday                             
+2041/11/9         16                      Saturday                           
+2041/11/10        17                      Sunday                             
+2041/11/11        18                      Monday                             
+2041/11/12        19                      Tuesday                            
+2041/11/13        20                      Wednesday                          
+2041/11/14        21                      Thursday                           
+2041/11/15        22                      Friday                             
+2041/11/16        23                      Saturday                           
+2041/11/17        24                      Sunday                             
+2041/11/18        25                      Monday                             
+2041/11/19        26                      Tuesday                            
+2041/11/20        27                      Wednesday                          
+2041/11/21        28                      Thursday                           
+2041/11/22        29                      Friday         Light Snow          
+2041/11/23        30                      Saturday                           
+2041/11/24        11th Lunar Month        Sunday                             
+2041/11/25        2                       Monday                             
+2041/11/26        3                       Tuesday                            
+2041/11/27        4                       Wednesday                          
+2041/11/28        5                       Thursday                           
+2041/11/29        6                       Friday                             
+2041/11/30        7                       Saturday                           
+2041/12/1         8                       Sunday                             
+2041/12/2         9                       Monday                             
+2041/12/3         10                      Tuesday                            
+2041/12/4         11                      Wednesday                          
+2041/12/5         12                      Thursday                           
+2041/12/6         13                      Friday                             
+2041/12/7         14                      Saturday       Heavy Snow          
+2041/12/8         15                      Sunday                             
+2041/12/9         16                      Monday                             
+2041/12/10        17                      Tuesday                            
+2041/12/11        18                      Wednesday                          
+2041/12/12        19                      Thursday                           
+2041/12/13        20                      Friday                             
+2041/12/14        21                      Saturday                           
+2041/12/15        22                      Sunday                             
+2041/12/16        23                      Monday                             
+2041/12/17        24                      Tuesday                            
+2041/12/18        25                      Wednesday                          
+2041/12/19        26                      Thursday                           
+2041/12/20        27                      Friday                             
+2041/12/21        28                      Saturday       Winter Solstice     
+2041/12/22        29                      Sunday                             
+2041/12/23        12th Lunar Month        Monday                             
+2041/12/24        2                       Tuesday                            
+2041/12/25        3                       Wednesday                          
+2041/12/26        4                       Thursday                           
+2041/12/27        5                       Friday                             
+2041/12/28        6                       Saturday                           
+2041/12/29        7                       Sunday                             
+2041/12/30        8                       Monday                             
+2041/12/31        9                       Tuesday                            

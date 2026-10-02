@@ -1,0 +1,368 @@
+Gregorian-Lunar Calendar Conversion Table of 2032 (Ren-zi  -  year of the Mouse)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2032/1/1          19                      Thursday                           
+2032/1/2          20                      Friday                             
+2032/1/3          21                      Saturday                           
+2032/1/4          22                      Sunday                             
+2032/1/5          23                      Monday                             
+2032/1/6          24                      Tuesday        Moderate Cold       
+2032/1/7          25                      Wednesday                          
+2032/1/8          26                      Thursday                           
+2032/1/9          27                      Friday                             
+2032/1/10         28                      Saturday                           
+2032/1/11         29                      Sunday                             
+2032/1/12         30                      Monday                             
+2032/1/13         12th Lunar Month        Tuesday                            
+2032/1/14         2                       Wednesday                          
+2032/1/15         3                       Thursday                           
+2032/1/16         4                       Friday                             
+2032/1/17         5                       Saturday                           
+2032/1/18         6                       Sunday                             
+2032/1/19         7                       Monday                             
+2032/1/20         8                       Tuesday        Severe Cold         
+2032/1/21         9                       Wednesday                          
+2032/1/22         10                      Thursday                           
+2032/1/23         11                      Friday                             
+2032/1/24         12                      Saturday                           
+2032/1/25         13                      Sunday                             
+2032/1/26         14                      Monday                             
+2032/1/27         15                      Tuesday                            
+2032/1/28         16                      Wednesday                          
+2032/1/29         17                      Thursday                           
+2032/1/30         18                      Friday                             
+2032/1/31         19                      Saturday                           
+2032/2/1          20                      Sunday                             
+2032/2/2          21                      Monday                             
+2032/2/3          22                      Tuesday                            
+2032/2/4          23                      Wednesday      Spring Commences    
+2032/2/5          24                      Thursday                           
+2032/2/6          25                      Friday                             
+2032/2/7          26                      Saturday                           
+2032/2/8          27                      Sunday                             
+2032/2/9          28                      Monday                             
+2032/2/10         29                      Tuesday                            
+2032/2/11         1st Lunar Month         Wednesday                          
+2032/2/12         2                       Thursday                           
+2032/2/13         3                       Friday                             
+2032/2/14         4                       Saturday                           
+2032/2/15         5                       Sunday                             
+2032/2/16         6                       Monday                             
+2032/2/17         7                       Tuesday                            
+2032/2/18         8                       Wednesday                          
+2032/2/19         9                       Thursday       Spring Showers      
+2032/2/20         10                      Friday                             
+2032/2/21         11                      Saturday                           
+2032/2/22         12                      Sunday                             
+2032/2/23         13                      Monday                             
+2032/2/24         14                      Tuesday                            
+2032/2/25         15                      Wednesday                          
+2032/2/26         16                      Thursday                           
+2032/2/27         17                      Friday                             
+2032/2/28         18                      Saturday                           
+2032/2/29         19                      Sunday                             
+2032/3/1          20                      Monday                             
+2032/3/2          21                      Tuesday                            
+2032/3/3          22                      Wednesday                          
+2032/3/4          23                      Thursday                           
+2032/3/5          24                      Friday         Insects Waken       
+2032/3/6          25                      Saturday                           
+2032/3/7          26                      Sunday                             
+2032/3/8          27                      Monday                             
+2032/3/9          28                      Tuesday                            
+2032/3/10         29                      Wednesday                          
+2032/3/11         30                      Thursday                           
+2032/3/12         2nd Lunar Month         Friday                             
+2032/3/13         2                       Saturday                           
+2032/3/14         3                       Sunday                             
+2032/3/15         4                       Monday                             
+2032/3/16         5                       Tuesday                            
+2032/3/17         6                       Wednesday                          
+2032/3/18         7                       Thursday                           
+2032/3/19         8                       Friday                             
+2032/3/20         9                       Saturday       Vernal Equinox      
+2032/3/21         10                      Sunday                             
+2032/3/22         11                      Monday                             
+2032/3/23         12                      Tuesday                            
+2032/3/24         13                      Wednesday                          
+2032/3/25         14                      Thursday                           
+2032/3/26         15                      Friday                             
+2032/3/27         16                      Saturday                           
+2032/3/28         17                      Sunday                             
+2032/3/29         18                      Monday                             
+2032/3/30         19                      Tuesday                            
+2032/3/31         20                      Wednesday                          
+2032/4/1          21                      Thursday                           
+2032/4/2          22                      Friday                             
+2032/4/3          23                      Saturday                           
+2032/4/4          24                      Sunday         Bright & Clear      
+2032/4/5          25                      Monday                             
+2032/4/6          26                      Tuesday                            
+2032/4/7          27                      Wednesday                          
+2032/4/8          28                      Thursday                           
+2032/4/9          29                      Friday                             
+2032/4/10         3rd Lunar Month         Saturday                           
+2032/4/11         2                       Sunday                             
+2032/4/12         3                       Monday                             
+2032/4/13         4                       Tuesday                            
+2032/4/14         5                       Wednesday                          
+2032/4/15         6                       Thursday                           
+2032/4/16         7                       Friday                             
+2032/4/17         8                       Saturday                           
+2032/4/18         9                       Sunday                             
+2032/4/19         10                      Monday         Corn Rain           
+2032/4/20         11                      Tuesday                            
+2032/4/21         12                      Wednesday                          
+2032/4/22         13                      Thursday                           
+2032/4/23         14                      Friday                             
+2032/4/24         15                      Saturday                           
+2032/4/25         16                      Sunday                             
+2032/4/26         17                      Monday                             
+2032/4/27         18                      Tuesday                            
+2032/4/28         19                      Wednesday                          
+2032/4/29         20                      Thursday                           
+2032/4/30         21                      Friday                             
+2032/5/1          22                      Saturday                           
+2032/5/2          23                      Sunday                             
+2032/5/3          24                      Monday                             
+2032/5/4          25                      Tuesday                            
+2032/5/5          26                      Wednesday      Summer Commences    
+2032/5/6          27                      Thursday                           
+2032/5/7          28                      Friday                             
+2032/5/8          29                      Saturday                           
+2032/5/9          4th Lunar Month         Sunday                             
+2032/5/10         2                       Monday                             
+2032/5/11         3                       Tuesday                            
+2032/5/12         4                       Wednesday                          
+2032/5/13         5                       Thursday                           
+2032/5/14         6                       Friday                             
+2032/5/15         7                       Saturday                           
+2032/5/16         8                       Sunday                             
+2032/5/17         9                       Monday                             
+2032/5/18         10                      Tuesday                            
+2032/5/19         11                      Wednesday                          
+2032/5/20         12                      Thursday       Corn Forms          
+2032/5/21         13                      Friday                             
+2032/5/22         14                      Saturday                           
+2032/5/23         15                      Sunday                             
+2032/5/24         16                      Monday                             
+2032/5/25         17                      Tuesday                            
+2032/5/26         18                      Wednesday                          
+2032/5/27         19                      Thursday                           
+2032/5/28         20                      Friday                             
+2032/5/29         21                      Saturday                           
+2032/5/30         22                      Sunday                             
+2032/5/31         23                      Monday                             
+2032/6/1          24                      Tuesday                            
+2032/6/2          25                      Wednesday                          
+2032/6/3          26                      Thursday                           
+2032/6/4          27                      Friday                             
+2032/6/5          28                      Saturday       Corn on Ear         
+2032/6/6          29                      Sunday                             
+2032/6/7          30                      Monday                             
+2032/6/8          5th Lunar Month         Tuesday                            
+2032/6/9          2                       Wednesday                          
+2032/6/10         3                       Thursday                           
+2032/6/11         4                       Friday                             
+2032/6/12         5                       Saturday                           
+2032/6/13         6                       Sunday                             
+2032/6/14         7                       Monday                             
+2032/6/15         8                       Tuesday                            
+2032/6/16         9                       Wednesday                          
+2032/6/17         10                      Thursday                           
+2032/6/18         11                      Friday                             
+2032/6/19         12                      Saturday                           
+2032/6/20         13                      Sunday                             
+2032/6/21         14                      Monday         Summer Solstice     
+2032/6/22         15                      Tuesday                            
+2032/6/23         16                      Wednesday                          
+2032/6/24         17                      Thursday                           
+2032/6/25         18                      Friday                             
+2032/6/26         19                      Saturday                           
+2032/6/27         20                      Sunday                             
+2032/6/28         21                      Monday                             
+2032/6/29         22                      Tuesday                            
+2032/6/30         23                      Wednesday                          
+2032/7/1          24                      Thursday                           
+2032/7/2          25                      Friday                             
+2032/7/3          26                      Saturday                           
+2032/7/4          27                      Sunday                             
+2032/7/5          28                      Monday                             
+2032/7/6          29                      Tuesday        Moderate Heat       
+2032/7/7          6th Lunar Month         Wednesday                          
+2032/7/8          2                       Thursday                           
+2032/7/9          3                       Friday                             
+2032/7/10         4                       Saturday                           
+2032/7/11         5                       Sunday                             
+2032/7/12         6                       Monday                             
+2032/7/13         7                       Tuesday                            
+2032/7/14         8                       Wednesday                          
+2032/7/15         9                       Thursday                           
+2032/7/16         10                      Friday                             
+2032/7/17         11                      Saturday                           
+2032/7/18         12                      Sunday                             
+2032/7/19         13                      Monday                             
+2032/7/20         14                      Tuesday                            
+2032/7/21         15                      Wednesday                          
+2032/7/22         16                      Thursday       Great Heat          
+2032/7/23         17                      Friday                             
+2032/7/24         18                      Saturday                           
+2032/7/25         19                      Sunday                             
+2032/7/26         20                      Monday                             
+2032/7/27         21                      Tuesday                            
+2032/7/28         22                      Wednesday                          
+2032/7/29         23                      Thursday                           
+2032/7/30         24                      Friday                             
+2032/7/31         25                      Saturday                           
+2032/8/1          26                      Sunday                             
+2032/8/2          27                      Monday                             
+2032/8/3          28                      Tuesday                            
+2032/8/4          29                      Wednesday                          
+2032/8/5          30                      Thursday                           
+2032/8/6          7th Lunar Month         Friday                             
+2032/8/7          2                       Saturday       Autumn Commences    
+2032/8/8          3                       Sunday                             
+2032/8/9          4                       Monday                             
+2032/8/10         5                       Tuesday                            
+2032/8/11         6                       Wednesday                          
+2032/8/12         7                       Thursday                           
+2032/8/13         8                       Friday                             
+2032/8/14         9                       Saturday                           
+2032/8/15         10                      Sunday                             
+2032/8/16         11                      Monday                             
+2032/8/17         12                      Tuesday                            
+2032/8/18         13                      Wednesday                          
+2032/8/19         14                      Thursday                           
+2032/8/20         15                      Friday                             
+2032/8/21         16                      Saturday                           
+2032/8/22         17                      Sunday         End of Heat         
+2032/8/23         18                      Monday                             
+2032/8/24         19                      Tuesday                            
+2032/8/25         20                      Wednesday                          
+2032/8/26         21                      Thursday                           
+2032/8/27         22                      Friday                             
+2032/8/28         23                      Saturday                           
+2032/8/29         24                      Sunday                             
+2032/8/30         25                      Monday                             
+2032/8/31         26                      Tuesday                            
+2032/9/1          27                      Wednesday                          
+2032/9/2          28                      Thursday                           
+2032/9/3          29                      Friday                             
+2032/9/4          30                      Saturday                           
+2032/9/5          8th Lunar Month         Sunday                             
+2032/9/6          2                       Monday                             
+2032/9/7          3                       Tuesday        White Dew           
+2032/9/8          4                       Wednesday                          
+2032/9/9          5                       Thursday                           
+2032/9/10         6                       Friday                             
+2032/9/11         7                       Saturday                           
+2032/9/12         8                       Sunday                             
+2032/9/13         9                       Monday                             
+2032/9/14         10                      Tuesday                            
+2032/9/15         11                      Wednesday                          
+2032/9/16         12                      Thursday                           
+2032/9/17         13                      Friday                             
+2032/9/18         14                      Saturday                           
+2032/9/19         15                      Sunday                             
+2032/9/20         16                      Monday                             
+2032/9/21         17                      Tuesday                            
+2032/9/22         18                      Wednesday      Autumnal Equinox    
+2032/9/23         19                      Thursday                           
+2032/9/24         20                      Friday                             
+2032/9/25         21                      Saturday                           
+2032/9/26         22                      Sunday                             
+2032/9/27         23                      Monday                             
+2032/9/28         24                      Tuesday                            
+2032/9/29         25                      Wednesday                          
+2032/9/30         26                      Thursday                           
+2032/10/1         27                      Friday                             
+2032/10/2         28                      Saturday                           
+2032/10/3         29                      Sunday                             
+2032/10/4         9th Lunar Month         Monday                             
+2032/10/5         2                       Tuesday                            
+2032/10/6         3                       Wednesday                          
+2032/10/7         4                       Thursday                           
+2032/10/8         5                       Friday         Cold Dew            
+2032/10/9         6                       Saturday                           
+2032/10/10        7                       Sunday                             
+2032/10/11        8                       Monday                             
+2032/10/12        9                       Tuesday                            
+2032/10/13        10                      Wednesday                          
+2032/10/14        11                      Thursday                           
+2032/10/15        12                      Friday                             
+2032/10/16        13                      Saturday                           
+2032/10/17        14                      Sunday                             
+2032/10/18        15                      Monday                             
+2032/10/19        16                      Tuesday                            
+2032/10/20        17                      Wednesday                          
+2032/10/21        18                      Thursday                           
+2032/10/22        19                      Friday                             
+2032/10/23        20                      Saturday       Frost               
+2032/10/24        21                      Sunday                             
+2032/10/25        22                      Monday                             
+2032/10/26        23                      Tuesday                            
+2032/10/27        24                      Wednesday                          
+2032/10/28        25                      Thursday                           
+2032/10/29        26                      Friday                             
+2032/10/30        27                      Saturday                           
+2032/10/31        28                      Sunday                             
+2032/11/1         29                      Monday                             
+2032/11/2         30                      Tuesday                            
+2032/11/3         10th Lunar Month        Wednesday                          
+2032/11/4         2                       Thursday                           
+2032/11/5         3                       Friday                             
+2032/11/6         4                       Saturday                           
+2032/11/7         5                       Sunday         Winter Commences    
+2032/11/8         6                       Monday                             
+2032/11/9         7                       Tuesday                            
+2032/11/10        8                       Wednesday                          
+2032/11/11        9                       Thursday                           
+2032/11/12        10                      Friday                             
+2032/11/13        11                      Saturday                           
+2032/11/14        12                      Sunday                             
+2032/11/15        13                      Monday                             
+2032/11/16        14                      Tuesday                            
+2032/11/17        15                      Wednesday                          
+2032/11/18        16                      Thursday                           
+2032/11/19        17                      Friday                             
+2032/11/20        18                      Saturday                           
+2032/11/21        19                      Sunday                             
+2032/11/22        20                      Monday         Light Snow          
+2032/11/23        21                      Tuesday                            
+2032/11/24        22                      Wednesday                          
+2032/11/25        23                      Thursday                           
+2032/11/26        24                      Friday                             
+2032/11/27        25                      Saturday                           
+2032/11/28        26                      Sunday                             
+2032/11/29        27                      Monday                             
+2032/11/30        28                      Tuesday                            
+2032/12/1         29                      Wednesday                          
+2032/12/2         30                      Thursday                           
+2032/12/3         11th Lunar Month        Friday                             
+2032/12/4         2                       Saturday                           
+2032/12/5         3                       Sunday                             
+2032/12/6         4                       Monday         Heavy Snow          
+2032/12/7         5                       Tuesday                            
+2032/12/8         6                       Wednesday                          
+2032/12/9         7                       Thursday                           
+2032/12/10        8                       Friday                             
+2032/12/11        9                       Saturday                           
+2032/12/12        10                      Sunday                             
+2032/12/13        11                      Monday                             
+2032/12/14        12                      Tuesday                            
+2032/12/15        13                      Wednesday                          
+2032/12/16        14                      Thursday                           
+2032/12/17        15                      Friday                             
+2032/12/18        16                      Saturday                           
+2032/12/19        17                      Sunday                             
+2032/12/20        18                      Monday                             
+2032/12/21        19                      Tuesday        Winter Solstice     
+2032/12/22        20                      Wednesday                          
+2032/12/23        21                      Thursday                           
+2032/12/24        22                      Friday                             
+2032/12/25        23                      Saturday                           
+2032/12/26        24                      Sunday                             
+2032/12/27        25                      Monday                             
+2032/12/28        26                      Tuesday                            
+2032/12/29        27                      Wednesday                          
+2032/12/30        28                      Thursday                           
+2032/12/31        29                      Friday                             

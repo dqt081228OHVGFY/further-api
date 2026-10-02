@@ -1,0 +1,84 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "RelayFor" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e13]: 工作空间
+    - button "概览" [ref=e14] [cursor=pointer]
+    - button "API Key" [ref=e21] [cursor=pointer]
+    - button "模型与价格" [ref=e26] [cursor=pointer]
+    - button "使用文档" [ref=e29] [cursor=pointer]
+    - button "调用记录" [ref=e34] [cursor=pointer]
+    - generic [ref=e39]: 我的账户
+    - button "兑换额度" [ref=e40] [cursor=pointer]
+    - button "订阅计划" [ref=e46] [cursor=pointer]
+    - button "活动与签到" [ref=e50] [cursor=pointer]
+    - button "账户设置" [ref=e56] [cursor=pointer]
+    - generic [ref=e61]:
+      - button "收起侧边栏" [expanded] [ref=e62] [cursor=pointer]
+      - link "返回首页" [ref=e68] [cursor=pointer]:
+        - /url: /
+      - button "退出登录" [ref=e72] [cursor=pointer]
+  - main [ref=e77]:
+    - generic [ref=e78]:
+      - generic [ref=e79]: 中秋专场
+      - generic [ref=e81]: $0.00
+      - button "刷新" [ref=e82] [cursor=pointer]
+      - generic [ref=e89]:
+        - generic [ref=e92]: 月
+        - generic [ref=e94]: 中秋好时光
+    - generic [ref=e95]:
+      - text: ◇ ◇ ◇ ◇ ◇ ◇ ◇
+      - article [ref=e98]:
+        - navigation "当前位置" [ref=e99]:
+          - link "活动与签到" [ref=e100] [cursor=pointer]:
+            - /url: "#activities"
+          - generic [ref=e104]: /
+          - generic [ref=e105]: 中秋专场
+          - button "刷新节日活动" [ref=e106] [cursor=pointer]
+        - generic [ref=e113]:
+          - generic [ref=e114]:
+            - generic [ref=e115]: 农历八月十五
+            - heading "中秋节" [level=1] [ref=e116]
+            - paragraph [ref=e117]: 赏月、吃月饼、团圆宴。
+            - generic [ref=e118]:
+              - generic [ref=e119]: 节日活动进行中
+              - generic [ref=e121]: 2026.09.25
+          - generic [ref=e122]:
+            - img [aria-hidden] [ref=e123]:
+              - generic [ref=e128]: 团圆
+              - generic [ref=e136]: 月
+            - generic [ref=e147]: 家庭团圆
+        - generic [ref=e148]:
+          - generic [ref=e149]:
+            - heading "节日习俗" [level=2] [ref=e151]
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - generic [ref=e154]: "01"
+                - generic [ref=e155]:
+                  - heading "赏月" [level=3] [ref=e156]
+                  - paragraph [ref=e157]: 在农历八月十五夜赏月。
+              - generic [ref=e158]:
+                - generic [ref=e159]: "02"
+                - generic [ref=e160]:
+                  - heading "吃月饼" [level=3] [ref=e161]
+                  - paragraph [ref=e162]: 分食月饼，寓意团圆。
+              - generic [ref=e163]:
+                - generic [ref=e164]: "03"
+                - generic [ref=e165]:
+                  - heading "团圆宴" [level=3] [ref=e166]
+                  - paragraph [ref=e167]: 家人团聚，共享团圆宴。
+            - paragraph [ref=e168]:
+              - generic [ref=e172]: 节日寓意 家庭团圆
+          - complementary [ref=e173]:
+            - heading "中秋 · 月满好礼" [level=2] [ref=e174]
+            - paragraph [ref=e175]: 把这份小小的心意，留给下一次灵感与创造。
+            - generic [ref=e176]:
+              - generic [ref=e177]: 每人每日可得
+              - strong [ref=e178]: $0.002
+            - button "领取节日奖励" [ref=e179] [cursor=pointer]
+            - paragraph [ref=e185]: 活动期间每天可领取一次。
+        - generic [ref=e186]:
+          - generic [ref=e187]: 农历八月十五 · 中秋
+          - link "返回活动与签到" [ref=e188] [cursor=pointer]:
+            - /url: "#activities"
+  - text: ◇

@@ -1,0 +1,368 @@
+Gregorian-Lunar Calendar Conversion Table of 2044 (Jia-zi  -  year of the Mouse)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2044/1/1          2                       Friday                             
+2044/1/2          3                       Saturday                           
+2044/1/3          4                       Sunday                             
+2044/1/4          5                       Monday                             
+2044/1/5          6                       Tuesday                            
+2044/1/6          7                       Wednesday      Moderate Cold       
+2044/1/7          8                       Thursday                           
+2044/1/8          9                       Friday                             
+2044/1/9          10                      Saturday                           
+2044/1/10         11                      Sunday                             
+2044/1/11         12                      Monday                             
+2044/1/12         13                      Tuesday                            
+2044/1/13         14                      Wednesday                          
+2044/1/14         15                      Thursday                           
+2044/1/15         16                      Friday                             
+2044/1/16         17                      Saturday                           
+2044/1/17         18                      Sunday                             
+2044/1/18         19                      Monday                             
+2044/1/19         20                      Tuesday                            
+2044/1/20         21                      Wednesday      Severe Cold         
+2044/1/21         22                      Thursday                           
+2044/1/22         23                      Friday                             
+2044/1/23         24                      Saturday                           
+2044/1/24         25                      Sunday                             
+2044/1/25         26                      Monday                             
+2044/1/26         27                      Tuesday                            
+2044/1/27         28                      Wednesday                          
+2044/1/28         29                      Thursday                           
+2044/1/29         30                      Friday                             
+2044/1/30         1st Lunar Month         Saturday                           
+2044/1/31         2                       Sunday                             
+2044/2/1          3                       Monday                             
+2044/2/2          4                       Tuesday                            
+2044/2/3          5                       Wednesday                          
+2044/2/4          6                       Thursday       Spring Commences    
+2044/2/5          7                       Friday                             
+2044/2/6          8                       Saturday                           
+2044/2/7          9                       Sunday                             
+2044/2/8          10                      Monday                             
+2044/2/9          11                      Tuesday                            
+2044/2/10         12                      Wednesday                          
+2044/2/11         13                      Thursday                           
+2044/2/12         14                      Friday                             
+2044/2/13         15                      Saturday                           
+2044/2/14         16                      Sunday                             
+2044/2/15         17                      Monday                             
+2044/2/16         18                      Tuesday                            
+2044/2/17         19                      Wednesday                          
+2044/2/18         20                      Thursday                           
+2044/2/19         21                      Friday         Spring Showers      
+2044/2/20         22                      Saturday                           
+2044/2/21         23                      Sunday                             
+2044/2/22         24                      Monday                             
+2044/2/23         25                      Tuesday                            
+2044/2/24         26                      Wednesday                          
+2044/2/25         27                      Thursday                           
+2044/2/26         28                      Friday                             
+2044/2/27         29                      Saturday                           
+2044/2/28         30                      Sunday                             
+2044/2/29         2nd Lunar Month         Monday                             
+2044/3/1          2                       Tuesday                            
+2044/3/2          3                       Wednesday                          
+2044/3/3          4                       Thursday                           
+2044/3/4          5                       Friday                             
+2044/3/5          6                       Saturday       Insects Waken       
+2044/3/6          7                       Sunday                             
+2044/3/7          8                       Monday                             
+2044/3/8          9                       Tuesday                            
+2044/3/9          10                      Wednesday                          
+2044/3/10         11                      Thursday                           
+2044/3/11         12                      Friday                             
+2044/3/12         13                      Saturday                           
+2044/3/13         14                      Sunday                             
+2044/3/14         15                      Monday                             
+2044/3/15         16                      Tuesday                            
+2044/3/16         17                      Wednesday                          
+2044/3/17         18                      Thursday                           
+2044/3/18         19                      Friday                             
+2044/3/19         20                      Saturday                           
+2044/3/20         21                      Sunday         Vernal Equinox      
+2044/3/21         22                      Monday                             
+2044/3/22         23                      Tuesday                            
+2044/3/23         24                      Wednesday                          
+2044/3/24         25                      Thursday                           
+2044/3/25         26                      Friday                             
+2044/3/26         27                      Saturday                           
+2044/3/27         28                      Sunday                             
+2044/3/28         29                      Monday                             
+2044/3/29         3rd Lunar Month         Tuesday                            
+2044/3/30         2                       Wednesday                          
+2044/3/31         3                       Thursday                           
+2044/4/1          4                       Friday                             
+2044/4/2          5                       Saturday                           
+2044/4/3          6                       Sunday                             
+2044/4/4          7                       Monday         Bright & Clear      
+2044/4/5          8                       Tuesday                            
+2044/4/6          9                       Wednesday                          
+2044/4/7          10                      Thursday                           
+2044/4/8          11                      Friday                             
+2044/4/9          12                      Saturday                           
+2044/4/10         13                      Sunday                             
+2044/4/11         14                      Monday                             
+2044/4/12         15                      Tuesday                            
+2044/4/13         16                      Wednesday                          
+2044/4/14         17                      Thursday                           
+2044/4/15         18                      Friday                             
+2044/4/16         19                      Saturday                           
+2044/4/17         20                      Sunday                             
+2044/4/18         21                      Monday                             
+2044/4/19         22                      Tuesday        Corn Rain           
+2044/4/20         23                      Wednesday                          
+2044/4/21         24                      Thursday                           
+2044/4/22         25                      Friday                             
+2044/4/23         26                      Saturday                           
+2044/4/24         27                      Sunday                             
+2044/4/25         28                      Monday                             
+2044/4/26         29                      Tuesday                            
+2044/4/27         30                      Wednesday                          
+2044/4/28         4th Lunar Month         Thursday                           
+2044/4/29         2                       Friday                             
+2044/4/30         3                       Saturday                           
+2044/5/1          4                       Sunday                             
+2044/5/2          5                       Monday                             
+2044/5/3          6                       Tuesday                            
+2044/5/4          7                       Wednesday                          
+2044/5/5          8                       Thursday       Summer Commences    
+2044/5/6          9                       Friday                             
+2044/5/7          10                      Saturday                           
+2044/5/8          11                      Sunday                             
+2044/5/9          12                      Monday                             
+2044/5/10         13                      Tuesday                            
+2044/5/11         14                      Wednesday                          
+2044/5/12         15                      Thursday                           
+2044/5/13         16                      Friday                             
+2044/5/14         17                      Saturday                           
+2044/5/15         18                      Sunday                             
+2044/5/16         19                      Monday                             
+2044/5/17         20                      Tuesday                            
+2044/5/18         21                      Wednesday                          
+2044/5/19         22                      Thursday                           
+2044/5/20         23                      Friday         Corn Forms          
+2044/5/21         24                      Saturday                           
+2044/5/22         25                      Sunday                             
+2044/5/23         26                      Monday                             
+2044/5/24         27                      Tuesday                            
+2044/5/25         28                      Wednesday                          
+2044/5/26         29                      Thursday                           
+2044/5/27         5th Lunar Month         Friday                             
+2044/5/28         2                       Saturday                           
+2044/5/29         3                       Sunday                             
+2044/5/30         4                       Monday                             
+2044/5/31         5                       Tuesday                            
+2044/6/1          6                       Wednesday                          
+2044/6/2          7                       Thursday                           
+2044/6/3          8                       Friday                             
+2044/6/4          9                       Saturday                           
+2044/6/5          10                      Sunday         Corn on Ear         
+2044/6/6          11                      Monday                             
+2044/6/7          12                      Tuesday                            
+2044/6/8          13                      Wednesday                          
+2044/6/9          14                      Thursday                           
+2044/6/10         15                      Friday                             
+2044/6/11         16                      Saturday                           
+2044/6/12         17                      Sunday                             
+2044/6/13         18                      Monday                             
+2044/6/14         19                      Tuesday                            
+2044/6/15         20                      Wednesday                          
+2044/6/16         21                      Thursday                           
+2044/6/17         22                      Friday                             
+2044/6/18         23                      Saturday                           
+2044/6/19         24                      Sunday                             
+2044/6/20         25                      Monday                             
+2044/6/21         26                      Tuesday        Summer Solstice     
+2044/6/22         27                      Wednesday                          
+2044/6/23         28                      Thursday                           
+2044/6/24         29                      Friday                             
+2044/6/25         6th Lunar Month         Saturday                           
+2044/6/26         2                       Sunday                             
+2044/6/27         3                       Monday                             
+2044/6/28         4                       Tuesday                            
+2044/6/29         5                       Wednesday                          
+2044/6/30         6                       Thursday                           
+2044/7/1          7                       Friday                             
+2044/7/2          8                       Saturday                           
+2044/7/3          9                       Sunday                             
+2044/7/4          10                      Monday                             
+2044/7/5          11                      Tuesday                            
+2044/7/6          12                      Wednesday      Moderate Heat       
+2044/7/7          13                      Thursday                           
+2044/7/8          14                      Friday                             
+2044/7/9          15                      Saturday                           
+2044/7/10         16                      Sunday                             
+2044/7/11         17                      Monday                             
+2044/7/12         18                      Tuesday                            
+2044/7/13         19                      Wednesday                          
+2044/7/14         20                      Thursday                           
+2044/7/15         21                      Friday                             
+2044/7/16         22                      Saturday                           
+2044/7/17         23                      Sunday                             
+2044/7/18         24                      Monday                             
+2044/7/19         25                      Tuesday                            
+2044/7/20         26                      Wednesday                          
+2044/7/21         27                      Thursday                           
+2044/7/22         28                      Friday         Great Heat          
+2044/7/23         29                      Saturday                           
+2044/7/24         30                      Sunday                             
+2044/7/25         7th Lunar Month         Monday                             
+2044/7/26         2                       Tuesday                            
+2044/7/27         3                       Wednesday                          
+2044/7/28         4                       Thursday                           
+2044/7/29         5                       Friday                             
+2044/7/30         6                       Saturday                           
+2044/7/31         7                       Sunday                             
+2044/8/1          8                       Monday                             
+2044/8/2          9                       Tuesday                            
+2044/8/3          10                      Wednesday                          
+2044/8/4          11                      Thursday                           
+2044/8/5          12                      Friday                             
+2044/8/6          13                      Saturday                           
+2044/8/7          14                      Sunday         Autumn Commences    
+2044/8/8          15                      Monday                             
+2044/8/9          16                      Tuesday                            
+2044/8/10         17                      Wednesday                          
+2044/8/11         18                      Thursday                           
+2044/8/12         19                      Friday                             
+2044/8/13         20                      Saturday                           
+2044/8/14         21                      Sunday                             
+2044/8/15         22                      Monday                             
+2044/8/16         23                      Tuesday                            
+2044/8/17         24                      Wednesday                          
+2044/8/18         25                      Thursday                           
+2044/8/19         26                      Friday                             
+2044/8/20         27                      Saturday                           
+2044/8/21         28                      Sunday                             
+2044/8/22         29                      Monday         End of Heat         
+2044/8/23         7th Lunar Month         Tuesday                            
+2044/8/24         2                       Wednesday                          
+2044/8/25         3                       Thursday                           
+2044/8/26         4                       Friday                             
+2044/8/27         5                       Saturday                           
+2044/8/28         6                       Sunday                             
+2044/8/29         7                       Monday                             
+2044/8/30         8                       Tuesday                            
+2044/8/31         9                       Wednesday                          
+2044/9/1          10                      Thursday                           
+2044/9/2          11                      Friday                             
+2044/9/3          12                      Saturday                           
+2044/9/4          13                      Sunday                             
+2044/9/5          14                      Monday                             
+2044/9/6          15                      Tuesday                            
+2044/9/7          16                      Wednesday      White Dew           
+2044/9/8          17                      Thursday                           
+2044/9/9          18                      Friday                             
+2044/9/10         19                      Saturday                           
+2044/9/11         20                      Sunday                             
+2044/9/12         21                      Monday                             
+2044/9/13         22                      Tuesday                            
+2044/9/14         23                      Wednesday                          
+2044/9/15         24                      Thursday                           
+2044/9/16         25                      Friday                             
+2044/9/17         26                      Saturday                           
+2044/9/18         27                      Sunday                             
+2044/9/19         28                      Monday                             
+2044/9/20         29                      Tuesday                            
+2044/9/21         8th Lunar Month         Wednesday                          
+2044/9/22         2                       Thursday       Autumnal Equinox    
+2044/9/23         3                       Friday                             
+2044/9/24         4                       Saturday                           
+2044/9/25         5                       Sunday                             
+2044/9/26         6                       Monday                             
+2044/9/27         7                       Tuesday                            
+2044/9/28         8                       Wednesday                          
+2044/9/29         9                       Thursday                           
+2044/9/30         10                      Friday                             
+2044/10/1         11                      Saturday                           
+2044/10/2         12                      Sunday                             
+2044/10/3         13                      Monday                             
+2044/10/4         14                      Tuesday                            
+2044/10/5         15                      Wednesday                          
+2044/10/6         16                      Thursday                           
+2044/10/7         17                      Friday         Cold Dew            
+2044/10/8         18                      Saturday                           
+2044/10/9         19                      Sunday                             
+2044/10/10        20                      Monday                             
+2044/10/11        21                      Tuesday                            
+2044/10/12        22                      Wednesday                          
+2044/10/13        23                      Thursday                           
+2044/10/14        24                      Friday                             
+2044/10/15        25                      Saturday                           
+2044/10/16        26                      Sunday                             
+2044/10/17        27                      Monday                             
+2044/10/18        28                      Tuesday                            
+2044/10/19        29                      Wednesday                          
+2044/10/20        30                      Thursday                           
+2044/10/21        9th Lunar Month         Friday                             
+2044/10/22        2                       Saturday                           
+2044/10/23        3                       Sunday         Frost               
+2044/10/24        4                       Monday                             
+2044/10/25        5                       Tuesday                            
+2044/10/26        6                       Wednesday                          
+2044/10/27        7                       Thursday                           
+2044/10/28        8                       Friday                             
+2044/10/29        9                       Saturday                           
+2044/10/30        10                      Sunday                             
+2044/10/31        11                      Monday                             
+2044/11/1         12                      Tuesday                            
+2044/11/2         13                      Wednesday                          
+2044/11/3         14                      Thursday                           
+2044/11/4         15                      Friday                             
+2044/11/5         16                      Saturday                           
+2044/11/6         17                      Sunday                             
+2044/11/7         18                      Monday         Winter Commences    
+2044/11/8         19                      Tuesday                            
+2044/11/9         20                      Wednesday                          
+2044/11/10        21                      Thursday                           
+2044/11/11        22                      Friday                             
+2044/11/12        23                      Saturday                           
+2044/11/13        24                      Sunday                             
+2044/11/14        25                      Monday                             
+2044/11/15        26                      Tuesday                            
+2044/11/16        27                      Wednesday                          
+2044/11/17        28                      Thursday                           
+2044/11/18        29                      Friday                             
+2044/11/19        10th Lunar Month        Saturday                           
+2044/11/20        2                       Sunday                             
+2044/11/21        3                       Monday                             
+2044/11/22        4                       Tuesday        Light Snow          
+2044/11/23        5                       Wednesday                          
+2044/11/24        6                       Thursday                           
+2044/11/25        7                       Friday                             
+2044/11/26        8                       Saturday                           
+2044/11/27        9                       Sunday                             
+2044/11/28        10                      Monday                             
+2044/11/29        11                      Tuesday                            
+2044/11/30        12                      Wednesday                          
+2044/12/1         13                      Thursday                           
+2044/12/2         14                      Friday                             
+2044/12/3         15                      Saturday                           
+2044/12/4         16                      Sunday                             
+2044/12/5         17                      Monday                             
+2044/12/6         18                      Tuesday        Heavy Snow          
+2044/12/7         19                      Wednesday                          
+2044/12/8         20                      Thursday                           
+2044/12/9         21                      Friday                             
+2044/12/10        22                      Saturday                           
+2044/12/11        23                      Sunday                             
+2044/12/12        24                      Monday                             
+2044/12/13        25                      Tuesday                            
+2044/12/14        26                      Wednesday                          
+2044/12/15        27                      Thursday                           
+2044/12/16        28                      Friday                             
+2044/12/17        29                      Saturday                           
+2044/12/18        30                      Sunday                             
+2044/12/19        11th Lunar Month        Monday                             
+2044/12/20        2                       Tuesday                            
+2044/12/21        3                       Wednesday      Winter Solstice     
+2044/12/22        4                       Thursday                           
+2044/12/23        5                       Friday                             
+2044/12/24        6                       Saturday                           
+2044/12/25        7                       Sunday                             
+2044/12/26        8                       Monday                             
+2044/12/27        9                       Tuesday                            
+2044/12/28        10                      Wednesday                          
+2044/12/29        11                      Thursday                           
+2044/12/30        12                      Friday                             
+2044/12/31        13                      Saturday                           

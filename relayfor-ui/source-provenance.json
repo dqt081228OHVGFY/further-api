@@ -1,0 +1,388 @@
+{
+  "restorationVersion": 1,
+  "sourceRoot": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary",
+  "resourceUrlPrefix": "/relayfor-assets/",
+  "assetDirectory": "assets",
+  "productionReady": false,
+  "legacyPolicy": "Original source is recovered for faithful UI/API integration. Legacy business scripts and auth handlers must not execute. All HTML script references are inert until the integration owner replaces obsolete behavior. Do not serve .agent-work.",
+  "pages": {
+    "/": "index.html",
+    "/auth/": "auth/index.html",
+    "/console/": "console/index.html",
+    "/admin/": "admin/index.html"
+  },
+  "files": [
+    {
+      "target": "index.html",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\index.html",
+      "sourceBytes": 4669,
+      "sourceSha256": "bcfe9e41f8474026873cbbcf1fbdbc1b0c44fbfc965542f4bfc8477e47a3e19a",
+      "restoredBytes": 4857,
+      "restoredSha256": "d0040951fcfbdab8144f2542d69919c4250d089a86ac875360fbf550f63e15ba",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\index.html",
+      "transformations": [
+        "Local script/style/font resource URLs use /relayfor-assets/.",
+        "Legacy scripts are inert source references until real New API integration replaces their API/auth/business initialization."
+      ],
+      "runtimeReady": false
+    },
+    {
+      "target": "auth/index.html",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\auth@@mode=login\\index.html",
+      "sourceBytes": 2959,
+      "sourceSha256": "87733f8bfebc6ca7e1e72b8d300a13d8d1a2b385ce588a40bb63de4d447d63c8",
+      "restoredBytes": 3147,
+      "restoredSha256": "5260e10aae5ba20e882193d20310524ad143fea657bbdfbe32f7e8bb46093b31",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\auth@@mode=login\\index.html",
+      "transformations": [
+        "Local script/style/font resource URLs use /relayfor-assets/.",
+        "Legacy scripts are inert source references until real New API integration replaces their API/auth/business initialization."
+      ],
+      "runtimeReady": false
+    },
+    {
+      "target": "console/index.html",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\probe-assets\\a.html",
+      "sourceBytes": 49052,
+      "sourceSha256": "794c5682202058def6aaf7a1a79f15f9bd8bb2755f75edebfbeb54a103a4e4d4",
+      "restoredBytes": 49498,
+      "restoredSha256": "c9a48e4e7ebbb98cdc14906d632321dc752e5df3630f4893a0353e8da43d22a3",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\probe-assets\\a.html",
+      "transformations": [
+        "Local script/style/font resource URLs use /relayfor-assets/.",
+        "Legacy scripts are inert source references until real New API integration replaces their API/auth/business initialization."
+      ],
+      "runtimeReady": false
+    },
+    {
+      "target": "admin/index.html",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin\\index.html",
+      "sourceBytes": 117534,
+      "sourceSha256": "e217042337c3df9a83dcf0efed156d1582bff7582a6247a1c7cf13f9a5f9600a",
+      "restoredBytes": 118366,
+      "restoredSha256": "6db3e11faa364e84b7bdc786b8800ebef675de8d6b33d0dc92dae6d01ccc0046",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin\\index.html",
+      "transformations": [
+        "Local script/style/font resource URLs use /relayfor-assets/.",
+        "Legacy scripts are inert source references until real New API integration replaces their API/auth/business initialization."
+      ],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/app.css",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\app.css",
+      "sourceBytes": 121614,
+      "sourceSha256": "c1067dd24f58dacc80cec8823ea38d42aa22fe57a2d5a6c1d3008eb994a0eb62",
+      "restoredBytes": 121623,
+      "restoredSha256": "f3b6dc23bded41383a82fce5f18f8d1ad29d25811ee571ab03f696db70fce7b1",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\app.css",
+      "transformations": [
+        "Local script/style/font resource URLs use /relayfor-assets/."
+      ],
+      "runtimeReady": true
+    },
+    {
+      "target": "assets/app.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\app.js",
+      "sourceBytes": 47669,
+      "sourceSha256": "1b89c2eb3362298f9f113f385281abc0b26cfe2b5126250a794ae1fb9dfe92e3",
+      "restoredBytes": 47669,
+      "restoredSha256": "1b89c2eb3362298f9f113f385281abc0b26cfe2b5126250a794ae1fb9dfe92e3",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\app.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/site.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\site.js",
+      "sourceBytes": 1767,
+      "sourceSha256": "372f7dbcca7fd69d0723b1bc6a1df3e50d87b067c7f31f69e73248735fc24805",
+      "restoredBytes": 1767,
+      "restoredSha256": "372f7dbcca7fd69d0723b1bc6a1df3e50d87b067c7f31f69e73248735fc24805",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\site.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/resource-loader.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\resource-loader.js",
+      "sourceBytes": 3269,
+      "sourceSha256": "2dc7ef8ae8a7a6e8f196c6c20eed32283e0574c4f0e4412898e668e9c09108b9",
+      "restoredBytes": 3269,
+      "restoredSha256": "2dc7ef8ae8a7a6e8f196c6c20eed32283e0574c4f0e4412898e668e9c09108b9",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\resource-loader.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/console.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\console.js",
+      "sourceBytes": 105802,
+      "sourceSha256": "500e8dc4311f78e43ce2e8c0a9f6c7b36c63d4fdf10949bceef9a3fe83c9126b",
+      "restoredBytes": 105802,
+      "restoredSha256": "500e8dc4311f78e43ce2e8c0a9f6c7b36c63d4fdf10949bceef9a3fe83c9126b",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\console.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/console-models.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\console-models.js",
+      "sourceBytes": 16550,
+      "sourceSha256": "95ddf89ccec352abcdb3bf1f88bcf3a0e5271a8b73e347db68ace2e8e6e79c6c",
+      "restoredBytes": 16550,
+      "restoredSha256": "95ddf89ccec352abcdb3bf1f88bcf3a0e5271a8b73e347db68ace2e8e6e79c6c",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\console-models.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/material-symbols-outlined-9cee10d72b8e.woff2",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\assets\\material-symbols-outlined-9cee10d72b8e.woff2",
+      "sourceBytes": 7248,
+      "sourceSha256": "9cee10d72b8e2d64f0a4e255cbdb147998441a4e8d393e6724f9a56d495baee7",
+      "restoredBytes": 7248,
+      "restoredSha256": "9cee10d72b8e2d64f0a4e255cbdb147998441a4e8d393e6724f9a56d495baee7",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\mirror\\assets\\material-symbols-outlined-9cee10d72b8e.woff2",
+      "transformations": [],
+      "runtimeReady": true
+    },
+    {
+      "target": "assets/admin/admin.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin.js",
+      "sourceBytes": 128556,
+      "sourceSha256": "4339aeca697a873076ea75bb7f6d54b674f20a7c39333dcb90d503ba317a5655",
+      "restoredBytes": 128556,
+      "restoredSha256": "4339aeca697a873076ea75bb7f6d54b674f20a7c39333dcb90d503ba317a5655",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/admin-overview.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin-overview.js",
+      "sourceBytes": 9458,
+      "sourceSha256": "d902f3d2571229e07a4ec88d7df92d0012b1085be1d70eac8658b7b5965c3dcd",
+      "restoredBytes": 9458,
+      "restoredSha256": "d902f3d2571229e07a4ec88d7df92d0012b1085be1d70eac8658b7b5965c3dcd",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin-overview.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/admin-settings.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin-settings.js",
+      "sourceBytes": 25842,
+      "sourceSha256": "8eceec9dbaa8dd5fe5123069ea7d4d89728b7be884820d92f376e3f6b59c284c",
+      "restoredBytes": 25842,
+      "restoredSha256": "8eceec9dbaa8dd5fe5123069ea7d4d89728b7be884820d92f376e3f6b59c284c",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin-settings.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/admin-models.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin-models.js",
+      "sourceBytes": 26374,
+      "sourceSha256": "2deab7ec072679907796d238009afa2a3a2eb81a02e2d98b5a3a8c9a1f12532b",
+      "restoredBytes": 26374,
+      "restoredSha256": "2deab7ec072679907796d238009afa2a3a2eb81a02e2d98b5a3a8c9a1f12532b",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin-models.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/admin-routing.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\admin-routing.js",
+      "sourceBytes": 28098,
+      "sourceSha256": "f0122264db901200dcb4ba840d38969d1bfa22a9756f5033418e583fbdd6b94c",
+      "restoredBytes": 28098,
+      "restoredSha256": "f0122264db901200dcb4ba840d38969d1bfa22a9756f5033418e583fbdd6b94c",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\admin-routing.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/channel-keys.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\channel-keys.js",
+      "sourceBytes": 14173,
+      "sourceSha256": "6c01d1323222e65cf96b828669b51ec0d37489fa25942e7bf5daf467364bddeb",
+      "restoredBytes": 14173,
+      "restoredSha256": "6c01d1323222e65cf96b828669b51ec0d37489fa25942e7bf5daf467364bddeb",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\channel-keys.js",
+      "transformations": [],
+      "runtimeReady": false
+    },
+    {
+      "target": "assets/admin/disabled-channels.js",
+      "sourcePath": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\disabled-channels.js",
+      "sourceBytes": 5469,
+      "sourceSha256": "f786495a6c8117c32f4e5d26433d67b996edbbc0fd03af77e38201adcaf8b34d",
+      "restoredBytes": 5469,
+      "restoredSha256": "f786495a6c8117c32f4e5d26433d67b996edbbc0fd03af77e38201adcaf8b34d",
+      "originalArchivePath": "D:\\test\\relayfor-rebuild\\.agent-work\\relayfor-original-source\\admin-mirror\\disabled-channels.js",
+      "transformations": [],
+      "runtimeReady": false
+    }
+  ],
+  "sameNameCollisions": [
+    {
+      "name": "app.css",
+      "userSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\app.css",
+      "adminSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\app.css",
+      "identical": true,
+      "sha256": "c1067dd24f58dacc80cec8823ea38d42aa22fe57a2d5a6c1d3008eb994a0eb62",
+      "resolution": "One shared assets/app.css"
+    },
+    {
+      "name": "app.js",
+      "userSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\app.js",
+      "adminSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\app.js",
+      "identical": true,
+      "sha256": "1b89c2eb3362298f9f113f385281abc0b26cfe2b5126250a794ae1fb9dfe92e3",
+      "resolution": "One shared assets/app.js"
+    },
+    {
+      "name": "resource-loader.js",
+      "userSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\mirror\\resource-loader.js",
+      "adminSource": "C:\\Users\\Administrator\\Desktop\\relayfor-rebuild-summary\\admin-mirror\\resource-loader.js",
+      "identical": true,
+      "sha256": "2dc7ef8ae8a7a6e8f196c6c20eed32283e0574c4f0e4412898e668e9c09108b9",
+      "resolution": "One shared assets/resource-loader.js"
+    }
+  ],
+  "resourceClosure": {
+    "allPresent": true,
+    "references": [
+      {
+        "page": "index.html",
+        "url": "/relayfor-assets/app.css",
+        "exists": true
+      },
+      {
+        "page": "index.html",
+        "url": "/relayfor-assets/app.js",
+        "exists": true
+      },
+      {
+        "page": "index.html",
+        "url": "/relayfor-assets/site.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/app.css",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/app.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/resource-loader.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/admin-overview.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/admin-settings.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/admin-models.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/admin-routing.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/disabled-channels.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/channel-keys.js",
+        "exists": true
+      },
+      {
+        "page": "admin\\index.html",
+        "url": "/relayfor-assets/admin/admin.js",
+        "exists": true
+      },
+      {
+        "page": "auth\\index.html",
+        "url": "/relayfor-assets/app.css",
+        "exists": true
+      },
+      {
+        "page": "auth\\index.html",
+        "url": "/relayfor-assets/app.js",
+        "exists": true
+      },
+      {
+        "page": "auth\\index.html",
+        "url": "/relayfor-assets/site.js",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/app.css",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/app.js",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/resource-loader.js",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/site.js",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/console-models.js",
+        "exists": true
+      },
+      {
+        "page": "console\\index.html",
+        "url": "/relayfor-assets/console.js",
+        "exists": true
+      },
+      {
+        "page": "assets\\app.css",
+        "url": "/relayfor-assets/material-symbols-outlined-9cee10d72b8e.woff2",
+        "exists": true
+      }
+    ]
+  },
+  "navigationTargetsForIntegration": [
+    "/",
+    "/auth/?mode=login",
+    "/auth/?mode=register",
+    "/console/",
+    "/console/#tokens",
+    "/prepaid/"
+  ],
+  "excluded": [
+    "All fixture scripts/data and cached /api JSON",
+    "Legacy Node preview server and runtime auth configuration",
+    "Legacy prepaid page/script (original business feature)",
+    "No synthetic accounts, tokens, or credentials copied"
+  ]
+}

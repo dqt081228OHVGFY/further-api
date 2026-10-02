@@ -1,0 +1,45 @@
+/* Administration screens use distinct work surfaces for inventory and operations. */
+.admin-minute-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.admin-minute-grid > div { display:grid; grid-template-columns:24px 1fr; align-items:center; gap:12px; background:var(--md-sys-color-surface-container-low); border-radius:15px; padding:19px; }
+.admin-minute-grid .material-symbol { color:var(--md-sys-color-primary); font-size:20px; }
+.admin-minute-grid small { font-size:10px; color:var(--md-sys-color-on-surface-variant); }
+.admin-minute-grid b { grid-column:1/-1; font-weight:600; font-size:25px; letter-spacing:-.6px; }
+.admin-workspace-shortcuts { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+@media(max-width:600px) { .admin-minute-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .admin-minute-grid > div { padding:15px; } .admin-minute-grid b { font-size:23px; overflow-wrap:anywhere; } }
+body[data-page='admin'] [data-admin-channel-rows] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+body[data-page='admin'] [data-admin-channel-rows] > .empty { grid-column:1/-1; }
+body[data-page='admin'] .channel-row { display:grid; grid-template-columns:40px minmax(0,1fr); gap:14px; padding:22px; margin:0; background:var(--md-sys-color-surface-container-low); border:1px solid transparent; }
+body[data-page='admin'] .channel-radio { width:40px; height:40px; border-radius:13px; background:var(--md-sys-color-primary-container); color:var(--md-sys-color-primary); }
+body[data-page='admin'] .channel-name { font-size:15px; font-weight:600; }
+body[data-page='admin'] .channel-target { font-size:11px; margin-top:7px; overflow-wrap:anywhere; }
+body[data-page='admin'] .channel-actions { grid-column:1/-1; display:flex; align-items:center; justify-content:flex-end; gap:5px; padding:8px; margin-top:5px; border:0; border-radius:12px; background:var(--md-sys-color-surface); }
+body[data-page='admin'] .channel-actions > span { margin-right:auto; }
+body[data-page='admin'] [data-model-rows] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+body[data-page='admin'] [data-model-rows] > .empty { grid-column:1/-1; }
+body[data-page='admin'] .admin-model-item { display:grid; grid-template-columns:30px minmax(0,1fr); gap:12px; align-items:start; padding:21px; margin:0; border-radius:17px; border:1px solid var(--md-sys-color-outline-variant); }
+body[data-page='admin'] .admin-model-item > .material-symbol { color:var(--md-sys-color-primary); padding-top:1px; }
+body[data-page='admin'] .admin-model-item .list-item-title { font-size:15px; }
+body[data-page='admin'] .admin-model-item .list-item-sub { overflow-wrap:anywhere; margin-top:5px; line-height:1.7; }
+body[data-page='admin'] .admin-model-item .list-metrics { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; padding:15px; border-radius:13px; background:var(--md-sys-color-surface-container-low); text-align:left; }
+body[data-page='admin'] .admin-model-item .list-metrics > div { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; font-size:10px; }
+body[data-page='admin'] .admin-model-item .list-metrics b { font-size:12px; overflow-wrap:anywhere; }
+body[data-page='admin'] .admin-model-item .list-actions { grid-column:1/-1; justify-content:flex-start; flex-wrap:wrap; gap:6px; }
+body[data-page='admin'] .admin-model-item .tag { font-size:9px; }
+body[data-page='admin'] [data-admin-model-page='health'] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+body[data-page='admin'] [data-admin-model-page='health'].hidden { display:none; }
+body[data-page='admin'] [data-admin-model-page='health'] > .card-head,body[data-page='admin'] [data-admin-model-page='health'] > .model-health-summary { grid-column:1/-1; }
+body[data-page='admin'] [data-admin-model-page='health'] > .md-card { margin-bottom:0; }
+body[data-page='admin'] .health-table { font-size:11px; }
+body[data-page='admin'] .health-table th { font-size:10px; color:var(--md-sys-color-on-surface-variant); }
+body[data-page='admin'] .model-health-summary .settings-meta { padding:22px; }
+body[data-page='admin'] .model-health-summary b { font-size:25px; letter-spacing:-.7px; }
+body[data-page='admin'] .filter-card { background:var(--md-sys-color-surface-container-low); border-color:transparent; }
+body[data-page='admin'] .filter-card .md-input { background:var(--md-sys-color-surface); }
+body[data-page='admin'] [data-panel='registration-codes'] .code-batch-card,body[data-page='admin'] [data-panel='prepaid-cards'] .code-batch-card { border-radius:17px; padding:18px; background:var(--md-sys-color-surface-container-low); margin-bottom:14px; }
+body[data-page='admin'] .settings-subpage > .md-card { max-width:1050px; }
+body[data-page='admin'] .settings-page-head { padding:8px 0 20px; }
+body[data-page='admin'] [data-panel='logs'] .usage-table-card { padding:0; overflow:hidden; }
+body[data-page='admin'] [data-panel='logs'] .usage-table-scroll { padding:0 12px; }
+body[data-page='admin'] [data-panel='logs'] .usage-pagination { padding:18px 22px; }
+@media(max-width:1200px) { .admin-minute-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } body[data-page='admin'] [data-admin-channel-rows],body[data-page='admin'] [data-model-rows],body[data-page='admin'] [data-admin-model-page='health'] { grid-template-columns:1fr; } }
+@media(max-width:600px) { .admin-minute-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .token-usage-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } body[data-page='admin'] .admin-model-item { padding:16px; } body[data-page='admin'] .channel-row { padding:17px; } body[data-page='admin'] .admin-model-item .list-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }

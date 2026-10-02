@@ -1,0 +1,368 @@
+Gregorian-Lunar Calendar Conversion Table of 2040 (Geng-shen  -  year of the Monkey)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2040/1/1          17                      Sunday                             
+2040/1/2          18                      Monday                             
+2040/1/3          19                      Tuesday                            
+2040/1/4          20                      Wednesday                          
+2040/1/5          21                      Thursday                           
+2040/1/6          22                      Friday         Moderate Cold       
+2040/1/7          23                      Saturday                           
+2040/1/8          24                      Sunday                             
+2040/1/9          25                      Monday                             
+2040/1/10         26                      Tuesday                            
+2040/1/11         27                      Wednesday                          
+2040/1/12         28                      Thursday                           
+2040/1/13         29                      Friday                             
+2040/1/14         12th Lunar Month        Saturday                           
+2040/1/15         2                       Sunday                             
+2040/1/16         3                       Monday                             
+2040/1/17         4                       Tuesday                            
+2040/1/18         5                       Wednesday                          
+2040/1/19         6                       Thursday                           
+2040/1/20         7                       Friday         Severe Cold         
+2040/1/21         8                       Saturday                           
+2040/1/22         9                       Sunday                             
+2040/1/23         10                      Monday                             
+2040/1/24         11                      Tuesday                            
+2040/1/25         12                      Wednesday                          
+2040/1/26         13                      Thursday                           
+2040/1/27         14                      Friday                             
+2040/1/28         15                      Saturday                           
+2040/1/29         16                      Sunday                             
+2040/1/30         17                      Monday                             
+2040/1/31         18                      Tuesday                            
+2040/2/1          19                      Wednesday                          
+2040/2/2          20                      Thursday                           
+2040/2/3          21                      Friday                             
+2040/2/4          22                      Saturday       Spring Commences    
+2040/2/5          23                      Sunday                             
+2040/2/6          24                      Monday                             
+2040/2/7          25                      Tuesday                            
+2040/2/8          26                      Wednesday                          
+2040/2/9          27                      Thursday                           
+2040/2/10         28                      Friday                             
+2040/2/11         29                      Saturday                           
+2040/2/12         1st Lunar Month         Sunday                             
+2040/2/13         2                       Monday                             
+2040/2/14         3                       Tuesday                            
+2040/2/15         4                       Wednesday                          
+2040/2/16         5                       Thursday                           
+2040/2/17         6                       Friday                             
+2040/2/18         7                       Saturday                           
+2040/2/19         8                       Sunday         Spring Showers      
+2040/2/20         9                       Monday                             
+2040/2/21         10                      Tuesday                            
+2040/2/22         11                      Wednesday                          
+2040/2/23         12                      Thursday                           
+2040/2/24         13                      Friday                             
+2040/2/25         14                      Saturday                           
+2040/2/26         15                      Sunday                             
+2040/2/27         16                      Monday                             
+2040/2/28         17                      Tuesday                            
+2040/2/29         18                      Wednesday                          
+2040/3/1          19                      Thursday                           
+2040/3/2          20                      Friday                             
+2040/3/3          21                      Saturday                           
+2040/3/4          22                      Sunday                             
+2040/3/5          23                      Monday         Insects Waken       
+2040/3/6          24                      Tuesday                            
+2040/3/7          25                      Wednesday                          
+2040/3/8          26                      Thursday                           
+2040/3/9          27                      Friday                             
+2040/3/10         28                      Saturday                           
+2040/3/11         29                      Sunday                             
+2040/3/12         30                      Monday                             
+2040/3/13         2nd Lunar Month         Tuesday                            
+2040/3/14         2                       Wednesday                          
+2040/3/15         3                       Thursday                           
+2040/3/16         4                       Friday                             
+2040/3/17         5                       Saturday                           
+2040/3/18         6                       Sunday                             
+2040/3/19         7                       Monday                             
+2040/3/20         8                       Tuesday        Vernal Equinox      
+2040/3/21         9                       Wednesday                          
+2040/3/22         10                      Thursday                           
+2040/3/23         11                      Friday                             
+2040/3/24         12                      Saturday                           
+2040/3/25         13                      Sunday                             
+2040/3/26         14                      Monday                             
+2040/3/27         15                      Tuesday                            
+2040/3/28         16                      Wednesday                          
+2040/3/29         17                      Thursday                           
+2040/3/30         18                      Friday                             
+2040/3/31         19                      Saturday                           
+2040/4/1          20                      Sunday                             
+2040/4/2          21                      Monday                             
+2040/4/3          22                      Tuesday                            
+2040/4/4          23                      Wednesday      Bright & Clear      
+2040/4/5          24                      Thursday                           
+2040/4/6          25                      Friday                             
+2040/4/7          26                      Saturday                           
+2040/4/8          27                      Sunday                             
+2040/4/9          28                      Monday                             
+2040/4/10         29                      Tuesday                            
+2040/4/11         3rd Lunar Month         Wednesday                          
+2040/4/12         2                       Thursday                           
+2040/4/13         3                       Friday                             
+2040/4/14         4                       Saturday                           
+2040/4/15         5                       Sunday                             
+2040/4/16         6                       Monday                             
+2040/4/17         7                       Tuesday                            
+2040/4/18         8                       Wednesday                          
+2040/4/19         9                       Thursday       Corn Rain           
+2040/4/20         10                      Friday                             
+2040/4/21         11                      Saturday                           
+2040/4/22         12                      Sunday                             
+2040/4/23         13                      Monday                             
+2040/4/24         14                      Tuesday                            
+2040/4/25         15                      Wednesday                          
+2040/4/26         16                      Thursday                           
+2040/4/27         17                      Friday                             
+2040/4/28         18                      Saturday                           
+2040/4/29         19                      Sunday                             
+2040/4/30         20                      Monday                             
+2040/5/1          21                      Tuesday                            
+2040/5/2          22                      Wednesday                          
+2040/5/3          23                      Thursday                           
+2040/5/4          24                      Friday                             
+2040/5/5          25                      Saturday       Summer Commences    
+2040/5/6          26                      Sunday                             
+2040/5/7          27                      Monday                             
+2040/5/8          28                      Tuesday                            
+2040/5/9          29                      Wednesday                          
+2040/5/10         30                      Thursday                           
+2040/5/11         4th Lunar Month         Friday                             
+2040/5/12         2                       Saturday                           
+2040/5/13         3                       Sunday                             
+2040/5/14         4                       Monday                             
+2040/5/15         5                       Tuesday                            
+2040/5/16         6                       Wednesday                          
+2040/5/17         7                       Thursday                           
+2040/5/18         8                       Friday                             
+2040/5/19         9                       Saturday                           
+2040/5/20         10                      Sunday         Corn Forms          
+2040/5/21         11                      Monday                             
+2040/5/22         12                      Tuesday                            
+2040/5/23         13                      Wednesday                          
+2040/5/24         14                      Thursday                           
+2040/5/25         15                      Friday                             
+2040/5/26         16                      Saturday                           
+2040/5/27         17                      Sunday                             
+2040/5/28         18                      Monday                             
+2040/5/29         19                      Tuesday                            
+2040/5/30         20                      Wednesday                          
+2040/5/31         21                      Thursday                           
+2040/6/1          22                      Friday                             
+2040/6/2          23                      Saturday                           
+2040/6/3          24                      Sunday                             
+2040/6/4          25                      Monday                             
+2040/6/5          26                      Tuesday        Corn on Ear         
+2040/6/6          27                      Wednesday                          
+2040/6/7          28                      Thursday                           
+2040/6/8          29                      Friday                             
+2040/6/9          30                      Saturday                           
+2040/6/10         5th Lunar Month         Sunday                             
+2040/6/11         2                       Monday                             
+2040/6/12         3                       Tuesday                            
+2040/6/13         4                       Wednesday                          
+2040/6/14         5                       Thursday                           
+2040/6/15         6                       Friday                             
+2040/6/16         7                       Saturday                           
+2040/6/17         8                       Sunday                             
+2040/6/18         9                       Monday                             
+2040/6/19         10                      Tuesday                            
+2040/6/20         11                      Wednesday                          
+2040/6/21         12                      Thursday       Summer Solstice     
+2040/6/22         13                      Friday                             
+2040/6/23         14                      Saturday                           
+2040/6/24         15                      Sunday                             
+2040/6/25         16                      Monday                             
+2040/6/26         17                      Tuesday                            
+2040/6/27         18                      Wednesday                          
+2040/6/28         19                      Thursday                           
+2040/6/29         20                      Friday                             
+2040/6/30         21                      Saturday                           
+2040/7/1          22                      Sunday                             
+2040/7/2          23                      Monday                             
+2040/7/3          24                      Tuesday                            
+2040/7/4          25                      Wednesday                          
+2040/7/5          26                      Thursday                           
+2040/7/6          27                      Friday         Moderate Heat       
+2040/7/7          28                      Saturday                           
+2040/7/8          29                      Sunday                             
+2040/7/9          6th Lunar Month         Monday                             
+2040/7/10         2                       Tuesday                            
+2040/7/11         3                       Wednesday                          
+2040/7/12         4                       Thursday                           
+2040/7/13         5                       Friday                             
+2040/7/14         6                       Saturday                           
+2040/7/15         7                       Sunday                             
+2040/7/16         8                       Monday                             
+2040/7/17         9                       Tuesday                            
+2040/7/18         10                      Wednesday                          
+2040/7/19         11                      Thursday                           
+2040/7/20         12                      Friday                             
+2040/7/21         13                      Saturday                           
+2040/7/22         14                      Sunday         Great Heat          
+2040/7/23         15                      Monday                             
+2040/7/24         16                      Tuesday                            
+2040/7/25         17                      Wednesday                          
+2040/7/26         18                      Thursday                           
+2040/7/27         19                      Friday                             
+2040/7/28         20                      Saturday                           
+2040/7/29         21                      Sunday                             
+2040/7/30         22                      Monday                             
+2040/7/31         23                      Tuesday                            
+2040/8/1          24                      Wednesday                          
+2040/8/2          25                      Thursday                           
+2040/8/3          26                      Friday                             
+2040/8/4          27                      Saturday                           
+2040/8/5          28                      Sunday                             
+2040/8/6          29                      Monday                             
+2040/8/7          30                      Tuesday        Autumn Commences    
+2040/8/8          7th Lunar Month         Wednesday                          
+2040/8/9          2                       Thursday                           
+2040/8/10         3                       Friday                             
+2040/8/11         4                       Saturday                           
+2040/8/12         5                       Sunday                             
+2040/8/13         6                       Monday                             
+2040/8/14         7                       Tuesday                            
+2040/8/15         8                       Wednesday                          
+2040/8/16         9                       Thursday                           
+2040/8/17         10                      Friday                             
+2040/8/18         11                      Saturday                           
+2040/8/19         12                      Sunday                             
+2040/8/20         13                      Monday                             
+2040/8/21         14                      Tuesday                            
+2040/8/22         15                      Wednesday      End of Heat         
+2040/8/23         16                      Thursday                           
+2040/8/24         17                      Friday                             
+2040/8/25         18                      Saturday                           
+2040/8/26         19                      Sunday                             
+2040/8/27         20                      Monday                             
+2040/8/28         21                      Tuesday                            
+2040/8/29         22                      Wednesday                          
+2040/8/30         23                      Thursday                           
+2040/8/31         24                      Friday                             
+2040/9/1          25                      Saturday                           
+2040/9/2          26                      Sunday                             
+2040/9/3          27                      Monday                             
+2040/9/4          28                      Tuesday                            
+2040/9/5          29                      Wednesday                          
+2040/9/6          8th Lunar Month         Thursday                           
+2040/9/7          2                       Friday         White Dew           
+2040/9/8          3                       Saturday                           
+2040/9/9          4                       Sunday                             
+2040/9/10         5                       Monday                             
+2040/9/11         6                       Tuesday                            
+2040/9/12         7                       Wednesday                          
+2040/9/13         8                       Thursday                           
+2040/9/14         9                       Friday                             
+2040/9/15         10                      Saturday                           
+2040/9/16         11                      Sunday                             
+2040/9/17         12                      Monday                             
+2040/9/18         13                      Tuesday                            
+2040/9/19         14                      Wednesday                          
+2040/9/20         15                      Thursday                           
+2040/9/21         16                      Friday                             
+2040/9/22         17                      Saturday       Autumnal Equinox    
+2040/9/23         18                      Sunday                             
+2040/9/24         19                      Monday                             
+2040/9/25         20                      Tuesday                            
+2040/9/26         21                      Wednesday                          
+2040/9/27         22                      Thursday                           
+2040/9/28         23                      Friday                             
+2040/9/29         24                      Saturday                           
+2040/9/30         25                      Sunday                             
+2040/10/1         26                      Monday                             
+2040/10/2         27                      Tuesday                            
+2040/10/3         28                      Wednesday                          
+2040/10/4         29                      Thursday                           
+2040/10/5         30                      Friday                             
+2040/10/6         9th Lunar Month         Saturday                           
+2040/10/7         2                       Sunday                             
+2040/10/8         3                       Monday         Cold Dew            
+2040/10/9         4                       Tuesday                            
+2040/10/10        5                       Wednesday                          
+2040/10/11        6                       Thursday                           
+2040/10/12        7                       Friday                             
+2040/10/13        8                       Saturday                           
+2040/10/14        9                       Sunday                             
+2040/10/15        10                      Monday                             
+2040/10/16        11                      Tuesday                            
+2040/10/17        12                      Wednesday                          
+2040/10/18        13                      Thursday                           
+2040/10/19        14                      Friday                             
+2040/10/20        15                      Saturday                           
+2040/10/21        16                      Sunday                             
+2040/10/22        17                      Monday                             
+2040/10/23        18                      Tuesday        Frost               
+2040/10/24        19                      Wednesday                          
+2040/10/25        20                      Thursday                           
+2040/10/26        21                      Friday                             
+2040/10/27        22                      Saturday                           
+2040/10/28        23                      Sunday                             
+2040/10/29        24                      Monday                             
+2040/10/30        25                      Tuesday                            
+2040/10/31        26                      Wednesday                          
+2040/11/1         27                      Thursday                           
+2040/11/2         28                      Friday                             
+2040/11/3         29                      Saturday                           
+2040/11/4         30                      Sunday                             
+2040/11/5         10th Lunar Month        Monday                             
+2040/11/6         2                       Tuesday                            
+2040/11/7         3                       Wednesday      Winter Commences    
+2040/11/8         4                       Thursday                           
+2040/11/9         5                       Friday                             
+2040/11/10        6                       Saturday                           
+2040/11/11        7                       Sunday                             
+2040/11/12        8                       Monday                             
+2040/11/13        9                       Tuesday                            
+2040/11/14        10                      Wednesday                          
+2040/11/15        11                      Thursday                           
+2040/11/16        12                      Friday                             
+2040/11/17        13                      Saturday                           
+2040/11/18        14                      Sunday                             
+2040/11/19        15                      Monday                             
+2040/11/20        16                      Tuesday                            
+2040/11/21        17                      Wednesday                          
+2040/11/22        18                      Thursday       Light Snow          
+2040/11/23        19                      Friday                             
+2040/11/24        20                      Saturday                           
+2040/11/25        21                      Sunday                             
+2040/11/26        22                      Monday                             
+2040/11/27        23                      Tuesday                            
+2040/11/28        24                      Wednesday                          
+2040/11/29        25                      Thursday                           
+2040/11/30        26                      Friday                             
+2040/12/1         27                      Saturday                           
+2040/12/2         28                      Sunday                             
+2040/12/3         29                      Monday                             
+2040/12/4         11th Lunar Month        Tuesday                            
+2040/12/5         2                       Wednesday                          
+2040/12/6         3                       Thursday       Heavy Snow          
+2040/12/7         4                       Friday                             
+2040/12/8         5                       Saturday                           
+2040/12/9         6                       Sunday                             
+2040/12/10        7                       Monday                             
+2040/12/11        8                       Tuesday                            
+2040/12/12        9                       Wednesday                          
+2040/12/13        10                      Thursday                           
+2040/12/14        11                      Friday                             
+2040/12/15        12                      Saturday                           
+2040/12/16        13                      Sunday                             
+2040/12/17        14                      Monday                             
+2040/12/18        15                      Tuesday                            
+2040/12/19        16                      Wednesday                          
+2040/12/20        17                      Thursday                           
+2040/12/21        18                      Friday         Winter Solstice     
+2040/12/22        19                      Saturday                           
+2040/12/23        20                      Sunday                             
+2040/12/24        21                      Monday                             
+2040/12/25        22                      Tuesday                            
+2040/12/26        23                      Wednesday                          
+2040/12/27        24                      Thursday                           
+2040/12/28        25                      Friday                             
+2040/12/29        26                      Saturday                           
+2040/12/30        27                      Sunday                             
+2040/12/31        28                      Monday                             

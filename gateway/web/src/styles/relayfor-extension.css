@@ -1,0 +1,12 @@
+body.relayfor-console-active { display:block; background:var(--md-sys-color-surface); }
+body.relayfor-console-active #root { width:100%; height:100dvh; }
+.relayfor-extension { height:100dvh; min-height:0; width:100%; --background:var(--md-sys-color-surface); --foreground:var(--md-sys-color-on-surface); --card:var(--md-sys-color-surface-container-low); --card-foreground:var(--md-sys-color-on-surface); --popover:var(--md-sys-color-surface-container-high); --popover-foreground:var(--md-sys-color-on-surface); --primary:var(--md-sys-color-primary); --primary-foreground:var(--md-sys-color-on-primary); --muted:var(--md-sys-color-surface-container); --muted-foreground:var(--md-sys-color-on-surface-variant); --border:var(--md-sys-color-outline-variant); --input:var(--md-sys-color-outline-variant); }
+.relayfor-extension [data-slot='button'] { border-radius:20px; min-height:36px; }
+.relayfor-extension [data-slot='input'], .relayfor-extension [data-slot='select-trigger'] { border-radius:10px; min-height:40px; }
+.relayfor-extension [data-slot='table-head'] { background:var(--md-sys-color-surface-container-low); }
+.relayfor-extension [data-slot='card'] { border-radius:16px; box-shadow:none; }
+.relayfor-extension .relayfor-risk-page { width:100%; }
+body.auth-page #root { width:100%; min-height:100dvh; }
+.relayfor-original-auth .auth-card { margin-top:0; }
+.relayfor-original-auth .auth-card [data-slot='input'] { height:56px; padding:16px; border-radius:4px 4px 0 0; background:var(--md-sys-color-surface-container-highest); border:0; border-bottom:1px solid var(--md-sys-color-outline); }
+.relayfor-original-auth .auth-card [data-slot='button'] { border-radius:20px; min-height:40px; }

@@ -1,0 +1,109 @@
+{
+  "base": "http://127.0.0.1:3002",
+  "checkedAt": "2026-10-01T06:28:50.307Z",
+  "checks": [
+    {
+      "name": "public homepage and protocol controls",
+      "passed": false,
+      "message": "locator.waitFor: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "registration and prepaid page layouts",
+      "passed": true
+    },
+    {
+      "name": "auth and administrator role redirect",
+      "passed": true
+    },
+    {
+      "name": "all native administrator pages",
+      "passed": true
+    },
+    {
+      "name": "administrator embedded feature pages and system settings",
+      "passed": true
+    },
+    {
+      "name": "health and routing real endpoints",
+      "passed": true
+    },
+    {
+      "name": "model creation, pricing persistence and alias routing",
+      "passed": false,
+      "message": "page.evaluate: Error: 原页面字段尚无等价执行规则：独立模型显示名称。本次未提交这些设置。"
+    },
+    {
+      "name": "site name settings, persistence and callback copy",
+      "passed": true
+    },
+    {
+      "name": "single redemption batch with expandable details and copying",
+      "passed": false,
+      "message": "/api/redemption/: Payment, redemption, subscription, and invitation reward features are disabled. The administrator must confirm compliance terms before enabling them."
+    },
+    {
+      "name": "multi-user token statistics real API and empty-state controls",
+      "passed": true
+    },
+    {
+      "name": "page search, keyboard shortcut and reduced motion",
+      "passed": true
+    },
+    {
+      "name": "administrator mobile navigation",
+      "passed": true
+    },
+    {
+      "name": "ordinary administrator model permissions",
+      "passed": false,
+      "message": "page.waitForURL: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "normal user creation and login",
+      "passed": false,
+      "message": "page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at http://127.0.0.1:3002/auth/?mode=login"
+    },
+    {
+      "name": "all native user pages and health privacy",
+      "passed": false,
+      "message": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "user key dialog and mobile layout",
+      "passed": false,
+      "message": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "browser console and HTTP error audit",
+      "passed": false,
+      "message": "[{\"url\":\"/relayfor-assets/material-symbols-outlined-9cee10d72b8e.woff2?v=c72f19f2e2f6008a\",\"status\":429},{\"url\":\"/relayfor-logo.svg\",\"status\":429},{\"url\":\"/relayfor-assets/app.js?v=c72f19f2e2f6008a\",\"status\":429},{\"url\":\"/relayfor-logo.svg\",\"status\":429},{\"url\":\"/auth/?username=reviewop&password=REDACTED&registration_code=\",\"status\":429},{\"url\":\"/auth/?mode=login\",\"status\":429}]"
+    }
+  ],
+  "consoleErrors": [],
+  "failedHTTP": [
+    {
+      "url": "/relayfor-assets/material-symbols-outlined-9cee10d72b8e.woff2?v=c72f19f2e2f6008a",
+      "status": 429
+    },
+    {
+      "url": "/relayfor-logo.svg",
+      "status": 429
+    },
+    {
+      "url": "/relayfor-assets/app.js?v=c72f19f2e2f6008a",
+      "status": 429
+    },
+    {
+      "url": "/relayfor-logo.svg",
+      "status": 429
+    },
+    {
+      "url": "/auth/?username=reviewop&password=REDACTED&registration_code=",
+      "status": 429
+    },
+    {
+      "url": "/auth/?mode=login",
+      "status": 429
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+Gregorian-Lunar Calendar Conversion Table of 2048 (Wu-chen  -  year of the Dragon)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2048/1/1          16                      Wednesday                          
+2048/1/2          17                      Thursday                           
+2048/1/3          18                      Friday                             
+2048/1/4          19                      Saturday                           
+2048/1/5          20                      Sunday                             
+2048/1/6          21                      Monday         Moderate Cold       
+2048/1/7          22                      Tuesday                            
+2048/1/8          23                      Wednesday                          
+2048/1/9          24                      Thursday                           
+2048/1/10         25                      Friday                             
+2048/1/11         26                      Saturday                           
+2048/1/12         27                      Sunday                             
+2048/1/13         28                      Monday                             
+2048/1/14         29                      Tuesday                            
+2048/1/15         12th Lunar Month        Wednesday                          
+2048/1/16         2                       Thursday                           
+2048/1/17         3                       Friday                             
+2048/1/18         4                       Saturday                           
+2048/1/19         5                       Sunday                             
+2048/1/20         6                       Monday         Severe Cold         
+2048/1/21         7                       Tuesday                            
+2048/1/22         8                       Wednesday                          
+2048/1/23         9                       Thursday                           
+2048/1/24         10                      Friday                             
+2048/1/25         11                      Saturday                           
+2048/1/26         12                      Sunday                             
+2048/1/27         13                      Monday                             
+2048/1/28         14                      Tuesday                            
+2048/1/29         15                      Wednesday                          
+2048/1/30         16                      Thursday                           
+2048/1/31         17                      Friday                             
+2048/2/1          18                      Saturday                           
+2048/2/2          19                      Sunday                             
+2048/2/3          20                      Monday                             
+2048/2/4          21                      Tuesday        Spring Commences    
+2048/2/5          22                      Wednesday                          
+2048/2/6          23                      Thursday                           
+2048/2/7          24                      Friday                             
+2048/2/8          25                      Saturday                           
+2048/2/9          26                      Sunday                             
+2048/2/10         27                      Monday                             
+2048/2/11         28                      Tuesday                            
+2048/2/12         29                      Wednesday                          
+2048/2/13         30                      Thursday                           
+2048/2/14         1st Lunar Month         Friday                             
+2048/2/15         2                       Saturday                           
+2048/2/16         3                       Sunday                             
+2048/2/17         4                       Monday                             
+2048/2/18         5                       Tuesday                            
+2048/2/19         6                       Wednesday      Spring Showers      
+2048/2/20         7                       Thursday                           
+2048/2/21         8                       Friday                             
+2048/2/22         9                       Saturday                           
+2048/2/23         10                      Sunday                             
+2048/2/24         11                      Monday                             
+2048/2/25         12                      Tuesday                            
+2048/2/26         13                      Wednesday                          
+2048/2/27         14                      Thursday                           
+2048/2/28         15                      Friday                             
+2048/2/29         16                      Saturday                           
+2048/3/1          17                      Sunday                             
+2048/3/2          18                      Monday                             
+2048/3/3          19                      Tuesday                            
+2048/3/4          20                      Wednesday                          
+2048/3/5          21                      Thursday       Insects Waken       
+2048/3/6          22                      Friday                             
+2048/3/7          23                      Saturday                           
+2048/3/8          24                      Sunday                             
+2048/3/9          25                      Monday                             
+2048/3/10         26                      Tuesday                            
+2048/3/11         27                      Wednesday                          
+2048/3/12         28                      Thursday                           
+2048/3/13         29                      Friday                             
+2048/3/14         2nd Lunar Month         Saturday                           
+2048/3/15         2                       Sunday                             
+2048/3/16         3                       Monday                             
+2048/3/17         4                       Tuesday                            
+2048/3/18         5                       Wednesday                          
+2048/3/19         6                       Thursday                           
+2048/3/20         7                       Friday         Vernal Equinox      
+2048/3/21         8                       Saturday                           
+2048/3/22         9                       Sunday                             
+2048/3/23         10                      Monday                             
+2048/3/24         11                      Tuesday                            
+2048/3/25         12                      Wednesday                          
+2048/3/26         13                      Thursday                           
+2048/3/27         14                      Friday                             
+2048/3/28         15                      Saturday                           
+2048/3/29         16                      Sunday                             
+2048/3/30         17                      Monday                             
+2048/3/31         18                      Tuesday                            
+2048/4/1          19                      Wednesday                          
+2048/4/2          20                      Thursday                           
+2048/4/3          21                      Friday                             
+2048/4/4          22                      Saturday       Bright & Clear      
+2048/4/5          23                      Sunday                             
+2048/4/6          24                      Monday                             
+2048/4/7          25                      Tuesday                            
+2048/4/8          26                      Wednesday                          
+2048/4/9          27                      Thursday                           
+2048/4/10         28                      Friday                             
+2048/4/11         29                      Saturday                           
+2048/4/12         30                      Sunday                             
+2048/4/13         3rd Lunar Month         Monday                             
+2048/4/14         2                       Tuesday                            
+2048/4/15         3                       Wednesday                          
+2048/4/16         4                       Thursday                           
+2048/4/17         5                       Friday                             
+2048/4/18         6                       Saturday                           
+2048/4/19         7                       Sunday         Corn Rain           
+2048/4/20         8                       Monday                             
+2048/4/21         9                       Tuesday                            
+2048/4/22         10                      Wednesday                          
+2048/4/23         11                      Thursday                           
+2048/4/24         12                      Friday                             
+2048/4/25         13                      Saturday                           
+2048/4/26         14                      Sunday                             
+2048/4/27         15                      Monday                             
+2048/4/28         16                      Tuesday                            
+2048/4/29         17                      Wednesday                          
+2048/4/30         18                      Thursday                           
+2048/5/1          19                      Friday                             
+2048/5/2          20                      Saturday                           
+2048/5/3          21                      Sunday                             
+2048/5/4          22                      Monday                             
+2048/5/5          23                      Tuesday        Summer Commences    
+2048/5/6          24                      Wednesday                          
+2048/5/7          25                      Thursday                           
+2048/5/8          26                      Friday                             
+2048/5/9          27                      Saturday                           
+2048/5/10         28                      Sunday                             
+2048/5/11         29                      Monday                             
+2048/5/12         30                      Tuesday                            
+2048/5/13         4th Lunar Month         Wednesday                          
+2048/5/14         2                       Thursday                           
+2048/5/15         3                       Friday                             
+2048/5/16         4                       Saturday                           
+2048/5/17         5                       Sunday                             
+2048/5/18         6                       Monday                             
+2048/5/19         7                       Tuesday                            
+2048/5/20         8                       Wednesday      Corn Forms          
+2048/5/21         9                       Thursday                           
+2048/5/22         10                      Friday                             
+2048/5/23         11                      Saturday                           
+2048/5/24         12                      Sunday                             
+2048/5/25         13                      Monday                             
+2048/5/26         14                      Tuesday                            
+2048/5/27         15                      Wednesday                          
+2048/5/28         16                      Thursday                           
+2048/5/29         17                      Friday                             
+2048/5/30         18                      Saturday                           
+2048/5/31         19                      Sunday                             
+2048/6/1          20                      Monday                             
+2048/6/2          21                      Tuesday                            
+2048/6/3          22                      Wednesday                          
+2048/6/4          23                      Thursday                           
+2048/6/5          24                      Friday         Corn on Ear         
+2048/6/6          25                      Saturday                           
+2048/6/7          26                      Sunday                             
+2048/6/8          27                      Monday                             
+2048/6/9          28                      Tuesday                            
+2048/6/10         29                      Wednesday                          
+2048/6/11         5th Lunar Month         Thursday                           
+2048/6/12         2                       Friday                             
+2048/6/13         3                       Saturday                           
+2048/6/14         4                       Sunday                             
+2048/6/15         5                       Monday                             
+2048/6/16         6                       Tuesday                            
+2048/6/17         7                       Wednesday                          
+2048/6/18         8                       Thursday                           
+2048/6/19         9                       Friday                             
+2048/6/20         10                      Saturday       Summer Solstice     
+2048/6/21         11                      Sunday                             
+2048/6/22         12                      Monday                             
+2048/6/23         13                      Tuesday                            
+2048/6/24         14                      Wednesday                          
+2048/6/25         15                      Thursday                           
+2048/6/26         16                      Friday                             
+2048/6/27         17                      Saturday                           
+2048/6/28         18                      Sunday                             
+2048/6/29         19                      Monday                             
+2048/6/30         20                      Tuesday                            
+2048/7/1          21                      Wednesday                          
+2048/7/2          22                      Thursday                           
+2048/7/3          23                      Friday                             
+2048/7/4          24                      Saturday                           
+2048/7/5          25                      Sunday                             
+2048/7/6          26                      Monday         Moderate Heat       
+2048/7/7          27                      Tuesday                            
+2048/7/8          28                      Wednesday                          
+2048/7/9          29                      Thursday                           
+2048/7/10         30                      Friday                             
+2048/7/11         6th Lunar Month         Saturday                           
+2048/7/12         2                       Sunday                             
+2048/7/13         3                       Monday                             
+2048/7/14         4                       Tuesday                            
+2048/7/15         5                       Wednesday                          
+2048/7/16         6                       Thursday                           
+2048/7/17         7                       Friday                             
+2048/7/18         8                       Saturday                           
+2048/7/19         9                       Sunday                             
+2048/7/20         10                      Monday                             
+2048/7/21         11                      Tuesday                            
+2048/7/22         12                      Wednesday      Great Heat          
+2048/7/23         13                      Thursday                           
+2048/7/24         14                      Friday                             
+2048/7/25         15                      Saturday                           
+2048/7/26         16                      Sunday                             
+2048/7/27         17                      Monday                             
+2048/7/28         18                      Tuesday                            
+2048/7/29         19                      Wednesday                          
+2048/7/30         20                      Thursday                           
+2048/7/31         21                      Friday                             
+2048/8/1          22                      Saturday                           
+2048/8/2          23                      Sunday                             
+2048/8/3          24                      Monday                             
+2048/8/4          25                      Tuesday                            
+2048/8/5          26                      Wednesday                          
+2048/8/6          27                      Thursday                           
+2048/8/7          28                      Friday         Autumn Commences    
+2048/8/8          29                      Saturday                           
+2048/8/9          30                      Sunday                             
+2048/8/10         7th Lunar Month         Monday                             
+2048/8/11         2                       Tuesday                            
+2048/8/12         3                       Wednesday                          
+2048/8/13         4                       Thursday                           
+2048/8/14         5                       Friday                             
+2048/8/15         6                       Saturday                           
+2048/8/16         7                       Sunday                             
+2048/8/17         8                       Monday                             
+2048/8/18         9                       Tuesday                            
+2048/8/19         10                      Wednesday                          
+2048/8/20         11                      Thursday                           
+2048/8/21         12                      Friday                             
+2048/8/22         13                      Saturday       End of Heat         
+2048/8/23         14                      Sunday                             
+2048/8/24         15                      Monday                             
+2048/8/25         16                      Tuesday                            
+2048/8/26         17                      Wednesday                          
+2048/8/27         18                      Thursday                           
+2048/8/28         19                      Friday                             
+2048/8/29         20                      Saturday                           
+2048/8/30         21                      Sunday                             
+2048/8/31         22                      Monday                             
+2048/9/1          23                      Tuesday                            
+2048/9/2          24                      Wednesday                          
+2048/9/3          25                      Thursday                           
+2048/9/4          26                      Friday                             
+2048/9/5          27                      Saturday                           
+2048/9/6          28                      Sunday                             
+2048/9/7          29                      Monday         White Dew           
+2048/9/8          8th Lunar Month         Tuesday                            
+2048/9/9          2                       Wednesday                          
+2048/9/10         3                       Thursday                           
+2048/9/11         4                       Friday                             
+2048/9/12         5                       Saturday                           
+2048/9/13         6                       Sunday                             
+2048/9/14         7                       Monday                             
+2048/9/15         8                       Tuesday                            
+2048/9/16         9                       Wednesday                          
+2048/9/17         10                      Thursday                           
+2048/9/18         11                      Friday                             
+2048/9/19         12                      Saturday                           
+2048/9/20         13                      Sunday                             
+2048/9/21         14                      Monday                             
+2048/9/22         15                      Tuesday        Autumnal Equinox    
+2048/9/23         16                      Wednesday                          
+2048/9/24         17                      Thursday                           
+2048/9/25         18                      Friday                             
+2048/9/26         19                      Saturday                           
+2048/9/27         20                      Sunday                             
+2048/9/28         21                      Monday                             
+2048/9/29         22                      Tuesday                            
+2048/9/30         23                      Wednesday                          
+2048/10/1         24                      Thursday                           
+2048/10/2         25                      Friday                             
+2048/10/3         26                      Saturday                           
+2048/10/4         27                      Sunday                             
+2048/10/5         28                      Monday                             
+2048/10/6         29                      Tuesday                            
+2048/10/7         30                      Wednesday      Cold Dew            
+2048/10/8         9th Lunar Month         Thursday                           
+2048/10/9         2                       Friday                             
+2048/10/10        3                       Saturday                           
+2048/10/11        4                       Sunday                             
+2048/10/12        5                       Monday                             
+2048/10/13        6                       Tuesday                            
+2048/10/14        7                       Wednesday                          
+2048/10/15        8                       Thursday                           
+2048/10/16        9                       Friday                             
+2048/10/17        10                      Saturday                           
+2048/10/18        11                      Sunday                             
+2048/10/19        12                      Monday                             
+2048/10/20        13                      Tuesday                            
+2048/10/21        14                      Wednesday                          
+2048/10/22        15                      Thursday                           
+2048/10/23        16                      Friday         Frost               
+2048/10/24        17                      Saturday                           
+2048/10/25        18                      Sunday                             
+2048/10/26        19                      Monday                             
+2048/10/27        20                      Tuesday                            
+2048/10/28        21                      Wednesday                          
+2048/10/29        22                      Thursday                           
+2048/10/30        23                      Friday                             
+2048/10/31        24                      Saturday                           
+2048/11/1         25                      Sunday                             
+2048/11/2         26                      Monday                             
+2048/11/3         27                      Tuesday                            
+2048/11/4         28                      Wednesday                          
+2048/11/5         29                      Thursday                           
+2048/11/6         10th Lunar Month        Friday                             
+2048/11/7         2                       Saturday       Winter Commences    
+2048/11/8         3                       Sunday                             
+2048/11/9         4                       Monday                             
+2048/11/10        5                       Tuesday                            
+2048/11/11        6                       Wednesday                          
+2048/11/12        7                       Thursday                           
+2048/11/13        8                       Friday                             
+2048/11/14        9                       Saturday                           
+2048/11/15        10                      Sunday                             
+2048/11/16        11                      Monday                             
+2048/11/17        12                      Tuesday                            
+2048/11/18        13                      Wednesday                          
+2048/11/19        14                      Thursday                           
+2048/11/20        15                      Friday                             
+2048/11/21        16                      Saturday       Light Snow          
+2048/11/22        17                      Sunday                             
+2048/11/23        18                      Monday                             
+2048/11/24        19                      Tuesday                            
+2048/11/25        20                      Wednesday                          
+2048/11/26        21                      Thursday                           
+2048/11/27        22                      Friday                             
+2048/11/28        23                      Saturday                           
+2048/11/29        24                      Sunday                             
+2048/11/30        25                      Monday                             
+2048/12/1         26                      Tuesday                            
+2048/12/2         27                      Wednesday                          
+2048/12/3         28                      Thursday                           
+2048/12/4         29                      Friday                             
+2048/12/5         11th Lunar Month        Saturday                           
+2048/12/6         2                       Sunday         Heavy Snow          
+2048/12/7         3                       Monday                             
+2048/12/8         4                       Tuesday                            
+2048/12/9         5                       Wednesday                          
+2048/12/10        6                       Thursday                           
+2048/12/11        7                       Friday                             
+2048/12/12        8                       Saturday                           
+2048/12/13        9                       Sunday                             
+2048/12/14        10                      Monday                             
+2048/12/15        11                      Tuesday                            
+2048/12/16        12                      Wednesday                          
+2048/12/17        13                      Thursday                           
+2048/12/18        14                      Friday                             
+2048/12/19        15                      Saturday                           
+2048/12/20        16                      Sunday                             
+2048/12/21        17                      Monday         Winter Solstice     
+2048/12/22        18                      Tuesday                            
+2048/12/23        19                      Wednesday                          
+2048/12/24        20                      Thursday                           
+2048/12/25        21                      Friday                             
+2048/12/26        22                      Saturday                           
+2048/12/27        23                      Sunday                             
+2048/12/28        24                      Monday                             
+2048/12/29        25                      Tuesday                            
+2048/12/30        26                      Wednesday                          
+2048/12/31        27                      Thursday                           

@@ -1,0 +1,28 @@
+- generic [ref=f1e2]:
+  - banner [ref=f1e3]:
+    - link "RelayFor AI API 网关" [ref=f1e4] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=f1e6]: hub
+      - generic [ref=f1e7]:
+        - strong [ref=f1e8]: RelayFor
+        - generic [ref=f1e9]: AI API 网关
+  - main [ref=f1e10]:
+    - heading "登录" [level=1] [ref=f1e11]
+    - button "使用 LinuxDO Connect 登录" [ref=f1e12] [cursor=pointer]
+    - generic [ref=f1e13]: 或使用本地账户
+    - generic [ref=f1e15]:
+      - generic [ref=f1e16]:
+        - generic [ref=f1e17]:
+          - textbox "用户名" [ref=f1e18]:
+            - /placeholder: " "
+          - generic: 用户名
+        - generic [ref=f1e19]:
+          - textbox "密码" [ref=f1e20]:
+            - /placeholder: " "
+          - generic: 密码
+      - button "登录" [ref=f1e21] [cursor=pointer]
+    - generic [ref=f1e22]:
+      - link "创建账户" [ref=f1e23] [cursor=pointer]:
+        - /url: /auth/?mode=register
+      - link "返回首页" [ref=f1e24] [cursor=pointer]:
+        - /url: /

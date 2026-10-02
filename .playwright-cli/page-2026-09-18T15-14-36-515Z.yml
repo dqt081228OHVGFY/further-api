@@ -1,0 +1,335 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "RelayFor管理后台" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e5]: hub
+    - generic [ref=e7]: 管理
+    - button "概览" [ref=e8] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e9]: space_dashboard
+      - text: 概览
+    - button "渠道" [ref=e10] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e11]: hub
+      - text: 渠道
+    - button "模型" [ref=e12] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e13]: tune
+      - text: 模型
+    - button "订阅" [ref=e14] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e15]: redeem
+      - text: 订阅
+    - button "用户" [ref=e16] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e17]: group
+      - text: 用户
+    - button "兑换码" [ref=e18] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e19]: confirmation_number
+      - text: 兑换码
+    - button "注册码" [ref=e20] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e21]: key
+      - text: 注册码
+    - button "预付卡" [ref=e22] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e23]: payments
+      - text: 预付卡
+    - button "日志" [ref=e24] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e25]: receipt_long
+      - text: 日志
+    - button "安全与设置" [ref=e26] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e27]: lock
+      - text: 安全与设置
+    - generic [ref=e28]:
+      - button "收起侧边栏" [expanded] [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: left_panel_close
+      - link "用户控制台" [ref=e32] [cursor=pointer]:
+        - /url: /console/
+        - generic [aria-hidden] [ref=e33]: person
+        - text: 用户控制台
+      - button "退出登录" [ref=e34] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e35]: logout
+        - text: 退出登录
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: 概览
+      - button "刷新" [ref=e40] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e41]: refresh
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [aria-hidden] [ref=e47]: payments
+            - text: 今日扣费
+          - generic [ref=e48]: $0.068
+          - generic [ref=e49]: 今日实际扣减额度
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [aria-hidden] [ref=e52]: data_usage
+            - text: Token
+          - generic [ref=e53]: 268,420
+          - generic [ref=e54]: 今日输入 + 输出
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - generic [aria-hidden] [ref=e57]: swap_horiz
+            - text: 请求
+          - generic [ref=e58]: "238"
+          - generic [ref=e59]: 今日调用次数
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - generic [aria-hidden] [ref=e62]: person_check
+            - text: 活跃用户
+          - generic [ref=e63]: "18"
+          - generic [ref=e64]: 今日独立调用用户
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [aria-hidden] [ref=e67]: error
+            - text: 错误率
+          - generic [ref=e68]: 1.7%
+          - generic [ref=e69]:
+            - generic [ref=e70]: 4 次失败请求
+            - strong [ref=e71]: 主要错误：rate_limit_exceeded
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - generic [ref=e74]: 使用趋势
+          - group "趋势周期" [ref=e75]:
+            - button "近 7 天" [pressed] [ref=e76] [cursor=pointer]
+            - button "近 30 天" [ref=e77] [cursor=pointer]
+        - generic [ref=e78]:
+          - article [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]:
+                - generic [aria-hidden] [ref=e82]: payments
+                - text: 扣费
+              - generic [ref=e83]: $0.062
+            - img "近 7 天扣费柱状趋势" [ref=e84]:
+              - generic "9月12日 · 扣费 $0.042" [ref=e85]
+              - generic "9月13日 · 扣费 $0.045" [ref=e87]
+              - generic "9月14日 · 扣费 $0.049" [ref=e89]
+              - generic "9月15日 · 扣费 $0.052" [ref=e91]
+              - generic "9月16日 · 扣费 $0.056" [ref=e93]
+              - generic "9月17日 · 扣费 $0.059" [ref=e95]
+              - generic "9月18日 · 扣费 $0.062" [ref=e97]
+            - generic [ref=e99]:
+              - generic [ref=e100]: 9月12日
+              - generic [ref=e101]: 9月18日
+          - article [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [aria-hidden] [ref=e105]: data_usage
+                - text: Token
+              - generic [ref=e106]: 25,800
+            - img "近 7 天Token柱状趋势" [ref=e107]:
+              - generic "9月12日 · Token 18,000" [ref=e108]
+              - generic "9月13日 · Token 19,300" [ref=e110]
+              - generic "9月14日 · Token 20,600" [ref=e112]
+              - generic "9月15日 · Token 21,900" [ref=e114]
+              - generic "9月16日 · Token 23,200" [ref=e116]
+              - generic "9月17日 · Token 24,500" [ref=e118]
+              - generic "9月18日 · Token 25,800" [ref=e120]
+            - generic [ref=e122]:
+              - generic [ref=e123]: 9月12日
+              - generic [ref=e124]: 9月18日
+          - article [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [aria-hidden] [ref=e128]: swap_horiz
+                - text: 请求
+              - generic [ref=e129]: "66"
+            - img "近 7 天请求柱状趋势" [ref=e130]:
+              - generic "9月12日 · 请求 42" [ref=e131]
+              - generic "9月13日 · 请求 46" [ref=e133]
+              - generic "9月14日 · 请求 50" [ref=e135]
+              - generic "9月15日 · 请求 54" [ref=e137]
+              - generic "9月16日 · 请求 58" [ref=e139]
+              - generic "9月17日 · 请求 62" [ref=e141]
+              - generic "9月18日 · 请求 66" [ref=e143]
+            - generic [ref=e145]:
+              - generic [ref=e146]: 9月12日
+              - generic [ref=e147]: 9月18日
+          - article [ref=e148]:
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [aria-hidden] [ref=e151]: person_check
+                - text: 活跃用户
+              - generic [ref=e152]: "8"
+            - img "近 7 天活跃用户柱状趋势" [ref=e153]:
+              - generic "9月12日 · 活跃用户 6" [ref=e154]
+              - generic "9月13日 · 活跃用户 7" [ref=e156]
+              - generic "9月14日 · 活跃用户 8" [ref=e158]
+              - generic "9月15日 · 活跃用户 9" [ref=e160]
+              - generic "9月16日 · 活跃用户 6" [ref=e162]
+              - generic "9月17日 · 活跃用户 7" [ref=e164]
+              - generic "9月18日 · 活跃用户 8" [ref=e166]
+            - generic [ref=e168]:
+              - generic [ref=e169]: 9月12日
+              - generic [ref=e170]: 9月18日
+          - article [ref=e171]:
+            - generic [ref=e172]:
+              - generic [ref=e173]:
+                - generic [aria-hidden] [ref=e174]: error
+                - text: 错误率
+              - generic [ref=e175]: 3.2%
+            - img "近 7 天错误率柱状趋势" [ref=e176]:
+              - generic "9月12日 · 错误率 3.2%" [ref=e177]
+              - generic "9月13日 · 错误率 0.8%" [ref=e179]
+              - generic "9月14日 · 错误率 0.8%" [ref=e181]
+              - generic "9月15日 · 错误率 0.8%" [ref=e183]
+              - generic "9月16日 · 错误率 0.8%" [ref=e185]
+              - generic "9月17日 · 错误率 0.8%" [ref=e187]
+              - generic "9月18日 · 错误率 3.2%" [ref=e189]
+            - generic [ref=e191]:
+              - generic [ref=e192]: 9月12日
+              - generic [ref=e193]: 9月18日
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e196]: 异常与排行
+          - generic [ref=e197]: 近 7 天
+        - generic [ref=e198]:
+          - article [ref=e199]:
+            - generic [ref=e200]:
+              - generic [aria-hidden] [ref=e202]: person
+              - generic [ref=e203]: Top 消费用户
+            - list [ref=e205]:
+              - listitem [ref=e206]:
+                - generic [ref=e207]: "1"
+                - generic [ref=e208]:
+                  - generic [ref=e209]: demo_operator
+                  - generic [ref=e210]: 80 次请求 · 120,000 Token
+                - generic [ref=e211]:
+                  - generic [ref=e212]: $0.128
+                  - generic [ref=e213]: 扣费
+              - listitem [ref=e214]:
+                - generic [ref=e215]: "2"
+                - generic [ref=e216]:
+                  - generic [ref=e217]: fixture_user
+                  - generic [ref=e218]: 51 次请求 · 72,000 Token
+                - generic [ref=e219]:
+                  - generic [ref=e220]: $0.048
+                  - generic [ref=e221]: 扣费
+          - article [ref=e222]:
+            - generic [ref=e223]:
+              - generic [aria-hidden] [ref=e225]: tune
+              - generic [ref=e226]: Top 模型
+            - list [ref=e228]:
+              - listitem [ref=e229]:
+                - generic [ref=e230]: "1"
+                - generic [ref=e231]:
+                  - generic [ref=e232]: gpt-5.6-sol
+                  - generic [ref=e233]: 142 次请求 · 182,000 Token
+                - generic [ref=e234]:
+                  - generic [ref=e235]: $0.104
+                  - generic [ref=e236]: 扣费
+              - listitem [ref=e237]:
+                - generic [ref=e238]: "2"
+                - generic [ref=e239]:
+                  - generic [ref=e240]: claude-opus-5
+                  - generic [ref=e241]: 61 次请求 · 78,000 Token
+                - generic [ref=e242]:
+                  - generic [ref=e243]: $0.062
+                  - generic [ref=e244]: 扣费
+          - article [ref=e245]:
+            - generic [ref=e246]:
+              - generic [aria-hidden] [ref=e248]: error
+              - generic [ref=e249]: Top 错误渠道
+            - list [ref=e251]:
+              - listitem [ref=e252]:
+                - generic [ref=e253]: "1"
+                - generic [ref=e254]:
+                  - generic [ref=e255]: Fixture Anthropic
+                  - generic [ref=e256]: 22 次请求 · 429 2 · 5xx 1
+                - generic [ref=e257]:
+                  - generic [ref=e258]: "3"
+                  - generic [ref=e259]: 13.6% 错误率
+          - article [ref=e260]:
+            - generic [ref=e261]:
+              - generic [aria-hidden] [ref=e263]: key
+              - generic [ref=e264]: 异常高频 Key
+            - list [ref=e266]:
+              - listitem [ref=e267]:
+                - generic [ref=e268]: "1"
+                - generic [ref=e269]:
+                  - generic [ref=e270]: demo-operator-key
+                  - generic [ref=e271]: "demo_operator · Key #2,002 · 错误率 1.5%"
+                - generic [ref=e272]:
+                  - generic [ref=e273]: "66"
+                  - generic [ref=e274]: 同级平均 2.8×
+      - generic [ref=e275]:
+        - generic [ref=e276]:
+          - generic [ref=e277]:
+            - generic [ref=e278]: 用户余额构成
+            - generic [aria-hidden] [ref=e279]: account_balance_wallet
+          - generic [ref=e280]:
+            - generic [ref=e281]:
+              - generic [ref=e282]:
+                - generic [ref=e283]: 公益站
+                - generic [ref=e284]: 24 位用户
+              - generic [ref=e285]: $129.20
+              - generic [ref=e286]: 可计量余额估算
+              - generic [ref=e287]:
+                - generic [ref=e288]:
+                  - generic [ref=e289]: 永久
+                  - strong [ref=e290]: $82.40
+                - generic [ref=e291]:
+                  - generic [ref=e292]: 限时
+                  - strong [ref=e293]: $10.80
+                - generic [ref=e294]:
+                  - generic [ref=e295]: 分组
+                  - strong [ref=e296]: $2.40
+                - generic [ref=e297]:
+                  - generic [ref=e298]: 订阅
+                  - strong [ref=e299]: $33.60
+              - generic [ref=e300]: 1 个不限额订阅未折算金额
+            - generic [ref=e301]:
+              - generic [ref=e302]:
+                - generic [ref=e303]: Pay 站
+                - generic [ref=e304]: 8 位用户
+              - generic [ref=e305]: $140.80
+              - generic [ref=e306]: 可计量余额估算
+              - generic [ref=e307]:
+                - generic [ref=e308]:
+                  - generic [ref=e309]: 永久
+                  - strong [ref=e310]: $56.80
+                - generic [ref=e311]:
+                  - generic [ref=e312]: 限时
+                  - strong [ref=e313]: $0.00
+                - generic [ref=e314]:
+                  - generic [ref=e315]: 分组
+                  - strong [ref=e316]: $0.00
+                - generic [ref=e317]:
+                  - generic [ref=e318]: 订阅
+                  - strong [ref=e319]: $84.00
+              - generic [ref=e320]: 0 个不限额订阅未折算金额
+        - generic [ref=e321]:
+          - generic [ref=e322]:
+            - generic [ref=e323]: 全站累计
+            - generic [aria-hidden] [ref=e324]: monitoring
+          - generic [ref=e325]:
+            - generic [ref=e326]: 请求
+            - generic [ref=e328]: 1,842
+          - generic [ref=e331]:
+            - generic [ref=e332]: 输入 Token
+            - generic [ref=e334]: 1,884,200
+          - generic [ref=e337]:
+            - generic [ref=e338]: 输出 Token
+            - generic [ref=e340]: 792,500
+          - generic [ref=e343]:
+            - generic [ref=e344]: 已扣额度
+            - generic [ref=e346]: $0.37
+        - generic [ref=e349]:
+          - generic [ref=e350]:
+            - generic [ref=e351]: 系统资源
+            - generic [aria-hidden] [ref=e352]: dns
+          - generic [ref=e353]:
+            - generic [ref=e354]: 用户
+            - generic [ref=e357]:
+              - generic [ref=e358]: "3"
+              - text: 启用 2
+          - generic [ref=e359]:
+            - generic [ref=e360]: 渠道
+            - generic [ref=e363]:
+              - generic [ref=e364]: "2"
+              - text: 已配置上游
+          - generic [ref=e365]:
+            - generic [ref=e366]: API Key
+            - generic [ref=e369]:
+              - generic [ref=e370]: "7"
+              - text: 当前启用
+      - generic [ref=e372]:
+        - generic [ref=e374]: 管理员权限已启用
+        - generic [ref=e375]: ·
+        - generic [ref=e376]: 数据来自当前 SQLite 数据库

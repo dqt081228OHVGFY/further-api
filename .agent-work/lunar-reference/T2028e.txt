@@ -1,0 +1,368 @@
+Gregorian-Lunar Calendar Conversion Table of 2028 (Wu-shen  -  year of the Monkey)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2028/1/1          5                       Saturday                           
+2028/1/2          6                       Sunday                             
+2028/1/3          7                       Monday                             
+2028/1/4          8                       Tuesday                            
+2028/1/5          9                       Wednesday                          
+2028/1/6          10                      Thursday       Moderate Cold       
+2028/1/7          11                      Friday                             
+2028/1/8          12                      Saturday                           
+2028/1/9          13                      Sunday                             
+2028/1/10         14                      Monday                             
+2028/1/11         15                      Tuesday                            
+2028/1/12         16                      Wednesday                          
+2028/1/13         17                      Thursday                           
+2028/1/14         18                      Friday                             
+2028/1/15         19                      Saturday                           
+2028/1/16         20                      Sunday                             
+2028/1/17         21                      Monday                             
+2028/1/18         22                      Tuesday                            
+2028/1/19         23                      Wednesday                          
+2028/1/20         24                      Thursday       Severe Cold         
+2028/1/21         25                      Friday                             
+2028/1/22         26                      Saturday                           
+2028/1/23         27                      Sunday                             
+2028/1/24         28                      Monday                             
+2028/1/25         29                      Tuesday                            
+2028/1/26         1st Lunar Month         Wednesday                          
+2028/1/27         2                       Thursday                           
+2028/1/28         3                       Friday                             
+2028/1/29         4                       Saturday                           
+2028/1/30         5                       Sunday                             
+2028/1/31         6                       Monday                             
+2028/2/1          7                       Tuesday                            
+2028/2/2          8                       Wednesday                          
+2028/2/3          9                       Thursday                           
+2028/2/4          10                      Friday         Spring Commences    
+2028/2/5          11                      Saturday                           
+2028/2/6          12                      Sunday                             
+2028/2/7          13                      Monday                             
+2028/2/8          14                      Tuesday                            
+2028/2/9          15                      Wednesday                          
+2028/2/10         16                      Thursday                           
+2028/2/11         17                      Friday                             
+2028/2/12         18                      Saturday                           
+2028/2/13         19                      Sunday                             
+2028/2/14         20                      Monday                             
+2028/2/15         21                      Tuesday                            
+2028/2/16         22                      Wednesday                          
+2028/2/17         23                      Thursday                           
+2028/2/18         24                      Friday                             
+2028/2/19         25                      Saturday       Spring Showers      
+2028/2/20         26                      Sunday                             
+2028/2/21         27                      Monday                             
+2028/2/22         28                      Tuesday                            
+2028/2/23         29                      Wednesday                          
+2028/2/24         30                      Thursday                           
+2028/2/25         2nd Lunar Month         Friday                             
+2028/2/26         2                       Saturday                           
+2028/2/27         3                       Sunday                             
+2028/2/28         4                       Monday                             
+2028/2/29         5                       Tuesday                            
+2028/3/1          6                       Wednesday                          
+2028/3/2          7                       Thursday                           
+2028/3/3          8                       Friday                             
+2028/3/4          9                       Saturday                           
+2028/3/5          10                      Sunday         Insects Waken       
+2028/3/6          11                      Monday                             
+2028/3/7          12                      Tuesday                            
+2028/3/8          13                      Wednesday                          
+2028/3/9          14                      Thursday                           
+2028/3/10         15                      Friday                             
+2028/3/11         16                      Saturday                           
+2028/3/12         17                      Sunday                             
+2028/3/13         18                      Monday                             
+2028/3/14         19                      Tuesday                            
+2028/3/15         20                      Wednesday                          
+2028/3/16         21                      Thursday                           
+2028/3/17         22                      Friday                             
+2028/3/18         23                      Saturday                           
+2028/3/19         24                      Sunday                             
+2028/3/20         25                      Monday         Vernal Equinox      
+2028/3/21         26                      Tuesday                            
+2028/3/22         27                      Wednesday                          
+2028/3/23         28                      Thursday                           
+2028/3/24         29                      Friday                             
+2028/3/25         30                      Saturday                           
+2028/3/26         3rd Lunar Month         Sunday                             
+2028/3/27         2                       Monday                             
+2028/3/28         3                       Tuesday                            
+2028/3/29         4                       Wednesday                          
+2028/3/30         5                       Thursday                           
+2028/3/31         6                       Friday                             
+2028/4/1          7                       Saturday                           
+2028/4/2          8                       Sunday                             
+2028/4/3          9                       Monday                             
+2028/4/4          10                      Tuesday        Bright & Clear      
+2028/4/5          11                      Wednesday                          
+2028/4/6          12                      Thursday                           
+2028/4/7          13                      Friday                             
+2028/4/8          14                      Saturday                           
+2028/4/9          15                      Sunday                             
+2028/4/10         16                      Monday                             
+2028/4/11         17                      Tuesday                            
+2028/4/12         18                      Wednesday                          
+2028/4/13         19                      Thursday                           
+2028/4/14         20                      Friday                             
+2028/4/15         21                      Saturday                           
+2028/4/16         22                      Sunday                             
+2028/4/17         23                      Monday                             
+2028/4/18         24                      Tuesday                            
+2028/4/19         25                      Wednesday      Corn Rain           
+2028/4/20         26                      Thursday                           
+2028/4/21         27                      Friday                             
+2028/4/22         28                      Saturday                           
+2028/4/23         29                      Sunday                             
+2028/4/24         30                      Monday                             
+2028/4/25         4th Lunar Month         Tuesday                            
+2028/4/26         2                       Wednesday                          
+2028/4/27         3                       Thursday                           
+2028/4/28         4                       Friday                             
+2028/4/29         5                       Saturday                           
+2028/4/30         6                       Sunday                             
+2028/5/1          7                       Monday                             
+2028/5/2          8                       Tuesday                            
+2028/5/3          9                       Wednesday                          
+2028/5/4          10                      Thursday                           
+2028/5/5          11                      Friday         Summer Commences    
+2028/5/6          12                      Saturday                           
+2028/5/7          13                      Sunday                             
+2028/5/8          14                      Monday                             
+2028/5/9          15                      Tuesday                            
+2028/5/10         16                      Wednesday                          
+2028/5/11         17                      Thursday                           
+2028/5/12         18                      Friday                             
+2028/5/13         19                      Saturday                           
+2028/5/14         20                      Sunday                             
+2028/5/15         21                      Monday                             
+2028/5/16         22                      Tuesday                            
+2028/5/17         23                      Wednesday                          
+2028/5/18         24                      Thursday                           
+2028/5/19         25                      Friday                             
+2028/5/20         26                      Saturday       Corn Forms          
+2028/5/21         27                      Sunday                             
+2028/5/22         28                      Monday                             
+2028/5/23         29                      Tuesday                            
+2028/5/24         5th Lunar Month         Wednesday                          
+2028/5/25         2                       Thursday                           
+2028/5/26         3                       Friday                             
+2028/5/27         4                       Saturday                           
+2028/5/28         5                       Sunday                             
+2028/5/29         6                       Monday                             
+2028/5/30         7                       Tuesday                            
+2028/5/31         8                       Wednesday                          
+2028/6/1          9                       Thursday                           
+2028/6/2          10                      Friday                             
+2028/6/3          11                      Saturday                           
+2028/6/4          12                      Sunday                             
+2028/6/5          13                      Monday         Corn on Ear         
+2028/6/6          14                      Tuesday                            
+2028/6/7          15                      Wednesday                          
+2028/6/8          16                      Thursday                           
+2028/6/9          17                      Friday                             
+2028/6/10         18                      Saturday                           
+2028/6/11         19                      Sunday                             
+2028/6/12         20                      Monday                             
+2028/6/13         21                      Tuesday                            
+2028/6/14         22                      Wednesday                          
+2028/6/15         23                      Thursday                           
+2028/6/16         24                      Friday                             
+2028/6/17         25                      Saturday                           
+2028/6/18         26                      Sunday                             
+2028/6/19         27                      Monday                             
+2028/6/20         28                      Tuesday                            
+2028/6/21         29                      Wednesday      Summer Solstice     
+2028/6/22         30                      Thursday                           
+2028/6/23         5th Lunar Month         Friday                             
+2028/6/24         2                       Saturday                           
+2028/6/25         3                       Sunday                             
+2028/6/26         4                       Monday                             
+2028/6/27         5                       Tuesday                            
+2028/6/28         6                       Wednesday                          
+2028/6/29         7                       Thursday                           
+2028/6/30         8                       Friday                             
+2028/7/1          9                       Saturday                           
+2028/7/2          10                      Sunday                             
+2028/7/3          11                      Monday                             
+2028/7/4          12                      Tuesday                            
+2028/7/5          13                      Wednesday                          
+2028/7/6          14                      Thursday       Moderate Heat       
+2028/7/7          15                      Friday                             
+2028/7/8          16                      Saturday                           
+2028/7/9          17                      Sunday                             
+2028/7/10         18                      Monday                             
+2028/7/11         19                      Tuesday                            
+2028/7/12         20                      Wednesday                          
+2028/7/13         21                      Thursday                           
+2028/7/14         22                      Friday                             
+2028/7/15         23                      Saturday                           
+2028/7/16         24                      Sunday                             
+2028/7/17         25                      Monday                             
+2028/7/18         26                      Tuesday                            
+2028/7/19         27                      Wednesday                          
+2028/7/20         28                      Thursday                           
+2028/7/21         29                      Friday                             
+2028/7/22         6th Lunar Month         Saturday       Great Heat          
+2028/7/23         2                       Sunday                             
+2028/7/24         3                       Monday                             
+2028/7/25         4                       Tuesday                            
+2028/7/26         5                       Wednesday                          
+2028/7/27         6                       Thursday                           
+2028/7/28         7                       Friday                             
+2028/7/29         8                       Saturday                           
+2028/7/30         9                       Sunday                             
+2028/7/31         10                      Monday                             
+2028/8/1          11                      Tuesday                            
+2028/8/2          12                      Wednesday                          
+2028/8/3          13                      Thursday                           
+2028/8/4          14                      Friday                             
+2028/8/5          15                      Saturday                           
+2028/8/6          16                      Sunday                             
+2028/8/7          17                      Monday         Autumn Commences    
+2028/8/8          18                      Tuesday                            
+2028/8/9          19                      Wednesday                          
+2028/8/10         20                      Thursday                           
+2028/8/11         21                      Friday                             
+2028/8/12         22                      Saturday                           
+2028/8/13         23                      Sunday                             
+2028/8/14         24                      Monday                             
+2028/8/15         25                      Tuesday                            
+2028/8/16         26                      Wednesday                          
+2028/8/17         27                      Thursday                           
+2028/8/18         28                      Friday                             
+2028/8/19         29                      Saturday                           
+2028/8/20         7th Lunar Month         Sunday                             
+2028/8/21         2                       Monday                             
+2028/8/22         3                       Tuesday        End of Heat         
+2028/8/23         4                       Wednesday                          
+2028/8/24         5                       Thursday                           
+2028/8/25         6                       Friday                             
+2028/8/26         7                       Saturday                           
+2028/8/27         8                       Sunday                             
+2028/8/28         9                       Monday                             
+2028/8/29         10                      Tuesday                            
+2028/8/30         11                      Wednesday                          
+2028/8/31         12                      Thursday                           
+2028/9/1          13                      Friday                             
+2028/9/2          14                      Saturday                           
+2028/9/3          15                      Sunday                             
+2028/9/4          16                      Monday                             
+2028/9/5          17                      Tuesday                            
+2028/9/6          18                      Wednesday                          
+2028/9/7          19                      Thursday       White Dew           
+2028/9/8          20                      Friday                             
+2028/9/9          21                      Saturday                           
+2028/9/10         22                      Sunday                             
+2028/9/11         23                      Monday                             
+2028/9/12         24                      Tuesday                            
+2028/9/13         25                      Wednesday                          
+2028/9/14         26                      Thursday                           
+2028/9/15         27                      Friday                             
+2028/9/16         28                      Saturday                           
+2028/9/17         29                      Sunday                             
+2028/9/18         30                      Monday                             
+2028/9/19         8th Lunar Month         Tuesday                            
+2028/9/20         2                       Wednesday                          
+2028/9/21         3                       Thursday                           
+2028/9/22         4                       Friday         Autumnal Equinox    
+2028/9/23         5                       Saturday                           
+2028/9/24         6                       Sunday                             
+2028/9/25         7                       Monday                             
+2028/9/26         8                       Tuesday                            
+2028/9/27         9                       Wednesday                          
+2028/9/28         10                      Thursday                           
+2028/9/29         11                      Friday                             
+2028/9/30         12                      Saturday                           
+2028/10/1         13                      Sunday                             
+2028/10/2         14                      Monday                             
+2028/10/3         15                      Tuesday                            
+2028/10/4         16                      Wednesday                          
+2028/10/5         17                      Thursday                           
+2028/10/6         18                      Friday                             
+2028/10/7         19                      Saturday                           
+2028/10/8         20                      Sunday         Cold Dew            
+2028/10/9         21                      Monday                             
+2028/10/10        22                      Tuesday                            
+2028/10/11        23                      Wednesday                          
+2028/10/12        24                      Thursday                           
+2028/10/13        25                      Friday                             
+2028/10/14        26                      Saturday                           
+2028/10/15        27                      Sunday                             
+2028/10/16        28                      Monday                             
+2028/10/17        29                      Tuesday                            
+2028/10/18        9th Lunar Month         Wednesday                          
+2028/10/19        2                       Thursday                           
+2028/10/20        3                       Friday                             
+2028/10/21        4                       Saturday                           
+2028/10/22        5                       Sunday                             
+2028/10/23        6                       Monday         Frost               
+2028/10/24        7                       Tuesday                            
+2028/10/25        8                       Wednesday                          
+2028/10/26        9                       Thursday                           
+2028/10/27        10                      Friday                             
+2028/10/28        11                      Saturday                           
+2028/10/29        12                      Sunday                             
+2028/10/30        13                      Monday                             
+2028/10/31        14                      Tuesday                            
+2028/11/1         15                      Wednesday                          
+2028/11/2         16                      Thursday                           
+2028/11/3         17                      Friday                             
+2028/11/4         18                      Saturday                           
+2028/11/5         19                      Sunday                             
+2028/11/6         20                      Monday                             
+2028/11/7         21                      Tuesday        Winter Commences    
+2028/11/8         22                      Wednesday                          
+2028/11/9         23                      Thursday                           
+2028/11/10        24                      Friday                             
+2028/11/11        25                      Saturday                           
+2028/11/12        26                      Sunday                             
+2028/11/13        27                      Monday                             
+2028/11/14        28                      Tuesday                            
+2028/11/15        29                      Wednesday                          
+2028/11/16        10th Lunar Month        Thursday                           
+2028/11/17        2                       Friday                             
+2028/11/18        3                       Saturday                           
+2028/11/19        4                       Sunday                             
+2028/11/20        5                       Monday                             
+2028/11/21        6                       Tuesday                            
+2028/11/22        7                       Wednesday      Light Snow          
+2028/11/23        8                       Thursday                           
+2028/11/24        9                       Friday                             
+2028/11/25        10                      Saturday                           
+2028/11/26        11                      Sunday                             
+2028/11/27        12                      Monday                             
+2028/11/28        13                      Tuesday                            
+2028/11/29        14                      Wednesday                          
+2028/11/30        15                      Thursday                           
+2028/12/1         16                      Friday                             
+2028/12/2         17                      Saturday                           
+2028/12/3         18                      Sunday                             
+2028/12/4         19                      Monday                             
+2028/12/5         20                      Tuesday                            
+2028/12/6         21                      Wednesday      Heavy Snow          
+2028/12/7         22                      Thursday                           
+2028/12/8         23                      Friday                             
+2028/12/9         24                      Saturday                           
+2028/12/10        25                      Sunday                             
+2028/12/11        26                      Monday                             
+2028/12/12        27                      Tuesday                            
+2028/12/13        28                      Wednesday                          
+2028/12/14        29                      Thursday                           
+2028/12/15        30                      Friday                             
+2028/12/16        11th Lunar Month        Saturday                           
+2028/12/17        2                       Sunday                             
+2028/12/18        3                       Monday                             
+2028/12/19        4                       Tuesday                            
+2028/12/20        5                       Wednesday                          
+2028/12/21        6                       Thursday       Winter Solstice     
+2028/12/22        7                       Friday                             
+2028/12/23        8                       Saturday                           
+2028/12/24        9                       Sunday                             
+2028/12/25        10                      Monday                             
+2028/12/26        11                      Tuesday                            
+2028/12/27        12                      Wednesday                          
+2028/12/28        13                      Thursday                           
+2028/12/29        14                      Friday                             
+2028/12/30        15                      Saturday                           
+2028/12/31        16                      Sunday                             

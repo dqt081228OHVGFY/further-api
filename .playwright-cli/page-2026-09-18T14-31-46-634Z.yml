@@ -1,0 +1,62 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "RelayFor 公益站" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e6]: hub
+      - generic [ref=e7]:
+        - strong [ref=e8]: RelayFor
+        - generic [ref=e9]: 公益站
+    - navigation "账户导航" [ref=e10]:
+      - generic [ref=e11]:
+        - link "登录" [ref=e12] [cursor=pointer]:
+          - /url: /auth/?mode=login
+        - link "注册" [ref=e13] [cursor=pointer]:
+          - /url: /auth/?mode=register
+  - generic [ref=e14]:
+    - generic [aria-hidden] [ref=e16]: campaign
+    - generic [ref=e17]:
+      - generic [ref=e18]: 公益站公告
+      - paragraph [ref=e19]: 这是本地复刻预览。所有账户、额度与 Key 均为合成数据，不连接真实服务。
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - heading "RelayFor 公益站" [level=1] [ref=e23]
+        - paragraph [ref=e24]: 公益 API 服务。
+        - generic [ref=e25]:
+          - link "登录控制台" [ref=e26] [cursor=pointer]:
+            - /url: /auth/?mode=login
+          - link "创建账户" [ref=e27] [cursor=pointer]:
+            - /url: /auth/?mode=register
+          - link "兑换预付卡" [ref=e28] [cursor=pointer]:
+            - /url: /prepaid/
+            - generic [aria-hidden] [ref=e29]: confirmation_number
+            - text: 兑换预付卡
+      - generic [ref=e30]:
+        - generic [ref=e31]: 接口入口
+        - generic [ref=e32]:
+          - generic [ref=e33]: OpenAI
+          - code [ref=e34]: /v1/chat/completions
+        - generic [ref=e35]:
+          - generic [ref=e36]: Anthropic
+          - code [ref=e37]: /v1/messages
+        - generic [ref=e38]:
+          - generic [ref=e39]: 鉴权
+          - code [ref=e40]: Bearer sk-RelayFor-...
+    - region "服务能力" [ref=e41]:
+      - article [ref=e42]:
+        - generic [aria-hidden] [ref=e44]: confirmation_number
+        - generic [ref=e45]: 预付卡即用
+        - paragraph [ref=e46]: 绑定 LinuxDO 后直接生成 API Key。
+      - article [ref=e47]:
+        - generic [aria-hidden] [ref=e49]: hub
+        - generic [ref=e50]: 统一接口
+        - paragraph [ref=e51]: OpenAI 与 Anthropic 兼容接口。
+      - article [ref=e52]:
+        - generic [aria-hidden] [ref=e54]: key
+        - generic [ref=e55]: 独立 API Key
+        - paragraph [ref=e56]: 独立创建与撤销。
+      - article [ref=e57]:
+        - generic [aria-hidden] [ref=e59]: receipt_long
+        - generic [ref=e60]: 调用记录
+        - paragraph [ref=e61]: Token、耗时、状态与消费。
+  - contentinfo [ref=e62]: © 2026 RelayFor

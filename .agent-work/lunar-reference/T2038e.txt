@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2038 (Wu-wu  -  year of the Horse)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2038/1/1          26                      Friday                             
+2038/1/2          27                      Saturday                           
+2038/1/3          28                      Sunday                             
+2038/1/4          29                      Monday                             
+2038/1/5          12th Lunar Month        Tuesday        Moderate Cold       
+2038/1/6          2                       Wednesday                          
+2038/1/7          3                       Thursday                           
+2038/1/8          4                       Friday                             
+2038/1/9          5                       Saturday                           
+2038/1/10         6                       Sunday                             
+2038/1/11         7                       Monday                             
+2038/1/12         8                       Tuesday                            
+2038/1/13         9                       Wednesday                          
+2038/1/14         10                      Thursday                           
+2038/1/15         11                      Friday                             
+2038/1/16         12                      Saturday                           
+2038/1/17         13                      Sunday                             
+2038/1/18         14                      Monday                             
+2038/1/19         15                      Tuesday                            
+2038/1/20         16                      Wednesday      Severe Cold         
+2038/1/21         17                      Thursday                           
+2038/1/22         18                      Friday                             
+2038/1/23         19                      Saturday                           
+2038/1/24         20                      Sunday                             
+2038/1/25         21                      Monday                             
+2038/1/26         22                      Tuesday                            
+2038/1/27         23                      Wednesday                          
+2038/1/28         24                      Thursday                           
+2038/1/29         25                      Friday                             
+2038/1/30         26                      Saturday                           
+2038/1/31         27                      Sunday                             
+2038/2/1          28                      Monday                             
+2038/2/2          29                      Tuesday                            
+2038/2/3          30                      Wednesday                          
+2038/2/4          1st Lunar Month         Thursday       Spring Commences    
+2038/2/5          2                       Friday                             
+2038/2/6          3                       Saturday                           
+2038/2/7          4                       Sunday                             
+2038/2/8          5                       Monday                             
+2038/2/9          6                       Tuesday                            
+2038/2/10         7                       Wednesday                          
+2038/2/11         8                       Thursday                           
+2038/2/12         9                       Friday                             
+2038/2/13         10                      Saturday                           
+2038/2/14         11                      Sunday                             
+2038/2/15         12                      Monday                             
+2038/2/16         13                      Tuesday                            
+2038/2/17         14                      Wednesday                          
+2038/2/18         15                      Thursday       Spring Showers      
+2038/2/19         16                      Friday                             
+2038/2/20         17                      Saturday                           
+2038/2/21         18                      Sunday                             
+2038/2/22         19                      Monday                             
+2038/2/23         20                      Tuesday                            
+2038/2/24         21                      Wednesday                          
+2038/2/25         22                      Thursday                           
+2038/2/26         23                      Friday                             
+2038/2/27         24                      Saturday                           
+2038/2/28         25                      Sunday                             
+2038/3/1          26                      Monday                             
+2038/3/2          27                      Tuesday                            
+2038/3/3          28                      Wednesday                          
+2038/3/4          29                      Thursday                           
+2038/3/5          30                      Friday         Insects Waken       
+2038/3/6          2nd Lunar Month         Saturday                           
+2038/3/7          2                       Sunday                             
+2038/3/8          3                       Monday                             
+2038/3/9          4                       Tuesday                            
+2038/3/10         5                       Wednesday                          
+2038/3/11         6                       Thursday                           
+2038/3/12         7                       Friday                             
+2038/3/13         8                       Saturday                           
+2038/3/14         9                       Sunday                             
+2038/3/15         10                      Monday                             
+2038/3/16         11                      Tuesday                            
+2038/3/17         12                      Wednesday                          
+2038/3/18         13                      Thursday                           
+2038/3/19         14                      Friday                             
+2038/3/20         15                      Saturday       Vernal Equinox      
+2038/3/21         16                      Sunday                             
+2038/3/22         17                      Monday                             
+2038/3/23         18                      Tuesday                            
+2038/3/24         19                      Wednesday                          
+2038/3/25         20                      Thursday                           
+2038/3/26         21                      Friday                             
+2038/3/27         22                      Saturday                           
+2038/3/28         23                      Sunday                             
+2038/3/29         24                      Monday                             
+2038/3/30         25                      Tuesday                            
+2038/3/31         26                      Wednesday                          
+2038/4/1          27                      Thursday                           
+2038/4/2          28                      Friday                             
+2038/4/3          29                      Saturday                           
+2038/4/4          30                      Sunday                             
+2038/4/5          3rd Lunar Month         Monday         Bright & Clear      
+2038/4/6          2                       Tuesday                            
+2038/4/7          3                       Wednesday                          
+2038/4/8          4                       Thursday                           
+2038/4/9          5                       Friday                             
+2038/4/10         6                       Saturday                           
+2038/4/11         7                       Sunday                             
+2038/4/12         8                       Monday                             
+2038/4/13         9                       Tuesday                            
+2038/4/14         10                      Wednesday                          
+2038/4/15         11                      Thursday                           
+2038/4/16         12                      Friday                             
+2038/4/17         13                      Saturday                           
+2038/4/18         14                      Sunday                             
+2038/4/19         15                      Monday                             
+2038/4/20         16                      Tuesday        Corn Rain           
+2038/4/21         17                      Wednesday                          
+2038/4/22         18                      Thursday                           
+2038/4/23         19                      Friday                             
+2038/4/24         20                      Saturday                           
+2038/4/25         21                      Sunday                             
+2038/4/26         22                      Monday                             
+2038/4/27         23                      Tuesday                            
+2038/4/28         24                      Wednesday                          
+2038/4/29         25                      Thursday                           
+2038/4/30         26                      Friday                             
+2038/5/1          27                      Saturday                           
+2038/5/2          28                      Sunday                             
+2038/5/3          29                      Monday                             
+2038/5/4          4th Lunar Month         Tuesday                            
+2038/5/5          2                       Wednesday      Summer Commences    
+2038/5/6          3                       Thursday                           
+2038/5/7          4                       Friday                             
+2038/5/8          5                       Saturday                           
+2038/5/9          6                       Sunday                             
+2038/5/10         7                       Monday                             
+2038/5/11         8                       Tuesday                            
+2038/5/12         9                       Wednesday                          
+2038/5/13         10                      Thursday                           
+2038/5/14         11                      Friday                             
+2038/5/15         12                      Saturday                           
+2038/5/16         13                      Sunday                             
+2038/5/17         14                      Monday                             
+2038/5/18         15                      Tuesday                            
+2038/5/19         16                      Wednesday                          
+2038/5/20         17                      Thursday                           
+2038/5/21         18                      Friday         Corn Forms          
+2038/5/22         19                      Saturday                           
+2038/5/23         20                      Sunday                             
+2038/5/24         21                      Monday                             
+2038/5/25         22                      Tuesday                            
+2038/5/26         23                      Wednesday                          
+2038/5/27         24                      Thursday                           
+2038/5/28         25                      Friday                             
+2038/5/29         26                      Saturday                           
+2038/5/30         27                      Sunday                             
+2038/5/31         28                      Monday                             
+2038/6/1          29                      Tuesday                            
+2038/6/2          30                      Wednesday                          
+2038/6/3          5th Lunar Month         Thursday                           
+2038/6/4          2                       Friday                             
+2038/6/5          3                       Saturday       Corn on Ear         
+2038/6/6          4                       Sunday                             
+2038/6/7          5                       Monday                             
+2038/6/8          6                       Tuesday                            
+2038/6/9          7                       Wednesday                          
+2038/6/10         8                       Thursday                           
+2038/6/11         9                       Friday                             
+2038/6/12         10                      Saturday                           
+2038/6/13         11                      Sunday                             
+2038/6/14         12                      Monday                             
+2038/6/15         13                      Tuesday                            
+2038/6/16         14                      Wednesday                          
+2038/6/17         15                      Thursday                           
+2038/6/18         16                      Friday                             
+2038/6/19         17                      Saturday                           
+2038/6/20         18                      Sunday                             
+2038/6/21         19                      Monday         Summer Solstice     
+2038/6/22         20                      Tuesday                            
+2038/6/23         21                      Wednesday                          
+2038/6/24         22                      Thursday                           
+2038/6/25         23                      Friday                             
+2038/6/26         24                      Saturday                           
+2038/6/27         25                      Sunday                             
+2038/6/28         26                      Monday                             
+2038/6/29         27                      Tuesday                            
+2038/6/30         28                      Wednesday                          
+2038/7/1          29                      Thursday                           
+2038/7/2          6th Lunar Month         Friday                             
+2038/7/3          2                       Saturday                           
+2038/7/4          3                       Sunday                             
+2038/7/5          4                       Monday                             
+2038/7/6          5                       Tuesday                            
+2038/7/7          6                       Wednesday      Moderate Heat       
+2038/7/8          7                       Thursday                           
+2038/7/9          8                       Friday                             
+2038/7/10         9                       Saturday                           
+2038/7/11         10                      Sunday                             
+2038/7/12         11                      Monday                             
+2038/7/13         12                      Tuesday                            
+2038/7/14         13                      Wednesday                          
+2038/7/15         14                      Thursday                           
+2038/7/16         15                      Friday                             
+2038/7/17         16                      Saturday                           
+2038/7/18         17                      Sunday                             
+2038/7/19         18                      Monday                             
+2038/7/20         19                      Tuesday                            
+2038/7/21         20                      Wednesday                          
+2038/7/22         21                      Thursday                           
+2038/7/23         22                      Friday         Great Heat          
+2038/7/24         23                      Saturday                           
+2038/7/25         24                      Sunday                             
+2038/7/26         25                      Monday                             
+2038/7/27         26                      Tuesday                            
+2038/7/28         27                      Wednesday                          
+2038/7/29         28                      Thursday                           
+2038/7/30         29                      Friday                             
+2038/7/31         30                      Saturday                           
+2038/8/1          7th Lunar Month         Sunday                             
+2038/8/2          2                       Monday                             
+2038/8/3          3                       Tuesday                            
+2038/8/4          4                       Wednesday                          
+2038/8/5          5                       Thursday                           
+2038/8/6          6                       Friday                             
+2038/8/7          7                       Saturday       Autumn Commences    
+2038/8/8          8                       Sunday                             
+2038/8/9          9                       Monday                             
+2038/8/10         10                      Tuesday                            
+2038/8/11         11                      Wednesday                          
+2038/8/12         12                      Thursday                           
+2038/8/13         13                      Friday                             
+2038/8/14         14                      Saturday                           
+2038/8/15         15                      Sunday                             
+2038/8/16         16                      Monday                             
+2038/8/17         17                      Tuesday                            
+2038/8/18         18                      Wednesday                          
+2038/8/19         19                      Thursday                           
+2038/8/20         20                      Friday                             
+2038/8/21         21                      Saturday                           
+2038/8/22         22                      Sunday                             
+2038/8/23         23                      Monday         End of Heat         
+2038/8/24         24                      Tuesday                            
+2038/8/25         25                      Wednesday                          
+2038/8/26         26                      Thursday                           
+2038/8/27         27                      Friday                             
+2038/8/28         28                      Saturday                           
+2038/8/29         29                      Sunday                             
+2038/8/30         8th Lunar Month         Monday                             
+2038/8/31         2                       Tuesday                            
+2038/9/1          3                       Wednesday                          
+2038/9/2          4                       Thursday                           
+2038/9/3          5                       Friday                             
+2038/9/4          6                       Saturday                           
+2038/9/5          7                       Sunday                             
+2038/9/6          8                       Monday                             
+2038/9/7          9                       Tuesday        White Dew           
+2038/9/8          10                      Wednesday                          
+2038/9/9          11                      Thursday                           
+2038/9/10         12                      Friday                             
+2038/9/11         13                      Saturday                           
+2038/9/12         14                      Sunday                             
+2038/9/13         15                      Monday                             
+2038/9/14         16                      Tuesday                            
+2038/9/15         17                      Wednesday                          
+2038/9/16         18                      Thursday                           
+2038/9/17         19                      Friday                             
+2038/9/18         20                      Saturday                           
+2038/9/19         21                      Sunday                             
+2038/9/20         22                      Monday                             
+2038/9/21         23                      Tuesday                            
+2038/9/22         24                      Wednesday                          
+2038/9/23         25                      Thursday       Autumnal Equinox    
+2038/9/24         26                      Friday                             
+2038/9/25         27                      Saturday                           
+2038/9/26         28                      Sunday                             
+2038/9/27         29                      Monday                             
+2038/9/28         30                      Tuesday                            
+2038/9/29         9th Lunar Month         Wednesday                          
+2038/9/30         2                       Thursday                           
+2038/10/1         3                       Friday                             
+2038/10/2         4                       Saturday                           
+2038/10/3         5                       Sunday                             
+2038/10/4         6                       Monday                             
+2038/10/5         7                       Tuesday                            
+2038/10/6         8                       Wednesday                          
+2038/10/7         9                       Thursday                           
+2038/10/8         10                      Friday         Cold Dew            
+2038/10/9         11                      Saturday                           
+2038/10/10        12                      Sunday                             
+2038/10/11        13                      Monday                             
+2038/10/12        14                      Tuesday                            
+2038/10/13        15                      Wednesday                          
+2038/10/14        16                      Thursday                           
+2038/10/15        17                      Friday                             
+2038/10/16        18                      Saturday                           
+2038/10/17        19                      Sunday                             
+2038/10/18        20                      Monday                             
+2038/10/19        21                      Tuesday                            
+2038/10/20        22                      Wednesday                          
+2038/10/21        23                      Thursday                           
+2038/10/22        24                      Friday                             
+2038/10/23        25                      Saturday       Frost               
+2038/10/24        26                      Sunday                             
+2038/10/25        27                      Monday                             
+2038/10/26        28                      Tuesday                            
+2038/10/27        29                      Wednesday                          
+2038/10/28        10th Lunar Month        Thursday                           
+2038/10/29        2                       Friday                             
+2038/10/30        3                       Saturday                           
+2038/10/31        4                       Sunday                             
+2038/11/1         5                       Monday                             
+2038/11/2         6                       Tuesday                            
+2038/11/3         7                       Wednesday                          
+2038/11/4         8                       Thursday                           
+2038/11/5         9                       Friday                             
+2038/11/6         10                      Saturday                           
+2038/11/7         11                      Sunday         Winter Commences    
+2038/11/8         12                      Monday                             
+2038/11/9         13                      Tuesday                            
+2038/11/10        14                      Wednesday                          
+2038/11/11        15                      Thursday                           
+2038/11/12        16                      Friday                             
+2038/11/13        17                      Saturday                           
+2038/11/14        18                      Sunday                             
+2038/11/15        19                      Monday                             
+2038/11/16        20                      Tuesday                            
+2038/11/17        21                      Wednesday                          
+2038/11/18        22                      Thursday                           
+2038/11/19        23                      Friday                             
+2038/11/20        24                      Saturday                           
+2038/11/21        25                      Sunday                             
+2038/11/22        26                      Monday         Light Snow          
+2038/11/23        27                      Tuesday                            
+2038/11/24        28                      Wednesday                          
+2038/11/25        29                      Thursday                           
+2038/11/26        11th Lunar Month        Friday                             
+2038/11/27        2                       Saturday                           
+2038/11/28        3                       Sunday                             
+2038/11/29        4                       Monday                             
+2038/11/30        5                       Tuesday                            
+2038/12/1         6                       Wednesday                          
+2038/12/2         7                       Thursday                           
+2038/12/3         8                       Friday                             
+2038/12/4         9                       Saturday                           
+2038/12/5         10                      Sunday                             
+2038/12/6         11                      Monday                             
+2038/12/7         12                      Tuesday        Heavy Snow          
+2038/12/8         13                      Wednesday                          
+2038/12/9         14                      Thursday                           
+2038/12/10        15                      Friday                             
+2038/12/11        16                      Saturday                           
+2038/12/12        17                      Sunday                             
+2038/12/13        18                      Monday                             
+2038/12/14        19                      Tuesday                            
+2038/12/15        20                      Wednesday                          
+2038/12/16        21                      Thursday                           
+2038/12/17        22                      Friday                             
+2038/12/18        23                      Saturday                           
+2038/12/19        24                      Sunday                             
+2038/12/20        25                      Monday                             
+2038/12/21        26                      Tuesday                            
+2038/12/22        27                      Wednesday      Winter Solstice     
+2038/12/23        28                      Thursday                           
+2038/12/24        29                      Friday                             
+2038/12/25        30                      Saturday                           
+2038/12/26        12th Lunar Month        Sunday                             
+2038/12/27        2                       Monday                             
+2038/12/28        3                       Tuesday                            
+2038/12/29        4                       Wednesday                          
+2038/12/30        5                       Thursday                           
+2038/12/31        6                       Friday                             

@@ -1,0 +1,340 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - link "RelayFor管理后台" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e5]: hub
+    - generic [ref=e7]: 管理
+    - button "概览" [ref=e8] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e9]: space_dashboard
+      - text: 概览
+    - button "渠道" [ref=e10] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e11]: hub
+      - text: 渠道
+    - button "模型" [ref=e12] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e13]: tune
+      - text: 模型
+    - button "订阅" [active] [ref=e14] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e15]: redeem
+      - text: 订阅
+    - button "用户" [ref=e16] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e17]: group
+      - text: 用户
+    - button "兑换码" [ref=e18] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e19]: confirmation_number
+      - text: 兑换码
+    - button "注册码" [ref=e20] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e21]: key
+      - text: 注册码
+    - button "预付卡" [ref=e22] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e23]: payments
+      - text: 预付卡
+    - button "日志" [ref=e24] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e25]: receipt_long
+      - text: 日志
+    - button "安全与设置" [ref=e26] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e27]: lock
+      - text: 安全与设置
+    - generic [ref=e28]:
+      - button "收起侧边栏" [expanded] [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: left_panel_close
+      - link "用户控制台" [ref=e32] [cursor=pointer]:
+        - /url: /console/
+        - generic [aria-hidden] [ref=e33]: person
+        - text: 用户控制台
+      - button "退出登录" [ref=e34] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e35]: logout
+        - text: 退出登录
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: 订阅
+      - button "刷新" [ref=e40] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e41]: refresh
+    - generic [ref=e377]:
+      - generic [ref=e378]:
+        - generic [ref=e379]: 订阅与计费活动
+        - generic [ref=e380]:
+          - button "检查周期重置" [ref=e381] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e382]: refresh
+            - text: 检查周期重置
+          - button "发放套餐福利" [ref=e383] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e384]: redeem
+            - text: 发放套餐福利
+          - button "新建计费活动" [ref=e385] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e386]: redeem
+            - text: 新建计费活动
+          - button "新建计划" [ref=e387] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e388]: add
+            - text: 新建计划
+      - generic [ref=e390]:
+        - generic [ref=e391]:
+          - generic [ref=e392]:
+            - generic [ref=e393]:
+              - generic [ref=e394]: 直接显示计划
+              - generic [ref=e395]: 在用户套餐主列表中直接展示
+            - generic [ref=e396]: 3 个
+          - generic [ref=e397]:
+            - generic [aria-hidden] [ref=e398]: redeem
+            - generic [ref=e399]:
+              - generic [ref=e400]: RelayFor Go
+              - generic [ref=e401]:
+                - code [ref=e402]: 基础计划
+                - text: · 有效期 30 天 · 解锁 2 个模型
+              - generic [ref=e403]: 基础使用计划 适合日常调用与轻量开发，提供基础折扣、标准访问上限和专属模型权益。
+            - generic [ref=e404]:
+              - generic [ref=e405]:
+                - generic [ref=e406]: $20.00 · 通用
+                - text: 额度
+              - generic [ref=e407]:
+                - generic [ref=e408]: 不重置
+                - text: 周期重置
+              - generic [ref=e409]:
+                - generic [ref=e410]: ×0.95
+                - text: 折扣倍率
+              - generic [ref=e411]:
+                - generic [ref=e412]: 不限
+                - text: 最高节省
+              - generic [ref=e413]:
+                - generic [ref=e414]: 15 / 2
+                - text: RPM / 并发
+            - generic [ref=e415]:
+              - generic [ref=e416]: 直接展示 · 1
+              - generic [ref=e417]: 启用
+              - button "编辑" [ref=e418] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e419]: edit
+              - button "切换状态" [ref=e420] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e421]: refresh
+          - generic [ref=e422]:
+            - generic [aria-hidden] [ref=e423]: redeem
+            - generic [ref=e424]:
+              - generic [ref=e425]: RelayFor Plus
+              - generic [ref=e426]:
+                - code [ref=e427]: 升级计划
+                - text: · 有效期 30 天 · 解锁 1 个模型
+              - generic [ref=e428]: 进阶使用计划 适合更频繁的 API 调用与开发工作流，提供更低折扣倍率、更高访问上限和专属模型权益。
+            - generic [ref=e429]:
+              - generic [ref=e430]:
+                - generic [ref=e431]: $100.00 · 通用
+                - text: 额度
+              - generic [ref=e432]:
+                - generic [ref=e433]: 不重置
+                - text: 周期重置
+              - generic [ref=e434]:
+                - generic [ref=e435]: ×0.91
+                - text: 折扣倍率
+              - generic [ref=e436]:
+                - generic [ref=e437]: 不限
+                - text: 最高节省
+              - generic [ref=e438]:
+                - generic [ref=e439]: 25 / 4
+                - text: RPM / 并发
+            - generic [ref=e440]:
+              - generic [ref=e441]: 直接展示 · 2
+              - generic [ref=e442]: 启用
+              - button "编辑" [ref=e443] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e444]: edit
+              - button "切换状态" [ref=e445] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e446]: refresh
+          - generic [ref=e447]:
+            - generic [aria-hidden] [ref=e448]: redeem
+            - generic [ref=e449]:
+              - generic [ref=e450]: RelayFor Pro
+              - generic [ref=e451]:
+                - code [ref=e452]: 专业计划
+                - text: · 有效期 30 天 · 解锁 1 个模型
+              - generic [ref=e453]: 专业使用计划 面向持续开发、Agent 与较高并发场景，提供更优价格、更高吞吐和专业级访问权益。
+            - generic [ref=e454]:
+              - generic [ref=e455]:
+                - generic [ref=e456]: $200.00 · 通用
+                - text: 额度
+              - generic [ref=e457]:
+                - generic [ref=e458]: 不重置
+                - text: 周期重置
+              - generic [ref=e459]:
+                - generic [ref=e460]: ×0.88
+                - text: 折扣倍率
+              - generic [ref=e461]:
+                - generic [ref=e462]: 不限
+                - text: 最高节省
+              - generic [ref=e463]:
+                - generic [ref=e464]: 35 / 6
+                - text: RPM / 并发
+            - generic [ref=e465]:
+              - generic [ref=e466]: 直接展示 · 3
+              - generic [ref=e467]: 启用
+              - button "编辑" [ref=e468] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e469]: edit
+              - button "切换状态" [ref=e470] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e471]: refresh
+        - generic [ref=e472]:
+          - generic [ref=e473]:
+            - generic [ref=e474]:
+              - generic [ref=e475]: 折叠计划
+              - generic [ref=e476]: 收纳在“更多套餐”对话框中
+            - generic [ref=e477]: 5 个
+          - generic [ref=e478]:
+            - generic [aria-hidden] [ref=e479]: redeem
+            - generic [ref=e480]:
+              - generic [ref=e481]: RelayFor EveryDay
+              - generic [ref=e482]:
+                - code [ref=e483]: 每日计划
+                - text: · 有效期 10 天 · 解锁 0 个模型
+              - generic [ref=e484]: 每天享受一定的0.01倍率&少量赠额 最高节省23.3刀 持续10天
+            - generic [ref=e485]:
+              - generic [ref=e486]:
+                - generic [ref=e487]: $0.23 · 通用
+                - text: 额度
+              - generic [ref=e488]:
+                - generic [ref=e489]: 每 2 天
+                - text: 周期重置
+              - generic [ref=e490]:
+                - generic [ref=e491]: ×0.01
+                - text: 折扣倍率
+              - generic [ref=e492]:
+                - generic [ref=e493]: $1.00
+                - text: 最高节省
+              - generic [ref=e494]:
+                - generic [ref=e495]: 15 / 2
+                - text: RPM / 并发
+            - generic [ref=e496]:
+              - generic [ref=e497]: 更多套餐 · 4
+              - generic [ref=e498]: 启用
+              - button "编辑" [ref=e499] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e500]: edit
+              - button "切换状态" [ref=e501] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e502]: refresh
+          - generic [ref=e503]:
+            - generic [aria-hidden] [ref=e504]: redeem
+            - generic [ref=e505]:
+              - generic [ref=e506]: RelayFor Discount
+              - generic [ref=e507]:
+                - code [ref=e508]: 折扣计划
+                - text: · 有效期 1 天 · 解锁 0 个模型
+              - generic [ref=e509]: 短期高强度使用计划 1 天有效 · 15 RPM / 2 并发 公共模型全局 ×0.50
+            - generic [ref=e510]:
+              - generic [ref=e511]:
+                - generic [ref=e512]: $100.00 · 通用
+                - text: 额度
+              - generic [ref=e513]:
+                - generic [ref=e514]: 不重置
+                - text: 周期重置
+              - generic [ref=e515]:
+                - generic [ref=e516]: ×0.50
+                - text: 折扣倍率
+              - generic [ref=e517]:
+                - generic [ref=e518]: $250.00
+                - text: 最高节省
+              - generic [ref=e519]:
+                - generic [ref=e520]: 15 / 2
+                - text: RPM / 并发
+            - generic [ref=e521]:
+              - generic [ref=e522]: 更多套餐 · 5
+              - generic [ref=e523]: 启用
+              - button "编辑" [ref=e524] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e525]: edit
+              - button "切换状态" [ref=e526] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e527]: refresh
+          - generic [ref=e528]:
+            - generic [aria-hidden] [ref=e529]: redeem
+            - generic [ref=e530]:
+              - generic [ref=e531]: RelayFor Pro 2x
+              - generic [ref=e532]:
+                - code [ref=e533]: 专业计划 2x
+                - text: · 有效期 30 天 · 解锁 1 个模型 · 的升级计划
+              - generic [ref=e534]: 专业计划 2x 为已有 RelayFor Pro 的用户提供额外外消费承诺，并进一步提升折扣与请求上限。
+            - generic [ref=e535]:
+              - generic [ref=e536]:
+                - generic [ref=e537]: $200.00 · 通用
+                - text: 额度
+              - generic [ref=e538]:
+                - generic [ref=e539]: 不重置
+                - text: 周期重置
+              - generic [ref=e540]:
+                - generic [ref=e541]: ×0.87
+                - text: 折扣倍率
+              - generic [ref=e542]:
+                - generic [ref=e543]: 不限
+                - text: 最高节省
+              - generic [ref=e544]:
+                - generic [ref=e545]: 40 / 6
+                - text: RPM / 并发
+            - generic [ref=e546]:
+              - generic [ref=e547]: 更多套餐 · 6
+              - generic [ref=e548]: 启用
+              - button "编辑" [ref=e549] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e550]: edit
+              - button "切换状态" [ref=e551] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e552]: refresh
+          - generic [ref=e553]:
+            - generic [aria-hidden] [ref=e554]: redeem
+            - generic [ref=e555]:
+              - generic [ref=e556]: RelayFor Ultra
+              - generic [ref=e557]:
+                - code [ref=e558]: 终极计划
+                - text: · 有效期 30 天 · 解锁 1 个模型
+              - generic [ref=e559]: 高负载使用计划 面向持续高消费、多 Agent 与高并发工作流，提供大额额度、更低折扣倍率和更高访问上限。
+            - generic [ref=e560]:
+              - generic [ref=e561]:
+                - generic [ref=e562]: $1000.00 · 通用
+                - text: 额度
+              - generic [ref=e563]:
+                - generic [ref=e564]: 不重置
+                - text: 周期重置
+              - generic [ref=e565]:
+                - generic [ref=e566]: ×0.85
+                - text: 折扣倍率
+              - generic [ref=e567]:
+                - generic [ref=e568]: 不限
+                - text: 最高节省
+              - generic [ref=e569]:
+                - generic [ref=e570]: 65 / 12
+                - text: RPM / 并发
+            - generic [ref=e571]:
+              - generic [ref=e572]: 更多套餐 · 7
+              - generic [ref=e573]: 启用
+              - button "编辑" [ref=e574] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e575]: edit
+              - button "切换状态" [ref=e576] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e577]: refresh
+          - generic [ref=e578]:
+            - generic [aria-hidden] [ref=e579]: redeem
+            - generic [ref=e580]:
+              - generic [ref=e581]: RelayFor Ultra 5x
+              - generic [ref=e582]:
+                - code [ref=e583]: 终极计划 5x
+                - text: · 有效期 30 天 · 解锁 1 个模型 · 的升级计划
+              - generic [ref=e584]: 高负载计划 5x 为已有 RelayFor Ultra 的大规模使用场景提供更高消费承诺、更优折扣与更高并发能力。
+            - generic [ref=e585]:
+              - generic [ref=e586]:
+                - generic [ref=e587]: $4000.00 · 通用
+                - text: 额度
+              - generic [ref=e588]:
+                - generic [ref=e589]: 不重置
+                - text: 周期重置
+              - generic [ref=e590]:
+                - generic [ref=e591]: ×0.83
+                - text: 折扣倍率
+              - generic [ref=e592]:
+                - generic [ref=e593]: 不限
+                - text: 最高节省
+              - generic [ref=e594]:
+                - generic [ref=e595]: 70 / 18
+                - text: RPM / 并发
+            - generic [ref=e596]:
+              - generic [ref=e597]: 更多套餐 · 8
+              - generic [ref=e598]: 启用
+              - button "编辑" [ref=e599] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e600]: edit
+              - button "切换状态" [ref=e601] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e602]: refresh
+      - generic [ref=e603]:
+        - generic [ref=e604]:
+          - generic [ref=e605]:
+            - generic [ref=e606]: 计费活动
+            - generic [ref=e607]: 按用户组和模型或额度组配置分项折扣及消费返现；重叠折扣按计费项取最低倍率。
+          - generic [aria-hidden] [ref=e608]: redeem
+        - generic [ref=e609]: 还没有配置计费活动。
+      - generic [ref=e611]:
+        - generic [ref=e612]:
+          - generic [ref=e613]: 福利发放记录
+          - generic [aria-hidden] [ref=e614]: redeem
+        - generic [ref=e615]: 还没有发放套餐福利。

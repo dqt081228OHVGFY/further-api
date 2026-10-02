@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#005ac1">
+  <title>RelayFor</title>
+  <link rel="stylesheet" href="/app.css">
+  <script defer src="/app.js"></script>
+  <script defer src="/site.js"></script>
+</head>
+<body data-page="public" class="public-page">
+  <div class="public-shell">
+    <header class="public-header">
+      <a class="public-brand" href="/">
+        <span class="rail-logo"><span class="material-symbol" aria-hidden="true">hub</span></span>
+		<span><strong>RelayFor</strong><small data-site-subtitle>AI API 网关</small></span>
+      </a>
+      <nav aria-label="账户导航">
+        <span class="public-nav-actions" data-public-guest>
+          <a class="md-btn md-btn-text" href="/auth/?mode=login">登录</a>
+          <a class="md-btn md-btn-filled" data-public-register href="/auth/?mode=register">注册</a>
+        </span>
+        <span class="public-nav-actions hidden" data-public-user>
+          <span class="public-user-name"><span class="material-symbol" aria-hidden="true">person</span><span data-public-username>已登录</span></span>
+          <a class="md-btn md-btn-filled" data-public-destination href="/console/"><span data-public-destination-label>进入控制台</span></a>
+          <button class="md-btn md-btn-text" type="button" data-public-logout>退出</button>
+        </span>
+      </nav>
+    </header>
+
+    <section class="site-announcement hidden" data-site-announcement aria-live="polite">
+      <span class="site-announcement-icon"><span class="material-symbol" aria-hidden="true">campaign</span></span>
+      <div><b data-site-announcement-title>站点公告</b><p data-site-announcement-content></p></div>
+    </section>
+
+    <main class="public-main">
+      <section class="md-card public-hero">
+        <div class="public-hero-copy">
+		  <h1 data-public-title>AI API 网关</h1>
+		  <p data-public-description>兼容 OpenAI 与 Anthropic API。</p>
+          <div class="public-actions" data-public-guest>
+            <a class="md-btn md-btn-filled" href="/auth/?mode=login">登录控制台</a>
+            <a class="md-btn md-btn-outlined" data-public-register href="/auth/?mode=register">创建账户</a>
+            <a class="md-btn md-btn-text" href="/prepaid/"><span class="material-symbol" aria-hidden="true">confirmation_number</span>兑换预付卡</a>
+          </div>
+          <div class="public-actions hidden" data-public-user>
+            <a class="md-btn md-btn-filled" data-public-destination href="/console/"><span data-public-destination-label>进入控制台</span></a>
+            <a class="md-btn md-btn-outlined" href="/console/#tokens">管理 API Key</a>
+          </div>
+        </div>
+        <div class="public-endpoints">
+          <div class="md-card-title">接口入口</div>
+          <div class="public-endpoint"><span>OpenAI</span><code>/v1/chat/completions</code></div>
+          <div class="public-endpoint"><span>Anthropic</span><code>/v1/messages</code></div>
+          <div class="public-endpoint"><span>鉴权</span><code>Bearer sk-RelayFor-...</code></div>
+        </div>
+      </section>
+
+      <section class="public-feature-grid" aria-label="服务能力">
+        <article class="md-card public-feature">
+          <span class="public-feature-icon"><span class="material-symbol" aria-hidden="true">confirmation_number</span></span>
+          <div class="md-card-title">预付卡即用</div>
+          <p>绑定 LinuxDO 后直接生成 API Key。</p>
+        </article>
+        <article class="md-card public-feature">
+          <span class="public-feature-icon"><span class="material-symbol" aria-hidden="true">hub</span></span>
+          <div class="md-card-title">统一接口</div>
+          <p>OpenAI 与 Anthropic 兼容接口。</p>
+        </article>
+        <article class="md-card public-feature">
+          <span class="public-feature-icon"><span class="material-symbol" aria-hidden="true">key</span></span>
+          <div class="md-card-title">独立 API Key</div>
+          <p>独立创建与撤销。</p>
+        </article>
+        <article class="md-card public-feature">
+          <span class="public-feature-icon"><span class="material-symbol" aria-hidden="true">receipt_long</span></span>
+          <div class="md-card-title">调用记录</div>
+          <p>Token、耗时、状态与消费。</p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="public-footer">© 2026 RelayFor</footer>
+  </div>
+</body>
+</html>

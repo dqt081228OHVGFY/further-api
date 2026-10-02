@@ -1,0 +1,348 @@
+- generic [ref=f3e1]:
+  - navigation [ref=f3e2]:
+    - link [ref=f3e3] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=f3e5]: hub
+      - generic [ref=f3e6]:
+        - text: RelayFor
+        - paragraph [ref=f3e7]: 控制台
+    - generic [ref=f3e8]: 账户
+    - button "概览" [ref=f3e9] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e10]: space_dashboard
+      - text: 概览
+    - button "API Key" [ref=f3e11] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e12]: key
+      - text: API Key
+    - button "模型与价格" [ref=f3e13] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e14]: tune
+      - text: 模型与价格
+    - button "使用文档" [ref=f3e15] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e16]: description
+      - text: 使用文档
+    - button "调用记录" [ref=f3e17] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e18]: receipt_long
+      - text: 调用记录
+    - button "兑换额度" [ref=f3e19] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e20]: redeem
+      - text: 兑换额度
+    - button "订阅计划" [ref=f3e21] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e22]: confirmation_number
+      - text: 订阅计划
+    - button "账户设置" [ref=f3e23] [cursor=pointer]:
+      - generic [aria-hidden] [ref=f3e24]: person
+      - text: 账户设置
+    - generic [ref=f3e25]:
+      - button "收起侧边栏" [expanded] [ref=f3e26] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f3e27]: left_panel_close
+      - link "返回首页" [ref=f3e29] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=f3e30]: arrow_back
+        - text: 返回首页
+      - button "退出登录" [ref=f3e31] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f3e32]: logout
+        - text: 退出登录
+  - main [ref=f3e33]:
+    - generic [ref=f3e34]:
+      - generic [ref=f3e35]: 订阅计划
+      - generic [ref=f3e37]: $8.52
+      - button "刷新" [ref=f3e38] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f3e39]: refresh
+    - generic [ref=f3e41]:
+      - generic [ref=f3e43]:
+        - generic [ref=f3e44]: 可用订阅计划
+        - generic [aria-hidden] [ref=f3e45]: confirmation_number
+      - generic [ref=f3e46]:
+        - article [ref=f3e81]:
+          - generic [ref=f3e82]:
+            - generic [ref=f3e83]:
+              - generic [ref=f3e84]: RelayFor Go
+              - code [ref=f3e86]: 基础计划
+            - generic [ref=f3e87]: 已订阅
+          - generic [ref=f3e88]: 基础使用计划 适合日常调用与轻量开发，提供基础折扣、标准访问上限和专属模型权益。
+          - generic [ref=f3e89]:
+            - generic [ref=f3e90]:
+              - text: 有效期
+              - generic [ref=f3e91]: 30 天
+            - generic [ref=f3e92]:
+              - text: 额度
+              - generic [ref=f3e93]: $20.00
+            - generic [ref=f3e94]:
+              - text: 额度重置
+              - generic [ref=f3e95]: 不重置
+            - generic [ref=f3e96]:
+              - text: 折扣倍率
+              - generic [ref=f3e97]: ×0.95
+            - generic [ref=f3e98]:
+              - text: 最高可节省
+              - generic [ref=f3e99]: 不限
+            - generic [ref=f3e100]:
+              - text: 访问上限
+              - generic [ref=f3e101]: 15 RPM / 2 并发
+          - generic [ref=f3e102]:
+            - generic [ref=f3e103]: GPT 5.6 Sol
+            - generic [ref=f3e104]: GPT 6 Astra【不降智】【禁止逆向】
+          - generic [ref=f3e105]:
+            - generic [ref=f3e106]: 2 个专属模型
+            - button "使用兑换码" [ref=f3e108] [cursor=pointer]
+        - article [ref=f3e109]:
+          - generic [ref=f3e110]:
+            - generic [ref=f3e111]:
+              - generic [ref=f3e112]: RelayFor Plus
+              - code [ref=f3e114]: 升级计划
+            - generic [ref=f3e115]: 可兑换
+          - generic [ref=f3e116]: 进阶使用计划 适合更频繁的 API 调用与开发工作流，提供更低折扣倍率、更高访问上限和专属模型权益。
+          - generic [ref=f3e117]:
+            - generic [ref=f3e118]:
+              - text: 有效期
+              - generic [ref=f3e119]: 30 天
+            - generic [ref=f3e120]:
+              - text: 额度
+              - generic [ref=f3e121]: $100.00
+            - generic [ref=f3e122]:
+              - text: 额度重置
+              - generic [ref=f3e123]: 不重置
+            - generic [ref=f3e124]:
+              - text: 折扣倍率
+              - generic [ref=f3e125]: ×0.91
+            - generic [ref=f3e126]:
+              - text: 最高可节省
+              - generic [ref=f3e127]: 不限
+            - generic [ref=f3e128]:
+              - text: 访问上限
+              - generic [ref=f3e129]: 25 RPM / 4 并发
+          - generic [ref=f3e130]: GPT 5.6 Sol ×0.90
+          - generic [ref=f3e132]:
+            - generic [ref=f3e133]: 1 个专属模型
+            - button "使用兑换码" [ref=f3e135] [cursor=pointer]
+        - article [ref=f3e136]:
+          - generic [ref=f3e137]:
+            - generic [ref=f3e138]:
+              - generic [ref=f3e139]: RelayFor Pro
+              - code [ref=f3e141]: 专业计划
+            - generic [ref=f3e142]: 可兑换
+          - generic [ref=f3e143]: 专业使用计划 面向持续开发、Agent 与较高并发场景，提供更优价格、更高吞吐和专业级访问权益。
+          - generic [ref=f3e144]:
+            - generic [ref=f3e145]:
+              - text: 有效期
+              - generic [ref=f3e146]: 30 天
+            - generic [ref=f3e147]:
+              - text: 额度
+              - generic [ref=f3e148]: $200.00
+            - generic [ref=f3e149]:
+              - text: 额度重置
+              - generic [ref=f3e150]: 不重置
+            - generic [ref=f3e151]:
+              - text: 折扣倍率
+              - generic [ref=f3e152]: ×0.88
+            - generic [ref=f3e153]:
+              - text: 最高可节省
+              - generic [ref=f3e154]: 不限
+            - generic [ref=f3e155]:
+              - text: 访问上限
+              - generic [ref=f3e156]: 35 RPM / 6 并发
+          - generic [ref=f3e157]: GPT 5.6 Sol ×0.85
+          - generic [ref=f3e159]:
+            - generic [ref=f3e160]: 1 个专属模型
+            - button "使用兑换码" [ref=f3e162] [cursor=pointer]
+        - button "更多套餐 5 个" [ref=f3e163] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f3e164]: confirmation_number
+          - generic [ref=f3e165]:
+            - generic [ref=f3e166]: 更多套餐
+            - generic [ref=f3e167]: 5 个
+          - generic [aria-hidden] [ref=f3e168]: arrow_forward
+      - generic [ref=f3e48]:
+        - generic [ref=f3e49]: 我的订阅
+        - generic [aria-hidden] [ref=f3e50]: today
+      - generic [ref=f3e53]:
+        - generic [aria-hidden] [ref=f3e54]: today
+        - generic [ref=f3e55]:
+          - generic [ref=f3e56]: RelayFor Go
+          - generic [ref=f3e57]:
+            - code [ref=f3e58]: 基础计划
+            - text: · 2026/09/13 23:20 至 2026/10/13 23:20
+        - generic [ref=f3e59]:
+          - generic [ref=f3e60]:
+            - generic [ref=f3e61]: $17.04
+            - text: 剩余
+          - generic [ref=f3e62]:
+            - generic [ref=f3e63]: 不重置
+            - text: 下次重置
+          - generic [ref=f3e64]:
+            - generic [ref=f3e65]: ×0.95
+            - text: 计划倍率
+          - generic [ref=f3e66]:
+            - generic [ref=f3e67]: 不限
+            - text: 已省 / 上限
+          - generic [ref=f3e68]:
+            - generic [ref=f3e69]: 15 / 2
+            - text: RPM / 并发
+          - generic [ref=f3e70]:
+            - generic [ref=f3e71]: "2"
+            - text: 解锁模型
+        - generic [ref=f3e72]:
+          - generic [ref=f3e73]: 生效中
+          - button "放弃计划" [ref=f3e74] [cursor=pointer]
+      - generic [ref=f3e75]:
+        - generic [ref=f3e76]:
+          - generic [ref=f3e77]: 限时额度
+          - generic [aria-hidden] [ref=f3e78]: data_usage
+        - generic [ref=f3e79]: 当前没有通用限时额度。
+  - dialog "更多套餐" [ref=f3e171]:
+    - generic [ref=f3e172]:
+      - generic [ref=f3e173]: 更多套餐
+      - button "关闭" [active] [ref=f3e174] [cursor=pointer]:
+        - generic [aria-hidden] [ref=f3e175]: close
+    - generic [ref=f3e176]:
+      - article [ref=f3e177]:
+        - generic [ref=f3e178]:
+          - generic [ref=f3e179]:
+            - generic [ref=f3e180]: RelayFor EveryDay
+            - code [ref=f3e182]: 每日计划
+          - generic [ref=f3e183]: 可兑换
+        - generic [ref=f3e184]: 每天享受一定的0.01倍率&少量赠额 最高节省23.3刀 持续10天
+        - generic [ref=f3e185]:
+          - generic [ref=f3e186]:
+            - text: 有效期
+            - generic [ref=f3e187]: 10 天
+          - generic [ref=f3e188]:
+            - text: 额度
+            - generic [ref=f3e189]: $0.23
+          - generic [ref=f3e190]:
+            - text: 额度重置
+            - generic [ref=f3e191]: 每 2 天
+          - generic [ref=f3e192]:
+            - text: 折扣倍率
+            - generic [ref=f3e193]: ×0.01
+          - generic [ref=f3e194]:
+            - text: 最高可节省
+            - generic [ref=f3e195]: $1.00
+          - generic [ref=f3e196]:
+            - text: 访问上限
+            - generic [ref=f3e197]: 15 RPM / 2 并发
+        - generic [ref=f3e198]: 公共模型优惠
+        - generic [ref=f3e200]:
+          - generic [ref=f3e201]: 0 个专属模型
+          - button "使用兑换码" [ref=f3e203] [cursor=pointer]
+      - article [ref=f3e204]:
+        - generic [ref=f3e205]:
+          - generic [ref=f3e206]:
+            - generic [ref=f3e207]: RelayFor Discount
+            - code [ref=f3e209]: 折扣计划
+          - generic [ref=f3e210]: 可兑换
+        - generic [ref=f3e211]: 短期高强度使用计划 1 天有效 · 15 RPM / 2 并发 公共模型全局 ×0.50
+        - generic [ref=f3e212]:
+          - generic [ref=f3e213]:
+            - text: 有效期
+            - generic [ref=f3e214]: 1 天
+          - generic [ref=f3e215]:
+            - text: 额度
+            - generic [ref=f3e216]: $100.00
+          - generic [ref=f3e217]:
+            - text: 额度重置
+            - generic [ref=f3e218]: 不重置
+          - generic [ref=f3e219]:
+            - text: 折扣倍率
+            - generic [ref=f3e220]: ×0.50
+          - generic [ref=f3e221]:
+            - text: 最高可节省
+            - generic [ref=f3e222]: $250.00
+          - generic [ref=f3e223]:
+            - text: 访问上限
+            - generic [ref=f3e224]: 15 RPM / 2 并发
+        - generic [ref=f3e225]: 公共模型优惠
+        - generic [ref=f3e227]:
+          - generic [ref=f3e228]: 0 个专属模型
+          - button "使用兑换码" [ref=f3e230] [cursor=pointer]
+      - article [ref=f3e231]:
+        - generic [ref=f3e232]:
+          - generic [ref=f3e233]:
+            - generic [ref=f3e234]: RelayFor Pro 2x
+            - code [ref=f3e236]: 专业计划 2x
+          - generic [ref=f3e237]: 可兑换
+        - generic [ref=f3e238]: 专业计划 2x 为已有 RelayFor Pro 的用户提供额外外消费承诺，并进一步提升折扣与请求上限。
+        - generic [ref=f3e239]:
+          - generic [ref=f3e240]:
+            - text: 有效期
+            - generic [ref=f3e241]: 30 天
+          - generic [ref=f3e242]:
+            - text: 额度
+            - generic [ref=f3e243]: $200.00
+          - generic [ref=f3e244]:
+            - text: 额度重置
+            - generic [ref=f3e245]: 不重置
+          - generic [ref=f3e246]:
+            - text: 折扣倍率
+            - generic [ref=f3e247]: ×0.87
+          - generic [ref=f3e248]:
+            - text: 最高可节省
+            - generic [ref=f3e249]: 不限
+          - generic [ref=f3e250]:
+            - text: 访问上限
+            - generic [ref=f3e251]: 40 RPM / 6 并发
+        - generic [ref=f3e252]: 需要先订阅 RelayFor Pro，才能兑换此升级计划。
+        - generic [ref=f3e253]: GPT 5.6 Sol ×0.85
+        - generic [ref=f3e255]:
+          - generic [ref=f3e256]: 1 个专属模型
+          - button "暂不可升级" [disabled] [ref=f3e258]
+      - article [ref=f3e259]:
+        - generic [ref=f3e260]:
+          - generic [ref=f3e261]:
+            - generic [ref=f3e262]: RelayFor Ultra
+            - code [ref=f3e264]: 终极计划
+          - generic [ref=f3e265]: 可兑换
+        - generic [ref=f3e266]: 高负载使用计划 面向持续高消费、多 Agent 与高并发工作流，提供大额额度、更低折扣倍率和更高访问上限。
+        - generic [ref=f3e267]:
+          - generic [ref=f3e268]:
+            - text: 有效期
+            - generic [ref=f3e269]: 30 天
+          - generic [ref=f3e270]:
+            - text: 额度
+            - generic [ref=f3e271]: $1000.00
+          - generic [ref=f3e272]:
+            - text: 额度重置
+            - generic [ref=f3e273]: 不重置
+          - generic [ref=f3e274]:
+            - text: 折扣倍率
+            - generic [ref=f3e275]: ×0.85
+          - generic [ref=f3e276]:
+            - text: 最高可节省
+            - generic [ref=f3e277]: 不限
+          - generic [ref=f3e278]:
+            - text: 访问上限
+            - generic [ref=f3e279]: 65 RPM / 12 并发
+        - generic [ref=f3e280]: GPT 5.6 Sol ×0.83
+        - generic [ref=f3e282]:
+          - generic [ref=f3e283]: 1 个专属模型
+          - button "使用兑换码" [ref=f3e285] [cursor=pointer]
+      - article [ref=f3e286]:
+        - generic [ref=f3e287]:
+          - generic [ref=f3e288]:
+            - generic [ref=f3e289]: RelayFor Ultra 5x
+            - code [ref=f3e291]: 终极计划 5x
+          - generic [ref=f3e292]: 可兑换
+        - generic [ref=f3e293]: 高负载计划 5x 为已有 RelayFor Ultra 的大规模使用场景提供更高消费承诺、更优折扣与更高并发能力。
+        - generic [ref=f3e294]:
+          - generic [ref=f3e295]:
+            - text: 有效期
+            - generic [ref=f3e296]: 30 天
+          - generic [ref=f3e297]:
+            - text: 额度
+            - generic [ref=f3e298]: $4000.00
+          - generic [ref=f3e299]:
+            - text: 额度重置
+            - generic [ref=f3e300]: 不重置
+          - generic [ref=f3e301]:
+            - text: 折扣倍率
+            - generic [ref=f3e302]: ×0.83
+          - generic [ref=f3e303]:
+            - text: 最高可节省
+            - generic [ref=f3e304]: 不限
+          - generic [ref=f3e305]:
+            - text: 访问上限
+            - generic [ref=f3e306]: 70 RPM / 18 并发
+        - generic [ref=f3e307]: 需要先订阅 RelayFor Ultra，才能兑换此升级计划。
+        - generic [ref=f3e308]: GPT 5.6 Sol ×0.81
+        - generic [ref=f3e310]:
+          - generic [ref=f3e311]: 1 个专属模型
+          - button "暂不可升级" [disabled] [ref=f3e313]
+    - button "完成" [ref=f3e315] [cursor=pointer]

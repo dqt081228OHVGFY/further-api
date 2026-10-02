@@ -1,0 +1,29 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "RelayFor MY WORKSPACE" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e11]:
+        - generic [ref=e12]: RelayFor
+        - paragraph [ref=e13]:
+          - generic [ref=e14]: MY WORKSPACE
+    - generic [ref=e15]: WORKSPACE / 工作空间
+    - button "概览" [ref=e16] [cursor=pointer]
+    - button "API Key" [ref=e23] [cursor=pointer]
+    - button "模型与价格" [ref=e28] [cursor=pointer]
+    - button "使用文档" [ref=e31] [cursor=pointer]
+    - button "调用记录" [ref=e36] [cursor=pointer]
+    - generic [ref=e41]: ACCOUNT / 我的账户
+    - button "兑换额度" [ref=e42] [cursor=pointer]
+    - button "订阅计划" [ref=e48] [cursor=pointer]
+    - button "账户设置" [ref=e52] [cursor=pointer]
+    - generic [ref=e57]:
+      - link "返回首页" [ref=e58] [cursor=pointer]:
+        - /url: /
+      - button "退出登录" [ref=e62] [cursor=pointer]
+  - main [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]: 活动与签到
+      - generic [ref=e71]: $0.00
+      - button "刷新" [ref=e72] [cursor=pointer]
+    - generic [ref=e79]: ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇
+  - text: ◇

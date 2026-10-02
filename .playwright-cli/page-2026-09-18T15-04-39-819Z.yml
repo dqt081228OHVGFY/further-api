@@ -1,0 +1,32 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "RelayFor 公益站" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e6]: hub
+      - generic [ref=e7]:
+        - strong [ref=e8]: RelayFor
+        - generic [ref=e9]: 公益站
+  - generic [ref=e10]:
+    - generic [aria-hidden] [ref=e12]: campaign
+    - generic [ref=e13]:
+      - generic [ref=e14]: 公益站公告
+      - paragraph [ref=e15]: 这是本地复刻预览。所有账户、额度与 Key 均为合成数据，不连接真实服务。
+  - main [ref=e16]:
+    - heading "登录" [level=1] [ref=e17]
+    - generic [ref=e18]: 或使用本地账户
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - textbox "用户名" [ref=e23]:
+            - /placeholder: " "
+          - generic: 用户名
+        - generic [ref=e24]:
+          - textbox "密码" [ref=e25]:
+            - /placeholder: " "
+          - generic: 密码
+      - button "登录" [ref=e26] [cursor=pointer]
+    - generic [ref=e27]:
+      - link "创建账户" [ref=e28] [cursor=pointer]:
+        - /url: /auth/?mode=register
+      - link "返回首页" [ref=e29] [cursor=pointer]:
+        - /url: /

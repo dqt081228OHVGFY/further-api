@@ -1,0 +1,100 @@
+/* RelayFor's three color choices are independent of New API's preset axis.
+ * The preset still controls typography, radii, density and bespoke surfaces;
+ * this file only replaces the shared color accents after preset CSS loads. */
+html[data-relayfor-palette='white'] {
+  --rf-palette-primary: #30343b;
+  --rf-palette-on-primary: #fff;
+  --rf-palette-soft: #f1f2f3;
+  --rf-palette-on-soft: #30343b;
+  --rf-palette-outline: #737980;
+  --rf-palette-chart-1: #30343b;
+  --rf-palette-chart-2: #646a70;
+  --rf-palette-chart-3: #6a6060;
+}
+
+html[data-relayfor-palette='blue'] {
+  --rf-palette-primary: #005ac1;
+  --rf-palette-on-primary: #fff;
+  --rf-palette-soft: #e8f0ff;
+  --rf-palette-on-soft: #143f79;
+  --rf-palette-outline: #4976ae;
+  --rf-palette-chart-1: #005ac1;
+  --rf-palette-chart-2: #236eb5;
+  --rf-palette-chart-3: #4b5f93;
+}
+
+html[data-relayfor-palette='yellow'] {
+  --rf-palette-primary: #e9bd35;
+  --rf-palette-on-primary: #2c240d;
+  --rf-palette-soft: #fff5d6;
+  --rf-palette-on-soft: #594511;
+  --rf-palette-outline: #a27e1c;
+  --rf-palette-chart-1: #8b6500;
+  --rf-palette-chart-2: #975400;
+  --rf-palette-chart-3: #596323;
+}
+
+html.dark[data-relayfor-palette='white'] {
+  --rf-palette-primary: #eceef0;
+  --rf-palette-on-primary: #202329;
+  --rf-palette-soft: #353940;
+  --rf-palette-on-soft: #f4f5f6;
+  --rf-palette-outline: #9da2a8;
+  --rf-palette-chart-1: #eceef0;
+  --rf-palette-chart-2: #bfc4c9;
+  --rf-palette-chart-3: #8e959b;
+}
+
+html.dark[data-relayfor-palette='blue'] {
+  --rf-palette-primary: #8dbbff;
+  --rf-palette-on-primary: #092044;
+  --rf-palette-soft: #1c355c;
+  --rf-palette-on-soft: #d7e7ff;
+  --rf-palette-outline: #91b6e7;
+  --rf-palette-chart-1: #8dbbff;
+  --rf-palette-chart-2: #5b96e4;
+  --rf-palette-chart-3: #c0d8ff;
+}
+
+html.dark[data-relayfor-palette='yellow'] {
+  --rf-palette-primary: #f3d570;
+  --rf-palette-on-primary: #2f260a;
+  --rf-palette-soft: #4b3e20;
+  --rf-palette-on-soft: #fff1b8;
+  --rf-palette-outline: #d2b557;
+  --rf-palette-chart-1: #f3d570;
+  --rf-palette-chart-2: #d5b43d;
+  --rf-palette-chart-3: #fff0ad;
+}
+
+/* The dark selector outranks `.dark [data-theme-preset]`, keeping this color
+ * choice active even when a user has another New API preset saved. */
+html[data-relayfor-palette] body,
+html.dark[data-relayfor-palette] body {
+  --primary: var(--rf-palette-primary);
+  --primary-foreground: var(--rf-palette-on-primary);
+  --secondary: var(--rf-palette-soft);
+  --secondary-foreground: var(--rf-palette-on-soft);
+  --accent: color-mix(
+    in oklch,
+    var(--rf-palette-primary) 13%,
+    var(--background)
+  );
+  --accent-foreground: var(--foreground);
+  --ring: var(--rf-palette-outline);
+  --chart-1: var(--rf-palette-chart-1);
+  --chart-2: var(--rf-palette-chart-2);
+  --chart-3: var(--rf-palette-chart-3);
+  --overview-accent-1: var(--rf-palette-chart-1);
+  --overview-accent-2: var(--rf-palette-chart-2);
+  --overview-accent-3: var(--rf-palette-chart-3);
+  --sidebar-primary: var(--rf-palette-primary);
+  --sidebar-primary-foreground: var(--rf-palette-on-primary);
+  --sidebar-accent: color-mix(
+    in oklch,
+    var(--rf-palette-primary) 14%,
+    var(--sidebar)
+  );
+  --sidebar-accent-foreground: var(--rf-palette-on-soft);
+  --sidebar-ring: var(--rf-palette-outline);
+}

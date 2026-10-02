@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "RelayFor" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e5]: hub
+    - generic [ref=e8]: 工作空间
+    - button "概览" [ref=e9] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e10]: space_dashboard
+      - text: 概览
+    - button "API Key" [ref=e11] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e12]: key
+      - text: API Key
+    - button "模型与价格" [ref=e13] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e14]: tune
+      - text: 模型与价格
+    - button "使用文档" [ref=e15] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e16]: description
+      - text: 使用文档
+    - button "调用记录" [ref=e17] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e18]: receipt_long
+      - text: 调用记录
+    - generic [ref=e19]: 我的账户
+    - button "兑换额度" [ref=e20] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e21]: redeem
+      - text: 兑换额度
+    - button "订阅计划" [ref=e22] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e23]: confirmation_number
+      - text: 订阅计划
+    - button "账户设置" [ref=e24] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e25]: person
+      - text: 账户设置
+    - generic [ref=e26]:
+      - link "返回首页" [ref=e27] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=e28]: arrow_back
+        - text: 返回首页
+      - button "退出登录" [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: logout
+        - text: 退出登录
+  - main [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]: 概览
+      - generic [ref=e35]: $0.00
+      - button "刷新" [ref=e36] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e37]: refresh
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - heading "控制台" [level=1] [ref=e42]
+            - generic [ref=e43]:
+              - button "创建 API Key" [ref=e44] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e45]: add
+                - text: 创建 API Key
+              - button "查看接入文档" [ref=e46] [cursor=pointer]:
+                - text: 查看接入文档
+                - generic [aria-hidden] [ref=e47]: arrow_forward
+          - generic [aria-hidden] [ref=e50]: auto_awesome
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [aria-hidden] [ref=e56]: data_usage
+              - text: 可用额度
+            - generic [ref=e58]:
+              - generic [ref=e59]: 永久
+              - generic [ref=e60]: $0.00
+          - generic [ref=e61]:
+            - generic [ref=e62]: 累计消耗
+            - generic [ref=e63]: $0.00
+          - generic [ref=e64]:
+            - generic [ref=e65]: 累计调用
+            - generic [ref=e66]: "0"
+          - generic [ref=e67]:
+            - generic [ref=e68]: 活跃 API Key
+            - generic [ref=e69]: "0"
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - generic [ref=e73]: 今天，进展如何？
+              - generic [aria-hidden] [ref=e74]: today
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - generic [ref=e77]: 请求次数
+                - generic [ref=e80]:
+                  - generic [ref=e81]: "0"
+                  - text: 次
+              - generic [ref=e82]:
+                - generic [ref=e83]: Token 总量
+                - generic [ref=e86]:
+                  - generic [ref=e87]: "0"
+                  - text: 个
+              - generic [ref=e88]:
+                - generic [ref=e89]: 预估消耗
+                - generic [ref=e91]: $0.00
+            - button "查看调用记录" [ref=e94] [cursor=pointer]:
+              - text: 查看调用记录
+              - generic [aria-hidden] [ref=e95]: arrow_forward
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: 从第一条请求开始
+              - button "新建" [ref=e99] [cursor=pointer]:
+                - generic [aria-hidden] [ref=e100]: add
+                - text: 新建
+            - list [ref=e101]:
+              - listitem [ref=e102]:
+                - generic [ref=e103]: "01"
+                - generic [ref=e104]:
+                  - text: 为应用创建 API Key
+                  - paragraph [ref=e105]: 每个应用使用独立令牌，便于管理访问与用量。
+                - button "打开 API Key" [ref=e106] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=e107]: arrow_forward
+              - listitem [ref=e108]:
+                - generic [ref=e109]: "02"
+                - generic [ref=e110]:
+                  - text: 选择合适的模型
+                  - paragraph [ref=e111]: 确认模型名称、价格与支持的请求端点。
+                - button "查看模型与价格" [ref=e112] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=e113]: arrow_forward
+              - listitem [ref=e114]:
+                - generic [ref=e115]: "03"
+                - generic [ref=e116]:
+                  - text: 发送第一条请求
+                  - paragraph [ref=e117]: 复制文档中的示例，替换 API Key 后即可接入。
+                - button "打开接入文档" [ref=e118] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=e119]: arrow_forward
+      - text: ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇
+  - text: ◇

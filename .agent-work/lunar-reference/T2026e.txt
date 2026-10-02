@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2026 (Bing-wu  -  year of the Horse)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2026/1/1          13                      Thursday                           
+2026/1/2          14                      Friday                             
+2026/1/3          15                      Saturday                           
+2026/1/4          16                      Sunday                             
+2026/1/5          17                      Monday         Moderate Cold       
+2026/1/6          18                      Tuesday                            
+2026/1/7          19                      Wednesday                          
+2026/1/8          20                      Thursday                           
+2026/1/9          21                      Friday                             
+2026/1/10         22                      Saturday                           
+2026/1/11         23                      Sunday                             
+2026/1/12         24                      Monday                             
+2026/1/13         25                      Tuesday                            
+2026/1/14         26                      Wednesday                          
+2026/1/15         27                      Thursday                           
+2026/1/16         28                      Friday                             
+2026/1/17         29                      Saturday                           
+2026/1/18         30                      Sunday                             
+2026/1/19         12th Lunar Month        Monday                             
+2026/1/20         2                       Tuesday        Severe Cold         
+2026/1/21         3                       Wednesday                          
+2026/1/22         4                       Thursday                           
+2026/1/23         5                       Friday                             
+2026/1/24         6                       Saturday                           
+2026/1/25         7                       Sunday                             
+2026/1/26         8                       Monday                             
+2026/1/27         9                       Tuesday                            
+2026/1/28         10                      Wednesday                          
+2026/1/29         11                      Thursday                           
+2026/1/30         12                      Friday                             
+2026/1/31         13                      Saturday                           
+2026/2/1          14                      Sunday                             
+2026/2/2          15                      Monday                             
+2026/2/3          16                      Tuesday                            
+2026/2/4          17                      Wednesday      Spring Commences    
+2026/2/5          18                      Thursday                           
+2026/2/6          19                      Friday                             
+2026/2/7          20                      Saturday                           
+2026/2/8          21                      Sunday                             
+2026/2/9          22                      Monday                             
+2026/2/10         23                      Tuesday                            
+2026/2/11         24                      Wednesday                          
+2026/2/12         25                      Thursday                           
+2026/2/13         26                      Friday                             
+2026/2/14         27                      Saturday                           
+2026/2/15         28                      Sunday                             
+2026/2/16         29                      Monday                             
+2026/2/17         1st Lunar Month         Tuesday                            
+2026/2/18         2                       Wednesday      Spring Showers      
+2026/2/19         3                       Thursday                           
+2026/2/20         4                       Friday                             
+2026/2/21         5                       Saturday                           
+2026/2/22         6                       Sunday                             
+2026/2/23         7                       Monday                             
+2026/2/24         8                       Tuesday                            
+2026/2/25         9                       Wednesday                          
+2026/2/26         10                      Thursday                           
+2026/2/27         11                      Friday                             
+2026/2/28         12                      Saturday                           
+2026/3/1          13                      Sunday                             
+2026/3/2          14                      Monday                             
+2026/3/3          15                      Tuesday                            
+2026/3/4          16                      Wednesday                          
+2026/3/5          17                      Thursday       Insects Waken       
+2026/3/6          18                      Friday                             
+2026/3/7          19                      Saturday                           
+2026/3/8          20                      Sunday                             
+2026/3/9          21                      Monday                             
+2026/3/10         22                      Tuesday                            
+2026/3/11         23                      Wednesday                          
+2026/3/12         24                      Thursday                           
+2026/3/13         25                      Friday                             
+2026/3/14         26                      Saturday                           
+2026/3/15         27                      Sunday                             
+2026/3/16         28                      Monday                             
+2026/3/17         29                      Tuesday                            
+2026/3/18         30                      Wednesday                          
+2026/3/19         2nd Lunar Month         Thursday                           
+2026/3/20         2                       Friday         Vernal Equinox      
+2026/3/21         3                       Saturday                           
+2026/3/22         4                       Sunday                             
+2026/3/23         5                       Monday                             
+2026/3/24         6                       Tuesday                            
+2026/3/25         7                       Wednesday                          
+2026/3/26         8                       Thursday                           
+2026/3/27         9                       Friday                             
+2026/3/28         10                      Saturday                           
+2026/3/29         11                      Sunday                             
+2026/3/30         12                      Monday                             
+2026/3/31         13                      Tuesday                            
+2026/4/1          14                      Wednesday                          
+2026/4/2          15                      Thursday                           
+2026/4/3          16                      Friday                             
+2026/4/4          17                      Saturday                           
+2026/4/5          18                      Sunday         Bright & Clear      
+2026/4/6          19                      Monday                             
+2026/4/7          20                      Tuesday                            
+2026/4/8          21                      Wednesday                          
+2026/4/9          22                      Thursday                           
+2026/4/10         23                      Friday                             
+2026/4/11         24                      Saturday                           
+2026/4/12         25                      Sunday                             
+2026/4/13         26                      Monday                             
+2026/4/14         27                      Tuesday                            
+2026/4/15         28                      Wednesday                          
+2026/4/16         29                      Thursday                           
+2026/4/17         3rd Lunar Month         Friday                             
+2026/4/18         2                       Saturday                           
+2026/4/19         3                       Sunday                             
+2026/4/20         4                       Monday         Corn Rain           
+2026/4/21         5                       Tuesday                            
+2026/4/22         6                       Wednesday                          
+2026/4/23         7                       Thursday                           
+2026/4/24         8                       Friday                             
+2026/4/25         9                       Saturday                           
+2026/4/26         10                      Sunday                             
+2026/4/27         11                      Monday                             
+2026/4/28         12                      Tuesday                            
+2026/4/29         13                      Wednesday                          
+2026/4/30         14                      Thursday                           
+2026/5/1          15                      Friday                             
+2026/5/2          16                      Saturday                           
+2026/5/3          17                      Sunday                             
+2026/5/4          18                      Monday                             
+2026/5/5          19                      Tuesday        Summer Commences    
+2026/5/6          20                      Wednesday                          
+2026/5/7          21                      Thursday                           
+2026/5/8          22                      Friday                             
+2026/5/9          23                      Saturday                           
+2026/5/10         24                      Sunday                             
+2026/5/11         25                      Monday                             
+2026/5/12         26                      Tuesday                            
+2026/5/13         27                      Wednesday                          
+2026/5/14         28                      Thursday                           
+2026/5/15         29                      Friday                             
+2026/5/16         30                      Saturday                           
+2026/5/17         4th Lunar Month         Sunday                             
+2026/5/18         2                       Monday                             
+2026/5/19         3                       Tuesday                            
+2026/5/20         4                       Wednesday                          
+2026/5/21         5                       Thursday       Corn Forms          
+2026/5/22         6                       Friday                             
+2026/5/23         7                       Saturday                           
+2026/5/24         8                       Sunday                             
+2026/5/25         9                       Monday                             
+2026/5/26         10                      Tuesday                            
+2026/5/27         11                      Wednesday                          
+2026/5/28         12                      Thursday                           
+2026/5/29         13                      Friday                             
+2026/5/30         14                      Saturday                           
+2026/5/31         15                      Sunday                             
+2026/6/1          16                      Monday                             
+2026/6/2          17                      Tuesday                            
+2026/6/3          18                      Wednesday                          
+2026/6/4          19                      Thursday                           
+2026/6/5          20                      Friday         Corn on Ear         
+2026/6/6          21                      Saturday                           
+2026/6/7          22                      Sunday                             
+2026/6/8          23                      Monday                             
+2026/6/9          24                      Tuesday                            
+2026/6/10         25                      Wednesday                          
+2026/6/11         26                      Thursday                           
+2026/6/12         27                      Friday                             
+2026/6/13         28                      Saturday                           
+2026/6/14         29                      Sunday                             
+2026/6/15         5th Lunar Month         Monday                             
+2026/6/16         2                       Tuesday                            
+2026/6/17         3                       Wednesday                          
+2026/6/18         4                       Thursday                           
+2026/6/19         5                       Friday                             
+2026/6/20         6                       Saturday                           
+2026/6/21         7                       Sunday         Summer Solstice     
+2026/6/22         8                       Monday                             
+2026/6/23         9                       Tuesday                            
+2026/6/24         10                      Wednesday                          
+2026/6/25         11                      Thursday                           
+2026/6/26         12                      Friday                             
+2026/6/27         13                      Saturday                           
+2026/6/28         14                      Sunday                             
+2026/6/29         15                      Monday                             
+2026/6/30         16                      Tuesday                            
+2026/7/1          17                      Wednesday                          
+2026/7/2          18                      Thursday                           
+2026/7/3          19                      Friday                             
+2026/7/4          20                      Saturday                           
+2026/7/5          21                      Sunday                             
+2026/7/6          22                      Monday                             
+2026/7/7          23                      Tuesday        Moderate Heat       
+2026/7/8          24                      Wednesday                          
+2026/7/9          25                      Thursday                           
+2026/7/10         26                      Friday                             
+2026/7/11         27                      Saturday                           
+2026/7/12         28                      Sunday                             
+2026/7/13         29                      Monday                             
+2026/7/14         6th Lunar Month         Tuesday                            
+2026/7/15         2                       Wednesday                          
+2026/7/16         3                       Thursday                           
+2026/7/17         4                       Friday                             
+2026/7/18         5                       Saturday                           
+2026/7/19         6                       Sunday                             
+2026/7/20         7                       Monday                             
+2026/7/21         8                       Tuesday                            
+2026/7/22         9                       Wednesday                          
+2026/7/23         10                      Thursday       Great Heat          
+2026/7/24         11                      Friday                             
+2026/7/25         12                      Saturday                           
+2026/7/26         13                      Sunday                             
+2026/7/27         14                      Monday                             
+2026/7/28         15                      Tuesday                            
+2026/7/29         16                      Wednesday                          
+2026/7/30         17                      Thursday                           
+2026/7/31         18                      Friday                             
+2026/8/1          19                      Saturday                           
+2026/8/2          20                      Sunday                             
+2026/8/3          21                      Monday                             
+2026/8/4          22                      Tuesday                            
+2026/8/5          23                      Wednesday                          
+2026/8/6          24                      Thursday                           
+2026/8/7          25                      Friday         Autumn Commences    
+2026/8/8          26                      Saturday                           
+2026/8/9          27                      Sunday                             
+2026/8/10         28                      Monday                             
+2026/8/11         29                      Tuesday                            
+2026/8/12         30                      Wednesday                          
+2026/8/13         7th Lunar Month         Thursday                           
+2026/8/14         2                       Friday                             
+2026/8/15         3                       Saturday                           
+2026/8/16         4                       Sunday                             
+2026/8/17         5                       Monday                             
+2026/8/18         6                       Tuesday                            
+2026/8/19         7                       Wednesday                          
+2026/8/20         8                       Thursday                           
+2026/8/21         9                       Friday                             
+2026/8/22         10                      Saturday                           
+2026/8/23         11                      Sunday         End of Heat         
+2026/8/24         12                      Monday                             
+2026/8/25         13                      Tuesday                            
+2026/8/26         14                      Wednesday                          
+2026/8/27         15                      Thursday                           
+2026/8/28         16                      Friday                             
+2026/8/29         17                      Saturday                           
+2026/8/30         18                      Sunday                             
+2026/8/31         19                      Monday                             
+2026/9/1          20                      Tuesday                            
+2026/9/2          21                      Wednesday                          
+2026/9/3          22                      Thursday                           
+2026/9/4          23                      Friday                             
+2026/9/5          24                      Saturday                           
+2026/9/6          25                      Sunday                             
+2026/9/7          26                      Monday         White Dew           
+2026/9/8          27                      Tuesday                            
+2026/9/9          28                      Wednesday                          
+2026/9/10         29                      Thursday                           
+2026/9/11         8th Lunar Month         Friday                             
+2026/9/12         2                       Saturday                           
+2026/9/13         3                       Sunday                             
+2026/9/14         4                       Monday                             
+2026/9/15         5                       Tuesday                            
+2026/9/16         6                       Wednesday                          
+2026/9/17         7                       Thursday                           
+2026/9/18         8                       Friday                             
+2026/9/19         9                       Saturday                           
+2026/9/20         10                      Sunday                             
+2026/9/21         11                      Monday                             
+2026/9/22         12                      Tuesday                            
+2026/9/23         13                      Wednesday      Autumnal Equinox    
+2026/9/24         14                      Thursday                           
+2026/9/25         15                      Friday                             
+2026/9/26         16                      Saturday                           
+2026/9/27         17                      Sunday                             
+2026/9/28         18                      Monday                             
+2026/9/29         19                      Tuesday                            
+2026/9/30         20                      Wednesday                          
+2026/10/1         21                      Thursday                           
+2026/10/2         22                      Friday                             
+2026/10/3         23                      Saturday                           
+2026/10/4         24                      Sunday                             
+2026/10/5         25                      Monday                             
+2026/10/6         26                      Tuesday                            
+2026/10/7         27                      Wednesday                          
+2026/10/8         28                      Thursday       Cold Dew            
+2026/10/9         29                      Friday                             
+2026/10/10        9th Lunar Month         Saturday                           
+2026/10/11        2                       Sunday                             
+2026/10/12        3                       Monday                             
+2026/10/13        4                       Tuesday                            
+2026/10/14        5                       Wednesday                          
+2026/10/15        6                       Thursday                           
+2026/10/16        7                       Friday                             
+2026/10/17        8                       Saturday                           
+2026/10/18        9                       Sunday                             
+2026/10/19        10                      Monday                             
+2026/10/20        11                      Tuesday                            
+2026/10/21        12                      Wednesday                          
+2026/10/22        13                      Thursday                           
+2026/10/23        14                      Friday         Frost               
+2026/10/24        15                      Saturday                           
+2026/10/25        16                      Sunday                             
+2026/10/26        17                      Monday                             
+2026/10/27        18                      Tuesday                            
+2026/10/28        19                      Wednesday                          
+2026/10/29        20                      Thursday                           
+2026/10/30        21                      Friday                             
+2026/10/31        22                      Saturday                           
+2026/11/1         23                      Sunday                             
+2026/11/2         24                      Monday                             
+2026/11/3         25                      Tuesday                            
+2026/11/4         26                      Wednesday                          
+2026/11/5         27                      Thursday                           
+2026/11/6         28                      Friday                             
+2026/11/7         29                      Saturday       Winter Commences    
+2026/11/8         30                      Sunday                             
+2026/11/9         10th Lunar Month        Monday                             
+2026/11/10        2                       Tuesday                            
+2026/11/11        3                       Wednesday                          
+2026/11/12        4                       Thursday                           
+2026/11/13        5                       Friday                             
+2026/11/14        6                       Saturday                           
+2026/11/15        7                       Sunday                             
+2026/11/16        8                       Monday                             
+2026/11/17        9                       Tuesday                            
+2026/11/18        10                      Wednesday                          
+2026/11/19        11                      Thursday                           
+2026/11/20        12                      Friday                             
+2026/11/21        13                      Saturday                           
+2026/11/22        14                      Sunday         Light Snow          
+2026/11/23        15                      Monday                             
+2026/11/24        16                      Tuesday                            
+2026/11/25        17                      Wednesday                          
+2026/11/26        18                      Thursday                           
+2026/11/27        19                      Friday                             
+2026/11/28        20                      Saturday                           
+2026/11/29        21                      Sunday                             
+2026/11/30        22                      Monday                             
+2026/12/1         23                      Tuesday                            
+2026/12/2         24                      Wednesday                          
+2026/12/3         25                      Thursday                           
+2026/12/4         26                      Friday                             
+2026/12/5         27                      Saturday                           
+2026/12/6         28                      Sunday                             
+2026/12/7         29                      Monday         Heavy Snow          
+2026/12/8         30                      Tuesday                            
+2026/12/9         11th Lunar Month        Wednesday                          
+2026/12/10        2                       Thursday                           
+2026/12/11        3                       Friday                             
+2026/12/12        4                       Saturday                           
+2026/12/13        5                       Sunday                             
+2026/12/14        6                       Monday                             
+2026/12/15        7                       Tuesday                            
+2026/12/16        8                       Wednesday                          
+2026/12/17        9                       Thursday                           
+2026/12/18        10                      Friday                             
+2026/12/19        11                      Saturday                           
+2026/12/20        12                      Sunday                             
+2026/12/21        13                      Monday                             
+2026/12/22        14                      Tuesday        Winter Solstice     
+2026/12/23        15                      Wednesday                          
+2026/12/24        16                      Thursday                           
+2026/12/25        17                      Friday                             
+2026/12/26        18                      Saturday                           
+2026/12/27        19                      Sunday                             
+2026/12/28        20                      Monday                             
+2026/12/29        21                      Tuesday                            
+2026/12/30        22                      Wednesday                          
+2026/12/31        23                      Thursday                           

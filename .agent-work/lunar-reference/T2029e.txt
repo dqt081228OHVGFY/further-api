@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2029 (Ji-you  -  year of the Rooster)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2029/1/1          17                      Monday                             
+2029/1/2          18                      Tuesday                            
+2029/1/3          19                      Wednesday                          
+2029/1/4          20                      Thursday                           
+2029/1/5          21                      Friday         Moderate Cold       
+2029/1/6          22                      Saturday                           
+2029/1/7          23                      Sunday                             
+2029/1/8          24                      Monday                             
+2029/1/9          25                      Tuesday                            
+2029/1/10         26                      Wednesday                          
+2029/1/11         27                      Thursday                           
+2029/1/12         28                      Friday                             
+2029/1/13         29                      Saturday                           
+2029/1/14         30                      Sunday                             
+2029/1/15         12th Lunar Month        Monday                             
+2029/1/16         2                       Tuesday                            
+2029/1/17         3                       Wednesday                          
+2029/1/18         4                       Thursday                           
+2029/1/19         5                       Friday                             
+2029/1/20         6                       Saturday       Severe Cold         
+2029/1/21         7                       Sunday                             
+2029/1/22         8                       Monday                             
+2029/1/23         9                       Tuesday                            
+2029/1/24         10                      Wednesday                          
+2029/1/25         11                      Thursday                           
+2029/1/26         12                      Friday                             
+2029/1/27         13                      Saturday                           
+2029/1/28         14                      Sunday                             
+2029/1/29         15                      Monday                             
+2029/1/30         16                      Tuesday                            
+2029/1/31         17                      Wednesday                          
+2029/2/1          18                      Thursday                           
+2029/2/2          19                      Friday                             
+2029/2/3          20                      Saturday       Spring Commences    
+2029/2/4          21                      Sunday                             
+2029/2/5          22                      Monday                             
+2029/2/6          23                      Tuesday                            
+2029/2/7          24                      Wednesday                          
+2029/2/8          25                      Thursday                           
+2029/2/9          26                      Friday                             
+2029/2/10         27                      Saturday                           
+2029/2/11         28                      Sunday                             
+2029/2/12         29                      Monday                             
+2029/2/13         1st Lunar Month         Tuesday                            
+2029/2/14         2                       Wednesday                          
+2029/2/15         3                       Thursday                           
+2029/2/16         4                       Friday                             
+2029/2/17         5                       Saturday                           
+2029/2/18         6                       Sunday         Spring Showers      
+2029/2/19         7                       Monday                             
+2029/2/20         8                       Tuesday                            
+2029/2/21         9                       Wednesday                          
+2029/2/22         10                      Thursday                           
+2029/2/23         11                      Friday                             
+2029/2/24         12                      Saturday                           
+2029/2/25         13                      Sunday                             
+2029/2/26         14                      Monday                             
+2029/2/27         15                      Tuesday                            
+2029/2/28         16                      Wednesday                          
+2029/3/1          17                      Thursday                           
+2029/3/2          18                      Friday                             
+2029/3/3          19                      Saturday                           
+2029/3/4          20                      Sunday                             
+2029/3/5          21                      Monday         Insects Waken       
+2029/3/6          22                      Tuesday                            
+2029/3/7          23                      Wednesday                          
+2029/3/8          24                      Thursday                           
+2029/3/9          25                      Friday                             
+2029/3/10         26                      Saturday                           
+2029/3/11         27                      Sunday                             
+2029/3/12         28                      Monday                             
+2029/3/13         29                      Tuesday                            
+2029/3/14         30                      Wednesday                          
+2029/3/15         2nd Lunar Month         Thursday                           
+2029/3/16         2                       Friday                             
+2029/3/17         3                       Saturday                           
+2029/3/18         4                       Sunday                             
+2029/3/19         5                       Monday                             
+2029/3/20         6                       Tuesday        Vernal Equinox      
+2029/3/21         7                       Wednesday                          
+2029/3/22         8                       Thursday                           
+2029/3/23         9                       Friday                             
+2029/3/24         10                      Saturday                           
+2029/3/25         11                      Sunday                             
+2029/3/26         12                      Monday                             
+2029/3/27         13                      Tuesday                            
+2029/3/28         14                      Wednesday                          
+2029/3/29         15                      Thursday                           
+2029/3/30         16                      Friday                             
+2029/3/31         17                      Saturday                           
+2029/4/1          18                      Sunday                             
+2029/4/2          19                      Monday                             
+2029/4/3          20                      Tuesday                            
+2029/4/4          21                      Wednesday      Bright & Clear      
+2029/4/5          22                      Thursday                           
+2029/4/6          23                      Friday                             
+2029/4/7          24                      Saturday                           
+2029/4/8          25                      Sunday                             
+2029/4/9          26                      Monday                             
+2029/4/10         27                      Tuesday                            
+2029/4/11         28                      Wednesday                          
+2029/4/12         29                      Thursday                           
+2029/4/13         30                      Friday                             
+2029/4/14         3rd Lunar Month         Saturday                           
+2029/4/15         2                       Sunday                             
+2029/4/16         3                       Monday                             
+2029/4/17         4                       Tuesday                            
+2029/4/18         5                       Wednesday                          
+2029/4/19         6                       Thursday                           
+2029/4/20         7                       Friday         Corn Rain           
+2029/4/21         8                       Saturday                           
+2029/4/22         9                       Sunday                             
+2029/4/23         10                      Monday                             
+2029/4/24         11                      Tuesday                            
+2029/4/25         12                      Wednesday                          
+2029/4/26         13                      Thursday                           
+2029/4/27         14                      Friday                             
+2029/4/28         15                      Saturday                           
+2029/4/29         16                      Sunday                             
+2029/4/30         17                      Monday                             
+2029/5/1          18                      Tuesday                            
+2029/5/2          19                      Wednesday                          
+2029/5/3          20                      Thursday                           
+2029/5/4          21                      Friday                             
+2029/5/5          22                      Saturday       Summer Commences    
+2029/5/6          23                      Sunday                             
+2029/5/7          24                      Monday                             
+2029/5/8          25                      Tuesday                            
+2029/5/9          26                      Wednesday                          
+2029/5/10         27                      Thursday                           
+2029/5/11         28                      Friday                             
+2029/5/12         29                      Saturday                           
+2029/5/13         4th Lunar Month         Sunday                             
+2029/5/14         2                       Monday                             
+2029/5/15         3                       Tuesday                            
+2029/5/16         4                       Wednesday                          
+2029/5/17         5                       Thursday                           
+2029/5/18         6                       Friday                             
+2029/5/19         7                       Saturday                           
+2029/5/20         8                       Sunday                             
+2029/5/21         9                       Monday         Corn Forms          
+2029/5/22         10                      Tuesday                            
+2029/5/23         11                      Wednesday                          
+2029/5/24         12                      Thursday                           
+2029/5/25         13                      Friday                             
+2029/5/26         14                      Saturday                           
+2029/5/27         15                      Sunday                             
+2029/5/28         16                      Monday                             
+2029/5/29         17                      Tuesday                            
+2029/5/30         18                      Wednesday                          
+2029/5/31         19                      Thursday                           
+2029/6/1          20                      Friday                             
+2029/6/2          21                      Saturday                           
+2029/6/3          22                      Sunday                             
+2029/6/4          23                      Monday                             
+2029/6/5          24                      Tuesday        Corn on Ear         
+2029/6/6          25                      Wednesday                          
+2029/6/7          26                      Thursday                           
+2029/6/8          27                      Friday                             
+2029/6/9          28                      Saturday                           
+2029/6/10         29                      Sunday                             
+2029/6/11         30                      Monday                             
+2029/6/12         5th Lunar Month         Tuesday                            
+2029/6/13         2                       Wednesday                          
+2029/6/14         3                       Thursday                           
+2029/6/15         4                       Friday                             
+2029/6/16         5                       Saturday                           
+2029/6/17         6                       Sunday                             
+2029/6/18         7                       Monday                             
+2029/6/19         8                       Tuesday                            
+2029/6/20         9                       Wednesday                          
+2029/6/21         10                      Thursday       Summer Solstice     
+2029/6/22         11                      Friday                             
+2029/6/23         12                      Saturday                           
+2029/6/24         13                      Sunday                             
+2029/6/25         14                      Monday                             
+2029/6/26         15                      Tuesday                            
+2029/6/27         16                      Wednesday                          
+2029/6/28         17                      Thursday                           
+2029/6/29         18                      Friday                             
+2029/6/30         19                      Saturday                           
+2029/7/1          20                      Sunday                             
+2029/7/2          21                      Monday                             
+2029/7/3          22                      Tuesday                            
+2029/7/4          23                      Wednesday                          
+2029/7/5          24                      Thursday                           
+2029/7/6          25                      Friday                             
+2029/7/7          26                      Saturday       Moderate Heat       
+2029/7/8          27                      Sunday                             
+2029/7/9          28                      Monday                             
+2029/7/10         29                      Tuesday                            
+2029/7/11         6th Lunar Month         Wednesday                          
+2029/7/12         2                       Thursday                           
+2029/7/13         3                       Friday                             
+2029/7/14         4                       Saturday                           
+2029/7/15         5                       Sunday                             
+2029/7/16         6                       Monday                             
+2029/7/17         7                       Tuesday                            
+2029/7/18         8                       Wednesday                          
+2029/7/19         9                       Thursday                           
+2029/7/20         10                      Friday                             
+2029/7/21         11                      Saturday                           
+2029/7/22         12                      Sunday         Great Heat          
+2029/7/23         13                      Monday                             
+2029/7/24         14                      Tuesday                            
+2029/7/25         15                      Wednesday                          
+2029/7/26         16                      Thursday                           
+2029/7/27         17                      Friday                             
+2029/7/28         18                      Saturday                           
+2029/7/29         19                      Sunday                             
+2029/7/30         20                      Monday                             
+2029/7/31         21                      Tuesday                            
+2029/8/1          22                      Wednesday                          
+2029/8/2          23                      Thursday                           
+2029/8/3          24                      Friday                             
+2029/8/4          25                      Saturday                           
+2029/8/5          26                      Sunday                             
+2029/8/6          27                      Monday                             
+2029/8/7          28                      Tuesday        Autumn Commences    
+2029/8/8          29                      Wednesday                          
+2029/8/9          30                      Thursday                           
+2029/8/10         7th Lunar Month         Friday                             
+2029/8/11         2                       Saturday                           
+2029/8/12         3                       Sunday                             
+2029/8/13         4                       Monday                             
+2029/8/14         5                       Tuesday                            
+2029/8/15         6                       Wednesday                          
+2029/8/16         7                       Thursday                           
+2029/8/17         8                       Friday                             
+2029/8/18         9                       Saturday                           
+2029/8/19         10                      Sunday                             
+2029/8/20         11                      Monday                             
+2029/8/21         12                      Tuesday                            
+2029/8/22         13                      Wednesday                          
+2029/8/23         14                      Thursday       End of Heat         
+2029/8/24         15                      Friday                             
+2029/8/25         16                      Saturday                           
+2029/8/26         17                      Sunday                             
+2029/8/27         18                      Monday                             
+2029/8/28         19                      Tuesday                            
+2029/8/29         20                      Wednesday                          
+2029/8/30         21                      Thursday                           
+2029/8/31         22                      Friday                             
+2029/9/1          23                      Saturday                           
+2029/9/2          24                      Sunday                             
+2029/9/3          25                      Monday                             
+2029/9/4          26                      Tuesday                            
+2029/9/5          27                      Wednesday                          
+2029/9/6          28                      Thursday                           
+2029/9/7          29                      Friday         White Dew           
+2029/9/8          8th Lunar Month         Saturday                           
+2029/9/9          2                       Sunday                             
+2029/9/10         3                       Monday                             
+2029/9/11         4                       Tuesday                            
+2029/9/12         5                       Wednesday                          
+2029/9/13         6                       Thursday                           
+2029/9/14         7                       Friday                             
+2029/9/15         8                       Saturday                           
+2029/9/16         9                       Sunday                             
+2029/9/17         10                      Monday                             
+2029/9/18         11                      Tuesday                            
+2029/9/19         12                      Wednesday                          
+2029/9/20         13                      Thursday                           
+2029/9/21         14                      Friday                             
+2029/9/22         15                      Saturday                           
+2029/9/23         16                      Sunday         Autumnal Equinox    
+2029/9/24         17                      Monday                             
+2029/9/25         18                      Tuesday                            
+2029/9/26         19                      Wednesday                          
+2029/9/27         20                      Thursday                           
+2029/9/28         21                      Friday                             
+2029/9/29         22                      Saturday                           
+2029/9/30         23                      Sunday                             
+2029/10/1         24                      Monday                             
+2029/10/2         25                      Tuesday                            
+2029/10/3         26                      Wednesday                          
+2029/10/4         27                      Thursday                           
+2029/10/5         28                      Friday                             
+2029/10/6         29                      Saturday                           
+2029/10/7         30                      Sunday                             
+2029/10/8         9th Lunar Month         Monday         Cold Dew            
+2029/10/9         2                       Tuesday                            
+2029/10/10        3                       Wednesday                          
+2029/10/11        4                       Thursday                           
+2029/10/12        5                       Friday                             
+2029/10/13        6                       Saturday                           
+2029/10/14        7                       Sunday                             
+2029/10/15        8                       Monday                             
+2029/10/16        9                       Tuesday                            
+2029/10/17        10                      Wednesday                          
+2029/10/18        11                      Thursday                           
+2029/10/19        12                      Friday                             
+2029/10/20        13                      Saturday                           
+2029/10/21        14                      Sunday                             
+2029/10/22        15                      Monday                             
+2029/10/23        16                      Tuesday        Frost               
+2029/10/24        17                      Wednesday                          
+2029/10/25        18                      Thursday                           
+2029/10/26        19                      Friday                             
+2029/10/27        20                      Saturday                           
+2029/10/28        21                      Sunday                             
+2029/10/29        22                      Monday                             
+2029/10/30        23                      Tuesday                            
+2029/10/31        24                      Wednesday                          
+2029/11/1         25                      Thursday                           
+2029/11/2         26                      Friday                             
+2029/11/3         27                      Saturday                           
+2029/11/4         28                      Sunday                             
+2029/11/5         29                      Monday                             
+2029/11/6         10th Lunar Month        Tuesday                            
+2029/11/7         2                       Wednesday      Winter Commences    
+2029/11/8         3                       Thursday                           
+2029/11/9         4                       Friday                             
+2029/11/10        5                       Saturday                           
+2029/11/11        6                       Sunday                             
+2029/11/12        7                       Monday                             
+2029/11/13        8                       Tuesday                            
+2029/11/14        9                       Wednesday                          
+2029/11/15        10                      Thursday                           
+2029/11/16        11                      Friday                             
+2029/11/17        12                      Saturday                           
+2029/11/18        13                      Sunday                             
+2029/11/19        14                      Monday                             
+2029/11/20        15                      Tuesday                            
+2029/11/21        16                      Wednesday                          
+2029/11/22        17                      Thursday       Light Snow          
+2029/11/23        18                      Friday                             
+2029/11/24        19                      Saturday                           
+2029/11/25        20                      Sunday                             
+2029/11/26        21                      Monday                             
+2029/11/27        22                      Tuesday                            
+2029/11/28        23                      Wednesday                          
+2029/11/29        24                      Thursday                           
+2029/11/30        25                      Friday                             
+2029/12/1         26                      Saturday                           
+2029/12/2         27                      Sunday                             
+2029/12/3         28                      Monday                             
+2029/12/4         29                      Tuesday                            
+2029/12/5         11th Lunar Month        Wednesday                          
+2029/12/6         2                       Thursday                           
+2029/12/7         3                       Friday         Heavy Snow          
+2029/12/8         4                       Saturday                           
+2029/12/9         5                       Sunday                             
+2029/12/10        6                       Monday                             
+2029/12/11        7                       Tuesday                            
+2029/12/12        8                       Wednesday                          
+2029/12/13        9                       Thursday                           
+2029/12/14        10                      Friday                             
+2029/12/15        11                      Saturday                           
+2029/12/16        12                      Sunday                             
+2029/12/17        13                      Monday                             
+2029/12/18        14                      Tuesday                            
+2029/12/19        15                      Wednesday                          
+2029/12/20        16                      Thursday                           
+2029/12/21        17                      Friday         Winter Solstice     
+2029/12/22        18                      Saturday                           
+2029/12/23        19                      Sunday                             
+2029/12/24        20                      Monday                             
+2029/12/25        21                      Tuesday                            
+2029/12/26        22                      Wednesday                          
+2029/12/27        23                      Thursday                           
+2029/12/28        24                      Friday                             
+2029/12/29        25                      Saturday                           
+2029/12/30        26                      Sunday                             
+2029/12/31        27                      Monday                             

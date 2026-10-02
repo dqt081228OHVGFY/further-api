@@ -1,0 +1,42 @@
+2026-09-24T13:03:38.308619Z  WARN codex_core_plugins::manager: failed to warm featured plugin ids cache error=failed to send remote plugin sync request to https://chatgpt.com/backend-api/plugins/featured: error sending request for url (https://chatgpt.com/backend-api/plugins/featured?platform=codex)
+2026-09-24T13:03:38.466186Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
+2026-09-24T13:03:38.523839Z  WARN codex_exec_server::client::http_client::reqwest_http_client: http/request send failed http_method="POST" error_is_timeout=false error_is_connect=true error=error sending request error_sources=Some("client error (Connect): tcp connect error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013)")
+2026-09-24T13:03:38.525020Z  WARN codex_rmcp_client::http_client_adapter: streamable HTTP post_message failed endpoint_scheme="https" endpoint_host="developers.openai.com" endpoint_path="/mcp" endpoint_has_query=false mcp_method="initialize" mcp_request_id="0" has_session_id=false has_authorization_header=false
+2026-09-24T13:03:38.528019Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when Client(HttpRequest(HttpRequest("http/request failed: error sending request for url (https://developers.openai.com/mcp)")))
+{"type":"thread.started","thread_id":"01a0d383-b100-7111-ad71-fa20fae7a306"}
+2026-09-24T13:03:38.643452Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:38.679261Z  WARN codex_core::session_startup_prewarm: startup websocket prewarm setup failed: stream disconnected before completion: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013)
+{"type":"turn.started"}
+2026-09-24T13:03:38.738931Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:38.739279Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (1/5 in 215ms)...
+2026-09-24T13:03:38.853720Z  WARN codex_core_plugins::startup_sync: git sync failed for curated plugin sync; falling back to GitHub HTTP error=git ls-remote curated plugins repo failed with status exit code: 128: fatal: unable to access 'https://github.com/openai/plugins.git/': Failed to connect to github.com port 443 after 75 ms: Could not connect to server git_binary="git"
+2026-09-24T13:03:38.859490Z  WARN codex_core_plugins::startup_sync: GitHub HTTP sync failed for curated plugin sync; falling back to export archive error=failed to get curated plugins repository from https://api.github.com/repos/openai/plugins: error sending request for url (https://api.github.com/repos/openai/plugins) backup_archive_api_url="https://chatgpt.com/backend-api/plugins/export/curated"
+2026-09-24T13:03:38.868135Z  WARN codex_core_plugins::manager: failed to sync curated plugins repo: git sync failed for curated plugin sync: git ls-remote curated plugins repo failed with status exit code: 128: fatal: unable to access 'https://github.com/openai/plugins.git/': Failed to connect to github.com port 443 after 75 ms: Could not connect to server; GitHub HTTP sync failed for curated plugin sync: failed to get curated plugins repository from https://api.github.com/repos/openai/plugins: error sending request for url (https://api.github.com/repos/openai/plugins); export archive sync failed for curated plugin sync: failed to get curated plugins export archive metadata from https://chatgpt.com/backend-api/plugins/export/curated: error sending request for url (https://chatgpt.com/backend-api/plugins/export/curated)
+2026-09-24T13:03:38.960986Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:38.961248Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (2/5 in 427ms)...
+{"type":"error","message":"Reconnecting... 2/5 (stream disconnected before completion: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013))"}
+2026-09-24T13:03:39.399903Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:39.400215Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (3/5 in 819ms)...
+{"type":"error","message":"Reconnecting... 3/5 (stream disconnected before completion: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013))"}
+2026-09-24T13:03:40.227539Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:40.228328Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (4/5 in 1.542s)...
+{"type":"error","message":"Reconnecting... 4/5 (stream disconnected before completion: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013))"}
+2026-09-24T13:03:41.780728Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:41.781047Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (5/5 in 3.505s)...
+{"type":"error","message":"Reconnecting... 5/5 (stream disconnected before completion: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013))"}
+2026-09-24T13:03:45.304040Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。 (os error 10013), url: wss://api.openai.com/v1/responses
+2026-09-24T13:03:45.304944Z  WARN codex_core::client: falling back to HTTP
+2026-09-24T13:03:48.184034Z  WARN codex_core_plugins::startup_remote_sync: skipping startup remote plugin sync because curated marketplace is not ready codex_home=C:\Users\CodexSandboxOffline\.codex
+2026-09-24T13:03:48.349384Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (1/5 in 182ms)...
+{"type":"error","message":"Reconnecting... 1/5 (stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses))"}
+2026-09-24T13:03:51.631743Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (2/5 in 412ms)...
+{"type":"error","message":"Reconnecting... 2/5 (stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses))"}
+2026-09-24T13:03:55.270244Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (3/5 in 815ms)...
+{"type":"error","message":"Reconnecting... 3/5 (stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses))"}
+2026-09-24T13:03:59.171481Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (4/5 in 1.61s)...
+{"type":"error","message":"Reconnecting... 4/5 (stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses))"}
+2026-09-24T13:04:03.919081Z  WARN codex_core::responses_retry: stream disconnected - retrying sampling request (5/5 in 2.972s)...
+{"type":"error","message":"Reconnecting... 5/5 (stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses))"}
+{"type":"error","message":"stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses)"}
+{"type":"turn.failed","error":{"message":"stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses)"}}
+2026-09-24T13:04:09.995432Z  WARN codex_mcp::rmcp_client: failed to initialize MCP client during shutdown: MCP startup failed: handshaking with MCP server failed: Send message error Transport [rmcp::transport::worker::WorkerTransport<rmcp::transport::streamable_http_client::StreamableHttpClientWorker<codex_rmcp_client::http_client_adapter::StreamableHttpClientAdapter>>] error: Client error: HTTP request failed: http/request failed: error sending request for url (https://developers.openai.com/mcp), when send initialize request

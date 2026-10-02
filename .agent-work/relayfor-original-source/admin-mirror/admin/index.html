@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#005ac1">
+  <title>管理后台 · RelayFor</title>
+  <link rel="stylesheet" href="/app.css">
+  <script defer src="/app.js"></script>
+  <script defer src="/resource-loader.js"></script>
+  <script defer src="/admin-overview.js"></script>
+  <script defer src="/admin-settings.js"></script>
+  <script defer src="/admin-models.js"></script>
+  <script defer src="/admin-routing.js"></script>
+  <script defer src="/disabled-channels.js"></script>
+  <script defer src="/channel-keys.js"></script>
+  <script defer src="/admin.js"></script>
+</head>
+<body data-page="admin">
+  <nav class="nav-rail" data-shell>
+    <a class="rail-brand" href="/"><span class="rail-logo"><span class="material-symbol" aria-hidden="true">hub</span></span><span><span class="rail-title">RelayFor</span><span class="rail-sub">管理后台</span></span></a>
+    <div class="nav-group-title">管理</div>
+    <button type="button" class="nav-item active" data-nav="overview"><span class="material-symbol" aria-hidden="true">space_dashboard</span>概览</button>
+    <button type="button" class="nav-item" data-nav="channels"><span class="material-symbol" aria-hidden="true">hub</span>渠道</button>
+    <button type="button" class="nav-item" data-nav="models"><span class="material-symbol" aria-hidden="true">tune</span>模型</button>
+    <button type="button" class="nav-item" data-nav="subscriptions"><span class="material-symbol" aria-hidden="true">redeem</span>订阅</button>
+      <button type="button" class="nav-item" data-nav="users"><span class="material-symbol" aria-hidden="true">group</span>用户</button>
+      <button type="button" class="nav-item" data-nav="redemptions"><span class="material-symbol" aria-hidden="true">confirmation_number</span>兑换码</button>
+      <button type="button" class="nav-item" data-nav="registration-codes"><span class="material-symbol" aria-hidden="true">key</span>注册码</button>
+      <button type="button" class="nav-item" data-nav="prepaid-cards"><span class="material-symbol" aria-hidden="true">payments</span>预付卡</button>
+      <button type="button" class="nav-item" data-nav="logs"><span class="material-symbol" aria-hidden="true">receipt_long</span>日志</button>
+    <button type="button" class="nav-item" data-nav="settings" data-root-only><span class="material-symbol" aria-hidden="true">lock</span>安全与设置</button>
+    <div class="rail-bottom">
+      <a class="nav-item" href="/console/"><span class="material-symbol" aria-hidden="true">person</span>用户控制台</a>
+      <button type="button" class="nav-item" data-logout><span class="material-symbol" aria-hidden="true">logout</span>退出登录</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <header class="top-app-bar">
+      <div><div class="appbar-title" data-page-title>概览</div><div class="appbar-sub" data-page-subtitle>用户、渠道与使用记录</div></div>
+      <div class="appbar-spacer"></div>
+      <button type="button" class="md-icon-button" title="刷新" onclick="location.reload()"><span class="material-symbol" aria-hidden="true">refresh</span></button>
+    </header>
+
+    <div class="content-area">
+      <section class="view active" data-panel="overview" data-title="概览" data-subtitle="用户、渠道与使用记录">
+  <div class="dashboard-grid admin-today-grid">
+    <div class="md-card stat-card accent"><div class="stat-label"><span class="material-symbol" aria-hidden="true">payments</span>今日扣费</div><div class="stat-value compact" data-admin-today="quota">$0.000</div><div class="stat-foot">今日实际扣减额度</div></div>
+    <div class="md-card stat-card"><div class="stat-label"><span class="material-symbol" aria-hidden="true">data_usage</span>Token</div><div class="stat-value compact" data-admin-today="tokens">0</div><div class="stat-foot">今日输入 + 输出</div></div>
+    <div class="md-card stat-card"><div class="stat-label"><span class="material-symbol" aria-hidden="true">swap_horiz</span>请求</div><div class="stat-value compact" data-admin-today="requests">0</div><div class="stat-foot">今日调用次数</div></div>
+    <div class="md-card stat-card"><div class="stat-label"><span class="material-symbol" aria-hidden="true">person_check</span>活跃用户</div><div class="stat-value compact" data-admin-today="active_users">0</div><div class="stat-foot">今日独立调用用户</div></div>
+    <div class="md-card stat-card" data-admin-error-rate-card><div class="stat-label"><span class="material-symbol" aria-hidden="true">error</span>错误率</div><div class="stat-value compact" data-admin-today="error_rate">0.0%</div><div class="stat-foot error-rate-foot"><span><span data-admin-today="errors">0</span> 次失败请求</span><strong class="hidden" data-admin-primary-error>主要错误：—</strong></div></div>
+  </div>
+  <div class="md-card admin-trend-section">
+    <div class="card-head"><div class="md-card-title">使用趋势</div><div class="trend-period-switch" role="group" aria-label="趋势周期"><button type="button" class="active" data-admin-trend-days="7" aria-pressed="true">近 7 天</button><button type="button" data-admin-trend-days="30" aria-pressed="false">近 30 天</button></div></div>
+    <div class="admin-trend-grid" data-admin-trends aria-live="polite"><div class="empty">加载趋势中…</div></div>
+  </div>
+  <div class="md-card admin-ranking-section">
+    <div class="card-head"><div class="md-card-title">异常与排行</div><span class="tag" data-admin-ranking-window>近 7 天</span></div>
+    <div class="admin-ranking-grid">
+      <article class="ranking-card">
+        <div class="ranking-card-head"><span class="ranking-icon"><span class="material-symbol" aria-hidden="true">person</span></span><div><b>Top 消费用户</b></div></div>
+        <div class="ranking-list" data-admin-ranking-list="top_users" role="list" aria-live="polite"><div class="empty">加载中…</div></div>
+      </article>
+      <article class="ranking-card">
+        <div class="ranking-card-head"><span class="ranking-icon"><span class="material-symbol" aria-hidden="true">tune</span></span><div><b>Top 模型</b></div></div>
+        <div class="ranking-list" data-admin-ranking-list="top_models" role="list" aria-live="polite"><div class="empty">加载中…</div></div>
+      </article>
+      <article class="ranking-card ranking-card-alert">
+        <div class="ranking-card-head"><span class="ranking-icon"><span class="material-symbol" aria-hidden="true">error</span></span><div><b>Top 错误渠道</b></div></div>
+        <div class="ranking-list" data-admin-ranking-list="top_error_channels" role="list" aria-live="polite"><div class="empty">加载中…</div></div>
+      </article>
+      <article class="ranking-card ranking-card-warning">
+        <div class="ranking-card-head"><span class="ranking-icon"><span class="material-symbol" aria-hidden="true">key</span></span><div><b>异常高频 Key</b></div></div>
+        <div class="ranking-list" data-admin-ranking-list="high_frequency_keys" role="list" aria-live="polite"><div class="empty">加载中…</div></div>
+      </article>
+    </div>
+  </div>
+  <div class="overview-summary-grid">
+    <div class="md-card site-balance-card">
+      <div class="card-head"><div class="md-card-title">用户余额构成</div><span class="material-symbol" aria-hidden="true">account_balance_wallet</span></div>
+      <div class="site-balance-grid">
+        <div class="site-balance-item">
+          <div class="site-balance-head"><span>公益站</span><small><span data-admin-site-balance="public_users">0</span> 位用户</small></div>
+          <b data-admin-site-balance="public_estimated_quota">$0.00</b><small class="site-balance-caption">可计量余额估算</small>
+          <div class="site-balance-breakdown"><div><span>永久</span><strong data-admin-site-balance="public_permanent_quota">$0.00</strong></div><div><span>限时</span><strong data-admin-site-balance="public_timed_quota">$0.00</strong></div><div><span>分组</span><strong data-admin-site-balance="public_group_quota">$0.00</strong></div><div><span>订阅</span><strong data-admin-site-balance="public_subscription_quota">$0.00</strong></div></div>
+          <small class="site-balance-unlimited"><span data-admin-site-balance="public_unlimited_subscriptions">0</span> 个不限额订阅未折算金额</small>
+        </div>
+        <div class="site-balance-item pay">
+          <div class="site-balance-head"><span>Pay 站</span><small><span data-admin-site-balance="pay_users">0</span> 位用户</small></div>
+          <b data-admin-site-balance="pay_estimated_quota">$0.00</b><small class="site-balance-caption">可计量余额估算</small>
+          <div class="site-balance-breakdown"><div><span>永久</span><strong data-admin-site-balance="pay_permanent_quota">$0.00</strong></div><div><span>限时</span><strong data-admin-site-balance="pay_timed_quota">$0.00</strong></div><div><span>分组</span><strong data-admin-site-balance="pay_group_quota">$0.00</strong></div><div><span>订阅</span><strong data-admin-site-balance="pay_subscription_quota">$0.00</strong></div></div>
+          <small class="site-balance-unlimited"><span data-admin-site-balance="pay_unlimited_subscriptions">0</span> 个不限额订阅未折算金额</small>
+        </div>
+      </div>
+    </div>
+    <div class="md-card">
+      <div class="card-head"><div class="md-card-title">全站累计</div><span class="material-symbol" aria-hidden="true">monitoring</span></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">请求</div></div><div class="list-metrics"><div><b data-admin-stat="logs">0</b></div></div></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">输入 Token</div></div><div class="list-metrics"><div><b data-admin-stat="input_tokens">0</b></div></div></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">输出 Token</div></div><div class="list-metrics"><div><b data-admin-stat="output_tokens">0</b></div></div></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">已扣额度</div></div><div class="list-metrics"><div><b data-admin-stat-money="quota">$0.00</b></div></div></div>
+    </div>
+    <div class="md-card">
+      <div class="card-head"><div class="md-card-title">系统资源</div><span class="material-symbol" aria-hidden="true">dns</span></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">用户</div></div><div class="list-metrics"><div><b data-admin-stat="users">0</b>启用 <span data-admin-stat="enabled_users">0</span></div></div></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">渠道</div></div><div class="list-metrics"><div><b data-admin-stat="channels">0</b>已配置上游</div></div></div>
+      <div class="list-item"><div class="list-item-body"><div class="list-item-title">API Key</div></div><div class="list-metrics"><div><b data-admin-stat="active_tokens">0</b>当前启用</div></div></div>
+    </div>
+  </div>
+  <div class="md-card"><div class="status-line"><span class="dot"></span><span>管理员权限已启用</span><span class="status-sep">·</span><span>数据来自当前 SQLite 数据库</span></div></div>
+</section>
+
+
+      <section class="view" data-panel="channels" data-title="渠道" data-subtitle="管理上游渠道、Key 与健康状态">
+		<div data-channel-page="index">
+		  <div class="card-head"><div class="md-card-title">渠道</div><div class="list-actions"><label class="list-visibility-toggle" title="同时隐藏手动停用和自动下线的渠道"><input type="checkbox" data-hide-disabled-channels><span>隐藏停用渠道</span></label><button type="button" class="md-btn md-btn-outlined" data-channel-key-management-open><span class="material-symbol" aria-hidden="true">key</span>Key 管理</button><button type="button" class="md-btn md-btn-outlined" data-disabled-channel-management-open><span class="material-symbol" aria-hidden="true">block</span>禁用情况</button><button type="button" class="md-btn md-btn-filled" data-open-dialog="channel-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建</button></div></div>
+          <div class="md-card"><div data-admin-channel-rows><div class="empty">加载中…</div></div></div>
+		</div>
+		<div class="channel-management-shell hidden" data-channel-page="keys">
+		  <header class="card-head settings-page-head channel-management-head">
+			<div class="list-actions"><button type="button" class="md-btn md-btn-text" data-channel-key-management-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回渠道</button><h1 class="md-card-title">渠道 Key 管理</h1></div>
+			<div class="card-head-actions"><button type="button" class="md-btn md-btn-outlined" data-refresh-key-balances><span class="material-symbol" aria-hidden="true">account_balance_wallet</span>一键复查余额</button><button type="button" class="md-icon-button" title="刷新" data-refresh-channel-keys><span class="material-symbol" aria-hidden="true">refresh</span></button><button type="button" class="md-btn md-btn-filled hidden" data-add-channel-key><span class="material-symbol" aria-hidden="true">add</span>添加 Key</button></div>
+		  </header>
+		  <div class="channel-management-content">
+			<div class="settings-meta-grid channel-key-summary">
+			  <div class="settings-meta"><span>全部 Key</span><b data-key-total>—</b></div>
+			  <div class="settings-meta"><span>当前可用</span><b data-key-usable>—</b></div>
+			  <div class="settings-meta"><span>余额耗尽</span><b data-key-exhausted>—</b></div>
+			  <div class="settings-meta"><span>已停用/下线</span><b data-key-disabled>—</b></div>
+			</div>
+			<section class="md-card channel-management-card">
+			  <div class="channel-key-filters">
+				<div class="md-textfield"><input class="md-input" type="search" placeholder=" " data-key-search><label class="md-input-label">搜索渠道、标签或 Key ID</label></div>
+				<div class="md-textfield"><select class="md-input" data-key-channel-filter><option value="">全部渠道</option></select><label class="md-input-label">渠道</label></div>
+				<div class="md-textfield"><select class="md-input" data-key-status-filter><option value="">全部状态</option><option value="usable">当前可用</option><option value="exhausted">余额耗尽</option><option value="disabled">手动停用</option><option value="auto_off">自动下线</option><option value="channel_off">渠道不可用</option></select><label class="md-input-label">状态</label></div>
+			  </div>
+			  <div class="channel-key-list" data-channel-key-management-rows><div class="empty">加载中…</div></div>
+			</section>
+		  </div>
+		</div>
+		<div class="channel-management-shell hidden" data-channel-page="disabled">
+		  <header class="card-head settings-page-head channel-management-head">
+			<div class="list-actions"><button type="button" class="md-btn md-btn-text" data-disabled-channel-management-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回渠道</button><h1 class="md-card-title">禁用渠道</h1></div>
+			<button type="button" class="md-icon-button" title="刷新" data-refresh-disabled-channels><span class="material-symbol" aria-hidden="true">refresh</span></button>
+		  </header>
+		  <div class="channel-management-content">
+			<div class="settings-meta-grid disabled-channel-summary">
+			  <div class="settings-meta"><span>已禁用</span><b data-disabled-total>—</b></div>
+			  <div class="settings-meta"><span>自动下线</span><b data-disabled-auto>—</b></div>
+			  <div class="settings-meta"><span>手动禁用</span><b data-disabled-manual>—</b></div>
+			</div>
+			<section class="md-card channel-management-card"><div class="disabled-channel-list" data-disabled-channel-rows><div class="empty">加载中…</div></div></section>
+		  </div>
+		</div>
+      </section>
+
+      <section class="view" data-panel="models" data-title="模型" data-subtitle="配置模型价格、倍率与渠道绑定">
+		<nav class="model-subpage-tabs" aria-label="模型管理页面"><button type="button" class="model-subpage-tab active" aria-pressed="true" data-admin-model-tab="catalog">模型配置</button><button type="button" class="model-subpage-tab" aria-pressed="false" data-admin-model-tab="health"><span class="material-symbol" aria-hidden="true">monitoring</span>健康与收费</button><button type="button" class="model-subpage-tab" aria-pressed="false" data-admin-model-tab="routing"><span class="material-symbol" aria-hidden="true">swap_horiz</span>高级路由与别名</button></nav>
+		<div data-admin-model-page="catalog">
+		  <div class="card-head"><div class="md-card-title">模型配置</div><div class="list-actions"><label class="list-visibility-toggle"><input type="checkbox" data-hide-disabled-models><span>隐藏停用模型</span></label><button type="button" class="md-btn md-btn-filled" data-open-dialog="model-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建模型</button></div></div>
+          <div class="md-card"><div class="card-head"><div><div class="md-card-title">模型计费与远程压缩</div><div class="card-hint">模型可选择按量或按次计费；远程压缩价格独立设置，按量模型也可以启用远程压缩。</div></div><span class="material-symbol" aria-hidden="true">tune</span></div></div>
+          <div class="md-card"><div data-model-rows><div class="empty">加载中…</div></div></div>
+		</div>
+		<div class="hidden" data-admin-model-page="health">
+		  <div class="card-head"><div><div class="md-card-title">健康与收费</div><div class="card-hint" data-admin-model-health-updated>统计今日模型与渠道运行情况</div></div><button type="button" class="md-icon-button" title="刷新健康数据" data-admin-model-health-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button></div>
+		  <div class="settings-meta-grid model-health-summary"><div class="settings-meta"><span>今日请求</span><b data-admin-health-requests>—</b></div><div class="settings-meta"><span>今日成功率</span><b data-admin-health-success>—</b></div><div class="settings-meta"><span>缓存命中率</span><b data-admin-health-cache>—</b></div><div class="settings-meta"><span>今日模型收费</span><b data-admin-health-charge>—</b></div></div>
+		  <div class="md-card health-table-card"><div class="card-head"><div><div class="md-card-title">模型健康度</div><div class="card-hint">成功率、缓存读取和实际扣费按模型聚合。</div></div><span class="material-symbol" aria-hidden="true">monitoring</span></div><div class="health-table-wrap"><table class="health-table"><thead><tr><th>模型</th><th>最近 60 次</th><th>今日成功率</th><th>缓存命中率</th><th>今日收费</th></tr></thead><tbody data-admin-model-health-rows><tr><td class="empty" colspan="5">加载中…</td></tr></tbody></table></div></div>
+		  <div class="md-card health-table-card"><div class="card-head"><div><div class="md-card-title">渠道健康度</div><div class="card-hint">独立观察每个上游渠道的近期与今日表现。</div></div><span class="material-symbol" aria-hidden="true">hub</span></div><div class="health-table-wrap"><table class="health-table"><thead><tr><th>渠道</th><th>状态</th><th>最近 60 次</th><th>今日成功率</th><th>今日性能</th></tr></thead><tbody data-admin-channel-health-rows><tr><td class="empty" colspan="5">加载中…</td></tr></tbody></table></div></div>
+		</div>
+		<div class="hidden" data-admin-model-page="routing">
+		  <div class="card-head"><div><div class="md-card-title">高级路由规则</div><div class="card-hint">针对特定模型细分路由策略（百分比分流、成功率加权）、首选原地重试及有序兜底渠道。未配置的模型遵循基础渠道路由。</div></div><div class="list-actions"><button type="button" class="md-icon-button" title="刷新路由数据" data-admin-routing-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button><button type="button" class="md-btn md-btn-filled" data-open-dialog="model-routing-rule-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建路由规则</button></div></div>
+		  <div class="md-card">
+		    <div data-model-routing-rule-rows><div class="empty">加载中…</div></div>
+		  </div>
+
+		  <div class="card-head" style="margin-top: 24px;"><div><div class="md-card-title">模型别名映射</div><div class="card-hint">将客户端请求的模型名称映射为实际目标模型。支持链式映射（最大深度 10）与防自环保护，客户端响应与公开日志自动脱敏。</div></div><div class="list-actions"><button type="button" class="md-btn md-btn-filled" data-open-dialog="model-alias-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建模型别名</button></div></div>
+		  <div class="md-card">
+		    <div data-model-alias-rows><div class="empty">加载中…</div></div>
+		  </div>
+		</div>
+      </section>
+
+      <section class="view" data-panel="subscriptions" data-title="订阅" data-subtitle="管理订阅计划、周期额度与福利">
+        <div class="card-head"><div class="md-card-title">订阅与计费活动</div><div class="list-actions"><button type="button" class="md-btn md-btn-outlined" data-process-subscription-resets><span class="material-symbol" aria-hidden="true">refresh</span>检查周期重置</button><button type="button" class="md-btn md-btn-outlined" data-open-dialog="subscription-benefit-dialog" data-root-only><span class="material-symbol" aria-hidden="true">redeem</span>发放套餐福利</button><button type="button" class="md-btn md-btn-outlined" data-open-dialog="billing-promotion-dialog" data-root-only><span class="material-symbol" aria-hidden="true">redeem</span>新建计费活动</button><button type="button" class="md-btn md-btn-filled" data-open-dialog="subscription-plan-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建计划</button></div></div>
+        <div class="md-card"><div data-subscription-plan-rows><div class="empty">加载中…</div></div></div>
+        <div class="md-card"><div class="card-head"><div><div class="md-card-title">计费活动</div><div class="card-hint">按用户组和模型或额度组配置分项折扣及消费返现；重叠折扣按计费项取最低倍率。</div></div><span class="material-symbol" aria-hidden="true">redeem</span></div><div data-billing-promotion-rows><div class="empty">加载中…</div></div></div>
+        <div class="md-card"><div class="card-head"><div class="md-card-title">福利发放记录</div><span class="material-symbol" aria-hidden="true">redeem</span></div><div data-subscription-benefit-campaign-rows><div class="empty">加载中…</div></div></div>
+      </section>
+
+      <section class="view" data-panel="users" data-title="用户" data-subtitle="管理账户额度、分组与访问状态">
+        <div class="card-head"><div class="md-card-title">用户</div></div>
+        <div class="md-card filter-card">
+          <form class="list-filter" data-admin-user-filter>
+            <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">用户名或 ID</label></div>
+            <div class="md-textfield"><input class="md-input" name="group" placeholder=" "><label class="md-input-label">用户分组</label></div>
+            <div class="md-textfield"><select class="md-input" name="role"><option value="">全部角色</option><option value="1">用户</option><option value="25">审计员</option><option value="50">运维员</option><option value="100">超级管理员</option></select><label class="md-input-label">角色</label></div>
+            <div class="md-textfield"><select class="md-input" name="status"><option value="">全部状态</option><option value="1">启用</option><option value="2">停用</option></select><label class="md-input-label">状态</label></div>
+            <label class="filter-check"><input type="checkbox" name="sleeping"><span>沉睡用户（近 14 天无调用）</span></label>
+            <div class="md-textfield"><select class="md-input" name="page_size"><option value="20">每页 20 条</option><option value="50" selected>每页 50 条</option><option value="100">每页 100 条</option></select><label class="md-input-label">每页数量</label></div>
+            <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+          </form>
+        </div>
+        <div class="md-card">
+          <div data-admin-user-rows><div class="empty">加载中…</div></div>
+          <div class="pagination-bar"><span class="pagination-summary" data-admin-user-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-user-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-user-next>下一页</button></div>
+        </div>
+      </section>
+
+      <section class="view" data-panel="redemptions" data-title="兑换码" data-subtitle="生成和管理额度及订阅兑换码">
+        <div class="card-head"><div class="md-card-title">兑换码</div><div class="card-head-actions"><button type="button" class="md-btn md-btn-danger" data-delete-used-redemptions data-root-only><span class="material-symbol" aria-hidden="true">delete_sweep</span>删除已使用</button><button type="button" class="md-btn md-btn-filled" data-open-dialog="redeem-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建</button></div></div>
+        <div class="md-card filter-card">
+          <form class="list-filter code-filter" data-redemption-filter>
+            <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">兑换码、批次或使用者</label></div>
+            <div class="md-textfield"><select class="md-input" name="status"><option value="">全部状态</option><option value="1">未使用</option><option value="2">已使用</option></select><label class="md-input-label">状态</label></div>
+            <div class="md-textfield"><select class="md-input" name="user_group"><option value="">全部站点</option><option value="default">公益站（default）</option><option value="pay">商业站（pay）</option><option value="legacy">历史通用（未标记）</option></select><label class="md-input-label">归属站点</label></div>
+            <div class="md-textfield"><select class="md-input" name="page_size"><option value="10">每页 10 批</option><option value="25" selected>每页 25 批</option><option value="50">每页 50 批</option><option value="100">每页 100 批</option></select><label class="md-input-label">每页批次</label></div>
+            <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+          </form>
+        </div>
+        <div class="md-card"><div data-redemption-rows><div class="empty">加载中…</div></div><div class="pagination-bar"><span class="pagination-summary" data-redemption-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-redemption-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-redemption-next>下一页</button></div></div>
+      </section>
+
+      <section class="view" data-panel="registration-codes" data-title="注册码" data-subtitle="生成和管理一次性注册凭证">
+        <div class="card-head"><div class="md-card-title">注册码</div><div class="card-head-actions"><button type="button" class="md-btn md-btn-danger" data-delete-used-registration-codes data-root-only><span class="material-symbol" aria-hidden="true">delete_sweep</span>删除已使用</button><button type="button" class="md-btn md-btn-filled" data-open-dialog="registration-code-dialog"><span class="material-symbol" aria-hidden="true">add</span>新建批次</button></div></div>
+        <div class="md-card filter-card">
+          <form class="list-filter code-filter" data-registration-code-filter>
+            <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">注册码、批次或使用者</label></div>
+            <div class="md-textfield"><select class="md-input" name="status"><option value="">全部状态</option><option value="1">未使用</option><option value="2">已使用</option></select><label class="md-input-label">状态</label></div>
+            <div class="md-textfield"><select class="md-input" name="user_group"><option value="">全部用户类型</option><option value="default">普通用户（default）</option><option value="pay">付费用户（pay）</option></select><label class="md-input-label">注册用户类型</label></div>
+            <div class="md-textfield"><select class="md-input" name="page_size"><option value="10">每页 10 批</option><option value="25" selected>每页 25 批</option><option value="50">每页 50 批</option><option value="100">每页 100 批</option></select><label class="md-input-label">每页批次</label></div>
+            <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+          </form>
+        </div>
+        <div class="md-card"><div data-registration-code-rows><div class="empty">加载中…</div></div><div class="pagination-bar"><span class="pagination-summary" data-registration-code-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-registration-code-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-registration-code-next>下一页</button></div></div>
+      </section>
+
+      <section class="view" data-panel="prepaid-cards" data-title="预付卡" data-subtitle="管理预付额度、身份绑定与有效期">
+        <div class="card-head"><div class="md-card-title">预付卡管理</div><div class="card-head-actions"><button type="button" class="md-btn md-btn-danger" data-delete-used-prepaid data-root-only><span class="material-symbol" aria-hidden="true">delete_sweep</span>清理已使用/过期</button><button type="button" class="md-btn md-btn-filled" data-open-dialog="prepaid-card-dialog"><span class="material-symbol" aria-hidden="true">add</span>生成预付卡</button></div></div>
+        <div class="md-card filter-card"><form class="list-filter code-filter" data-prepaid-card-filter>
+          <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">卡号、批次或 LinuxDO 身份</label></div>
+          <div class="md-textfield"><select class="md-input" name="status"><option value="">全部状态</option><option value="1">未使用</option><option value="2">已兑换</option><option value="3">已过期</option></select><label class="md-input-label">状态</label></div>
+          <div class="md-textfield"><select class="md-input" name="page_size"><option value="10">每页 10 批</option><option value="25" selected>每页 25 批</option><option value="50">每页 50 批</option><option value="100">每页 100 批</option></select><label class="md-input-label">每页批次</label></div>
+          <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+        </form></div>
+        <div class="md-card"><div data-prepaid-card-rows><div class="empty">加载中…</div></div><div class="pagination-bar"><span class="pagination-summary" data-prepaid-card-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-prepaid-card-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-prepaid-card-next>下一页</button></div></div>
+      </section>
+
+      <section class="view" data-panel="logs" data-title="日志" data-subtitle="查看调用日志与全链路请求追踪">
+        <div class="card-head"><div class="md-card-title">日志</div><div class="trend-period-switch" role="group" aria-label="日志类型"><button type="button" class="active" data-log-view="calls" aria-pressed="true">调用日志</button><button type="button" data-log-view="traces" aria-pressed="false">请求追踪</button></div></div>
+        <div data-log-subpanel="calls">
+          <div class="card-head"><div></div><button type="button" class="md-icon-button" title="刷新调用日志" data-admin-log-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button></div>
+          <div class="md-card filter-card">
+            <form class="list-filter" data-admin-log-filter>
+              <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">用户、模型、Key 或渠道</label></div>
+              <div class="md-textfield"><input class="md-input" name="status_code" type="number" min="100" max="599" step="1" list="admin-log-status-codes" inputmode="numeric" placeholder=" "><label class="md-input-label">指定状态码</label><datalist id="admin-log-status-codes"><option value="200"><option value="400"><option value="401"><option value="403"><option value="404"><option value="429"><option value="500"><option value="502"><option value="503"><option value="524"></datalist></div>
+              <label class="filter-check"><input type="checkbox" name="exclude_200"><span>排除 200</span></label>
+              <div class="md-textfield"><select class="md-input" name="page_size"><option value="20">每页 20 条</option><option value="50" selected>每页 50 条</option><option value="100">每页 100 条</option><option value="200">每页 200 条</option></select><label class="md-input-label">每页数量</label></div>
+              <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+            </form>
+          </div>
+          <div class="md-card usage-table-card">
+            <div class="usage-table-scroll">
+              <table class="usage-table">
+                <thead><tr>
+                  <th aria-sort="descending"><button type="button" class="usage-sort active" data-admin-log-sort="created_at" data-direction="desc">时间<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="token_name">令牌<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="model">模型<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="total_tokens">Tokens<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="quota">费用<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="duration_ms">耗时<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                  <th aria-sort="none"><button type="button" class="usage-sort" data-admin-log-sort="status_code">详情<span class="sort-indicator" aria-hidden="true"></span></button></th>
+                </tr></thead>
+                <tbody data-admin-log-rows><tr><td class="empty" colspan="7">加载中…</td></tr></tbody>
+              </table>
+            </div>
+            <div class="pagination-bar"><span class="pagination-summary" data-admin-log-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-log-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-log-next>下一页</button></div>
+          </div>
+        </div>
+        <div class="hidden" data-log-subpanel="traces">
+          <div class="card-head"><div><div class="md-card-title">全链路请求追踪</div><div class="card-hint">从鉴权、准入、计费预占到渠道重试和结算；不保存请求正文或完整密钥。</div></div><button type="button" class="md-icon-button" title="刷新请求追踪" data-trace-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button></div>
+          <div class="md-card filter-card">
+            <form class="list-filter" data-trace-filter>
+              <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">请求 ID、用户、模型、渠道或错误</label></div>
+              <div class="md-textfield"><select class="md-input" name="status"><option value="">全部状态</option><option value="running">执行中</option><option value="succeeded">成功</option><option value="failed">失败</option><option value="rejected">已拒绝</option><option value="aborted">已中止</option></select><label class="md-input-label">链路状态</label></div>
+              <div class="md-textfield"><select class="md-input" name="page_size"><option value="25" selected>每页 25 条</option><option value="50">每页 50 条</option><option value="100">每页 100 条</option></select><label class="md-input-label">每页数量</label></div>
+              <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+            </form>
+          </div>
+          <div class="md-card"><div data-trace-rows><div class="empty">加载中…</div></div><div class="pagination-bar"><span class="pagination-summary" data-trace-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-trace-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-trace-next>下一页</button></div></div>
+        </div>
+      </section>
+
+      <section class="view" data-panel="settings" data-title="安全与设置" data-subtitle="管理安全策略、站点公告与系统开关" data-root-only>
+        <div class="settings-directory" data-settings-directory>
+          <button type="button" class="md-card settings-directory-item" data-settings-page="security"><span class="settings-directory-icon"><span class="material-symbol" aria-hidden="true">lock</span></span><span><b>安全控制</b></span><span class="material-symbol settings-directory-arrow" aria-hidden="true">arrow_forward</span></button>
+          <button type="button" class="md-card settings-directory-item" data-settings-page="announcements"><span class="settings-directory-icon"><span class="material-symbol" aria-hidden="true">campaign</span></span><span><b>站点公告</b></span><span class="material-symbol settings-directory-arrow" aria-hidden="true">arrow_forward</span></button>
+          <button type="button" class="md-card settings-directory-item" data-settings-page="routing"><span class="settings-directory-icon"><span class="material-symbol" aria-hidden="true">swap_horiz</span></span><span><b>路由运行</b></span><span class="material-symbol settings-directory-arrow" aria-hidden="true">arrow_forward</span></button>
+          <button type="button" class="md-card settings-directory-item" data-settings-page="registration"><span class="settings-directory-icon"><span class="material-symbol" aria-hidden="true">redeem</span></span><span><b>注册与福利</b></span><span class="material-symbol settings-directory-arrow" aria-hidden="true">arrow_forward</span></button>
+          <button type="button" class="md-card settings-directory-item" data-settings-page="payments"><span class="settings-directory-icon"><span class="material-symbol" aria-hidden="true">payments</span></span><span><b>商业支付</b></span><span class="material-symbol settings-directory-arrow" aria-hidden="true">arrow_forward</span></button>
+        </div>
+        <div class="settings-subpage" id="settings-page-security" data-settings-subpage="security" hidden>
+        <div class="card-head settings-page-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-settings-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回设置</button><div class="md-card-title">安全控制</div></div></div>
+        <div class="md-card emergency-stop-card" data-emergency-stop-card>
+          <div class="emergency-stop-head"><div class="emergency-stop-icon"><span class="material-symbol" aria-hidden="true">power_settings_new</span></div><div class="md-card-title">全局 API 拉闸</div></div>
+          <form data-emergency-stop-form>
+            <label class="emergency-master-switch">
+              <input type="checkbox" name="enabled">
+              <span class="emergency-switch-track"><span class="emergency-switch-thumb"></span></span>
+              <span class="emergency-switch-copy"><b data-emergency-switch-title>API 调用正常开放</b></span>
+            </label>
+            <div class="emergency-stop-controls">
+              <div class="md-textfield"><input class="md-input" name="duration_minutes" type="number" min="0" max="43200" value="30" list="emergency-duration-options" placeholder=" "><label class="md-input-label">持续时间（分钟）</label><datalist id="emergency-duration-options"><option value="5"><option value="15"><option value="30"><option value="60"><option value="360"><option value="1440"></datalist></div>
+              <p class="field-hint">0 表示持续生效，最长 30 天。</p>
+              <button class="md-btn md-btn-danger" type="submit" data-emergency-stop-submit>应用拉闸设置</button>
+            </div>
+          </form>
+          <div class="status-line emergency-stop-status"><span class="dot"></span><span data-emergency-stop-status>正在读取当前状态…</span></div>
+        </div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">管理员动态验证</div><span class="material-symbol" aria-hidden="true">lock</span></div>
+          <div class="security-status-line"><div><b data-admin-totp-status>读取中…</b></div><button type="button" class="md-btn md-btn-filled" data-admin-totp-setup>启用动态验证</button></div>
+          <form class="security-inline-form" data-admin-proof-settings>
+            <div class="md-textfield"><input class="md-input" name="admin_proof_lifetime_minutes" type="number" min="1" max="60" step="1" placeholder=" " required><label class="md-input-label">管理员二次验证有效期（分钟）</label></div>
+            <button class="md-btn md-btn-outlined" type="submit">保存有效期</button>
+          </form>
+          <p class="field-hint">验证通过后，敏感操作在该时长内无需重复验证；可设置 1 到 60 分钟。</p>
+          <form class="security-inline-form hidden" data-admin-totp-disable-form>
+            <div class="md-textfield"><input class="md-input" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder=" " required><label class="md-input-label">当前 6 位验证码</label></div>
+            <button class="md-btn md-btn-outlined danger" type="submit">关闭动态验证</button>
+          </form>
+        </div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">敏感操作审计</div><button type="button" class="md-btn md-btn-outlined" data-nav="audit" data-admin-audit-open><span class="material-symbol" aria-hidden="true">arrow_forward</span>查看审计日志</button></div>
+        </div>
+        </div>
+        <div class="settings-subpage" id="settings-page-announcements" data-settings-subpage="announcements" hidden>
+        <div class="card-head settings-page-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-settings-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回设置</button><div class="md-card-title">站点公告</div></div></div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">站点公告</div><span class="material-symbol" aria-hidden="true">campaign</span></div>
+          <form data-site-announcements>
+            <div class="md-textfield"><textarea class="md-input md-textarea" name="public" maxlength="4000" placeholder=" "></textarea><label class="md-input-label">公益站公告</label></div>
+            <div class="md-textfield"><textarea class="md-input md-textarea" name="pay" maxlength="4000" placeholder=" "></textarea><label class="md-input-label">Pay 站公告</label></div>
+            <p class="field-hint">留空隐藏，最多 4000 字。</p>
+            <div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存站点公告</button></div>
+          </form>
+        </div>
+        </div>
+        <div class="settings-subpage" id="settings-page-routing" data-settings-subpage="routing" hidden>
+        <div class="card-head settings-page-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-settings-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回设置</button><div class="md-card-title">路由运行</div></div></div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">路由与容错</div><span class="material-symbol" aria-hidden="true">swap_horiz</span></div>
+          <form data-routing-settings>
+            <div class="section-title">用户亲和</div>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="channel_affinity_minutes" type="number" min="1" max="10080" step="1" placeholder=" " required><label class="md-input-label">渠道亲和时长（分钟）</label></div>
+              <div class="md-textfield"><input class="md-input" name="channel_key_affinity_minutes" type="number" min="1" max="10080" step="1" placeholder=" " required><label class="md-input-label">Key 亲和时长（分钟）</label></div>
+            </div>
+            <p class="field-hint">最长 7 天；429 时切换备用 Key。</p>
+            <div class="section-title">熔断与恢复</div>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="channel_failure_threshold" type="number" min="1" max="20" step="1" placeholder=" " required><label class="md-input-label">连续失败熔断阈值（次）</label></div>
+              <div class="md-textfield"><input class="md-input" name="channel_key_recovery_minutes" type="number" min="1" max="1440" step="1" placeholder=" " required><label class="md-input-label">Key 自动恢复冷却（分钟）</label></div>
+            </div>
+            <p class="field-hint">自动熔断会在冷却后试流，手动禁用不会恢复。</p>
+            <div class="section-title">请求重试</div>
+            <label class="switch-line"><input type="checkbox" name="retry_enabled"><span class="switch-body"><span class="switch-title">允许安全重试与故障转移</span><span class="switch-desc">仅在响应尚未提交给客户端、且请求可以安全重放时执行。</span></span></label>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="retry_max_attempts" type="number" min="1" max="5" step="1" placeholder=" " required><label class="md-input-label">单请求最大尝试次数</label></div>
+              <div class="md-textfield"><input class="md-input" name="retry_status_codes" inputmode="numeric" placeholder=" "><label class="md-input-label">可重试 HTTP 状态码</label></div>
+            </div>
+            <p class="field-hint">状态码用英文逗号分隔；最大尝试次数包含首次请求。</p>
+            <div class="section-title">模型 Key 会话</div>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="session_lease_minutes" type="number" min="1" max="1440" step="1" placeholder=" " required><label class="md-input-label">认领时长（分钟）</label></div>
+              <div class="md-textfield"><input class="md-input" name="session_requests_per_minute" type="number" min="1" max="10000" step="1" placeholder=" " required><label class="md-input-label">每个会话 RPM</label></div>
+            </div>
+            <p class="field-hint">模型认领开关在“模型配置”中设置。</p>
+            <div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存路由设置</button></div>
+          </form>
+        </div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">高级运行参数</div><span class="material-symbol" aria-hidden="true">tune</span></div>
+          <form data-operational-settings>
+            <div class="section-title">准入与容量</div>
+            <div class="form-grid">
+              <div class="md-textfield"><input class="md-input" name="global_ip_requests_per_minute" type="number" min="1" max="100000" step="1" placeholder=" " required><label class="md-input-label">单 IP 请求上限（RPM）</label></div>
+              <div class="md-textfield"><input class="md-input" name="default_user_requests_per_minute" type="number" min="1" max="10000" step="1" placeholder=" " required><label class="md-input-label">默认用户请求上限（RPM）</label></div>
+              <div class="md-textfield"><input class="md-input" name="default_user_concurrent_requests" type="number" min="1" max="1000" step="1" placeholder=" " required><label class="md-input-label">默认用户并发上限</label></div>
+            </div>
+            <p class="field-hint">订阅配置可覆盖默认上限；账户内 Key 共享限制。</p>
+            <div class="section-title">流式与 Realtime</div>
+            <div class="form-grid">
+              <div class="md-textfield"><input class="md-input" name="stream_heartbeat_seconds" type="number" min="1" max="60" step="1" placeholder=" " required><label class="md-input-label">SSE 首字心跳（秒）</label></div>
+              <div class="md-textfield"><input class="md-input" name="realtime_handshake_timeout_seconds" type="number" min="1" max="120" step="1" placeholder=" " required><label class="md-input-label">Realtime 握手超时（秒）</label></div>
+              <div class="md-textfield"><input class="md-input" name="realtime_write_timeout_seconds" type="number" min="1" max="120" step="1" placeholder=" " required><label class="md-input-label">Realtime 写入超时（秒）</label></div>
+              <div class="md-textfield"><input class="md-input" name="realtime_max_message_mb" type="number" min="1" max="256" step="1" placeholder=" " required><label class="md-input-label">Realtime 单消息上限（MB）</label></div>
+            </div>
+            <div class="section-title">计费估算与安全</div>
+            <div class="form-grid">
+              <div class="md-textfield"><input class="md-input" name="default_max_output_tokens" type="number" min="1" max="1000000" step="1" placeholder=" " required><label class="md-input-label">缺省最大输出 Token</label></div>
+              <div class="md-textfield"><input class="md-input" name="unknown_image_token_estimate" type="number" min="1" max="1000000" step="1" placeholder=" " required><label class="md-input-label">未知图片 Token 估算</label></div>
+            </div>
+            <p class="field-hint">仅用于预占，实际结算以上游用量为准。</p>
+            <label class="switch-line"><input type="checkbox" name="user_docs_visible"><span class="switch-body"><span class="switch-title">显示用户文档</span></span></label>
+            <div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存运行参数</button></div>
+          </form>
+        </div>
+        </div>
+        <div class="settings-subpage" id="settings-page-registration" data-settings-subpage="registration" hidden>
+        <div class="card-head settings-page-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-settings-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回设置</button><div class="md-card-title">注册与福利</div></div></div>
+        <div class="md-card">
+          <div class="card-head"><div class="md-card-title">注册与登录</div><span class="material-symbol" aria-hidden="true">tune</span></div>
+          <form data-registration-settings>
+            <label class="switch-line"><input type="checkbox" name="local_registration_enabled"><span class="switch-body"><span class="switch-title">公益站本地注册</span></span></label>
+            <label class="switch-line"><input type="checkbox" name="pay_local_registration_enabled"><span class="switch-body"><span class="switch-title">付费站本地注册</span></span></label>
+            <label class="switch-line"><input type="checkbox" name="linuxdo_login_enabled"><span class="switch-body"><span class="switch-title">LinuxDO 登录</span></span></label>
+            <label class="switch-line"><input type="checkbox" name="linuxdo_registration_enabled"><span class="switch-body"><span class="switch-title">LinuxDO 新用户注册</span></span></label>
+            <label class="switch-line"><input type="checkbox" name="registration_code_required"><span class="switch-body"><span class="switch-title">公益站需要注册码</span></span></label>
+            <div class="md-textfield"><input class="md-input" name="new_registration_code" type="password" autocomplete="new-password" placeholder=" "><label class="md-input-label">设置共享注册码</label></div>
+            <p class="field-hint">公益站注册码：<span data-registration-code-status>未配置</span></p>
+            <label class="switch-line"><input type="checkbox" name="pay_registration_code_required"><span class="switch-body"><span class="switch-title">付费站需要注册码</span></span></label>
+            <div class="md-textfield"><input class="md-input" name="new_pay_registration_code" type="password" autocomplete="new-password" placeholder=" "><label class="md-input-label">设置付费站注册码</label></div>
+            <p class="field-hint">付费站注册码：<span data-pay-registration-code-status>未配置</span></p>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="public_initial_quota" type="number" min="0" max="500000000" placeholder=" "><label class="md-input-label">公益站初始余额（Quota）</label></div>
+              <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="public_initial_quota" placeholder=" "><label class="md-input-label">公益站初始余额（USD）</label></div>
+            </div>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="pay_initial_quota" type="number" min="0" max="500000000" placeholder=" "><label class="md-input-label">付费站初始余额（Quota）</label></div>
+              <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="pay_initial_quota" placeholder=" "><label class="md-input-label">付费站初始余额（USD）</label></div>
+            </div>
+            <div class="form-grid two">
+              <div class="md-textfield"><input class="md-input" name="linuxdo_extra_quota" type="number" min="0" max="500000000" placeholder=" "><label class="md-input-label">LinuxDO 额外赠送（Quota）</label></div>
+              <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="linuxdo_extra_quota" placeholder=" "><label class="md-input-label">LinuxDO 额外赠送（USD）</label></div>
+            </div>
+            <p class="field-hint">LinuxDO 赠送额度会叠加到初始余额。</p>
+            <div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存注册设置</button></div>
+          </form>
+        </div>
+		<div class="md-card">
+		  <div class="card-head"><div class="md-card-title">公益福利 · 词元贷</div><span class="material-symbol" aria-hidden="true">redeem</span></div>
+		  <form data-token-loan-settings>
+			<label class="switch-line"><input type="checkbox" name="enabled"><span class="switch-body"><span class="switch-title">开放词元贷</span></span></label>
+			<div class="form-grid two">
+			  <div class="md-textfield"><input class="md-input" name="max_borrow_quota" type="number" min="1" max="500000000" value="500000" placeholder=" " required><label class="md-input-label">单次最高额度（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0.000001" step="0.000001" data-quota-usd-for="max_borrow_quota" placeholder=" "><label class="md-input-label">单次最高额度（USD）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="min_checkin_quota" type="number" min="1" max="500000000" value="1440000" placeholder=" " required><label class="md-input-label">签到最低额度（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0.000001" step="0.000001" data-quota-usd-for="min_checkin_quota" placeholder=" "><label class="md-input-label">签到最低额度（USD）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="daily_cut_limit" type="number" min="1" max="20" value="2" placeholder=" " required><label class="md-input-label">每人每日砍价次数</label></div>
+			</div>
+			<div class="section-title">帮助站长砍一刀 · 长上下文亏损池</div>
+			<label class="switch-line"><input type="checkbox" name="loss_pool_visible" checked><span class="switch-body"><span class="switch-title">显示“砍一刀”模块</span></span></label>
+			<div class="form-grid two">
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_title" maxlength="80" value="帮助站长砍一刀" placeholder=" "><label class="md-input-label">模块标题</label></div>
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_description" maxlength="300" value="每刀随机 $1–$3，每位用户每天可连续砍两刀；清零前暂停公益贷新借款。" placeholder=" "><label class="md-input-label">模块文案</label></div>
+			</div>
+			<div class="form-grid two">
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_total_quota" type="number" min="0" max="500000000000" value="460970646" placeholder=" " required><label class="md-input-label">亏损池总额（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="loss_pool_total_quota" placeholder=" "><label class="md-input-label">亏损池总额（USD）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_remaining_quota" type="number" min="0" max="500000000000" value="460970646" placeholder=" " required><label class="md-input-label">当前剩余（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="loss_pool_remaining_quota" placeholder=" "><label class="md-input-label">当前剩余（USD）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_cut_min_quota" type="number" min="1" max="500000000" value="500000" placeholder=" " required><label class="md-input-label">单刀最小值（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0.000001" step="0.000001" data-quota-usd-for="loss_pool_cut_min_quota" placeholder=" "><label class="md-input-label">单刀最小值（USD）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="loss_pool_cut_max_quota" type="number" min="1" max="500000000" value="1500000" placeholder=" " required><label class="md-input-label">单刀最大值（Quota）</label></div>
+			  <div class="md-textfield"><input class="md-input" type="number" min="0.000001" step="0.000001" data-quota-usd-for="loss_pool_cut_max_quota" placeholder=" "><label class="md-input-label">单刀最大值（USD）</label></div>
+			</div>
+			<p class="field-hint">亏损池未清零时暂停新借款。</p>
+			<div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存词元贷设置</button></div>
+		  </form>
+		</div>
+		<div class="md-card"><div class="status-line"><span class="material-symbol" aria-hidden="true">info</span><span>LinuxDO Client ID：<code data-linuxdo-client-id>未读取</code> · 回调：<code data-linuxdo-redirect>未读取</code></span></div></div>
+        </div>
+        <div class="settings-subpage" id="settings-page-payments" data-settings-subpage="payments" hidden>
+        <div class="card-head settings-page-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-settings-back><span class="material-symbol" aria-hidden="true">arrow_back</span>返回设置</button><div class="md-card-title">商业支付</div></div></div>
+		<div class="md-card">
+		  <div class="card-head"><div class="md-card-title">Pro 商业站与易支付</div><span class="material-symbol" aria-hidden="true">payments</span></div>
+		  <form data-payment-settings>
+			<label class="switch-line"><input type="checkbox" name="enabled"><span class="switch-body"><span class="switch-title">开放在线支付</span></span></label>
+			<div class="form-grid two">
+			  <div class="md-textfield"><input class="md-input" name="pro_site_host" placeholder=" " required><label class="md-input-label">Pro 域名</label></div>
+			  <div class="md-textfield"><input class="md-input" name="gateway_url" type="url" placeholder=" " required><label class="md-input-label">易支付网关根地址</label></div>
+			  <div class="md-textfield"><input class="md-input" name="merchant_id" placeholder=" " autocomplete="off"><label class="md-input-label">商户 ID（PID）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="new_merchant_key" type="password" placeholder=" " autocomplete="new-password"><label class="md-input-label">商户密钥（留空保留）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="cny_per_usd" type="number" min="0.0001" step="0.0001" placeholder=" " required><label class="md-input-label">人民币兑美元（¥ / $1）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="min_cny" type="number" min="0.01" step="0.01" placeholder=" " required><label class="md-input-label">单笔最低金额（CNY）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="max_cny" type="number" min="0.01" step="0.01" placeholder=" " required><label class="md-input-label">单笔最高金额（CNY）</label></div>
+			  <div class="md-textfield"><input class="md-input" name="subscription_markup" type="number" min="0.1" max="10" step="0.0001" placeholder=" " required><label class="md-input-label">套餐支付加价倍率（×）</label></div>
+			</div>
+			<p class="field-hint">回调地址：<code data-epay-notify-url>—</code> · 商户密钥：<span data-epay-key-status>未配置</span></p>
+			<div class="form-actions"><button class="md-btn md-btn-filled" type="submit">保存支付设置</button></div>
+		  </form>
+		</div>
+		<div class="md-card">
+		  <div class="card-head"><div class="md-card-title">最近支付订单</div><button type="button" class="md-icon-button" title="刷新订单" data-admin-payment-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button></div>
+		  <div data-admin-payment-orders><div class="empty">加载中…</div></div>
+		</div>
+		</div>
+      </section>
+
+      <section class="view" data-panel="audit" data-title="敏感操作审计" data-subtitle="审查管理员敏感操作与验证记录" data-root-only>
+        <div class="card-head"><div class="list-actions"><button type="button" class="md-btn md-btn-text" data-nav="settings"><span class="material-symbol" aria-hidden="true">arrow_back</span>返回安全与设置</button><div class="md-card-title">敏感操作审计</div></div><button type="button" class="md-icon-button" title="刷新审计日志" data-admin-audit-refresh><span class="material-symbol" aria-hidden="true">refresh</span></button></div>
+        <div class="md-card filter-card">
+          <form class="list-filter" data-admin-audit-filter>
+            <div class="md-textfield"><input class="md-input" name="keyword" type="search" placeholder=" "><label class="md-input-label">操作人、目标、请求 ID 或 IP</label></div>
+            <div class="md-textfield"><input class="md-input" name="action" type="search" placeholder=" "><label class="md-input-label">操作类型或接口路径</label></div>
+            <div class="md-textfield"><select class="md-input" name="page_size"><option value="20">每页 20 条</option><option value="50" selected>每页 50 条</option><option value="100">每页 100 条</option><option value="200">每页 200 条</option></select><label class="md-input-label">每页数量</label></div>
+            <div class="list-filter-actions"><button class="md-btn md-btn-text" type="reset">重置</button><button class="md-btn md-btn-filled" type="submit">搜索</button></div>
+          </form>
+        </div>
+        <div class="md-card">
+          <div data-admin-audit-rows><div class="empty">加载中…</div></div>
+          <div class="pagination-bar"><span class="pagination-summary" data-admin-audit-page>第 1 页</span><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-audit-prev>上一页</button><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-admin-audit-next>下一页</button></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="dialog-backdrop" id="channel-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title">添加渠道</div>
+      <form data-channel-form>
+        <input type="hidden" name="id">
+        <div class="md-textfield"><input class="md-input" name="name" placeholder=" " required><label class="md-input-label">渠道名称</label></div>
+        <div class="form-grid">
+          <div class="md-textfield"><select class="md-input" name="type"><option value="1">OpenAI</option><option value="2">Anthropic</option><option value="4">Custom</option></select><label class="md-input-label">协议类型</label></div>
+          <div class="md-textfield"><select class="md-input" name="upstream_format"><option value="openai_chat">OpenAI Chat</option><option value="openai_responses">OpenAI Responses</option><option value="anthropic">Anthropic Messages</option></select><label class="md-input-label">主协议（回退使用）</label></div>
+          <div class="md-textfield"><input class="md-input" name="priority" type="number" value="0" placeholder=" "><label class="md-input-label">优先级</label></div>
+          <div class="md-textfield"><input class="md-input" name="weight" type="number" value="1" min="1" placeholder=" "><label class="md-input-label">权重</label></div>
+          <div class="md-textfield"><input class="md-input" name="groups" value="default" placeholder=" "><label class="md-input-label">分组</label></div>
+        </div>
+        <fieldset class="protocol-picker">
+          <legend>支持的上游协议（可多选）</legend>
+          <div class="protocol-picker-hint">请求会优先使用同协议；没有匹配协议时通过主协议转换。</div>
+          <div class="protocol-options">
+            <label class="protocol-option"><input type="checkbox" name="upstream_formats" value="openai_chat" checked><span><b>OpenAI Chat</b><small>/v1/chat/completions</small></span></label>
+            <label class="protocol-option"><input type="checkbox" name="upstream_formats" value="openai_responses"><span><b>OpenAI Responses</b><small>/v1/responses</small></span></label>
+            <label class="protocol-option"><input type="checkbox" name="upstream_formats" value="anthropic"><span><b>Anthropic Messages</b><small>/v1/messages</small></span></label>
+          </div>
+        </fieldset>
+		<label class="switch-line"><input type="checkbox" name="data_train"><span class="switch-body"><span class="switch-title">数据可能用于训练（data-train）</span><span class="switch-desc">仅路由已授权用户。</span></span></label>
+		<label class="switch-line"><input type="checkbox" name="remote_compaction"><span class="switch-body"><span class="switch-title">Codex 远程压缩</span><span class="switch-desc">仅 Responses v2；模型也开启“此模型支持远程压缩”后，才转发 /v1/responses/compact。压缩价格在“模型”页独立设置。</span></span></label>
+        <div class="md-textfield"><input class="md-input" name="base_url" placeholder=" " required><label class="md-input-label">上游地址</label></div>
+        <div class="md-textfield"><input class="md-input" name="key" type="password" placeholder=" "><label class="md-input-label">上游 Key</label></div>
+        <div class="md-textfield"><input class="md-input" name="models" placeholder=" "><label class="md-input-label">支持模型</label></div>
+        <div class="md-textfield"><input class="md-input" name="model_mapping" placeholder=" "><label class="md-input-label">模型映射 JSON</label></div>
+        <div class="form-grid">
+		  <div class="md-textfield"><input class="md-input" name="requests_per_minute" type="number" min="0" max="100000" value="0" placeholder=" "><label class="md-input-label">渠道 RPM（0 不限）</label></div>
+		  <div class="md-textfield"><input class="md-input" name="concurrent_requests" type="number" min="0" max="10000" value="0" placeholder=" "><label class="md-input-label">渠道并发（0 不限）</label></div>
+          <div class="md-textfield"><input class="md-input" name="quota_total" type="number" value="-1" placeholder=" "><label class="md-input-label">渠道总额度（-1 不限）</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="-1" step="0.000001" value="-1" data-quota-usd-for="quota_total" placeholder=" "><label class="md-input-label">渠道总额度（USD，-1 不限）</label></div>
+          <div class="md-textfield"><input class="md-input" name="quota_remaining" type="number" value="-1" placeholder=" "><label class="md-input-label">渠道剩余额度</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="-1" step="0.000001" value="-1" data-quota-usd-for="quota_remaining" placeholder=" "><label class="md-input-label">渠道剩余额度（USD）</label></div>
+        </div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="model-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title" data-model-dialog-title>添加模型</div>
+      <form data-model-form>
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="model" placeholder=" " required><label class="md-input-label">模型标识</label></div>
+          <div class="md-textfield"><input class="md-input" name="display_name" placeholder=" "><label class="md-input-label">显示名称</label></div>
+          <div class="md-textfield"><select class="md-input" name="billing_mode"><option value="token">按量计费</option><option value="request">按次计费</option></select><label class="md-input-label">模型计费模式</label></div>
+          <div class="md-textfield"><input class="md-input" name="compaction_price" type="number" min="0" step="0.000001" value="0" placeholder=" "><label class="md-input-label">远程压缩价格（USD / 次）</label></div>
+          <div class="md-textfield"><input class="md-input" name="price_multiplier" type="number" min="0.000001" max="1000" step="0.000001" value="1" placeholder=" "><label class="md-input-label">模型倍率（×，最大 1000）</label></div>
+          <div class="md-textfield"><input class="md-input" name="quota_group" maxlength="64" placeholder=" "><label class="md-input-label">额度分组（留空为通用）</label></div>
+        </div>
+        <div class="card-hint">远程压缩价格与模型计费模式相互独立，内部重试或故障转移不会重复计费。</div>
+		<label class="switch-line"><input type="checkbox" name="remote_compaction_enabled"><span class="switch-body"><span class="switch-title">此模型支持远程压缩</span><span class="switch-desc">默认关闭；还需要绑定的 Responses v2 渠道开启远程压缩。</span></span></label>
+        <div data-request-pricing class="hidden">
+          <div class="field-title">按次模型价格</div>
+          <div class="md-textfield"><input class="md-input" name="request_price" type="number" min="0" step="0.000001" value="0" placeholder=" "><label class="md-input-label">模型按次价格（USD / 次）</label></div>
+          <p class="field-hint">按次模型每个客户端请求只结算一次，不计算输入、输出或缓存 Token。</p>
+        </div>
+        <div data-token-pricing>
+        <div class="field-title">按量模型价格</div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="input_price" type="number" min="0" step="0.000001" value="0" placeholder=" "><label class="md-input-label">输入价格（USD / 1M Token）</label></div>
+          <div class="md-textfield"><input class="md-input" name="output_price" type="number" min="0" step="0.000001" value="0" placeholder=" "><label class="md-input-label">输出价格（USD / 1M Token）</label></div>
+           <div class="md-textfield"><input class="md-input" name="cache_read_price" type="number" min="-1" step="0.000001" value="-1" placeholder=" "><label class="md-input-label">缓存读取价格（-1 跟随输入）</label></div>
+           <div class="md-textfield"><input class="md-input" name="cache_write_price" type="number" min="-1" step="0.000001" value="-1" placeholder=" "><label class="md-input-label">缓存写入价格（-1 跟随输入）</label></div>
+         </div>
+        </div>
+        <div data-token-pricing>
+        <div class="field-title">长上下文分段计价</div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="long_context_threshold" type="number" min="0" max="10000000" step="1" value="0" placeholder=" "><label class="md-input-label">触发阈值（输入 Token，0 关闭）</label></div>
+          <div class="md-textfield"><input class="md-input" name="long_context_input_multiplier" type="number" min="1" max="1000" step="0.000001" value="1" placeholder=" "><label class="md-input-label">长上下文输入/缓存倍率（×）</label></div>
+          <div class="md-textfield"><input class="md-input" name="long_context_output_multiplier" type="number" min="1" max="1000" step="0.000001" value="1" placeholder=" "><label class="md-input-label">长上下文输出倍率（×）</label></div>
+        </div>
+        <p class="field-hint">超过阈值后使用长上下文价格。</p>
+        </div>
+        <label class="switch-line"><input type="checkbox" name="enabled" checked><span class="switch-body"><span class="switch-title">启用模型</span></span></label>
+        <label class="switch-line"><input type="checkbox" name="subscription_only"><span class="switch-body"><span class="switch-title">订阅专属模型</span></span></label>
+        <label class="switch-line"><input type="checkbox" name="prepaid_compatible" checked><span class="switch-body"><span class="switch-title">支持预付卡</span></span></label>
+        <label class="switch-line"><input type="checkbox" name="free_model"><span class="switch-body"><span class="switch-title">免费模型</span></span></label>
+        <label class="switch-line"><input type="checkbox" name="data_train"><span class="switch-body"><span class="switch-title">data-train 模型</span><span class="switch-desc">调用前需要用户授权。</span></span></label>
+        <div class="field-title">模型 Key 会话认领</div>
+        <label class="switch-line"><input type="checkbox" name="session_enabled"><span class="switch-body"><span class="switch-title">支持会话认领</span></span></label>
+        <label class="switch-line"><input type="checkbox" name="session_only"><span class="switch-body"><span class="switch-title">仅允许会话调用</span><span class="switch-desc">开启时自动启用认领。</span></span></label>
+        <div class="field-title">渠道绑定</div>
+        <div class="routing-management-notice" data-model-bindings-routing-managed hidden>
+          <span class="material-symbol" aria-hidden="true">swap_horiz</span>
+          <span>该模型已启用高级路由，渠道绑定由高级路由统一管理。</span>
+          <button type="button" class="md-btn md-btn-text md-btn-compact" data-open-model-routing>前往高级路由</button>
+        </div>
+        <fieldset class="model-bindings-fieldset" data-model-bindings-fieldset>
+          <div data-model-bindings><div class="empty">暂无绑定，模型暂时不可用。</div></div>
+          <button type="button" class="md-btn md-btn-outlined md-btn-compact" data-add-model-binding><span class="material-symbol" aria-hidden="true">add</span>添加绑定</button>
+        </fieldset>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="model-routing-rule-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title" data-routing-rule-dialog-title>新建高级路由规则</div>
+      <form data-model-routing-rule-form>
+        <input type="hidden" name="id">
+        <div class="field-error-banner" data-routing-rule-form-error hidden style="color:var(--md-sys-color-error);margin-bottom:12px;"></div>
+
+        <div class="form-grid">
+          <div class="md-textfield">
+            <input class="md-input" name="model" list="available-models-datalist" placeholder=" " required>
+            <label class="md-input-label">请求模型名称</label>
+          </div>
+          <div class="md-textfield">
+            <select class="md-input" name="strategy">
+              <option value="percentage">手动百分比流量分流 (归一化)</option>
+              <option value="success_rate">成功率加权 (近60次有效日志)</option>
+              <option value="priority_weight">基础优先级与权重</option>
+            </select>
+            <label class="md-input-label">主候选选路策略</label>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="md-textfield">
+            <input class="md-input" name="retry_on_primary" type="number" min="0" max="10" value="0" placeholder=" ">
+            <label class="md-input-label">首选渠道原地重试次数 (0-10)</label>
+          </div>
+        </div>
+        <p class="field-hint">若首选渠道出现传输错误或 429/5xx 等可重试故障，优先在该渠道重试，耗尽后再切换备选或兜底渠道。实际次数受全局最大尝试次数限制，并会为已配置的其他候选保留一次重选机会。</p>
+
+        <label class="switch-line"><input type="checkbox" name="enabled" checked><span class="switch-body"><span class="switch-title">启用此路由规则</span></span></label>
+
+        <div class="field-title routing-section-title">
+          <span>主候选渠道分流</span>
+          <span class="routing-percent-summary">当前百分比总计: <b data-percent-total>0%</b></span>
+        </div>
+        <p class="field-hint routing-section-hint">启用后由高级路由接管该模型的渠道绑定；每个主候选和兜底渠道可独立设置上游模型与“上游免费”。非百分比策略下主候选留空时，继续使用除兜底外的现有匹配渠道。百分比分流总计不是 100% 时按比例归一化，0% 渠道不承接流量；成功率加权取每渠道最近 60 条有效请求，排除 499/客户端中断，并以 50% 中性先验平滑小样本。</p>
+        <div data-primary-channel-rows></div>
+        <button type="button" class="md-btn md-btn-outlined md-btn-compact" data-add-primary-channel style="margin-top:8px;"><span class="material-symbol" aria-hidden="true">add</span>添加主候选渠道</button>
+
+        <div class="field-title routing-section-title">有序兜底渠道</div>
+        <p class="field-hint routing-section-hint">当所有主候选渠道发生故障或不可用时，按配置顺位依次尝试下列兜底渠道。</p>
+        <div data-fallback-channel-rows></div>
+        <button type="button" class="md-btn md-btn-outlined md-btn-compact" data-add-fallback-channel style="margin-top:8px;"><span class="material-symbol" aria-hidden="true">add</span>添加兜底渠道</button>
+
+        <div class="form-actions">
+          <button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button>
+          <button class="md-btn md-btn-filled" type="submit">保存规则</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop" id="model-alias-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title" data-model-alias-dialog-title>新建模型别名</div>
+      <form data-model-alias-form>
+        <input type="hidden" name="id">
+        <div class="field-error-banner" data-model-alias-form-error hidden style="color:var(--md-sys-color-error);margin-bottom:12px;"></div>
+
+        <div class="md-textfield">
+          <input class="md-input" name="alias" placeholder=" " required>
+          <label class="md-input-label">外部请求模型别名 (如 gpt-4o-free)</label>
+        </div>
+
+        <div class="md-textfield">
+          <input class="md-input" name="target_model" list="available-models-datalist" placeholder=" " required>
+          <label class="md-input-label">映射目标模型 (如 gpt-4o)</label>
+        </div>
+
+        <div class="md-textfield">
+          <textarea class="md-input md-textarea" name="description" maxlength="255" rows="2" placeholder=" "></textarea>
+          <label class="md-input-label">说明备注 (可选)</label>
+        </div>
+
+        <label class="switch-line"><input type="checkbox" name="enabled" checked><span class="switch-body"><span class="switch-title">启用此别名</span></span></label>
+
+        <p class="field-hint">别名支持链式映射（最大深度 10）与防自环保护；客户端响应和公开日志将自动脱敏保护，呈现原始请求模型。</p>
+
+        <div class="form-actions">
+          <button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button>
+          <button class="md-btn md-btn-filled" type="submit">保存别名</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <datalist id="available-models-datalist"></datalist>
+
+  <div class="dialog-backdrop" id="subscription-plan-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title" data-subscription-plan-dialog-title>添加订阅计划</div>
+      <form data-subscription-plan-form>
+        <input type="hidden" name="id">
+        <div class="md-textfield"><input class="md-input" name="code" placeholder=" " required><label class="md-input-label">计划代号</label></div>
+        <div class="md-textfield"><input class="md-input" name="name" placeholder=" " required><label class="md-input-label">计划名称</label></div>
+		<div class="md-textfield"><textarea class="md-input md-textarea" name="description" maxlength="500" rows="3" placeholder=" "></textarea><label class="md-input-label">计划描述</label></div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="duration_days" type="number" min="1" value="30" placeholder=" " required><label class="md-input-label">有效期（天）</label></div>
+          <div class="md-textfield"><input class="md-input" name="reset_interval_days" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">额度重置周期（天）</label></div>
+        </div>
+		<div class="md-textfield"><input class="md-input" name="quota_group" maxlength="64" placeholder=" "><label class="md-input-label">套餐额度分组（留空为通用）</label></div>
+		<p class="field-hint">留空表示通用额度。</p>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="quota" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">订阅 Quota</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="quota" placeholder=" "><label class="md-input-label">订阅额度（USD）</label></div>
+        </div>
+		<p class="field-hint">0 表示不重置。</p>
+		<div class="md-textfield"><input class="md-input" name="discount_multiplier" type="number" min="0.01" max="1" step="0.01" value="1" placeholder=" " required><label class="md-input-label">计划折扣倍率（×）</label></div>
+		<div class="form-grid">
+		  <div class="md-textfield"><input class="md-input" name="discount_savings_limit" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">折扣节省上限（Quota）</label></div>
+		  <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="discount_savings_limit" placeholder=" "><label class="md-input-label">折扣节省上限（USD）</label></div>
+		</div>
+		<p class="field-hint">0.8 表示八折；上限为 0 表示不限。</p>
+        <div class="md-textfield"><select class="md-input" name="upgrade_from_plan_id" data-plan-upgrade-from><option value="0">独立计划</option></select><label class="md-input-label">升级自计划</label></div>
+		<p class="field-hint">设置后需要先拥有该基础计划。</p>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="requests_per_minute" type="number" min="0" max="100000" value="0" placeholder=" "><label class="md-input-label">计划 RPM 上限</label></div>
+          <div class="md-textfield"><input class="md-input" name="concurrent_requests" type="number" min="0" max="10000" value="0" placeholder=" "><label class="md-input-label">计划并发上限</label></div>
+        </div>
+		<p class="field-hint">0 使用系统默认值。</p>
+		<label class="switch-line"><input type="checkbox" name="unlimited_quota"><span class="switch-body"><span class="switch-title">不限额订阅</span></span></label>
+		<label class="switch-line"><input type="checkbox" name="collapsed"><span class="switch-body"><span class="switch-title">折叠到更多套餐</span></span></label>
+		<div class="md-textfield"><input class="md-input" name="display_order" type="number" min="0" max="1000000" value="0" placeholder=" "><label class="md-input-label">用户界面排序</label></div>
+		<p class="field-hint">数值越小越靠前。</p>
+        <div class="field-title">模型解锁与专属倍率</div>
+        <p class="card-hint">勾选模型表示该计划可解锁模型；专属倍率留空或填 0 时跟随计划折扣。</p>
+        <label class="switch-line"><input type="checkbox" name="refresh_existing_benefits"><span class="switch-body"><span class="switch-title">更新时为全体刷新权益（不含额度）</span><span class="switch-desc">同步未到期订阅的名称、说明、折扣、折扣节省上限、模型权限和速率限制；保留额度、已用计数、有效期及重置周期。</span></span></label>
+<div class="subscription-model-rules" data-subscription-model-rules><div class="empty">请先创建模型。</div></div>
+        <div class="md-textfield"><select class="md-input" name="status"><option value="1">启用</option><option value="2">停用</option></select><label class="md-input-label">状态</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="subscription-benefit-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title">发放套餐福利</div>
+      <p class="card-hint">发放对象会在提交时锁定：每个当前生效用户仅生成一份，用户可在对应套餐失效前领取。</p>
+      <form data-subscription-benefit-form>
+        <div class="md-textfield"><select class="md-input" name="plan_id" data-benefit-plan required><option value="">请选择套餐</option></select><label class="md-input-label">目标套餐</label></div>
+        <div class="md-textfield"><input class="md-input" name="target_user_group" maxlength="64" list="benefit-user-groups" placeholder=" "><label class="md-input-label">目标用户分组（留空为全部）</label><datalist id="benefit-user-groups"><option value="default"><option value="pay"></datalist></div>
+        <div class="md-textfield"><input class="md-input" name="name" maxlength="100" placeholder=" " required><label class="md-input-label">福利名称</label></div>
+        <div class="md-textfield"><textarea class="md-input md-textarea" name="description" maxlength="500" rows="3" placeholder=" "></textarea><label class="md-input-label">福利说明</label></div>
+        <div class="md-textfield"><input class="md-input" name="quota_group" maxlength="64" placeholder=" "><label class="md-input-label">福利额度分组（留空为通用）</label></div>
+        <div class="field-title">永久余额</div>
+        <div class="form-grid"><div class="md-textfield"><input class="md-input" name="permanent_quota" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">永久余额（Quota）</label></div><div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="permanent_quota" placeholder=" "><label class="md-input-label">永久余额（USD）</label></div></div>
+        <div class="field-title">限时余额</div>
+        <div class="form-grid"><div class="md-textfield"><input class="md-input" name="timed_quota" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">限时余额（Quota）</label></div><div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="timed_quota" placeholder=" "><label class="md-input-label">限时余额（USD）</label></div></div>
+        <p class="field-hint">到期时间留空则随目标套餐到期；自定义时间按本地时间填写。</p>
+        <div class="md-textfield"><input class="md-input" name="timed_quota_expires_at" type="datetime-local"><label class="md-input-label">限时额度到期时间（可选）</label></div>
+<div class="md-textfield"><input class="md-input" name="restore_quota_percent" type="number" min="0" max="100" step="1" value="0"><label class="md-input-label">恢复套餐总额度的百分比</label></div><p class="field-hint">0 表示不恢复；补回套餐总额度的指定百分比，最多补至总额。不能与全额重置同时选择。</p>
+        <div class="md-textfield"><input class="md-input" name="extend_subscription_days" type="number" min="0" max="3650" step="1" value="0"><label class="md-input-label">套餐展期（天）</label></div><p class="field-hint">0 表示不展期；领取时从当前到期时间起顺延，不附带额外额度，可与额度恢复或重置搭配。</p>
+<label class="switch-line"><input type="checkbox" name="reset_subscription_quota"><span class="switch-body"><span class="switch-title">重置套餐额度</span><span class="switch-desc">领取时把目标套餐剩余额度恢复为套餐总额度，并清零本周期折扣节省计数。</span></span></label>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">确认发放</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="billing-promotion-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title" data-billing-promotion-dialog-title>新建计费活动</div>
+      <p class="card-hint">折扣在套餐折扣之后生效；同一计费项同时命中多个活动时只取最低倍率。返现按折后实际扣费累计。</p>
+      <form data-billing-promotion-form>
+        <input type="hidden" name="id">
+        <div class="md-textfield"><input class="md-input" name="name" maxlength="100" placeholder=" " required><label class="md-input-label">活动名称</label></div>
+        <div class="md-textfield"><textarea class="md-input md-textarea" name="description" maxlength="500" rows="3" placeholder=" "></textarea><label class="md-input-label">活动说明</label></div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="target_user_group" maxlength="64" list="promotion-user-groups" placeholder=" "><label class="md-input-label">目标用户组（留空为全部）</label><datalist id="promotion-user-groups"><option value="default"><option value="pay"><option value="vip"><option value="svip"></datalist></div>
+          <div class="md-textfield"><select class="md-input" name="scope_type" data-promotion-scope-type><option value="all_models">全站模型</option><option value="model">指定模型</option><option value="quota_group">指定额度组</option></select><label class="md-input-label">消费范围</label></div>
+          <div class="md-textfield" data-promotion-scope-value-field><input class="md-input" name="scope_value" maxlength="128" list="promotion-scope-values" placeholder=" " required><label class="md-input-label" data-promotion-scope-label>模型名称</label><datalist id="promotion-scope-values" data-promotion-scope-values></datalist></div>
+        </div>
+        <div class="field-title">折扣或免费</div>
+        <div class="form-grid two">
+          <div class="md-textfield"><select class="md-input" name="discount_target"><option value="none">不打折</option><option value="all">整单</option><option value="input">全部输入类</option><option value="output">全部输出类</option><option value="ordinary_input">普通输入</option><option value="cache_read">缓存读取</option><option value="cache_write">缓存写入</option><option value="request">按次请求费</option><option value="compaction">远程压缩费</option></select><label class="md-input-label">优惠计费项</label></div>
+          <div class="md-textfield"><input class="md-input" name="discount_multiplier" type="number" min="0" max="1" step="0.01" value="1" placeholder=" "><label class="md-input-label">折扣倍率（0 免费）</label></div>
+        </div>
+        <div class="field-title">消费返现</div>
+        <div class="form-grid two">
+          <div class="md-textfield"><input class="md-input" name="cashback_threshold" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">每消费（Quota）</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="cashback_threshold" placeholder=" "><label class="md-input-label">每消费（USD）</label></div>
+          <div class="md-textfield"><input class="md-input" name="cashback_amount" type="number" min="0" value="0" placeholder=" "><label class="md-input-label">返现（Quota）</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" value="0" data-quota-usd-for="cashback_amount" placeholder=" "><label class="md-input-label">返现（USD）</label></div>
+        </div>
+        <div class="form-grid two">
+          <div class="md-textfield"><input class="md-input" name="cashback_quota_group" maxlength="64" placeholder=" "><label class="md-input-label">返现额度组（留空为通用）</label></div>
+          <div class="md-textfield"><input class="md-input" name="cashback_validity_days" type="number" min="0" max="3650" value="0" placeholder=" "><label class="md-input-label">返现有效期（天）</label></div>
+        </div>
+        <p class="field-hint">有效期为 0 时返到永久余额；大于 0 时生成限时额度。新到账额度会先抵扣账户小额透支。</p>
+        <label class="switch-line"><input type="checkbox" name="cashback_repeatable" checked><span class="switch-body"><span class="switch-title">达到门槛后可循环返现</span><span class="switch-desc">关闭后，每名用户在本活动中最多返现一次。</span></span></label>
+        <div class="field-title">活动时间</div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="starts_at" type="datetime-local"><label class="md-input-label">开始时间（留空为立即）</label></div>
+          <div class="md-textfield"><input class="md-input" name="ends_at" type="datetime-local"><label class="md-input-label">结束时间（留空为长期）</label></div>
+          <div class="md-textfield"><select class="md-input" name="status"><option value="1">启用</option><option value="2">停用</option></select><label class="md-input-label">状态</label></div>
+        </div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存活动</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="channel-key-dialog">
+    <div class="md-dialog wide">
+      <div class="card-head"><div><div class="md-dialog-title" data-channel-key-dialog-title>渠道 Key</div><div class="card-hint" data-channel-key-dialog-hint></div></div><button type="button" class="md-btn md-btn-outlined md-btn-compact" data-channel-key-add><span class="material-symbol" aria-hidden="true">add</span>添加 Key</button></div>
+      <div data-channel-key-rows><div class="empty">加载中…</div></div>
+      <form class="hidden" data-channel-key-form>
+        <input type="hidden" name="channel_id"><input type="hidden" name="id">
+        <div class="md-textfield"><input class="md-input" name="label" placeholder=" "><label class="md-input-label">Key 标签</label></div>
+        <div class="md-textfield"><input class="md-input" name="key" type="password" placeholder=" "><label class="md-input-label">上游 Key（编辑时留空保留原值）</label></div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="weight" type="number" min="1" value="1" placeholder=" "><label class="md-input-label">权重</label></div>
+          <div class="md-textfield"><select class="md-input" name="status"><option value="1">启用</option><option value="2">停用</option><option value="3">自动下线</option></select><label class="md-input-label">状态</label></div>
+		  <div class="md-textfield"><input class="md-input" name="requests_per_minute" type="number" min="0" max="100000" value="0" placeholder=" "><label class="md-input-label">Key RPM（0 跟随渠道）</label></div>
+		  <div class="md-textfield"><input class="md-input" name="concurrent_requests" type="number" min="0" max="10000" value="0" placeholder=" "><label class="md-input-label">Key 并发（0 跟随渠道）</label></div>
+          <div class="md-textfield"><input class="md-input" name="quota_total" type="number" value="-1" placeholder=" "><label class="md-input-label">总额度（-1 不限）</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="-1" step="0.000001" value="-1" data-quota-usd-for="quota_total" placeholder=" "><label class="md-input-label">总额度（USD，-1 不限）</label></div>
+          <div class="md-textfield"><input class="md-input" name="quota_remaining" type="number" value="-1" placeholder=" "><label class="md-input-label">剩余额度</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="-1" step="0.000001" value="-1" data-quota-usd-for="quota_remaining" placeholder=" "><label class="md-input-label">剩余额度（USD）</label></div>
+        </div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-channel-key-cancel>取消</button><button class="md-btn md-btn-filled" type="submit">保存 Key</button></div>
+      </form>
+      <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>关闭</button></div>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="trace-dialog">
+    <div class="md-dialog wide">
+      <div class="card-head"><div><div class="md-dialog-title" data-trace-dialog-title>请求追踪</div><div class="card-hint" data-trace-dialog-hint></div></div><button type="button" class="md-icon-button" title="关闭" data-dialog-close><span class="material-symbol" aria-hidden="true">close</span></button></div>
+      <div class="trace-summary" data-trace-summary></div>
+      <div class="trace-timeline" data-trace-timeline><div class="empty">加载中…</div></div>
+      <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>关闭</button></div>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="user-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title">编辑用户</div>
+      <form data-user-form>
+        <input type="hidden" name="id">
+        <div class="md-textfield"><input class="md-input" name="username" minlength="3" maxlength="32" placeholder=" " required><label class="md-input-label">用户名</label></div>
+        <div class="form-grid">
+          <div class="md-textfield"><input class="md-input" name="quota" type="number" min="0" placeholder=" " required><label class="md-input-label">账户额度（Quota）</label></div>
+          <div class="md-textfield"><input class="md-input" type="number" min="0" step="0.000001" data-quota-usd-for="quota" placeholder=" "><label class="md-input-label">账户额度（USD）</label></div>
+        </div>
+        <div class="md-textfield"><input class="md-input" name="group" placeholder=" " required><label class="md-input-label">用户分组</label></div>
+        <div class="md-textfield"><select class="md-input" name="role"><option value="1">用户</option><option value="25">审计员（只读）</option><option value="50">运维员（状态操作）</option><option value="100">超级管理员（完整权限）</option></select><label class="md-input-label">账户角色</label></div>
+        <div class="md-textfield"><select class="md-input" name="status"><option value="1">启用</option><option value="2">禁用</option></select><label class="md-input-label">访问状态</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="redeem-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title">生成兑换码</div>
+      <form data-redeem-form>
+        <div class="md-textfield"><input class="md-input" name="name" value="通用额度卡密" placeholder=" " required><label class="md-input-label">批次名称</label></div>
+        <div class="md-textfield" data-redeem-count-field><input class="md-input" name="count" type="number" min="1" max="100" value="10" placeholder=" " required><label class="md-input-label">数量</label></div>
+        <label class="switch-line"><input type="checkbox" name="is_public"><span class="switch-body"><span class="switch-title">公共兑换码</span><span class="switch-desc">只生成一个共享码；不同账户可各兑换一次，达到总上限后自动停用。</span></span></label>
+        <div class="md-textfield hidden" data-redeem-limit-field><input class="md-input" name="redeem_limit" type="number" min="1" max="1000000" value="100" placeholder=" "><label class="md-input-label">公共码兑换上限</label></div>
+        <div class="md-textfield"><select class="md-input" name="user_group"><option value="default">公益站（default）</option><option value="pay">商业站（pay）</option></select><label class="md-input-label">兑换码归属站点</label></div>
+        <div class="md-textfield"><select class="md-input" name="redeem_type" data-redeem-type><option value="quota">额度充值</option><option value="subscription">订阅兑换</option><option value="subscription_extension">套餐展期</option></select><label class="md-input-label">兑换类型</label></div>
+        <div class="md-textfield" data-redeem-plan-field><select class="md-input" name="subscription_plan_id" data-redeem-plan><option value="">请选择订阅计划</option></select><label class="md-input-label">订阅计划</label></div>
+        <div class="md-textfield hidden" data-redeem-extension-days-field><input class="md-input" name="subscription_extension_days" type="number" min="1" max="3650" step="1" value="30" placeholder=" "><label class="md-input-label">展期天数</label></div><p class="field-hint hidden" data-redeem-extension-hint>仍有效的套餐从原到期时间顺延；已过期或已结束的套餐从兑换时起重新计算。不会补发套餐额度。</p>
+        <label class="switch-line hidden" data-redeem-base-plans-field><input type="checkbox" name="include_base_plans"><span class="switch-body"><span class="switch-title">包含基础计划（直升码）</span><span class="switch-desc" data-redeem-base-plans-desc>兑换时自动激活完整的前置计划链。</span></span></label>
+        <div class="md-textfield" data-redeem-denomination-field><select class="md-input" name="denomination" data-redeem-denomination><option value="quota">Quota 点数</option><option value="usd">美元</option></select><label class="md-input-label">面额类型</label></div>
+        <div class="md-textfield" data-redeem-quota-group-field><input class="md-input" name="quota_group" maxlength="64" placeholder=" "><label class="md-input-label">额度分组（留空为通用）</label></div>
+        <div class="md-textfield" data-redeem-quota-field><input class="md-input" name="quota" type="number" min="1" value="500000" placeholder=" "><label class="md-input-label">单张 Quota</label></div>
+        <div class="md-textfield hidden" data-redeem-usd-field><input class="md-input" name="amount_usd" type="number" min="0.000001" step="0.000001" value="1.00" data-quota-usd-for="quota" placeholder=" "><label class="md-input-label">单张美元</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">生成</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="generated-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title" data-generated-redemption-title>兑换码批量复制</div>
+      <textarea class="generated-code" data-generated-codes readonly rows="8"></textarea>
+      <div class="form-actions"><button class="md-btn md-btn-text" data-copy-codes>复制</button><button class="md-btn md-btn-filled" data-dialog-close>完成</button></div>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="registration-code-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title">生成注册码</div>
+      <form data-registration-code-form>
+        <div class="md-textfield"><input class="md-input" name="name" value="注册码批次" placeholder=" " required><label class="md-input-label">批次名称</label></div>
+        <div class="md-textfield"><input class="md-input" name="count" type="number" min="1" max="100" value="10" placeholder=" " required><label class="md-input-label">数量</label></div>
+        <div class="md-textfield"><select class="md-input" name="user_group"><option value="default">普通用户（default）</option><option value="pay">付费用户（pay）</option></select><label class="md-input-label">注册用户类型</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">生成</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="prepaid-card-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title">生成预付卡</div>
+      <form data-prepaid-card-form>
+		<div class="md-textfield"><input class="md-input" name="name" value="LinuxDO 预付卡" placeholder=" " required><label class="md-input-label">批次名称</label></div>
+		<div class="md-textfield"><select class="md-input" name="user_group"><option value="pay">商业站预付卡（pay）</option><option value="default">公益站预付卡（default）</option></select><label class="md-input-label">预付卡归属</label></div>
+        <div class="form-grid"><div class="md-textfield"><input class="md-input" name="count" type="number" min="1" max="100" value="10" placeholder=" " required><label class="md-input-label">数量</label></div><div class="md-textfield"><input class="md-input" name="validity_days" type="number" min="1" max="3650" value="30" placeholder=" " required><label class="md-input-label">兑换后有效期（天）</label></div></div>
+        <div class="form-grid"><div class="md-textfield"><input class="md-input" name="quota" type="number" min="1" value="500000" placeholder=" " required><label class="md-input-label">单张 Quota</label></div><div class="md-textfield"><input class="md-input" name="amount_usd" type="number" min="0.000001" step="0.000001" data-quota-usd-for="quota" placeholder=" "><label class="md-input-label">单张额度（USD）</label></div></div>
+        <div class="md-textfield"><input class="md-input" name="claim_expires_at" type="datetime-local" placeholder=" "><label class="md-input-label">兑换截止时间（可选）</label></div>
+		<p class="field-hint">商业卡与公益卡不可混用。</p>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">生成</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="generated-prepaid-dialog">
+    <div class="md-dialog"><div class="md-dialog-title" data-generated-prepaid-title>预付卡批量复制</div><textarea class="generated-code" data-generated-prepaid-codes readonly rows="8"></textarea><div class="form-actions"><button class="md-btn md-btn-text" data-copy-prepaid-codes>复制</button><button class="md-btn md-btn-filled" data-dialog-close>完成</button></div></div>
+  </div>
+  <div class="dialog-backdrop" id="generated-registration-code-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title" data-generated-registration-title>注册码批量复制</div>
+      <textarea class="generated-code" data-generated-registration-codes readonly rows="8"></textarea>
+      <div class="form-actions"><button class="md-btn md-btn-text" data-copy-registration-codes>复制</button><button class="md-btn md-btn-filled" data-dialog-close>完成</button></div>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="admin-totp-setup-dialog">
+    <div class="md-dialog wide">
+      <div class="md-dialog-title">绑定身份验证器</div>
+	  <p class="dialog-copy">使用身份验证器扫描二维码，或手动添加密钥，再输入生成的 6 位验证码完成绑定。</p>
+	  <div class="totp-setup-layout">
+		<div class="totp-qr-panel"><img class="totp-qr-image hidden" data-admin-totp-qr alt="管理员 TOTP 配置二维码" width="256" height="256"><b>使用身份验证器扫码</b><small>二维码仅由本站本地生成，不会发送给第三方服务。</small></div>
+		<div class="totp-manual-fields"><div class="security-secret"><span>密钥</span><code data-admin-totp-secret>—</code></div><div class="security-secret"><span>配置 URI</span><code data-admin-totp-uri>—</code></div><p class="field-hint">无法扫码时，可在验证器中选择手动输入并使用上方密钥。</p></div>
+	  </div>
+      <form data-admin-totp-enable-form>
+        <div class="md-textfield"><input class="md-input" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder=" " required><label class="md-input-label">6 位动态验证码</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>稍后完成</button><button class="md-btn md-btn-filled" type="submit">确认启用</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="channel-key-management-dialog">
+    <div class="md-dialog">
+      <div class="md-dialog-title" data-channel-key-form-title>添加渠道 Key</div>
+      <form data-channel-key-management-form>
+        <input type="hidden" name="id">
+        <div class="md-textfield"><select class="md-input" name="channel_id" required></select><label class="md-input-label">所属渠道</label></div>
+        <div class="form-grid"><div class="md-textfield"><input class="md-input" name="label" placeholder=" "><label class="md-input-label">Key 标签</label></div><div class="md-textfield"><input class="md-input" name="weight" type="number" min="1" value="1" placeholder=" " required><label class="md-input-label">权重</label></div></div>
+        <div class="md-textfield"><input class="md-input" name="key" autocomplete="off" placeholder=" "><label class="md-input-label">上游 Key</label></div>
+        <p class="field-hint">新增时必须填写；编辑时留空保留原 Key。</p>
+        <div class="form-grid"><input type="hidden" name="quota_total" value="-1"><div class="md-textfield"><input class="md-input" name="quota_total_usd" type="number" step="0.000001" data-quota-usd-for="quota_total" placeholder=" "><label class="md-input-label">总额度 USD（-1 不限额）</label></div><input type="hidden" name="quota_remaining" value="-1"><div class="md-textfield"><input class="md-input" name="quota_remaining_usd" type="number" step="0.000001" data-quota-usd-for="quota_remaining" placeholder=" "><label class="md-input-label">剩余额度 USD（-1 不限额）</label></div></div>
+        <div class="md-textfield"><select class="md-input" name="status"><option value="1">启用</option><option value="2">手动停用</option><option value="3">自动下线</option></select><label class="md-input-label">状态</label></div>
+        <div class="form-actions"><button type="button" class="md-btn md-btn-text" data-dialog-close>取消</button><button class="md-btn md-btn-filled" type="submit">保存 Key</button></div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

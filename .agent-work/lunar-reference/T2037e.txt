@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2037 (Ding-si  -  year of the Snake)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2037/1/1          16                      Thursday                           
+2037/1/2          17                      Friday                             
+2037/1/3          18                      Saturday                           
+2037/1/4          19                      Sunday                             
+2037/1/5          20                      Monday         Moderate Cold       
+2037/1/6          21                      Tuesday                            
+2037/1/7          22                      Wednesday                          
+2037/1/8          23                      Thursday                           
+2037/1/9          24                      Friday                             
+2037/1/10         25                      Saturday                           
+2037/1/11         26                      Sunday                             
+2037/1/12         27                      Monday                             
+2037/1/13         28                      Tuesday                            
+2037/1/14         29                      Wednesday                          
+2037/1/15         30                      Thursday                           
+2037/1/16         12th Lunar Month        Friday                             
+2037/1/17         2                       Saturday                           
+2037/1/18         3                       Sunday                             
+2037/1/19         4                       Monday                             
+2037/1/20         5                       Tuesday        Severe Cold         
+2037/1/21         6                       Wednesday                          
+2037/1/22         7                       Thursday                           
+2037/1/23         8                       Friday                             
+2037/1/24         9                       Saturday                           
+2037/1/25         10                      Sunday                             
+2037/1/26         11                      Monday                             
+2037/1/27         12                      Tuesday                            
+2037/1/28         13                      Wednesday                          
+2037/1/29         14                      Thursday                           
+2037/1/30         15                      Friday                             
+2037/1/31         16                      Saturday                           
+2037/2/1          17                      Sunday                             
+2037/2/2          18                      Monday                             
+2037/2/3          19                      Tuesday        Spring Commences    
+2037/2/4          20                      Wednesday                          
+2037/2/5          21                      Thursday                           
+2037/2/6          22                      Friday                             
+2037/2/7          23                      Saturday                           
+2037/2/8          24                      Sunday                             
+2037/2/9          25                      Monday                             
+2037/2/10         26                      Tuesday                            
+2037/2/11         27                      Wednesday                          
+2037/2/12         28                      Thursday                           
+2037/2/13         29                      Friday                             
+2037/2/14         30                      Saturday                           
+2037/2/15         1st Lunar Month         Sunday                             
+2037/2/16         2                       Monday                             
+2037/2/17         3                       Tuesday                            
+2037/2/18         4                       Wednesday      Spring Showers      
+2037/2/19         5                       Thursday                           
+2037/2/20         6                       Friday                             
+2037/2/21         7                       Saturday                           
+2037/2/22         8                       Sunday                             
+2037/2/23         9                       Monday                             
+2037/2/24         10                      Tuesday                            
+2037/2/25         11                      Wednesday                          
+2037/2/26         12                      Thursday                           
+2037/2/27         13                      Friday                             
+2037/2/28         14                      Saturday                           
+2037/3/1          15                      Sunday                             
+2037/3/2          16                      Monday                             
+2037/3/3          17                      Tuesday                            
+2037/3/4          18                      Wednesday                          
+2037/3/5          19                      Thursday       Insects Waken       
+2037/3/6          20                      Friday                             
+2037/3/7          21                      Saturday                           
+2037/3/8          22                      Sunday                             
+2037/3/9          23                      Monday                             
+2037/3/10         24                      Tuesday                            
+2037/3/11         25                      Wednesday                          
+2037/3/12         26                      Thursday                           
+2037/3/13         27                      Friday                             
+2037/3/14         28                      Saturday                           
+2037/3/15         29                      Sunday                             
+2037/3/16         30                      Monday                             
+2037/3/17         2nd Lunar Month         Tuesday                            
+2037/3/18         2                       Wednesday                          
+2037/3/19         3                       Thursday                           
+2037/3/20         4                       Friday         Vernal Equinox      
+2037/3/21         5                       Saturday                           
+2037/3/22         6                       Sunday                             
+2037/3/23         7                       Monday                             
+2037/3/24         8                       Tuesday                            
+2037/3/25         9                       Wednesday                          
+2037/3/26         10                      Thursday                           
+2037/3/27         11                      Friday                             
+2037/3/28         12                      Saturday                           
+2037/3/29         13                      Sunday                             
+2037/3/30         14                      Monday                             
+2037/3/31         15                      Tuesday                            
+2037/4/1          16                      Wednesday                          
+2037/4/2          17                      Thursday                           
+2037/4/3          18                      Friday                             
+2037/4/4          19                      Saturday       Bright & Clear      
+2037/4/5          20                      Sunday                             
+2037/4/6          21                      Monday                             
+2037/4/7          22                      Tuesday                            
+2037/4/8          23                      Wednesday                          
+2037/4/9          24                      Thursday                           
+2037/4/10         25                      Friday                             
+2037/4/11         26                      Saturday                           
+2037/4/12         27                      Sunday                             
+2037/4/13         28                      Monday                             
+2037/4/14         29                      Tuesday                            
+2037/4/15         30                      Wednesday                          
+2037/4/16         3rd Lunar Month         Thursday                           
+2037/4/17         2                       Friday                             
+2037/4/18         3                       Saturday                           
+2037/4/19         4                       Sunday                             
+2037/4/20         5                       Monday         Corn Rain           
+2037/4/21         6                       Tuesday                            
+2037/4/22         7                       Wednesday                          
+2037/4/23         8                       Thursday                           
+2037/4/24         9                       Friday                             
+2037/4/25         10                      Saturday                           
+2037/4/26         11                      Sunday                             
+2037/4/27         12                      Monday                             
+2037/4/28         13                      Tuesday                            
+2037/4/29         14                      Wednesday                          
+2037/4/30         15                      Thursday                           
+2037/5/1          16                      Friday                             
+2037/5/2          17                      Saturday                           
+2037/5/3          18                      Sunday                             
+2037/5/4          19                      Monday                             
+2037/5/5          20                      Tuesday        Summer Commences    
+2037/5/6          21                      Wednesday                          
+2037/5/7          22                      Thursday                           
+2037/5/8          23                      Friday                             
+2037/5/9          24                      Saturday                           
+2037/5/10         25                      Sunday                             
+2037/5/11         26                      Monday                             
+2037/5/12         27                      Tuesday                            
+2037/5/13         28                      Wednesday                          
+2037/5/14         29                      Thursday                           
+2037/5/15         4th Lunar Month         Friday                             
+2037/5/16         2                       Saturday                           
+2037/5/17         3                       Sunday                             
+2037/5/18         4                       Monday                             
+2037/5/19         5                       Tuesday                            
+2037/5/20         6                       Wednesday                          
+2037/5/21         7                       Thursday       Corn Forms          
+2037/5/22         8                       Friday                             
+2037/5/23         9                       Saturday                           
+2037/5/24         10                      Sunday                             
+2037/5/25         11                      Monday                             
+2037/5/26         12                      Tuesday                            
+2037/5/27         13                      Wednesday                          
+2037/5/28         14                      Thursday                           
+2037/5/29         15                      Friday                             
+2037/5/30         16                      Saturday                           
+2037/5/31         17                      Sunday                             
+2037/6/1          18                      Monday                             
+2037/6/2          19                      Tuesday                            
+2037/6/3          20                      Wednesday                          
+2037/6/4          21                      Thursday                           
+2037/6/5          22                      Friday         Corn on Ear         
+2037/6/6          23                      Saturday                           
+2037/6/7          24                      Sunday                             
+2037/6/8          25                      Monday                             
+2037/6/9          26                      Tuesday                            
+2037/6/10         27                      Wednesday                          
+2037/6/11         28                      Thursday                           
+2037/6/12         29                      Friday                             
+2037/6/13         30                      Saturday                           
+2037/6/14         5th Lunar Month         Sunday                             
+2037/6/15         2                       Monday                             
+2037/6/16         3                       Tuesday                            
+2037/6/17         4                       Wednesday                          
+2037/6/18         5                       Thursday                           
+2037/6/19         6                       Friday                             
+2037/6/20         7                       Saturday                           
+2037/6/21         8                       Sunday         Summer Solstice     
+2037/6/22         9                       Monday                             
+2037/6/23         10                      Tuesday                            
+2037/6/24         11                      Wednesday                          
+2037/6/25         12                      Thursday                           
+2037/6/26         13                      Friday                             
+2037/6/27         14                      Saturday                           
+2037/6/28         15                      Sunday                             
+2037/6/29         16                      Monday                             
+2037/6/30         17                      Tuesday                            
+2037/7/1          18                      Wednesday                          
+2037/7/2          19                      Thursday                           
+2037/7/3          20                      Friday                             
+2037/7/4          21                      Saturday                           
+2037/7/5          22                      Sunday                             
+2037/7/6          23                      Monday                             
+2037/7/7          24                      Tuesday        Moderate Heat       
+2037/7/8          25                      Wednesday                          
+2037/7/9          26                      Thursday                           
+2037/7/10         27                      Friday                             
+2037/7/11         28                      Saturday                           
+2037/7/12         29                      Sunday                             
+2037/7/13         6th Lunar Month         Monday                             
+2037/7/14         2                       Tuesday                            
+2037/7/15         3                       Wednesday                          
+2037/7/16         4                       Thursday                           
+2037/7/17         5                       Friday                             
+2037/7/18         6                       Saturday                           
+2037/7/19         7                       Sunday                             
+2037/7/20         8                       Monday                             
+2037/7/21         9                       Tuesday                            
+2037/7/22         10                      Wednesday      Great Heat          
+2037/7/23         11                      Thursday                           
+2037/7/24         12                      Friday                             
+2037/7/25         13                      Saturday                           
+2037/7/26         14                      Sunday                             
+2037/7/27         15                      Monday                             
+2037/7/28         16                      Tuesday                            
+2037/7/29         17                      Wednesday                          
+2037/7/30         18                      Thursday                           
+2037/7/31         19                      Friday                             
+2037/8/1          20                      Saturday                           
+2037/8/2          21                      Sunday                             
+2037/8/3          22                      Monday                             
+2037/8/4          23                      Tuesday                            
+2037/8/5          24                      Wednesday                          
+2037/8/6          25                      Thursday                           
+2037/8/7          26                      Friday         Autumn Commences    
+2037/8/8          27                      Saturday                           
+2037/8/9          28                      Sunday                             
+2037/8/10         29                      Monday                             
+2037/8/11         7th Lunar Month         Tuesday                            
+2037/8/12         2                       Wednesday                          
+2037/8/13         3                       Thursday                           
+2037/8/14         4                       Friday                             
+2037/8/15         5                       Saturday                           
+2037/8/16         6                       Sunday                             
+2037/8/17         7                       Monday                             
+2037/8/18         8                       Tuesday                            
+2037/8/19         9                       Wednesday                          
+2037/8/20         10                      Thursday                           
+2037/8/21         11                      Friday                             
+2037/8/22         12                      Saturday                           
+2037/8/23         13                      Sunday         End of Heat         
+2037/8/24         14                      Monday                             
+2037/8/25         15                      Tuesday                            
+2037/8/26         16                      Wednesday                          
+2037/8/27         17                      Thursday                           
+2037/8/28         18                      Friday                             
+2037/8/29         19                      Saturday                           
+2037/8/30         20                      Sunday                             
+2037/8/31         21                      Monday                             
+2037/9/1          22                      Tuesday                            
+2037/9/2          23                      Wednesday                          
+2037/9/3          24                      Thursday                           
+2037/9/4          25                      Friday                             
+2037/9/5          26                      Saturday                           
+2037/9/6          27                      Sunday                             
+2037/9/7          28                      Monday         White Dew           
+2037/9/8          29                      Tuesday                            
+2037/9/9          30                      Wednesday                          
+2037/9/10         8th Lunar Month         Thursday                           
+2037/9/11         2                       Friday                             
+2037/9/12         3                       Saturday                           
+2037/9/13         4                       Sunday                             
+2037/9/14         5                       Monday                             
+2037/9/15         6                       Tuesday                            
+2037/9/16         7                       Wednesday                          
+2037/9/17         8                       Thursday                           
+2037/9/18         9                       Friday                             
+2037/9/19         10                      Saturday                           
+2037/9/20         11                      Sunday                             
+2037/9/21         12                      Monday                             
+2037/9/22         13                      Tuesday                            
+2037/9/23         14                      Wednesday      Autumnal Equinox    
+2037/9/24         15                      Thursday                           
+2037/9/25         16                      Friday                             
+2037/9/26         17                      Saturday                           
+2037/9/27         18                      Sunday                             
+2037/9/28         19                      Monday                             
+2037/9/29         20                      Tuesday                            
+2037/9/30         21                      Wednesday                          
+2037/10/1         22                      Thursday                           
+2037/10/2         23                      Friday                             
+2037/10/3         24                      Saturday                           
+2037/10/4         25                      Sunday                             
+2037/10/5         26                      Monday                             
+2037/10/6         27                      Tuesday                            
+2037/10/7         28                      Wednesday                          
+2037/10/8         29                      Thursday       Cold Dew            
+2037/10/9         9th Lunar Month         Friday                             
+2037/10/10        2                       Saturday                           
+2037/10/11        3                       Sunday                             
+2037/10/12        4                       Monday                             
+2037/10/13        5                       Tuesday                            
+2037/10/14        6                       Wednesday                          
+2037/10/15        7                       Thursday                           
+2037/10/16        8                       Friday                             
+2037/10/17        9                       Saturday                           
+2037/10/18        10                      Sunday                             
+2037/10/19        11                      Monday                             
+2037/10/20        12                      Tuesday                            
+2037/10/21        13                      Wednesday                          
+2037/10/22        14                      Thursday                           
+2037/10/23        15                      Friday         Frost               
+2037/10/24        16                      Saturday                           
+2037/10/25        17                      Sunday                             
+2037/10/26        18                      Monday                             
+2037/10/27        19                      Tuesday                            
+2037/10/28        20                      Wednesday                          
+2037/10/29        21                      Thursday                           
+2037/10/30        22                      Friday                             
+2037/10/31        23                      Saturday                           
+2037/11/1         24                      Sunday                             
+2037/11/2         25                      Monday                             
+2037/11/3         26                      Tuesday                            
+2037/11/4         27                      Wednesday                          
+2037/11/5         28                      Thursday                           
+2037/11/6         29                      Friday                             
+2037/11/7         10th Lunar Month        Saturday       Winter Commences    
+2037/11/8         2                       Sunday                             
+2037/11/9         3                       Monday                             
+2037/11/10        4                       Tuesday                            
+2037/11/11        5                       Wednesday                          
+2037/11/12        6                       Thursday                           
+2037/11/13        7                       Friday                             
+2037/11/14        8                       Saturday                           
+2037/11/15        9                       Sunday                             
+2037/11/16        10                      Monday                             
+2037/11/17        11                      Tuesday                            
+2037/11/18        12                      Wednesday                          
+2037/11/19        13                      Thursday                           
+2037/11/20        14                      Friday                             
+2037/11/21        15                      Saturday                           
+2037/11/22        16                      Sunday         Light Snow          
+2037/11/23        17                      Monday                             
+2037/11/24        18                      Tuesday                            
+2037/11/25        19                      Wednesday                          
+2037/11/26        20                      Thursday                           
+2037/11/27        21                      Friday                             
+2037/11/28        22                      Saturday                           
+2037/11/29        23                      Sunday                             
+2037/11/30        24                      Monday                             
+2037/12/1         25                      Tuesday                            
+2037/12/2         26                      Wednesday                          
+2037/12/3         27                      Thursday                           
+2037/12/4         28                      Friday                             
+2037/12/5         29                      Saturday                           
+2037/12/6         30                      Sunday                             
+2037/12/7         11th Lunar Month        Monday         Heavy Snow          
+2037/12/8         2                       Tuesday                            
+2037/12/9         3                       Wednesday                          
+2037/12/10        4                       Thursday                           
+2037/12/11        5                       Friday                             
+2037/12/12        6                       Saturday                           
+2037/12/13        7                       Sunday                             
+2037/12/14        8                       Monday                             
+2037/12/15        9                       Tuesday                            
+2037/12/16        10                      Wednesday                          
+2037/12/17        11                      Thursday                           
+2037/12/18        12                      Friday                             
+2037/12/19        13                      Saturday                           
+2037/12/20        14                      Sunday                             
+2037/12/21        15                      Monday         Winter Solstice     
+2037/12/22        16                      Tuesday                            
+2037/12/23        17                      Wednesday                          
+2037/12/24        18                      Thursday                           
+2037/12/25        19                      Friday                             
+2037/12/26        20                      Saturday                           
+2037/12/27        21                      Sunday                             
+2037/12/28        22                      Monday                             
+2037/12/29        23                      Tuesday                            
+2037/12/30        24                      Wednesday                          
+2037/12/31        25                      Thursday                           

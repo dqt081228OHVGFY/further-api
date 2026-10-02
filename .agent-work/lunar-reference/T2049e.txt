@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2049 (Ji-si  -  year of the Snake)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2049/1/1          28                      Friday                             
+2049/1/2          29                      Saturday                           
+2049/1/3          30                      Sunday                             
+2049/1/4          12th Lunar Month        Monday                             
+2049/1/5          2                       Tuesday        Moderate Cold       
+2049/1/6          3                       Wednesday                          
+2049/1/7          4                       Thursday                           
+2049/1/8          5                       Friday                             
+2049/1/9          6                       Saturday                           
+2049/1/10         7                       Sunday                             
+2049/1/11         8                       Monday                             
+2049/1/12         9                       Tuesday                            
+2049/1/13         10                      Wednesday                          
+2049/1/14         11                      Thursday                           
+2049/1/15         12                      Friday                             
+2049/1/16         13                      Saturday                           
+2049/1/17         14                      Sunday                             
+2049/1/18         15                      Monday                             
+2049/1/19         16                      Tuesday        Severe Cold         
+2049/1/20         17                      Wednesday                          
+2049/1/21         18                      Thursday                           
+2049/1/22         19                      Friday                             
+2049/1/23         20                      Saturday                           
+2049/1/24         21                      Sunday                             
+2049/1/25         22                      Monday                             
+2049/1/26         23                      Tuesday                            
+2049/1/27         24                      Wednesday                          
+2049/1/28         25                      Thursday                           
+2049/1/29         26                      Friday                             
+2049/1/30         27                      Saturday                           
+2049/1/31         28                      Sunday                             
+2049/2/1          29                      Monday                             
+2049/2/2          1st Lunar Month         Tuesday                            
+2049/2/3          2                       Wednesday      Spring Commences    
+2049/2/4          3                       Thursday                           
+2049/2/5          4                       Friday                             
+2049/2/6          5                       Saturday                           
+2049/2/7          6                       Sunday                             
+2049/2/8          7                       Monday                             
+2049/2/9          8                       Tuesday                            
+2049/2/10         9                       Wednesday                          
+2049/2/11         10                      Thursday                           
+2049/2/12         11                      Friday                             
+2049/2/13         12                      Saturday                           
+2049/2/14         13                      Sunday                             
+2049/2/15         14                      Monday                             
+2049/2/16         15                      Tuesday                            
+2049/2/17         16                      Wednesday                          
+2049/2/18         17                      Thursday       Spring Showers      
+2049/2/19         18                      Friday                             
+2049/2/20         19                      Saturday                           
+2049/2/21         20                      Sunday                             
+2049/2/22         21                      Monday                             
+2049/2/23         22                      Tuesday                            
+2049/2/24         23                      Wednesday                          
+2049/2/25         24                      Thursday                           
+2049/2/26         25                      Friday                             
+2049/2/27         26                      Saturday                           
+2049/2/28         27                      Sunday                             
+2049/3/1          28                      Monday                             
+2049/3/2          29                      Tuesday                            
+2049/3/3          30                      Wednesday                          
+2049/3/4          2nd Lunar Month         Thursday                           
+2049/3/5          2                       Friday         Insects Waken       
+2049/3/6          3                       Saturday                           
+2049/3/7          4                       Sunday                             
+2049/3/8          5                       Monday                             
+2049/3/9          6                       Tuesday                            
+2049/3/10         7                       Wednesday                          
+2049/3/11         8                       Thursday                           
+2049/3/12         9                       Friday                             
+2049/3/13         10                      Saturday                           
+2049/3/14         11                      Sunday                             
+2049/3/15         12                      Monday                             
+2049/3/16         13                      Tuesday                            
+2049/3/17         14                      Wednesday                          
+2049/3/18         15                      Thursday                           
+2049/3/19         16                      Friday                             
+2049/3/20         17                      Saturday       Vernal Equinox      
+2049/3/21         18                      Sunday                             
+2049/3/22         19                      Monday                             
+2049/3/23         20                      Tuesday                            
+2049/3/24         21                      Wednesday                          
+2049/3/25         22                      Thursday                           
+2049/3/26         23                      Friday                             
+2049/3/27         24                      Saturday                           
+2049/3/28         25                      Sunday                             
+2049/3/29         26                      Monday                             
+2049/3/30         27                      Tuesday                            
+2049/3/31         28                      Wednesday                          
+2049/4/1          29                      Thursday                           
+2049/4/2          3rd Lunar Month         Friday                             
+2049/4/3          2                       Saturday                           
+2049/4/4          3                       Sunday         Bright & Clear      
+2049/4/5          4                       Monday                             
+2049/4/6          5                       Tuesday                            
+2049/4/7          6                       Wednesday                          
+2049/4/8          7                       Thursday                           
+2049/4/9          8                       Friday                             
+2049/4/10         9                       Saturday                           
+2049/4/11         10                      Sunday                             
+2049/4/12         11                      Monday                             
+2049/4/13         12                      Tuesday                            
+2049/4/14         13                      Wednesday                          
+2049/4/15         14                      Thursday                           
+2049/4/16         15                      Friday                             
+2049/4/17         16                      Saturday                           
+2049/4/18         17                      Sunday                             
+2049/4/19         18                      Monday         Corn Rain           
+2049/4/20         19                      Tuesday                            
+2049/4/21         20                      Wednesday                          
+2049/4/22         21                      Thursday                           
+2049/4/23         22                      Friday                             
+2049/4/24         23                      Saturday                           
+2049/4/25         24                      Sunday                             
+2049/4/26         25                      Monday                             
+2049/4/27         26                      Tuesday                            
+2049/4/28         27                      Wednesday                          
+2049/4/29         28                      Thursday                           
+2049/4/30         29                      Friday                             
+2049/5/1          30                      Saturday                           
+2049/5/2          4th Lunar Month         Sunday                             
+2049/5/3          2                       Monday                             
+2049/5/4          3                       Tuesday                            
+2049/5/5          4                       Wednesday      Summer Commences    
+2049/5/6          5                       Thursday                           
+2049/5/7          6                       Friday                             
+2049/5/8          7                       Saturday                           
+2049/5/9          8                       Sunday                             
+2049/5/10         9                       Monday                             
+2049/5/11         10                      Tuesday                            
+2049/5/12         11                      Wednesday                          
+2049/5/13         12                      Thursday                           
+2049/5/14         13                      Friday                             
+2049/5/15         14                      Saturday                           
+2049/5/16         15                      Sunday                             
+2049/5/17         16                      Monday                             
+2049/5/18         17                      Tuesday                            
+2049/5/19         18                      Wednesday                          
+2049/5/20         19                      Thursday       Corn Forms          
+2049/5/21         20                      Friday                             
+2049/5/22         21                      Saturday                           
+2049/5/23         22                      Sunday                             
+2049/5/24         23                      Monday                             
+2049/5/25         24                      Tuesday                            
+2049/5/26         25                      Wednesday                          
+2049/5/27         26                      Thursday                           
+2049/5/28         27                      Friday                             
+2049/5/29         28                      Saturday                           
+2049/5/30         29                      Sunday                             
+2049/5/31         5th Lunar Month         Monday                             
+2049/6/1          2                       Tuesday                            
+2049/6/2          3                       Wednesday                          
+2049/6/3          4                       Thursday                           
+2049/6/4          5                       Friday                             
+2049/6/5          6                       Saturday       Corn on Ear         
+2049/6/6          7                       Sunday                             
+2049/6/7          8                       Monday                             
+2049/6/8          9                       Tuesday                            
+2049/6/9          10                      Wednesday                          
+2049/6/10         11                      Thursday                           
+2049/6/11         12                      Friday                             
+2049/6/12         13                      Saturday                           
+2049/6/13         14                      Sunday                             
+2049/6/14         15                      Monday                             
+2049/6/15         16                      Tuesday                            
+2049/6/16         17                      Wednesday                          
+2049/6/17         18                      Thursday                           
+2049/6/18         19                      Friday                             
+2049/6/19         20                      Saturday                           
+2049/6/20         21                      Sunday                             
+2049/6/21         22                      Monday         Summer Solstice     
+2049/6/22         23                      Tuesday                            
+2049/6/23         24                      Wednesday                          
+2049/6/24         25                      Thursday                           
+2049/6/25         26                      Friday                             
+2049/6/26         27                      Saturday                           
+2049/6/27         28                      Sunday                             
+2049/6/28         29                      Monday                             
+2049/6/29         30                      Tuesday                            
+2049/6/30         6th Lunar Month         Wednesday                          
+2049/7/1          2                       Thursday                           
+2049/7/2          3                       Friday                             
+2049/7/3          4                       Saturday                           
+2049/7/4          5                       Sunday                             
+2049/7/5          6                       Monday                             
+2049/7/6          7                       Tuesday        Moderate Heat       
+2049/7/7          8                       Wednesday                          
+2049/7/8          9                       Thursday                           
+2049/7/9          10                      Friday                             
+2049/7/10         11                      Saturday                           
+2049/7/11         12                      Sunday                             
+2049/7/12         13                      Monday                             
+2049/7/13         14                      Tuesday                            
+2049/7/14         15                      Wednesday                          
+2049/7/15         16                      Thursday                           
+2049/7/16         17                      Friday                             
+2049/7/17         18                      Saturday                           
+2049/7/18         19                      Sunday                             
+2049/7/19         20                      Monday                             
+2049/7/20         21                      Tuesday                            
+2049/7/21         22                      Wednesday                          
+2049/7/22         23                      Thursday       Great Heat          
+2049/7/23         24                      Friday                             
+2049/7/24         25                      Saturday                           
+2049/7/25         26                      Sunday                             
+2049/7/26         27                      Monday                             
+2049/7/27         28                      Tuesday                            
+2049/7/28         29                      Wednesday                          
+2049/7/29         30                      Thursday                           
+2049/7/30         7th Lunar Month         Friday                             
+2049/7/31         2                       Saturday                           
+2049/8/1          3                       Sunday                             
+2049/8/2          4                       Monday                             
+2049/8/3          5                       Tuesday                            
+2049/8/4          6                       Wednesday                          
+2049/8/5          7                       Thursday                           
+2049/8/6          8                       Friday                             
+2049/8/7          9                       Saturday       Autumn Commences    
+2049/8/8          10                      Sunday                             
+2049/8/9          11                      Monday                             
+2049/8/10         12                      Tuesday                            
+2049/8/11         13                      Wednesday                          
+2049/8/12         14                      Thursday                           
+2049/8/13         15                      Friday                             
+2049/8/14         16                      Saturday                           
+2049/8/15         17                      Sunday                             
+2049/8/16         18                      Monday                             
+2049/8/17         19                      Tuesday                            
+2049/8/18         20                      Wednesday                          
+2049/8/19         21                      Thursday                           
+2049/8/20         22                      Friday                             
+2049/8/21         23                      Saturday                           
+2049/8/22         24                      Sunday         End of Heat         
+2049/8/23         25                      Monday                             
+2049/8/24         26                      Tuesday                            
+2049/8/25         27                      Wednesday                          
+2049/8/26         28                      Thursday                           
+2049/8/27         29                      Friday                             
+2049/8/28         8th Lunar Month         Saturday                           
+2049/8/29         2                       Sunday                             
+2049/8/30         3                       Monday                             
+2049/8/31         4                       Tuesday                            
+2049/9/1          5                       Wednesday                          
+2049/9/2          6                       Thursday                           
+2049/9/3          7                       Friday                             
+2049/9/4          8                       Saturday                           
+2049/9/5          9                       Sunday                             
+2049/9/6          10                      Monday                             
+2049/9/7          11                      Tuesday        White Dew           
+2049/9/8          12                      Wednesday                          
+2049/9/9          13                      Thursday                           
+2049/9/10         14                      Friday                             
+2049/9/11         15                      Saturday                           
+2049/9/12         16                      Sunday                             
+2049/9/13         17                      Monday                             
+2049/9/14         18                      Tuesday                            
+2049/9/15         19                      Wednesday                          
+2049/9/16         20                      Thursday                           
+2049/9/17         21                      Friday                             
+2049/9/18         22                      Saturday                           
+2049/9/19         23                      Sunday                             
+2049/9/20         24                      Monday                             
+2049/9/21         25                      Tuesday                            
+2049/9/22         26                      Wednesday      Autumnal Equinox    
+2049/9/23         27                      Thursday                           
+2049/9/24         28                      Friday                             
+2049/9/25         29                      Saturday                           
+2049/9/26         30                      Sunday                             
+2049/9/27         9th Lunar Month         Monday                             
+2049/9/28         2                       Tuesday                            
+2049/9/29         3                       Wednesday                          
+2049/9/30         4                       Thursday                           
+2049/10/1         5                       Friday                             
+2049/10/2         6                       Saturday                           
+2049/10/3         7                       Sunday                             
+2049/10/4         8                       Monday                             
+2049/10/5         9                       Tuesday                            
+2049/10/6         10                      Wednesday                          
+2049/10/7         11                      Thursday                           
+2049/10/8         12                      Friday         Cold Dew            
+2049/10/9         13                      Saturday                           
+2049/10/10        14                      Sunday                             
+2049/10/11        15                      Monday                             
+2049/10/12        16                      Tuesday                            
+2049/10/13        17                      Wednesday                          
+2049/10/14        18                      Thursday                           
+2049/10/15        19                      Friday                             
+2049/10/16        20                      Saturday                           
+2049/10/17        21                      Sunday                             
+2049/10/18        22                      Monday                             
+2049/10/19        23                      Tuesday                            
+2049/10/20        24                      Wednesday                          
+2049/10/21        25                      Thursday                           
+2049/10/22        26                      Friday                             
+2049/10/23        27                      Saturday       Frost               
+2049/10/24        28                      Sunday                             
+2049/10/25        29                      Monday                             
+2049/10/26        30                      Tuesday                            
+2049/10/27        10th Lunar Month        Wednesday                          
+2049/10/28        2                       Thursday                           
+2049/10/29        3                       Friday                             
+2049/10/30        4                       Saturday                           
+2049/10/31        5                       Sunday                             
+2049/11/1         6                       Monday                             
+2049/11/2         7                       Tuesday                            
+2049/11/3         8                       Wednesday                          
+2049/11/4         9                       Thursday                           
+2049/11/5         10                      Friday                             
+2049/11/6         11                      Saturday                           
+2049/11/7         12                      Sunday         Winter Commences    
+2049/11/8         13                      Monday                             
+2049/11/9         14                      Tuesday                            
+2049/11/10        15                      Wednesday                          
+2049/11/11        16                      Thursday                           
+2049/11/12        17                      Friday                             
+2049/11/13        18                      Saturday                           
+2049/11/14        19                      Sunday                             
+2049/11/15        20                      Monday                             
+2049/11/16        21                      Tuesday                            
+2049/11/17        22                      Wednesday                          
+2049/11/18        23                      Thursday                           
+2049/11/19        24                      Friday                             
+2049/11/20        25                      Saturday                           
+2049/11/21        26                      Sunday                             
+2049/11/22        27                      Monday         Light Snow          
+2049/11/23        28                      Tuesday                            
+2049/11/24        29                      Wednesday                          
+2049/11/25        11th Lunar Month        Thursday                           
+2049/11/26        2                       Friday                             
+2049/11/27        3                       Saturday                           
+2049/11/28        4                       Sunday                             
+2049/11/29        5                       Monday                             
+2049/11/30        6                       Tuesday                            
+2049/12/1         7                       Wednesday                          
+2049/12/2         8                       Thursday                           
+2049/12/3         9                       Friday                             
+2049/12/4         10                      Saturday                           
+2049/12/5         11                      Sunday                             
+2049/12/6         12                      Monday                             
+2049/12/7         13                      Tuesday        Heavy Snow          
+2049/12/8         14                      Wednesday                          
+2049/12/9         15                      Thursday                           
+2049/12/10        16                      Friday                             
+2049/12/11        17                      Saturday                           
+2049/12/12        18                      Sunday                             
+2049/12/13        19                      Monday                             
+2049/12/14        20                      Tuesday                            
+2049/12/15        21                      Wednesday                          
+2049/12/16        22                      Thursday                           
+2049/12/17        23                      Friday                             
+2049/12/18        24                      Saturday                           
+2049/12/19        25                      Sunday                             
+2049/12/20        26                      Monday                             
+2049/12/21        27                      Tuesday        Winter Solstice     
+2049/12/22        28                      Wednesday                          
+2049/12/23        29                      Thursday                           
+2049/12/24        30                      Friday                             
+2049/12/25        12th Lunar Month        Saturday                           
+2049/12/26        2                       Sunday                             
+2049/12/27        3                       Monday                             
+2049/12/28        4                       Tuesday                            
+2049/12/29        5                       Wednesday                          
+2049/12/30        6                       Thursday                           
+2049/12/31        7                       Friday                             

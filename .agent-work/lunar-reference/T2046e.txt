@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2046 (Bing-yin  -  year of the Tiger)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2046/1/1          25                      Monday                             
+2046/1/2          26                      Tuesday                            
+2046/1/3          27                      Wednesday                          
+2046/1/4          28                      Thursday                           
+2046/1/5          29                      Friday         Moderate Cold       
+2046/1/6          30                      Saturday                           
+2046/1/7          12th Lunar Month        Sunday                             
+2046/1/8          2                       Monday                             
+2046/1/9          3                       Tuesday                            
+2046/1/10         4                       Wednesday                          
+2046/1/11         5                       Thursday                           
+2046/1/12         6                       Friday                             
+2046/1/13         7                       Saturday                           
+2046/1/14         8                       Sunday                             
+2046/1/15         9                       Monday                             
+2046/1/16         10                      Tuesday                            
+2046/1/17         11                      Wednesday                          
+2046/1/18         12                      Thursday                           
+2046/1/19         13                      Friday                             
+2046/1/20         14                      Saturday       Severe Cold         
+2046/1/21         15                      Sunday                             
+2046/1/22         16                      Monday                             
+2046/1/23         17                      Tuesday                            
+2046/1/24         18                      Wednesday                          
+2046/1/25         19                      Thursday                           
+2046/1/26         20                      Friday                             
+2046/1/27         21                      Saturday                           
+2046/1/28         22                      Sunday                             
+2046/1/29         23                      Monday                             
+2046/1/30         24                      Tuesday                            
+2046/1/31         25                      Wednesday                          
+2046/2/1          26                      Thursday                           
+2046/2/2          27                      Friday                             
+2046/2/3          28                      Saturday                           
+2046/2/4          29                      Sunday         Spring Commences    
+2046/2/5          30                      Monday                             
+2046/2/6          1st Lunar Month         Tuesday                            
+2046/2/7          2                       Wednesday                          
+2046/2/8          3                       Thursday                           
+2046/2/9          4                       Friday                             
+2046/2/10         5                       Saturday                           
+2046/2/11         6                       Sunday                             
+2046/2/12         7                       Monday                             
+2046/2/13         8                       Tuesday                            
+2046/2/14         9                       Wednesday                          
+2046/2/15         10                      Thursday                           
+2046/2/16         11                      Friday                             
+2046/2/17         12                      Saturday                           
+2046/2/18         13                      Sunday         Spring Showers      
+2046/2/19         14                      Monday                             
+2046/2/20         15                      Tuesday                            
+2046/2/21         16                      Wednesday                          
+2046/2/22         17                      Thursday                           
+2046/2/23         18                      Friday                             
+2046/2/24         19                      Saturday                           
+2046/2/25         20                      Sunday                             
+2046/2/26         21                      Monday                             
+2046/2/27         22                      Tuesday                            
+2046/2/28         23                      Wednesday                          
+2046/3/1          24                      Thursday                           
+2046/3/2          25                      Friday                             
+2046/3/3          26                      Saturday                           
+2046/3/4          27                      Sunday                             
+2046/3/5          28                      Monday         Insects Waken       
+2046/3/6          29                      Tuesday                            
+2046/3/7          30                      Wednesday                          
+2046/3/8          2nd Lunar Month         Thursday                           
+2046/3/9          2                       Friday                             
+2046/3/10         3                       Saturday                           
+2046/3/11         4                       Sunday                             
+2046/3/12         5                       Monday                             
+2046/3/13         6                       Tuesday                            
+2046/3/14         7                       Wednesday                          
+2046/3/15         8                       Thursday                           
+2046/3/16         9                       Friday                             
+2046/3/17         10                      Saturday                           
+2046/3/18         11                      Sunday                             
+2046/3/19         12                      Monday                             
+2046/3/20         13                      Tuesday        Vernal Equinox      
+2046/3/21         14                      Wednesday                          
+2046/3/22         15                      Thursday                           
+2046/3/23         16                      Friday                             
+2046/3/24         17                      Saturday                           
+2046/3/25         18                      Sunday                             
+2046/3/26         19                      Monday                             
+2046/3/27         20                      Tuesday                            
+2046/3/28         21                      Wednesday                          
+2046/3/29         22                      Thursday                           
+2046/3/30         23                      Friday                             
+2046/3/31         24                      Saturday                           
+2046/4/1          25                      Sunday                             
+2046/4/2          26                      Monday                             
+2046/4/3          27                      Tuesday                            
+2046/4/4          28                      Wednesday      Bright & Clear      
+2046/4/5          29                      Thursday                           
+2046/4/6          3rd Lunar Month         Friday                             
+2046/4/7          2                       Saturday                           
+2046/4/8          3                       Sunday                             
+2046/4/9          4                       Monday                             
+2046/4/10         5                       Tuesday                            
+2046/4/11         6                       Wednesday                          
+2046/4/12         7                       Thursday                           
+2046/4/13         8                       Friday                             
+2046/4/14         9                       Saturday                           
+2046/4/15         10                      Sunday                             
+2046/4/16         11                      Monday                             
+2046/4/17         12                      Tuesday                            
+2046/4/18         13                      Wednesday                          
+2046/4/19         14                      Thursday                           
+2046/4/20         15                      Friday         Corn Rain           
+2046/4/21         16                      Saturday                           
+2046/4/22         17                      Sunday                             
+2046/4/23         18                      Monday                             
+2046/4/24         19                      Tuesday                            
+2046/4/25         20                      Wednesday                          
+2046/4/26         21                      Thursday                           
+2046/4/27         22                      Friday                             
+2046/4/28         23                      Saturday                           
+2046/4/29         24                      Sunday                             
+2046/4/30         25                      Monday                             
+2046/5/1          26                      Tuesday                            
+2046/5/2          27                      Wednesday                          
+2046/5/3          28                      Thursday                           
+2046/5/4          29                      Friday                             
+2046/5/5          30                      Saturday       Summer Commences    
+2046/5/6          4th Lunar Month         Sunday                             
+2046/5/7          2                       Monday                             
+2046/5/8          3                       Tuesday                            
+2046/5/9          4                       Wednesday                          
+2046/5/10         5                       Thursday                           
+2046/5/11         6                       Friday                             
+2046/5/12         7                       Saturday                           
+2046/5/13         8                       Sunday                             
+2046/5/14         9                       Monday                             
+2046/5/15         10                      Tuesday                            
+2046/5/16         11                      Wednesday                          
+2046/5/17         12                      Thursday                           
+2046/5/18         13                      Friday                             
+2046/5/19         14                      Saturday                           
+2046/5/20         15                      Sunday                             
+2046/5/21         16                      Monday         Corn Forms          
+2046/5/22         17                      Tuesday                            
+2046/5/23         18                      Wednesday                          
+2046/5/24         19                      Thursday                           
+2046/5/25         20                      Friday                             
+2046/5/26         21                      Saturday                           
+2046/5/27         22                      Sunday                             
+2046/5/28         23                      Monday                             
+2046/5/29         24                      Tuesday                            
+2046/5/30         25                      Wednesday                          
+2046/5/31         26                      Thursday                           
+2046/6/1          27                      Friday                             
+2046/6/2          28                      Saturday                           
+2046/6/3          29                      Sunday                             
+2046/6/4          5th Lunar Month         Monday                             
+2046/6/5          2                       Tuesday        Corn on Ear         
+2046/6/6          3                       Wednesday                          
+2046/6/7          4                       Thursday                           
+2046/6/8          5                       Friday                             
+2046/6/9          6                       Saturday                           
+2046/6/10         7                       Sunday                             
+2046/6/11         8                       Monday                             
+2046/6/12         9                       Tuesday                            
+2046/6/13         10                      Wednesday                          
+2046/6/14         11                      Thursday                           
+2046/6/15         12                      Friday                             
+2046/6/16         13                      Saturday                           
+2046/6/17         14                      Sunday                             
+2046/6/18         15                      Monday                             
+2046/6/19         16                      Tuesday                            
+2046/6/20         17                      Wednesday                          
+2046/6/21         18                      Thursday       Summer Solstice     
+2046/6/22         19                      Friday                             
+2046/6/23         20                      Saturday                           
+2046/6/24         21                      Sunday                             
+2046/6/25         22                      Monday                             
+2046/6/26         23                      Tuesday                            
+2046/6/27         24                      Wednesday                          
+2046/6/28         25                      Thursday                           
+2046/6/29         26                      Friday                             
+2046/6/30         27                      Saturday                           
+2046/7/1          28                      Sunday                             
+2046/7/2          29                      Monday                             
+2046/7/3          30                      Tuesday                            
+2046/7/4          6th Lunar Month         Wednesday                          
+2046/7/5          2                       Thursday                           
+2046/7/6          3                       Friday                             
+2046/7/7          4                       Saturday       Moderate Heat       
+2046/7/8          5                       Sunday                             
+2046/7/9          6                       Monday                             
+2046/7/10         7                       Tuesday                            
+2046/7/11         8                       Wednesday                          
+2046/7/12         9                       Thursday                           
+2046/7/13         10                      Friday                             
+2046/7/14         11                      Saturday                           
+2046/7/15         12                      Sunday                             
+2046/7/16         13                      Monday                             
+2046/7/17         14                      Tuesday                            
+2046/7/18         15                      Wednesday                          
+2046/7/19         16                      Thursday                           
+2046/7/20         17                      Friday                             
+2046/7/21         18                      Saturday                           
+2046/7/22         19                      Sunday         Great Heat          
+2046/7/23         20                      Monday                             
+2046/7/24         21                      Tuesday                            
+2046/7/25         22                      Wednesday                          
+2046/7/26         23                      Thursday                           
+2046/7/27         24                      Friday                             
+2046/7/28         25                      Saturday                           
+2046/7/29         26                      Sunday                             
+2046/7/30         27                      Monday                             
+2046/7/31         28                      Tuesday                            
+2046/8/1          29                      Wednesday                          
+2046/8/2          7th Lunar Month         Thursday                           
+2046/8/3          2                       Friday                             
+2046/8/4          3                       Saturday                           
+2046/8/5          4                       Sunday                             
+2046/8/6          5                       Monday                             
+2046/8/7          6                       Tuesday        Autumn Commences    
+2046/8/8          7                       Wednesday                          
+2046/8/9          8                       Thursday                           
+2046/8/10         9                       Friday                             
+2046/8/11         10                      Saturday                           
+2046/8/12         11                      Sunday                             
+2046/8/13         12                      Monday                             
+2046/8/14         13                      Tuesday                            
+2046/8/15         14                      Wednesday                          
+2046/8/16         15                      Thursday                           
+2046/8/17         16                      Friday                             
+2046/8/18         17                      Saturday                           
+2046/8/19         18                      Sunday                             
+2046/8/20         19                      Monday                             
+2046/8/21         20                      Tuesday                            
+2046/8/22         21                      Wednesday                          
+2046/8/23         22                      Thursday       End of Heat         
+2046/8/24         23                      Friday                             
+2046/8/25         24                      Saturday                           
+2046/8/26         25                      Sunday                             
+2046/8/27         26                      Monday                             
+2046/8/28         27                      Tuesday                            
+2046/8/29         28                      Wednesday                          
+2046/8/30         29                      Thursday                           
+2046/8/31         30                      Friday                             
+2046/9/1          8th Lunar Month         Saturday                           
+2046/9/2          2                       Sunday                             
+2046/9/3          3                       Monday                             
+2046/9/4          4                       Tuesday                            
+2046/9/5          5                       Wednesday                          
+2046/9/6          6                       Thursday                           
+2046/9/7          7                       Friday         White Dew           
+2046/9/8          8                       Saturday                           
+2046/9/9          9                       Sunday                             
+2046/9/10         10                      Monday                             
+2046/9/11         11                      Tuesday                            
+2046/9/12         12                      Wednesday                          
+2046/9/13         13                      Thursday                           
+2046/9/14         14                      Friday                             
+2046/9/15         15                      Saturday                           
+2046/9/16         16                      Sunday                             
+2046/9/17         17                      Monday                             
+2046/9/18         18                      Tuesday                            
+2046/9/19         19                      Wednesday                          
+2046/9/20         20                      Thursday                           
+2046/9/21         21                      Friday                             
+2046/9/22         22                      Saturday                           
+2046/9/23         23                      Sunday         Autumnal Equinox    
+2046/9/24         24                      Monday                             
+2046/9/25         25                      Tuesday                            
+2046/9/26         26                      Wednesday                          
+2046/9/27         27                      Thursday                           
+2046/9/28         28                      Friday                             
+2046/9/29         29                      Saturday                           
+2046/9/30         9th Lunar Month         Sunday                             
+2046/10/1         2                       Monday                             
+2046/10/2         3                       Tuesday                            
+2046/10/3         4                       Wednesday                          
+2046/10/4         5                       Thursday                           
+2046/10/5         6                       Friday                             
+2046/10/6         7                       Saturday                           
+2046/10/7         8                       Sunday                             
+2046/10/8         9                       Monday         Cold Dew            
+2046/10/9         10                      Tuesday                            
+2046/10/10        11                      Wednesday                          
+2046/10/11        12                      Thursday                           
+2046/10/12        13                      Friday                             
+2046/10/13        14                      Saturday                           
+2046/10/14        15                      Sunday                             
+2046/10/15        16                      Monday                             
+2046/10/16        17                      Tuesday                            
+2046/10/17        18                      Wednesday                          
+2046/10/18        19                      Thursday                           
+2046/10/19        20                      Friday                             
+2046/10/20        21                      Saturday                           
+2046/10/21        22                      Sunday                             
+2046/10/22        23                      Monday                             
+2046/10/23        24                      Tuesday        Frost               
+2046/10/24        25                      Wednesday                          
+2046/10/25        26                      Thursday                           
+2046/10/26        27                      Friday                             
+2046/10/27        28                      Saturday                           
+2046/10/28        29                      Sunday                             
+2046/10/29        10th Lunar Month        Monday                             
+2046/10/30        2                       Tuesday                            
+2046/10/31        3                       Wednesday                          
+2046/11/1         4                       Thursday                           
+2046/11/2         5                       Friday                             
+2046/11/3         6                       Saturday                           
+2046/11/4         7                       Sunday                             
+2046/11/5         8                       Monday                             
+2046/11/6         9                       Tuesday                            
+2046/11/7         10                      Wednesday      Winter Commences    
+2046/11/8         11                      Thursday                           
+2046/11/9         12                      Friday                             
+2046/11/10        13                      Saturday                           
+2046/11/11        14                      Sunday                             
+2046/11/12        15                      Monday                             
+2046/11/13        16                      Tuesday                            
+2046/11/14        17                      Wednesday                          
+2046/11/15        18                      Thursday                           
+2046/11/16        19                      Friday                             
+2046/11/17        20                      Saturday                           
+2046/11/18        21                      Sunday                             
+2046/11/19        22                      Monday                             
+2046/11/20        23                      Tuesday                            
+2046/11/21        24                      Wednesday                          
+2046/11/22        25                      Thursday       Light Snow          
+2046/11/23        26                      Friday                             
+2046/11/24        27                      Saturday                           
+2046/11/25        28                      Sunday                             
+2046/11/26        29                      Monday                             
+2046/11/27        30                      Tuesday                            
+2046/11/28        11th Lunar Month        Wednesday                          
+2046/11/29        2                       Thursday                           
+2046/11/30        3                       Friday                             
+2046/12/1         4                       Saturday                           
+2046/12/2         5                       Sunday                             
+2046/12/3         6                       Monday                             
+2046/12/4         7                       Tuesday                            
+2046/12/5         8                       Wednesday                          
+2046/12/6         9                       Thursday                           
+2046/12/7         10                      Friday         Heavy Snow          
+2046/12/8         11                      Saturday                           
+2046/12/9         12                      Sunday                             
+2046/12/10        13                      Monday                             
+2046/12/11        14                      Tuesday                            
+2046/12/12        15                      Wednesday                          
+2046/12/13        16                      Thursday                           
+2046/12/14        17                      Friday                             
+2046/12/15        18                      Saturday                           
+2046/12/16        19                      Sunday                             
+2046/12/17        20                      Monday                             
+2046/12/18        21                      Tuesday                            
+2046/12/19        22                      Wednesday                          
+2046/12/20        23                      Thursday                           
+2046/12/21        24                      Friday                             
+2046/12/22        25                      Saturday       Winter Solstice     
+2046/12/23        26                      Sunday                             
+2046/12/24        27                      Monday                             
+2046/12/25        28                      Tuesday                            
+2046/12/26        29                      Wednesday                          
+2046/12/27        12th Lunar Month        Thursday                           
+2046/12/28        2                       Friday                             
+2046/12/29        3                       Saturday                           
+2046/12/30        4                       Sunday                             
+2046/12/31        5                       Monday                             

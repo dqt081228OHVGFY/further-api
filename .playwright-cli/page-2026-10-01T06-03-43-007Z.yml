@@ -1,0 +1,122 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "站点首页" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - generic [aria-hidden] [ref=e6]: hub
+      - generic [ref=e7]:
+        - strong [ref=e8]: RelayFor
+        - generic [ref=e9]: AI API 网关
+    - navigation "账户导航" [ref=e11]:
+      - generic [ref=e12]:
+        - link "登录" [ref=e13] [cursor=pointer]:
+          - /url: /auth/?mode=login
+        - link "开始使用 ↗" [ref=e14] [cursor=pointer]:
+          - /url: /auth/?mode=register
+  - main [ref=e15]:
+    - region [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: AI API 网关
+        - heading "欢迎来到RelayFor站" [level=1] [ref=e20]
+        - paragraph [ref=e21]: 为你的应用提供统一的 AI 接口入口。在一个控制台里管理可用模型、独立 API Key、调用记录和消费明细，从第一条请求到日常运营都更清楚。
+        - generic [ref=e22]:
+          - link "创建账户 ↗" [ref=e23] [cursor=pointer]:
+            - /url: /auth/?mode=register
+          - link "登录控制台" [ref=e24] [cursor=pointer]:
+            - /url: /auth/?mode=login
+          - link "已有预付卡？去兑换 ↗" [ref=e25] [cursor=pointer]:
+            - /url: /prepaid/
+        - generic [ref=e26]: 一个地址 · 一把 Key · 多种模型协议
+      - img "应用通过本站连接不同 AI 接口的示意图" [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]: 调用路径示意
+          - generic [ref=e31]: 示意演示
+        - generic [aria-hidden] [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: code
+            - generic [ref=e36]: 你的应用
+            - generic [ref=e37]: YOUR APP
+          - generic [ref=e40]:
+            - generic [ref=e41]: hub
+            - generic [ref=e43]: RelayFor
+          - generic [ref=e46]:
+            - generic [ref=e47]: OpenAI 兼容
+            - generic [ref=e48]: Anthropic
+            - generic [ref=e49]: Gemini
+            - generic [ref=e50]: 更多模型
+        - generic [ref=e51]:
+          - generic [ref=e52]: 请求经过身份验证、路由与用量记录
+          - generic [aria-hidden] [ref=e53]: arrow_outward
+    - region [ref=e54]:
+      - generic [ref=e55]: 01 / 为什么使用
+      - heading "接口接入简单， 管理也应该简单。" [level=2] [ref=e59]: 接口接入简单，管理也应该简单。
+      - generic [ref=e60]:
+        - article [ref=e61]:
+          - text: "01"
+          - generic [aria-hidden] [ref=e62]: hub
+          - heading "统一接入" [level=3] [ref=e63]
+          - paragraph [ref=e64]: 保持熟悉的接口格式，通过同一站点地址调用已配置的模型。
+        - article [ref=e65]:
+          - text: "02"
+          - generic [aria-hidden] [ref=e66]: key
+          - heading "独立 API Key" [level=3] [ref=e67]
+          - paragraph [ref=e68]: 为不同应用分别创建密钥，按需设置模型范围、有效期和访问限制。
+        - article [ref=e69]:
+          - text: "03"
+          - generic [aria-hidden] [ref=e70]: monitoring
+          - heading "调用可追踪" [level=3] [ref=e71]
+          - paragraph [ref=e72]: 在控制台查看调用结果、Token 用量、耗时与实际消费。
+    - region [ref=e73]:
+      - generic [ref=e74]: 02 / 接口示例
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - paragraph [ref=e79]: 从你熟悉的格式开始
+          - heading "一个入口，多种调用方式。" [level=2] [ref=e80]
+        - paragraph [ref=e81]: 切换下方示例，了解不同 API 如何使用本站地址。示例仅用于说明，不会发出请求。
+      - generic [ref=e82]:
+        - tablist "API 协议示例" [ref=e83]:
+          - tab "Responses" [selected] [ref=e84] [cursor=pointer]
+          - tab "Chat Completions" [ref=e85] [cursor=pointer]
+          - tab "Anthropic" [ref=e86] [cursor=pointer]
+          - tab "Gemini" [ref=e87] [cursor=pointer]
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - generic [ref=e90]: POST
+            - code [ref=e91]: /v1/responses
+            - generic [ref=e92]: API EXAMPLE
+          - generic "API 请求示例" [ref=e93]: "curl https://your-domain.example/v1/responses \\ -H \"Authorization: Bearer YOUR_API_KEY\" \\ -H \"Content-Type: application/json\" \\ -d '{\"model\":\"YOUR_MODEL\",\"input\":\"Hello, world.\"}'"
+          - generic [ref=e94]: 将地址、Key 与模型名替换为你自己的配置。
+    - region [ref=e98]:
+      - generic [ref=e99]: 03 / 开始接入
+      - generic [ref=e102]:
+        - heading "从第一条请求开始。" [level=2] [ref=e103]
+        - paragraph [ref=e104]: 把接入步骤压缩到三个清晰动作。
+      - list [ref=e105]:
+        - listitem [ref=e106]:
+          - generic [ref=e107]: "01"
+          - generic [ref=e108]:
+            - heading "进入账户" [level=3] [ref=e109]
+            - paragraph [ref=e110]: 注册或登录控制台，查看当前可用模型与账户余额。
+          - generic [aria-hidden] [ref=e111]: arrow_outward
+        - listitem [ref=e112]:
+          - generic [ref=e113]: "02"
+          - generic [ref=e114]:
+            - heading "创建 API Key" [level=3] [ref=e115]
+            - paragraph [ref=e116]: 为应用生成独立密钥，按需要设置访问范围和有效期。
+          - generic [aria-hidden] [ref=e117]: arrow_outward
+        - listitem [ref=e118]:
+          - generic [ref=e119]: "03"
+          - generic [ref=e120]:
+            - heading "发起调用" [level=3] [ref=e121]
+            - paragraph [ref=e122]: 填入本站接口地址、模型标识与 Key；调用记录可在控制台追踪。
+          - generic [aria-hidden] [ref=e123]: arrow_outward
+    - region [ref=e124]:
+      - generic [ref=e125]:
+        - paragraph [ref=e126]: 准备好下一次请求
+        - heading "让下一次调用， 从这里出发。" [level=2] [ref=e127]: 让下一次调用，从这里出发。
+      - link "开始使用 ↗" [ref=e129] [cursor=pointer]:
+        - /url: /auth/?mode=register
+  - contentinfo [ref=e130]:
+    - generic [ref=e131]:
+      - text: Frontend design and development by New API contributors.
+      - link "New API" [ref=e132] [cursor=pointer]:
+        - /url: https://github.com/QuantumNous/new-api

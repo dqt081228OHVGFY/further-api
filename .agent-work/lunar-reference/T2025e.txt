@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2025 (Yi-si  -  year of the Snake)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2025/1/1          2                       Wednesday                          
+2025/1/2          3                       Thursday                           
+2025/1/3          4                       Friday                             
+2025/1/4          5                       Saturday                           
+2025/1/5          6                       Sunday         Moderate Cold       
+2025/1/6          7                       Monday                             
+2025/1/7          8                       Tuesday                            
+2025/1/8          9                       Wednesday                          
+2025/1/9          10                      Thursday                           
+2025/1/10         11                      Friday                             
+2025/1/11         12                      Saturday                           
+2025/1/12         13                      Sunday                             
+2025/1/13         14                      Monday                             
+2025/1/14         15                      Tuesday                            
+2025/1/15         16                      Wednesday                          
+2025/1/16         17                      Thursday                           
+2025/1/17         18                      Friday                             
+2025/1/18         19                      Saturday                           
+2025/1/19         20                      Sunday                             
+2025/1/20         21                      Monday         Severe Cold         
+2025/1/21         22                      Tuesday                            
+2025/1/22         23                      Wednesday                          
+2025/1/23         24                      Thursday                           
+2025/1/24         25                      Friday                             
+2025/1/25         26                      Saturday                           
+2025/1/26         27                      Sunday                             
+2025/1/27         28                      Monday                             
+2025/1/28         29                      Tuesday                            
+2025/1/29         1st Lunar Month         Wednesday                          
+2025/1/30         2                       Thursday                           
+2025/1/31         3                       Friday                             
+2025/2/1          4                       Saturday                           
+2025/2/2          5                       Sunday                             
+2025/2/3          6                       Monday         Spring Commences    
+2025/2/4          7                       Tuesday                            
+2025/2/5          8                       Wednesday                          
+2025/2/6          9                       Thursday                           
+2025/2/7          10                      Friday                             
+2025/2/8          11                      Saturday                           
+2025/2/9          12                      Sunday                             
+2025/2/10         13                      Monday                             
+2025/2/11         14                      Tuesday                            
+2025/2/12         15                      Wednesday                          
+2025/2/13         16                      Thursday                           
+2025/2/14         17                      Friday                             
+2025/2/15         18                      Saturday                           
+2025/2/16         19                      Sunday                             
+2025/2/17         20                      Monday                             
+2025/2/18         21                      Tuesday        Spring Showers      
+2025/2/19         22                      Wednesday                          
+2025/2/20         23                      Thursday                           
+2025/2/21         24                      Friday                             
+2025/2/22         25                      Saturday                           
+2025/2/23         26                      Sunday                             
+2025/2/24         27                      Monday                             
+2025/2/25         28                      Tuesday                            
+2025/2/26         29                      Wednesday                          
+2025/2/27         30                      Thursday                           
+2025/2/28         2nd Lunar Month         Friday                             
+2025/3/1          2                       Saturday                           
+2025/3/2          3                       Sunday                             
+2025/3/3          4                       Monday                             
+2025/3/4          5                       Tuesday                            
+2025/3/5          6                       Wednesday      Insects Waken       
+2025/3/6          7                       Thursday                           
+2025/3/7          8                       Friday                             
+2025/3/8          9                       Saturday                           
+2025/3/9          10                      Sunday                             
+2025/3/10         11                      Monday                             
+2025/3/11         12                      Tuesday                            
+2025/3/12         13                      Wednesday                          
+2025/3/13         14                      Thursday                           
+2025/3/14         15                      Friday                             
+2025/3/15         16                      Saturday                           
+2025/3/16         17                      Sunday                             
+2025/3/17         18                      Monday                             
+2025/3/18         19                      Tuesday                            
+2025/3/19         20                      Wednesday                          
+2025/3/20         21                      Thursday       Vernal Equinox      
+2025/3/21         22                      Friday                             
+2025/3/22         23                      Saturday                           
+2025/3/23         24                      Sunday                             
+2025/3/24         25                      Monday                             
+2025/3/25         26                      Tuesday                            
+2025/3/26         27                      Wednesday                          
+2025/3/27         28                      Thursday                           
+2025/3/28         29                      Friday                             
+2025/3/29         3rd Lunar Month         Saturday                           
+2025/3/30         2                       Sunday                             
+2025/3/31         3                       Monday                             
+2025/4/1          4                       Tuesday                            
+2025/4/2          5                       Wednesday                          
+2025/4/3          6                       Thursday                           
+2025/4/4          7                       Friday         Bright & Clear      
+2025/4/5          8                       Saturday                           
+2025/4/6          9                       Sunday                             
+2025/4/7          10                      Monday                             
+2025/4/8          11                      Tuesday                            
+2025/4/9          12                      Wednesday                          
+2025/4/10         13                      Thursday                           
+2025/4/11         14                      Friday                             
+2025/4/12         15                      Saturday                           
+2025/4/13         16                      Sunday                             
+2025/4/14         17                      Monday                             
+2025/4/15         18                      Tuesday                            
+2025/4/16         19                      Wednesday                          
+2025/4/17         20                      Thursday                           
+2025/4/18         21                      Friday                             
+2025/4/19         22                      Saturday                           
+2025/4/20         23                      Sunday         Corn Rain           
+2025/4/21         24                      Monday                             
+2025/4/22         25                      Tuesday                            
+2025/4/23         26                      Wednesday                          
+2025/4/24         27                      Thursday                           
+2025/4/25         28                      Friday                             
+2025/4/26         29                      Saturday                           
+2025/4/27         30                      Sunday                             
+2025/4/28         4th Lunar Month         Monday                             
+2025/4/29         2                       Tuesday                            
+2025/4/30         3                       Wednesday                          
+2025/5/1          4                       Thursday                           
+2025/5/2          5                       Friday                             
+2025/5/3          6                       Saturday                           
+2025/5/4          7                       Sunday                             
+2025/5/5          8                       Monday         Summer Commences    
+2025/5/6          9                       Tuesday                            
+2025/5/7          10                      Wednesday                          
+2025/5/8          11                      Thursday                           
+2025/5/9          12                      Friday                             
+2025/5/10         13                      Saturday                           
+2025/5/11         14                      Sunday                             
+2025/5/12         15                      Monday                             
+2025/5/13         16                      Tuesday                            
+2025/5/14         17                      Wednesday                          
+2025/5/15         18                      Thursday                           
+2025/5/16         19                      Friday                             
+2025/5/17         20                      Saturday                           
+2025/5/18         21                      Sunday                             
+2025/5/19         22                      Monday                             
+2025/5/20         23                      Tuesday                            
+2025/5/21         24                      Wednesday      Corn Forms          
+2025/5/22         25                      Thursday                           
+2025/5/23         26                      Friday                             
+2025/5/24         27                      Saturday                           
+2025/5/25         28                      Sunday                             
+2025/5/26         29                      Monday                             
+2025/5/27         5th Lunar Month         Tuesday                            
+2025/5/28         2                       Wednesday                          
+2025/5/29         3                       Thursday                           
+2025/5/30         4                       Friday                             
+2025/5/31         5                       Saturday                           
+2025/6/1          6                       Sunday                             
+2025/6/2          7                       Monday                             
+2025/6/3          8                       Tuesday                            
+2025/6/4          9                       Wednesday                          
+2025/6/5          10                      Thursday       Corn on Ear         
+2025/6/6          11                      Friday                             
+2025/6/7          12                      Saturday                           
+2025/6/8          13                      Sunday                             
+2025/6/9          14                      Monday                             
+2025/6/10         15                      Tuesday                            
+2025/6/11         16                      Wednesday                          
+2025/6/12         17                      Thursday                           
+2025/6/13         18                      Friday                             
+2025/6/14         19                      Saturday                           
+2025/6/15         20                      Sunday                             
+2025/6/16         21                      Monday                             
+2025/6/17         22                      Tuesday                            
+2025/6/18         23                      Wednesday                          
+2025/6/19         24                      Thursday                           
+2025/6/20         25                      Friday                             
+2025/6/21         26                      Saturday       Summer Solstice     
+2025/6/22         27                      Sunday                             
+2025/6/23         28                      Monday                             
+2025/6/24         29                      Tuesday                            
+2025/6/25         6th Lunar Month         Wednesday                          
+2025/6/26         2                       Thursday                           
+2025/6/27         3                       Friday                             
+2025/6/28         4                       Saturday                           
+2025/6/29         5                       Sunday                             
+2025/6/30         6                       Monday                             
+2025/7/1          7                       Tuesday                            
+2025/7/2          8                       Wednesday                          
+2025/7/3          9                       Thursday                           
+2025/7/4          10                      Friday                             
+2025/7/5          11                      Saturday                           
+2025/7/6          12                      Sunday                             
+2025/7/7          13                      Monday         Moderate Heat       
+2025/7/8          14                      Tuesday                            
+2025/7/9          15                      Wednesday                          
+2025/7/10         16                      Thursday                           
+2025/7/11         17                      Friday                             
+2025/7/12         18                      Saturday                           
+2025/7/13         19                      Sunday                             
+2025/7/14         20                      Monday                             
+2025/7/15         21                      Tuesday                            
+2025/7/16         22                      Wednesday                          
+2025/7/17         23                      Thursday                           
+2025/7/18         24                      Friday                             
+2025/7/19         25                      Saturday                           
+2025/7/20         26                      Sunday                             
+2025/7/21         27                      Monday                             
+2025/7/22         28                      Tuesday        Great Heat          
+2025/7/23         29                      Wednesday                          
+2025/7/24         30                      Thursday                           
+2025/7/25         6th Lunar Month         Friday                             
+2025/7/26         2                       Saturday                           
+2025/7/27         3                       Sunday                             
+2025/7/28         4                       Monday                             
+2025/7/29         5                       Tuesday                            
+2025/7/30         6                       Wednesday                          
+2025/7/31         7                       Thursday                           
+2025/8/1          8                       Friday                             
+2025/8/2          9                       Saturday                           
+2025/8/3          10                      Sunday                             
+2025/8/4          11                      Monday                             
+2025/8/5          12                      Tuesday                            
+2025/8/6          13                      Wednesday                          
+2025/8/7          14                      Thursday       Autumn Commences    
+2025/8/8          15                      Friday                             
+2025/8/9          16                      Saturday                           
+2025/8/10         17                      Sunday                             
+2025/8/11         18                      Monday                             
+2025/8/12         19                      Tuesday                            
+2025/8/13         20                      Wednesday                          
+2025/8/14         21                      Thursday                           
+2025/8/15         22                      Friday                             
+2025/8/16         23                      Saturday                           
+2025/8/17         24                      Sunday                             
+2025/8/18         25                      Monday                             
+2025/8/19         26                      Tuesday                            
+2025/8/20         27                      Wednesday                          
+2025/8/21         28                      Thursday                           
+2025/8/22         29                      Friday                             
+2025/8/23         7th Lunar Month         Saturday       End of Heat         
+2025/8/24         2                       Sunday                             
+2025/8/25         3                       Monday                             
+2025/8/26         4                       Tuesday                            
+2025/8/27         5                       Wednesday                          
+2025/8/28         6                       Thursday                           
+2025/8/29         7                       Friday                             
+2025/8/30         8                       Saturday                           
+2025/8/31         9                       Sunday                             
+2025/9/1          10                      Monday                             
+2025/9/2          11                      Tuesday                            
+2025/9/3          12                      Wednesday                          
+2025/9/4          13                      Thursday                           
+2025/9/5          14                      Friday                             
+2025/9/6          15                      Saturday                           
+2025/9/7          16                      Sunday         White Dew           
+2025/9/8          17                      Monday                             
+2025/9/9          18                      Tuesday                            
+2025/9/10         19                      Wednesday                          
+2025/9/11         20                      Thursday                           
+2025/9/12         21                      Friday                             
+2025/9/13         22                      Saturday                           
+2025/9/14         23                      Sunday                             
+2025/9/15         24                      Monday                             
+2025/9/16         25                      Tuesday                            
+2025/9/17         26                      Wednesday                          
+2025/9/18         27                      Thursday                           
+2025/9/19         28                      Friday                             
+2025/9/20         29                      Saturday                           
+2025/9/21         30                      Sunday                             
+2025/9/22         8th Lunar Month         Monday                             
+2025/9/23         2                       Tuesday        Autumnal Equinox    
+2025/9/24         3                       Wednesday                          
+2025/9/25         4                       Thursday                           
+2025/9/26         5                       Friday                             
+2025/9/27         6                       Saturday                           
+2025/9/28         7                       Sunday                             
+2025/9/29         8                       Monday                             
+2025/9/30         9                       Tuesday                            
+2025/10/1         10                      Wednesday                          
+2025/10/2         11                      Thursday                           
+2025/10/3         12                      Friday                             
+2025/10/4         13                      Saturday                           
+2025/10/5         14                      Sunday                             
+2025/10/6         15                      Monday                             
+2025/10/7         16                      Tuesday                            
+2025/10/8         17                      Wednesday      Cold Dew            
+2025/10/9         18                      Thursday                           
+2025/10/10        19                      Friday                             
+2025/10/11        20                      Saturday                           
+2025/10/12        21                      Sunday                             
+2025/10/13        22                      Monday                             
+2025/10/14        23                      Tuesday                            
+2025/10/15        24                      Wednesday                          
+2025/10/16        25                      Thursday                           
+2025/10/17        26                      Friday                             
+2025/10/18        27                      Saturday                           
+2025/10/19        28                      Sunday                             
+2025/10/20        29                      Monday                             
+2025/10/21        9th Lunar Month         Tuesday                            
+2025/10/22        2                       Wednesday                          
+2025/10/23        3                       Thursday       Frost               
+2025/10/24        4                       Friday                             
+2025/10/25        5                       Saturday                           
+2025/10/26        6                       Sunday                             
+2025/10/27        7                       Monday                             
+2025/10/28        8                       Tuesday                            
+2025/10/29        9                       Wednesday                          
+2025/10/30        10                      Thursday                           
+2025/10/31        11                      Friday                             
+2025/11/1         12                      Saturday                           
+2025/11/2         13                      Sunday                             
+2025/11/3         14                      Monday                             
+2025/11/4         15                      Tuesday                            
+2025/11/5         16                      Wednesday                          
+2025/11/6         17                      Thursday                           
+2025/11/7         18                      Friday         Winter Commences    
+2025/11/8         19                      Saturday                           
+2025/11/9         20                      Sunday                             
+2025/11/10        21                      Monday                             
+2025/11/11        22                      Tuesday                            
+2025/11/12        23                      Wednesday                          
+2025/11/13        24                      Thursday                           
+2025/11/14        25                      Friday                             
+2025/11/15        26                      Saturday                           
+2025/11/16        27                      Sunday                             
+2025/11/17        28                      Monday                             
+2025/11/18        29                      Tuesday                            
+2025/11/19        30                      Wednesday                          
+2025/11/20        10th Lunar Month        Thursday                           
+2025/11/21        2                       Friday                             
+2025/11/22        3                       Saturday       Light Snow          
+2025/11/23        4                       Sunday                             
+2025/11/24        5                       Monday                             
+2025/11/25        6                       Tuesday                            
+2025/11/26        7                       Wednesday                          
+2025/11/27        8                       Thursday                           
+2025/11/28        9                       Friday                             
+2025/11/29        10                      Saturday                           
+2025/11/30        11                      Sunday                             
+2025/12/1         12                      Monday                             
+2025/12/2         13                      Tuesday                            
+2025/12/3         14                      Wednesday                          
+2025/12/4         15                      Thursday                           
+2025/12/5         16                      Friday                             
+2025/12/6         17                      Saturday                           
+2025/12/7         18                      Sunday         Heavy Snow          
+2025/12/8         19                      Monday                             
+2025/12/9         20                      Tuesday                            
+2025/12/10        21                      Wednesday                          
+2025/12/11        22                      Thursday                           
+2025/12/12        23                      Friday                             
+2025/12/13        24                      Saturday                           
+2025/12/14        25                      Sunday                             
+2025/12/15        26                      Monday                             
+2025/12/16        27                      Tuesday                            
+2025/12/17        28                      Wednesday                          
+2025/12/18        29                      Thursday                           
+2025/12/19        30                      Friday                             
+2025/12/20        11th Lunar Month        Saturday                           
+2025/12/21        2                       Sunday         Winter Solstice     
+2025/12/22        3                       Monday                             
+2025/12/23        4                       Tuesday                            
+2025/12/24        5                       Wednesday                          
+2025/12/25        6                       Thursday                           
+2025/12/26        7                       Friday                             
+2025/12/27        8                       Saturday                           
+2025/12/28        9                       Sunday                             
+2025/12/29        10                      Monday                             
+2025/12/30        11                      Tuesday                            
+2025/12/31        12                      Wednesday                          

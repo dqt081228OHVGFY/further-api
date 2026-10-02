@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2042 (Ren-xu  -  year of the Dog)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2042/1/1          10                      Wednesday                          
+2042/1/2          11                      Thursday                           
+2042/1/3          12                      Friday                             
+2042/1/4          13                      Saturday                           
+2042/1/5          14                      Sunday         Moderate Cold       
+2042/1/6          15                      Monday                             
+2042/1/7          16                      Tuesday                            
+2042/1/8          17                      Wednesday                          
+2042/1/9          18                      Thursday                           
+2042/1/10         19                      Friday                             
+2042/1/11         20                      Saturday                           
+2042/1/12         21                      Sunday                             
+2042/1/13         22                      Monday                             
+2042/1/14         23                      Tuesday                            
+2042/1/15         24                      Wednesday                          
+2042/1/16         25                      Thursday                           
+2042/1/17         26                      Friday                             
+2042/1/18         27                      Saturday                           
+2042/1/19         28                      Sunday                             
+2042/1/20         29                      Monday         Severe Cold         
+2042/1/21         30                      Tuesday                            
+2042/1/22         1st Lunar Month         Wednesday                          
+2042/1/23         2                       Thursday                           
+2042/1/24         3                       Friday                             
+2042/1/25         4                       Saturday                           
+2042/1/26         5                       Sunday                             
+2042/1/27         6                       Monday                             
+2042/1/28         7                       Tuesday                            
+2042/1/29         8                       Wednesday                          
+2042/1/30         9                       Thursday                           
+2042/1/31         10                      Friday                             
+2042/2/1          11                      Saturday                           
+2042/2/2          12                      Sunday                             
+2042/2/3          13                      Monday                             
+2042/2/4          14                      Tuesday        Spring Commences    
+2042/2/5          15                      Wednesday                          
+2042/2/6          16                      Thursday                           
+2042/2/7          17                      Friday                             
+2042/2/8          18                      Saturday                           
+2042/2/9          19                      Sunday                             
+2042/2/10         20                      Monday                             
+2042/2/11         21                      Tuesday                            
+2042/2/12         22                      Wednesday                          
+2042/2/13         23                      Thursday                           
+2042/2/14         24                      Friday                             
+2042/2/15         25                      Saturday                           
+2042/2/16         26                      Sunday                             
+2042/2/17         27                      Monday                             
+2042/2/18         28                      Tuesday        Spring Showers      
+2042/2/19         29                      Wednesday                          
+2042/2/20         2nd Lunar Month         Thursday                           
+2042/2/21         2                       Friday                             
+2042/2/22         3                       Saturday                           
+2042/2/23         4                       Sunday                             
+2042/2/24         5                       Monday                             
+2042/2/25         6                       Tuesday                            
+2042/2/26         7                       Wednesday                          
+2042/2/27         8                       Thursday                           
+2042/2/28         9                       Friday                             
+2042/3/1          10                      Saturday                           
+2042/3/2          11                      Sunday                             
+2042/3/3          12                      Monday                             
+2042/3/4          13                      Tuesday                            
+2042/3/5          14                      Wednesday      Insects Waken       
+2042/3/6          15                      Thursday                           
+2042/3/7          16                      Friday                             
+2042/3/8          17                      Saturday                           
+2042/3/9          18                      Sunday                             
+2042/3/10         19                      Monday                             
+2042/3/11         20                      Tuesday                            
+2042/3/12         21                      Wednesday                          
+2042/3/13         22                      Thursday                           
+2042/3/14         23                      Friday                             
+2042/3/15         24                      Saturday                           
+2042/3/16         25                      Sunday                             
+2042/3/17         26                      Monday                             
+2042/3/18         27                      Tuesday                            
+2042/3/19         28                      Wednesday                          
+2042/3/20         29                      Thursday       Vernal Equinox      
+2042/3/21         30                      Friday                             
+2042/3/22         2nd Lunar Month         Saturday                           
+2042/3/23         2                       Sunday                             
+2042/3/24         3                       Monday                             
+2042/3/25         4                       Tuesday                            
+2042/3/26         5                       Wednesday                          
+2042/3/27         6                       Thursday                           
+2042/3/28         7                       Friday                             
+2042/3/29         8                       Saturday                           
+2042/3/30         9                       Sunday                             
+2042/3/31         10                      Monday                             
+2042/4/1          11                      Tuesday                            
+2042/4/2          12                      Wednesday                          
+2042/4/3          13                      Thursday                           
+2042/4/4          14                      Friday         Bright & Clear      
+2042/4/5          15                      Saturday                           
+2042/4/6          16                      Sunday                             
+2042/4/7          17                      Monday                             
+2042/4/8          18                      Tuesday                            
+2042/4/9          19                      Wednesday                          
+2042/4/10         20                      Thursday                           
+2042/4/11         21                      Friday                             
+2042/4/12         22                      Saturday                           
+2042/4/13         23                      Sunday                             
+2042/4/14         24                      Monday                             
+2042/4/15         25                      Tuesday                            
+2042/4/16         26                      Wednesday                          
+2042/4/17         27                      Thursday                           
+2042/4/18         28                      Friday                             
+2042/4/19         29                      Saturday                           
+2042/4/20         3rd Lunar Month         Sunday         Corn Rain           
+2042/4/21         2                       Monday                             
+2042/4/22         3                       Tuesday                            
+2042/4/23         4                       Wednesday                          
+2042/4/24         5                       Thursday                           
+2042/4/25         6                       Friday                             
+2042/4/26         7                       Saturday                           
+2042/4/27         8                       Sunday                             
+2042/4/28         9                       Monday                             
+2042/4/29         10                      Tuesday                            
+2042/4/30         11                      Wednesday                          
+2042/5/1          12                      Thursday                           
+2042/5/2          13                      Friday                             
+2042/5/3          14                      Saturday                           
+2042/5/4          15                      Sunday                             
+2042/5/5          16                      Monday         Summer Commences    
+2042/5/6          17                      Tuesday                            
+2042/5/7          18                      Wednesday                          
+2042/5/8          19                      Thursday                           
+2042/5/9          20                      Friday                             
+2042/5/10         21                      Saturday                           
+2042/5/11         22                      Sunday                             
+2042/5/12         23                      Monday                             
+2042/5/13         24                      Tuesday                            
+2042/5/14         25                      Wednesday                          
+2042/5/15         26                      Thursday                           
+2042/5/16         27                      Friday                             
+2042/5/17         28                      Saturday                           
+2042/5/18         29                      Sunday                             
+2042/5/19         4th Lunar Month         Monday                             
+2042/5/20         2                       Tuesday                            
+2042/5/21         3                       Wednesday      Corn Forms          
+2042/5/22         4                       Thursday                           
+2042/5/23         5                       Friday                             
+2042/5/24         6                       Saturday                           
+2042/5/25         7                       Sunday                             
+2042/5/26         8                       Monday                             
+2042/5/27         9                       Tuesday                            
+2042/5/28         10                      Wednesday                          
+2042/5/29         11                      Thursday                           
+2042/5/30         12                      Friday                             
+2042/5/31         13                      Saturday                           
+2042/6/1          14                      Sunday                             
+2042/6/2          15                      Monday                             
+2042/6/3          16                      Tuesday                            
+2042/6/4          17                      Wednesday                          
+2042/6/5          18                      Thursday       Corn on Ear         
+2042/6/6          19                      Friday                             
+2042/6/7          20                      Saturday                           
+2042/6/8          21                      Sunday                             
+2042/6/9          22                      Monday                             
+2042/6/10         23                      Tuesday                            
+2042/6/11         24                      Wednesday                          
+2042/6/12         25                      Thursday                           
+2042/6/13         26                      Friday                             
+2042/6/14         27                      Saturday                           
+2042/6/15         28                      Sunday                             
+2042/6/16         29                      Monday                             
+2042/6/17         30                      Tuesday                            
+2042/6/18         5th Lunar Month         Wednesday                          
+2042/6/19         2                       Thursday                           
+2042/6/20         3                       Friday                             
+2042/6/21         4                       Saturday       Summer Solstice     
+2042/6/22         5                       Sunday                             
+2042/6/23         6                       Monday                             
+2042/6/24         7                       Tuesday                            
+2042/6/25         8                       Wednesday                          
+2042/6/26         9                       Thursday                           
+2042/6/27         10                      Friday                             
+2042/6/28         11                      Saturday                           
+2042/6/29         12                      Sunday                             
+2042/6/30         13                      Monday                             
+2042/7/1          14                      Tuesday                            
+2042/7/2          15                      Wednesday                          
+2042/7/3          16                      Thursday                           
+2042/7/4          17                      Friday                             
+2042/7/5          18                      Saturday                           
+2042/7/6          19                      Sunday                             
+2042/7/7          20                      Monday         Moderate Heat       
+2042/7/8          21                      Tuesday                            
+2042/7/9          22                      Wednesday                          
+2042/7/10         23                      Thursday                           
+2042/7/11         24                      Friday                             
+2042/7/12         25                      Saturday                           
+2042/7/13         26                      Sunday                             
+2042/7/14         27                      Monday                             
+2042/7/15         28                      Tuesday                            
+2042/7/16         29                      Wednesday                          
+2042/7/17         6th Lunar Month         Thursday                           
+2042/7/18         2                       Friday                             
+2042/7/19         3                       Saturday                           
+2042/7/20         4                       Sunday                             
+2042/7/21         5                       Monday                             
+2042/7/22         6                       Tuesday                            
+2042/7/23         7                       Wednesday      Great Heat          
+2042/7/24         8                       Thursday                           
+2042/7/25         9                       Friday                             
+2042/7/26         10                      Saturday                           
+2042/7/27         11                      Sunday                             
+2042/7/28         12                      Monday                             
+2042/7/29         13                      Tuesday                            
+2042/7/30         14                      Wednesday                          
+2042/7/31         15                      Thursday                           
+2042/8/1          16                      Friday                             
+2042/8/2          17                      Saturday                           
+2042/8/3          18                      Sunday                             
+2042/8/4          19                      Monday                             
+2042/8/5          20                      Tuesday                            
+2042/8/6          21                      Wednesday                          
+2042/8/7          22                      Thursday       Autumn Commences    
+2042/8/8          23                      Friday                             
+2042/8/9          24                      Saturday                           
+2042/8/10         25                      Sunday                             
+2042/8/11         26                      Monday                             
+2042/8/12         27                      Tuesday                            
+2042/8/13         28                      Wednesday                          
+2042/8/14         29                      Thursday                           
+2042/8/15         30                      Friday                             
+2042/8/16         7th Lunar Month         Saturday                           
+2042/8/17         2                       Sunday                             
+2042/8/18         3                       Monday                             
+2042/8/19         4                       Tuesday                            
+2042/8/20         5                       Wednesday                          
+2042/8/21         6                       Thursday                           
+2042/8/22         7                       Friday                             
+2042/8/23         8                       Saturday       End of Heat         
+2042/8/24         9                       Sunday                             
+2042/8/25         10                      Monday                             
+2042/8/26         11                      Tuesday                            
+2042/8/27         12                      Wednesday                          
+2042/8/28         13                      Thursday                           
+2042/8/29         14                      Friday                             
+2042/8/30         15                      Saturday                           
+2042/8/31         16                      Sunday                             
+2042/9/1          17                      Monday                             
+2042/9/2          18                      Tuesday                            
+2042/9/3          19                      Wednesday                          
+2042/9/4          20                      Thursday                           
+2042/9/5          21                      Friday                             
+2042/9/6          22                      Saturday                           
+2042/9/7          23                      Sunday         White Dew           
+2042/9/8          24                      Monday                             
+2042/9/9          25                      Tuesday                            
+2042/9/10         26                      Wednesday                          
+2042/9/11         27                      Thursday                           
+2042/9/12         28                      Friday                             
+2042/9/13         29                      Saturday                           
+2042/9/14         8th Lunar Month         Sunday                             
+2042/9/15         2                       Monday                             
+2042/9/16         3                       Tuesday                            
+2042/9/17         4                       Wednesday                          
+2042/9/18         5                       Thursday                           
+2042/9/19         6                       Friday                             
+2042/9/20         7                       Saturday                           
+2042/9/21         8                       Sunday                             
+2042/9/22         9                       Monday                             
+2042/9/23         10                      Tuesday        Autumnal Equinox    
+2042/9/24         11                      Wednesday                          
+2042/9/25         12                      Thursday                           
+2042/9/26         13                      Friday                             
+2042/9/27         14                      Saturday                           
+2042/9/28         15                      Sunday                             
+2042/9/29         16                      Monday                             
+2042/9/30         17                      Tuesday                            
+2042/10/1         18                      Wednesday                          
+2042/10/2         19                      Thursday                           
+2042/10/3         20                      Friday                             
+2042/10/4         21                      Saturday                           
+2042/10/5         22                      Sunday                             
+2042/10/6         23                      Monday                             
+2042/10/7         24                      Tuesday                            
+2042/10/8         25                      Wednesday      Cold Dew            
+2042/10/9         26                      Thursday                           
+2042/10/10        27                      Friday                             
+2042/10/11        28                      Saturday                           
+2042/10/12        29                      Sunday                             
+2042/10/13        30                      Monday                             
+2042/10/14        9th Lunar Month         Tuesday                            
+2042/10/15        2                       Wednesday                          
+2042/10/16        3                       Thursday                           
+2042/10/17        4                       Friday                             
+2042/10/18        5                       Saturday                           
+2042/10/19        6                       Sunday                             
+2042/10/20        7                       Monday                             
+2042/10/21        8                       Tuesday                            
+2042/10/22        9                       Wednesday                          
+2042/10/23        10                      Thursday       Frost               
+2042/10/24        11                      Friday                             
+2042/10/25        12                      Saturday                           
+2042/10/26        13                      Sunday                             
+2042/10/27        14                      Monday                             
+2042/10/28        15                      Tuesday                            
+2042/10/29        16                      Wednesday                          
+2042/10/30        17                      Thursday                           
+2042/10/31        18                      Friday                             
+2042/11/1         19                      Saturday                           
+2042/11/2         20                      Sunday                             
+2042/11/3         21                      Monday                             
+2042/11/4         22                      Tuesday                            
+2042/11/5         23                      Wednesday                          
+2042/11/6         24                      Thursday                           
+2042/11/7         25                      Friday         Winter Commences    
+2042/11/8         26                      Saturday                           
+2042/11/9         27                      Sunday                             
+2042/11/10        28                      Monday                             
+2042/11/11        29                      Tuesday                            
+2042/11/12        30                      Wednesday                          
+2042/11/13        10th Lunar Month        Thursday                           
+2042/11/14        2                       Friday                             
+2042/11/15        3                       Saturday                           
+2042/11/16        4                       Sunday                             
+2042/11/17        5                       Monday                             
+2042/11/18        6                       Tuesday                            
+2042/11/19        7                       Wednesday                          
+2042/11/20        8                       Thursday                           
+2042/11/21        9                       Friday                             
+2042/11/22        10                      Saturday       Light Snow          
+2042/11/23        11                      Sunday                             
+2042/11/24        12                      Monday                             
+2042/11/25        13                      Tuesday                            
+2042/11/26        14                      Wednesday                          
+2042/11/27        15                      Thursday                           
+2042/11/28        16                      Friday                             
+2042/11/29        17                      Saturday                           
+2042/11/30        18                      Sunday                             
+2042/12/1         19                      Monday                             
+2042/12/2         20                      Tuesday                            
+2042/12/3         21                      Wednesday                          
+2042/12/4         22                      Thursday                           
+2042/12/5         23                      Friday                             
+2042/12/6         24                      Saturday                           
+2042/12/7         25                      Sunday         Heavy Snow          
+2042/12/8         26                      Monday                             
+2042/12/9         27                      Tuesday                            
+2042/12/10        28                      Wednesday                          
+2042/12/11        29                      Thursday                           
+2042/12/12        11th Lunar Month        Friday                             
+2042/12/13        2                       Saturday                           
+2042/12/14        3                       Sunday                             
+2042/12/15        4                       Monday                             
+2042/12/16        5                       Tuesday                            
+2042/12/17        6                       Wednesday                          
+2042/12/18        7                       Thursday                           
+2042/12/19        8                       Friday                             
+2042/12/20        9                       Saturday                           
+2042/12/21        10                      Sunday                             
+2042/12/22        11                      Monday         Winter Solstice     
+2042/12/23        12                      Tuesday                            
+2042/12/24        13                      Wednesday                          
+2042/12/25        14                      Thursday                           
+2042/12/26        15                      Friday                             
+2042/12/27        16                      Saturday                           
+2042/12/28        17                      Sunday                             
+2042/12/29        18                      Monday                             
+2042/12/30        19                      Tuesday                            
+2042/12/31        20                      Wednesday                          

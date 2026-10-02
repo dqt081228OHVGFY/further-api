@@ -1,0 +1,259 @@
+/* Loaded only inside the RelayFor native feature ShadowRoot. */
+:host([data-account-security-host]) {
+  min-height: 0;
+}
+
+:host([data-account-security-host]) [data-native-feature-root],
+:host([data-account-security-host].dark) [data-native-feature-root] {
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  animation: none;
+}
+
+:host([data-account-security-host]) [data-native-feature-root] > .relayfor-native-content {
+  min-height: 0;
+}
+
+.relayfor-account-security {
+  width: 100%;
+  min-width: 0;
+}
+
+:host([data-account-security-host]) [data-slot='card'] {
+  border-radius: 14px;
+  box-shadow: none;
+  background: var(--rf-feature-surface-soft);
+}
+
+:host {
+  display: block;
+  min-height: 600px;
+  --rf-feature-surface: var(--md-sys-color-surface, #fff);
+  --rf-feature-surface-soft: var(--md-sys-color-surface-container-low, #f8fafd);
+  --rf-feature-surface-raised: var(--md-sys-color-surface-container, #f0f4f9);
+  --rf-feature-ink: var(--md-sys-color-on-surface, #202b3a);
+  --rf-feature-ink-muted: var(--md-sys-color-on-surface-variant, #617087);
+  --rf-feature-line: var(--md-sys-color-outline-variant, #e0e7f0);
+  --rf-feature-primary: var(--md-sys-color-primary, #0b57d0);
+  --rf-feature-on-primary: var(--md-sys-color-on-primary, #fff);
+  --rf-feature-primary-soft: var(--md-sys-color-primary-container, #d3e3fd);
+  --background: var(--rf-feature-surface);
+  --foreground: var(--rf-feature-ink);
+  --card: var(--rf-feature-surface);
+  --card-foreground: var(--rf-feature-ink);
+  --popover: var(--rf-feature-surface);
+  --popover-foreground: var(--rf-feature-ink);
+  --primary: var(--rf-feature-primary);
+  --primary-foreground: var(--rf-feature-on-primary);
+  --secondary: var(--rf-feature-surface-raised);
+  --secondary-foreground: var(--rf-feature-ink);
+  --muted: var(--rf-feature-surface-soft);
+  --muted-foreground: var(--rf-feature-ink-muted);
+  --border: var(--rf-feature-line);
+  --input: var(--rf-feature-line);
+  --ring: var(--rf-feature-primary);
+  color-scheme: light;
+}
+
+:host(.dark) {
+  --rf-feature-surface: var(--md-sys-color-surface, #18212d);
+  --rf-feature-surface-soft: var(--md-sys-color-surface-container-low, #1b2636);
+  --rf-feature-surface-raised: var(--md-sys-color-surface-container-high, #233145);
+  --rf-feature-ink: var(--md-sys-color-on-surface, #eef3fb);
+  --rf-feature-ink-muted: var(--md-sys-color-on-surface-variant, #a9b6c8);
+  --rf-feature-line: var(--md-sys-color-outline-variant, #304056);
+  --rf-feature-primary: var(--md-sys-color-primary, #a8c7fa);
+  --rf-feature-on-primary: var(--md-sys-color-on-primary, #092044);
+  --rf-feature-primary-soft: var(--md-sys-color-primary-container, #25456b);
+  color-scheme: dark;
+}
+
+:host([data-native-feature-notifications]) {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  height: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+[data-sonner-toaster] {
+  pointer-events: auto;
+}
+
+/* Portals only host fixed overlays/toasts. They must not inherit the compiled
+ * document body's viewport-sized box beneath an embedded feature. */
+[data-native-feature-portal] {
+  display: contents;
+  min-height: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) {
+  color: var(--rf-feature-ink);
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-width: 0;
+}
+
+[data-native-feature-root] {
+  display: flex;
+  min-height: 600px;
+  height: 100%;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  padding: clamp(18px, 2.4vw, 32px);
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 24px;
+  background: var(--rf-feature-surface);
+  box-shadow: 0 14px 48px rgb(23 43 77 / 9%);
+  animation: rf-native-enter 360ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+[data-native-feature-root] > .relayfor-native-content {
+  flex: 1 1 auto;
+  min-height: 100%;
+  width: 100%;
+}
+
+:host(.dark) [data-native-feature-root] {
+  box-shadow: 0 16px 48px rgb(0 0 0 / 18%);
+}
+
+[data-native-feature-root] [data-slot='card'],
+[data-native-feature-portal] [data-slot='card'] {
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 20px;
+  background: var(--rf-feature-surface);
+  box-shadow: 0 4px 16px rgb(29 51 84 / 5%);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='card-header'] {
+  padding-inline: clamp(16px, 2vw, 24px);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='card-title'] {
+  color: var(--rf-feature-ink);
+  font-weight: 650;
+  letter-spacing: -.025em;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) :is([data-slot='input'], [data-slot='textarea'], [data-slot='select-trigger']) {
+  min-height: 42px;
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 12px;
+  background: var(--rf-feature-surface-soft);
+  color: var(--rf-feature-ink);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) :is([data-slot='input'], [data-slot='textarea'], [data-slot='select-trigger']):focus-visible {
+  border-color: var(--rf-feature-primary);
+  background: var(--rf-feature-surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rf-feature-primary) 17%, transparent);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button'] {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: transform 160ms cubic-bezier(.2, .8, .2, 1), box-shadow 160ms ease, background-color 160ms ease;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button'][class~='bg-primary'] {
+  background: var(--rf-feature-primary);
+  color: var(--rf-feature-on-primary);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--rf-feature-primary) 18%, transparent);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button']:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'], [data-slot='popover-content'], [data-slot='select-content']) {
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 20px;
+  background: var(--rf-feature-surface);
+  color: var(--rf-feature-ink);
+  box-shadow: 0 20px 56px rgb(15 35 68 / 17%);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='tabs-list'] {
+  border-radius: 14px;
+  background: var(--rf-feature-surface-raised);
+}
+
+@keyframes rf-native-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-native-feature-root] { animation: none; }
+  :is([data-native-feature-root], [data-native-feature-portal]) :is([data-slot='button'], [data-slot='input'], [data-slot='textarea'], [data-slot='select-trigger']) { transition: none; }
+}
+
+:host([data-relayfor-motion='off']) [data-native-feature-root],
+:host([data-relayfor-motion='off']) [data-native-feature-root] *,
+:host([data-relayfor-motion='off']) [data-native-feature-portal] * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'], [data-slot='sheet-overlay']) { z-index: 1100; }
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'], [data-slot='sheet-content']) { z-index: 1101; }
+
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'])[data-open] {
+  animation: rf-native-backdrop-in 240ms linear both;
+}
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'])[data-open] {
+  animation: rf-native-dialog-in 300ms cubic-bezier(.05, .7, .1, 1) both;
+}
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay']):is([data-ending-style], [data-closed]) {
+  animation: rf-native-backdrop-out 180ms linear both;
+}
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']):is([data-ending-style], [data-closed]) {
+  animation: rf-native-dialog-out 200ms cubic-bezier(.3, 0, .8, .15) both;
+}
+@keyframes rf-native-dialog-in {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes rf-native-dialog-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(8px) scale(.97); }
+}
+@keyframes rf-native-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rf-native-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'], [data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay']),
+  [data-sonner-toast] {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Keep embedded dialogs and controls in step with the surrounding console. */
+[data-native-feature-portal] :is([data-slot='dialog-content'],[data-slot='alert-dialog-content'],[data-slot='sheet-content'])[data-open] {
+  animation-duration:280ms;
+  animation-timing-function:cubic-bezier(.2,.8,.2,1);
+}
+[data-native-feature-portal] :is([data-slot='dialog-content'],[data-slot='alert-dialog-content'],[data-slot='sheet-content'])[data-closed] {
+  animation-duration:180ms;
+  animation-timing-function:cubic-bezier(.4,0,1,1);
+}
+[data-native-feature-portal] :is([data-slot='dialog-overlay'],[data-slot='alert-dialog-overlay'],[data-slot='sheet-overlay']) { animation-duration:180ms; }
+:is([data-native-feature-root],[data-native-feature-portal]) [data-slot='button']:active:not(:disabled) { transform:scale(.97); }
+@media (prefers-reduced-motion:reduce) {
+  :host(:not([data-relayfor-motion='on'])) [data-native-feature-portal] * { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  :host(:not([data-relayfor-motion='on'])) [data-slot='button'] { transform:none !important; }
+}
+:host([data-relayfor-motion='off']) [data-slot='button'] { transform:none !important; }

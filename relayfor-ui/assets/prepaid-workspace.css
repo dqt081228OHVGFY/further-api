@@ -1,0 +1,22 @@
+.prepaid-page { background:var(--md-sys-color-surface-container-low); }
+.prepaid-page .auth-shell { max-width:1180px; width:calc(100% - 64px); padding:26px 0; }
+.prepaid-page .auth-header { justify-content:space-between; padding:0 0 38px; border:0; }
+.prepaid-page .auth-brand strong { font-size:23px; font-weight:650; }
+.prepaid-workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:68px; align-items:start; padding:40px 0; }
+.prepaid-story { padding-top:28px; }
+.prepaid-story .workspace-eyebrow { font-size:10px; }
+.prepaid-story h2 { font-size:42px; font-weight:600; line-height:1.4; letter-spacing:-1.3px; margin:18px 0; }
+.prepaid-story > p { font-size:13px; line-height:1.9; color:var(--md-sys-color-on-surface-variant); }
+.prepaid-step-box { display:flex; gap:14px; padding:18px; margin-top:14px; border:1px solid var(--md-sys-color-outline-variant); border-radius:17px; background:var(--md-sys-color-surface); }
+.prepaid-step-box > .material-symbol { padding:10px; align-self:start; border-radius:12px; color:var(--md-sys-color-primary); background:var(--md-sys-color-primary-container); font-size:21px; }
+.prepaid-step-box b { font-size:13px; }
+.prepaid-step-box p { font-size:11px; line-height:1.7; color:var(--md-sys-color-on-surface-variant); margin:6px 0 0; }
+.prepaid-page .auth-card { max-width:none; margin:0; padding:36px; border-radius:24px; box-shadow:0 12px 44px #14213d06; background:var(--md-sys-color-surface); }
+.prepaid-page .auth-card h1 { font-size:27px; font-weight:600; letter-spacing:-.6px; }
+.prepaid-page .prepaid-disclaimer { border:0; border-radius:15px; padding:16px; background:var(--md-sys-color-surface-container-low); font-size:11px; }
+.prepaid-page .prepaid-disclaimer b { font-size:12px; }
+.prepaid-page .auth-links { border:0; gap:8px; flex-wrap:wrap; }
+.prepaid-page .auth-submit { border-radius:12px; margin-top:15px; }
+.prepaid-page .prepaid-key-box { border:0; background:var(--md-sys-color-surface-container-low); border-radius:14px; }
+@media(max-width:800px) { .prepaid-workspace { grid-template-columns:1fr; gap:28px; padding:15px 0; } .prepaid-story { padding-top:0; } .prepaid-story h2 { font-size:30px; } .prepaid-story .prepaid-step-box { display:none; } }
+@media(max-width:520px) { .prepaid-page .auth-shell { width:calc(100% - 32px); padding:20px 0; } .prepaid-page .auth-card { padding:25px; } .prepaid-page .auth-header { padding-bottom:24px; } .prepaid-story h2 { font-size:27px; } }

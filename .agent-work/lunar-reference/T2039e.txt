@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2039 (Ji-wei  -  year of the Goat)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2039/1/1          7                       Saturday                           
+2039/1/2          8                       Sunday                             
+2039/1/3          9                       Monday                             
+2039/1/4          10                      Tuesday                            
+2039/1/5          11                      Wednesday      Moderate Cold       
+2039/1/6          12                      Thursday                           
+2039/1/7          13                      Friday                             
+2039/1/8          14                      Saturday                           
+2039/1/9          15                      Sunday                             
+2039/1/10         16                      Monday                             
+2039/1/11         17                      Tuesday                            
+2039/1/12         18                      Wednesday                          
+2039/1/13         19                      Thursday                           
+2039/1/14         20                      Friday                             
+2039/1/15         21                      Saturday                           
+2039/1/16         22                      Sunday                             
+2039/1/17         23                      Monday                             
+2039/1/18         24                      Tuesday                            
+2039/1/19         25                      Wednesday                          
+2039/1/20         26                      Thursday       Severe Cold         
+2039/1/21         27                      Friday                             
+2039/1/22         28                      Saturday                           
+2039/1/23         29                      Sunday                             
+2039/1/24         1st Lunar Month         Monday                             
+2039/1/25         2                       Tuesday                            
+2039/1/26         3                       Wednesday                          
+2039/1/27         4                       Thursday                           
+2039/1/28         5                       Friday                             
+2039/1/29         6                       Saturday                           
+2039/1/30         7                       Sunday                             
+2039/1/31         8                       Monday                             
+2039/2/1          9                       Tuesday                            
+2039/2/2          10                      Wednesday                          
+2039/2/3          11                      Thursday                           
+2039/2/4          12                      Friday         Spring Commences    
+2039/2/5          13                      Saturday                           
+2039/2/6          14                      Sunday                             
+2039/2/7          15                      Monday                             
+2039/2/8          16                      Tuesday                            
+2039/2/9          17                      Wednesday                          
+2039/2/10         18                      Thursday                           
+2039/2/11         19                      Friday                             
+2039/2/12         20                      Saturday                           
+2039/2/13         21                      Sunday                             
+2039/2/14         22                      Monday                             
+2039/2/15         23                      Tuesday                            
+2039/2/16         24                      Wednesday                          
+2039/2/17         25                      Thursday                           
+2039/2/18         26                      Friday                             
+2039/2/19         27                      Saturday       Spring Showers      
+2039/2/20         28                      Sunday                             
+2039/2/21         29                      Monday                             
+2039/2/22         30                      Tuesday                            
+2039/2/23         2nd Lunar Month         Wednesday                          
+2039/2/24         2                       Thursday                           
+2039/2/25         3                       Friday                             
+2039/2/26         4                       Saturday                           
+2039/2/27         5                       Sunday                             
+2039/2/28         6                       Monday                             
+2039/3/1          7                       Tuesday                            
+2039/3/2          8                       Wednesday                          
+2039/3/3          9                       Thursday                           
+2039/3/4          10                      Friday                             
+2039/3/5          11                      Saturday                           
+2039/3/6          12                      Sunday         Insects Waken       
+2039/3/7          13                      Monday                             
+2039/3/8          14                      Tuesday                            
+2039/3/9          15                      Wednesday                          
+2039/3/10         16                      Thursday                           
+2039/3/11         17                      Friday                             
+2039/3/12         18                      Saturday                           
+2039/3/13         19                      Sunday                             
+2039/3/14         20                      Monday                             
+2039/3/15         21                      Tuesday                            
+2039/3/16         22                      Wednesday                          
+2039/3/17         23                      Thursday                           
+2039/3/18         24                      Friday                             
+2039/3/19         25                      Saturday                           
+2039/3/20         26                      Sunday                             
+2039/3/21         27                      Monday         Vernal Equinox      
+2039/3/22         28                      Tuesday                            
+2039/3/23         29                      Wednesday                          
+2039/3/24         30                      Thursday                           
+2039/3/25         3rd Lunar Month         Friday                             
+2039/3/26         2                       Saturday                           
+2039/3/27         3                       Sunday                             
+2039/3/28         4                       Monday                             
+2039/3/29         5                       Tuesday                            
+2039/3/30         6                       Wednesday                          
+2039/3/31         7                       Thursday                           
+2039/4/1          8                       Friday                             
+2039/4/2          9                       Saturday                           
+2039/4/3          10                      Sunday                             
+2039/4/4          11                      Monday                             
+2039/4/5          12                      Tuesday        Bright & Clear      
+2039/4/6          13                      Wednesday                          
+2039/4/7          14                      Thursday                           
+2039/4/8          15                      Friday                             
+2039/4/9          16                      Saturday                           
+2039/4/10         17                      Sunday                             
+2039/4/11         18                      Monday                             
+2039/4/12         19                      Tuesday                            
+2039/4/13         20                      Wednesday                          
+2039/4/14         21                      Thursday                           
+2039/4/15         22                      Friday                             
+2039/4/16         23                      Saturday                           
+2039/4/17         24                      Sunday                             
+2039/4/18         25                      Monday                             
+2039/4/19         26                      Tuesday                            
+2039/4/20         27                      Wednesday      Corn Rain           
+2039/4/21         28                      Thursday                           
+2039/4/22         29                      Friday                             
+2039/4/23         4th Lunar Month         Saturday                           
+2039/4/24         2                       Sunday                             
+2039/4/25         3                       Monday                             
+2039/4/26         4                       Tuesday                            
+2039/4/27         5                       Wednesday                          
+2039/4/28         6                       Thursday                           
+2039/4/29         7                       Friday                             
+2039/4/30         8                       Saturday                           
+2039/5/1          9                       Sunday                             
+2039/5/2          10                      Monday                             
+2039/5/3          11                      Tuesday                            
+2039/5/4          12                      Wednesday                          
+2039/5/5          13                      Thursday       Summer Commences    
+2039/5/6          14                      Friday                             
+2039/5/7          15                      Saturday                           
+2039/5/8          16                      Sunday                             
+2039/5/9          17                      Monday                             
+2039/5/10         18                      Tuesday                            
+2039/5/11         19                      Wednesday                          
+2039/5/12         20                      Thursday                           
+2039/5/13         21                      Friday                             
+2039/5/14         22                      Saturday                           
+2039/5/15         23                      Sunday                             
+2039/5/16         24                      Monday                             
+2039/5/17         25                      Tuesday                            
+2039/5/18         26                      Wednesday                          
+2039/5/19         27                      Thursday                           
+2039/5/20         28                      Friday                             
+2039/5/21         29                      Saturday       Corn Forms          
+2039/5/22         30                      Sunday                             
+2039/5/23         5th Lunar Month         Monday                             
+2039/5/24         2                       Tuesday                            
+2039/5/25         3                       Wednesday                          
+2039/5/26         4                       Thursday                           
+2039/5/27         5                       Friday                             
+2039/5/28         6                       Saturday                           
+2039/5/29         7                       Sunday                             
+2039/5/30         8                       Monday                             
+2039/5/31         9                       Tuesday                            
+2039/6/1          10                      Wednesday                          
+2039/6/2          11                      Thursday                           
+2039/6/3          12                      Friday                             
+2039/6/4          13                      Saturday                           
+2039/6/5          14                      Sunday                             
+2039/6/6          15                      Monday         Corn on Ear         
+2039/6/7          16                      Tuesday                            
+2039/6/8          17                      Wednesday                          
+2039/6/9          18                      Thursday                           
+2039/6/10         19                      Friday                             
+2039/6/11         20                      Saturday                           
+2039/6/12         21                      Sunday                             
+2039/6/13         22                      Monday                             
+2039/6/14         23                      Tuesday                            
+2039/6/15         24                      Wednesday                          
+2039/6/16         25                      Thursday                           
+2039/6/17         26                      Friday                             
+2039/6/18         27                      Saturday                           
+2039/6/19         28                      Sunday                             
+2039/6/20         29                      Monday                             
+2039/6/21         30                      Tuesday        Summer Solstice     
+2039/6/22         5th Lunar Month         Wednesday                          
+2039/6/23         2                       Thursday                           
+2039/6/24         3                       Friday                             
+2039/6/25         4                       Saturday                           
+2039/6/26         5                       Sunday                             
+2039/6/27         6                       Monday                             
+2039/6/28         7                       Tuesday                            
+2039/6/29         8                       Wednesday                          
+2039/6/30         9                       Thursday                           
+2039/7/1          10                      Friday                             
+2039/7/2          11                      Saturday                           
+2039/7/3          12                      Sunday                             
+2039/7/4          13                      Monday                             
+2039/7/5          14                      Tuesday                            
+2039/7/6          15                      Wednesday                          
+2039/7/7          16                      Thursday       Moderate Heat       
+2039/7/8          17                      Friday                             
+2039/7/9          18                      Saturday                           
+2039/7/10         19                      Sunday                             
+2039/7/11         20                      Monday                             
+2039/7/12         21                      Tuesday                            
+2039/7/13         22                      Wednesday                          
+2039/7/14         23                      Thursday                           
+2039/7/15         24                      Friday                             
+2039/7/16         25                      Saturday                           
+2039/7/17         26                      Sunday                             
+2039/7/18         27                      Monday                             
+2039/7/19         28                      Tuesday                            
+2039/7/20         29                      Wednesday                          
+2039/7/21         6th Lunar Month         Thursday                           
+2039/7/22         2                       Friday                             
+2039/7/23         3                       Saturday       Great Heat          
+2039/7/24         4                       Sunday                             
+2039/7/25         5                       Monday                             
+2039/7/26         6                       Tuesday                            
+2039/7/27         7                       Wednesday                          
+2039/7/28         8                       Thursday                           
+2039/7/29         9                       Friday                             
+2039/7/30         10                      Saturday                           
+2039/7/31         11                      Sunday                             
+2039/8/1          12                      Monday                             
+2039/8/2          13                      Tuesday                            
+2039/8/3          14                      Wednesday                          
+2039/8/4          15                      Thursday                           
+2039/8/5          16                      Friday                             
+2039/8/6          17                      Saturday                           
+2039/8/7          18                      Sunday         Autumn Commences    
+2039/8/8          19                      Monday                             
+2039/8/9          20                      Tuesday                            
+2039/8/10         21                      Wednesday                          
+2039/8/11         22                      Thursday                           
+2039/8/12         23                      Friday                             
+2039/8/13         24                      Saturday                           
+2039/8/14         25                      Sunday                             
+2039/8/15         26                      Monday                             
+2039/8/16         27                      Tuesday                            
+2039/8/17         28                      Wednesday                          
+2039/8/18         29                      Thursday                           
+2039/8/19         30                      Friday                             
+2039/8/20         7th Lunar Month         Saturday                           
+2039/8/21         2                       Sunday                             
+2039/8/22         3                       Monday                             
+2039/8/23         4                       Tuesday        End of Heat         
+2039/8/24         5                       Wednesday                          
+2039/8/25         6                       Thursday                           
+2039/8/26         7                       Friday                             
+2039/8/27         8                       Saturday                           
+2039/8/28         9                       Sunday                             
+2039/8/29         10                      Monday                             
+2039/8/30         11                      Tuesday                            
+2039/8/31         12                      Wednesday                          
+2039/9/1          13                      Thursday                           
+2039/9/2          14                      Friday                             
+2039/9/3          15                      Saturday                           
+2039/9/4          16                      Sunday                             
+2039/9/5          17                      Monday                             
+2039/9/6          18                      Tuesday                            
+2039/9/7          19                      Wednesday                          
+2039/9/8          20                      Thursday       White Dew           
+2039/9/9          21                      Friday                             
+2039/9/10         22                      Saturday                           
+2039/9/11         23                      Sunday                             
+2039/9/12         24                      Monday                             
+2039/9/13         25                      Tuesday                            
+2039/9/14         26                      Wednesday                          
+2039/9/15         27                      Thursday                           
+2039/9/16         28                      Friday                             
+2039/9/17         29                      Saturday                           
+2039/9/18         8th Lunar Month         Sunday                             
+2039/9/19         2                       Monday                             
+2039/9/20         3                       Tuesday                            
+2039/9/21         4                       Wednesday                          
+2039/9/22         5                       Thursday                           
+2039/9/23         6                       Friday         Autumnal Equinox    
+2039/9/24         7                       Saturday                           
+2039/9/25         8                       Sunday                             
+2039/9/26         9                       Monday                             
+2039/9/27         10                      Tuesday                            
+2039/9/28         11                      Wednesday                          
+2039/9/29         12                      Thursday                           
+2039/9/30         13                      Friday                             
+2039/10/1         14                      Saturday                           
+2039/10/2         15                      Sunday                             
+2039/10/3         16                      Monday                             
+2039/10/4         17                      Tuesday                            
+2039/10/5         18                      Wednesday                          
+2039/10/6         19                      Thursday                           
+2039/10/7         20                      Friday                             
+2039/10/8         21                      Saturday       Cold Dew            
+2039/10/9         22                      Sunday                             
+2039/10/10        23                      Monday                             
+2039/10/11        24                      Tuesday                            
+2039/10/12        25                      Wednesday                          
+2039/10/13        26                      Thursday                           
+2039/10/14        27                      Friday                             
+2039/10/15        28                      Saturday                           
+2039/10/16        29                      Sunday                             
+2039/10/17        30                      Monday                             
+2039/10/18        9th Lunar Month         Tuesday                            
+2039/10/19        2                       Wednesday                          
+2039/10/20        3                       Thursday                           
+2039/10/21        4                       Friday                             
+2039/10/22        5                       Saturday                           
+2039/10/23        6                       Sunday         Frost               
+2039/10/24        7                       Monday                             
+2039/10/25        8                       Tuesday                            
+2039/10/26        9                       Wednesday                          
+2039/10/27        10                      Thursday                           
+2039/10/28        11                      Friday                             
+2039/10/29        12                      Saturday                           
+2039/10/30        13                      Sunday                             
+2039/10/31        14                      Monday                             
+2039/11/1         15                      Tuesday                            
+2039/11/2         16                      Wednesday                          
+2039/11/3         17                      Thursday                           
+2039/11/4         18                      Friday                             
+2039/11/5         19                      Saturday                           
+2039/11/6         20                      Sunday                             
+2039/11/7         21                      Monday         Winter Commences    
+2039/11/8         22                      Tuesday                            
+2039/11/9         23                      Wednesday                          
+2039/11/10        24                      Thursday                           
+2039/11/11        25                      Friday                             
+2039/11/12        26                      Saturday                           
+2039/11/13        27                      Sunday                             
+2039/11/14        28                      Monday                             
+2039/11/15        29                      Tuesday                            
+2039/11/16        10th Lunar Month        Wednesday                          
+2039/11/17        2                       Thursday                           
+2039/11/18        3                       Friday                             
+2039/11/19        4                       Saturday                           
+2039/11/20        5                       Sunday                             
+2039/11/21        6                       Monday                             
+2039/11/22        7                       Tuesday        Light Snow          
+2039/11/23        8                       Wednesday                          
+2039/11/24        9                       Thursday                           
+2039/11/25        10                      Friday                             
+2039/11/26        11                      Saturday                           
+2039/11/27        12                      Sunday                             
+2039/11/28        13                      Monday                             
+2039/11/29        14                      Tuesday                            
+2039/11/30        15                      Wednesday                          
+2039/12/1         16                      Thursday                           
+2039/12/2         17                      Friday                             
+2039/12/3         18                      Saturday                           
+2039/12/4         19                      Sunday                             
+2039/12/5         20                      Monday                             
+2039/12/6         21                      Tuesday                            
+2039/12/7         22                      Wednesday      Heavy Snow          
+2039/12/8         23                      Thursday                           
+2039/12/9         24                      Friday                             
+2039/12/10        25                      Saturday                           
+2039/12/11        26                      Sunday                             
+2039/12/12        27                      Monday                             
+2039/12/13        28                      Tuesday                            
+2039/12/14        29                      Wednesday                          
+2039/12/15        30                      Thursday                           
+2039/12/16        11th Lunar Month        Friday                             
+2039/12/17        2                       Saturday                           
+2039/12/18        3                       Sunday                             
+2039/12/19        4                       Monday                             
+2039/12/20        5                       Tuesday                            
+2039/12/21        6                       Wednesday                          
+2039/12/22        7                       Thursday       Winter Solstice     
+2039/12/23        8                       Friday                             
+2039/12/24        9                       Saturday                           
+2039/12/25        10                      Sunday                             
+2039/12/26        11                      Monday                             
+2039/12/27        12                      Tuesday                            
+2039/12/28        13                      Wednesday                          
+2039/12/29        14                      Thursday                           
+2039/12/30        15                      Friday                             
+2039/12/31        16                      Saturday                           

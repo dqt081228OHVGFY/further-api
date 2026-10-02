@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2045 (Yi-chou  -  year of the Ox)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2045/1/1          14                      Sunday                             
+2045/1/2          15                      Monday                             
+2045/1/3          16                      Tuesday                            
+2045/1/4          17                      Wednesday                          
+2045/1/5          18                      Thursday       Moderate Cold       
+2045/1/6          19                      Friday                             
+2045/1/7          20                      Saturday                           
+2045/1/8          21                      Sunday                             
+2045/1/9          22                      Monday                             
+2045/1/10         23                      Tuesday                            
+2045/1/11         24                      Wednesday                          
+2045/1/12         25                      Thursday                           
+2045/1/13         26                      Friday                             
+2045/1/14         27                      Saturday                           
+2045/1/15         28                      Sunday                             
+2045/1/16         29                      Monday                             
+2045/1/17         30                      Tuesday                            
+2045/1/18         12th Lunar Month        Wednesday                          
+2045/1/19         2                       Thursday                           
+2045/1/20         3                       Friday         Severe Cold         
+2045/1/21         4                       Saturday                           
+2045/1/22         5                       Sunday                             
+2045/1/23         6                       Monday                             
+2045/1/24         7                       Tuesday                            
+2045/1/25         8                       Wednesday                          
+2045/1/26         9                       Thursday                           
+2045/1/27         10                      Friday                             
+2045/1/28         11                      Saturday                           
+2045/1/29         12                      Sunday                             
+2045/1/30         13                      Monday                             
+2045/1/31         14                      Tuesday                            
+2045/2/1          15                      Wednesday                          
+2045/2/2          16                      Thursday                           
+2045/2/3          17                      Friday         Spring Commences    
+2045/2/4          18                      Saturday                           
+2045/2/5          19                      Sunday                             
+2045/2/6          20                      Monday                             
+2045/2/7          21                      Tuesday                            
+2045/2/8          22                      Wednesday                          
+2045/2/9          23                      Thursday                           
+2045/2/10         24                      Friday                             
+2045/2/11         25                      Saturday                           
+2045/2/12         26                      Sunday                             
+2045/2/13         27                      Monday                             
+2045/2/14         28                      Tuesday                            
+2045/2/15         29                      Wednesday                          
+2045/2/16         30                      Thursday                           
+2045/2/17         1st Lunar Month         Friday                             
+2045/2/18         2                       Saturday       Spring Showers      
+2045/2/19         3                       Sunday                             
+2045/2/20         4                       Monday                             
+2045/2/21         5                       Tuesday                            
+2045/2/22         6                       Wednesday                          
+2045/2/23         7                       Thursday                           
+2045/2/24         8                       Friday                             
+2045/2/25         9                       Saturday                           
+2045/2/26         10                      Sunday                             
+2045/2/27         11                      Monday                             
+2045/2/28         12                      Tuesday                            
+2045/3/1          13                      Wednesday                          
+2045/3/2          14                      Thursday                           
+2045/3/3          15                      Friday                             
+2045/3/4          16                      Saturday                           
+2045/3/5          17                      Sunday         Insects Waken       
+2045/3/6          18                      Monday                             
+2045/3/7          19                      Tuesday                            
+2045/3/8          20                      Wednesday                          
+2045/3/9          21                      Thursday                           
+2045/3/10         22                      Friday                             
+2045/3/11         23                      Saturday                           
+2045/3/12         24                      Sunday                             
+2045/3/13         25                      Monday                             
+2045/3/14         26                      Tuesday                            
+2045/3/15         27                      Wednesday                          
+2045/3/16         28                      Thursday                           
+2045/3/17         29                      Friday                             
+2045/3/18         30                      Saturday                           
+2045/3/19         2nd Lunar Month         Sunday                             
+2045/3/20         2                       Monday         Vernal Equinox      
+2045/3/21         3                       Tuesday                            
+2045/3/22         4                       Wednesday                          
+2045/3/23         5                       Thursday                           
+2045/3/24         6                       Friday                             
+2045/3/25         7                       Saturday                           
+2045/3/26         8                       Sunday                             
+2045/3/27         9                       Monday                             
+2045/3/28         10                      Tuesday                            
+2045/3/29         11                      Wednesday                          
+2045/3/30         12                      Thursday                           
+2045/3/31         13                      Friday                             
+2045/4/1          14                      Saturday                           
+2045/4/2          15                      Sunday                             
+2045/4/3          16                      Monday                             
+2045/4/4          17                      Tuesday        Bright & Clear      
+2045/4/5          18                      Wednesday                          
+2045/4/6          19                      Thursday                           
+2045/4/7          20                      Friday                             
+2045/4/8          21                      Saturday                           
+2045/4/9          22                      Sunday                             
+2045/4/10         23                      Monday                             
+2045/4/11         24                      Tuesday                            
+2045/4/12         25                      Wednesday                          
+2045/4/13         26                      Thursday                           
+2045/4/14         27                      Friday                             
+2045/4/15         28                      Saturday                           
+2045/4/16         29                      Sunday                             
+2045/4/17         3rd Lunar Month         Monday                             
+2045/4/18         2                       Tuesday                            
+2045/4/19         3                       Wednesday      Corn Rain           
+2045/4/20         4                       Thursday                           
+2045/4/21         5                       Friday                             
+2045/4/22         6                       Saturday                           
+2045/4/23         7                       Sunday                             
+2045/4/24         8                       Monday                             
+2045/4/25         9                       Tuesday                            
+2045/4/26         10                      Wednesday                          
+2045/4/27         11                      Thursday                           
+2045/4/28         12                      Friday                             
+2045/4/29         13                      Saturday                           
+2045/4/30         14                      Sunday                             
+2045/5/1          15                      Monday                             
+2045/5/2          16                      Tuesday                            
+2045/5/3          17                      Wednesday                          
+2045/5/4          18                      Thursday                           
+2045/5/5          19                      Friday         Summer Commences    
+2045/5/6          20                      Saturday                           
+2045/5/7          21                      Sunday                             
+2045/5/8          22                      Monday                             
+2045/5/9          23                      Tuesday                            
+2045/5/10         24                      Wednesday                          
+2045/5/11         25                      Thursday                           
+2045/5/12         26                      Friday                             
+2045/5/13         27                      Saturday                           
+2045/5/14         28                      Sunday                             
+2045/5/15         29                      Monday                             
+2045/5/16         30                      Tuesday                            
+2045/5/17         4th Lunar Month         Wednesday                          
+2045/5/18         2                       Thursday                           
+2045/5/19         3                       Friday                             
+2045/5/20         4                       Saturday       Corn Forms          
+2045/5/21         5                       Sunday                             
+2045/5/22         6                       Monday                             
+2045/5/23         7                       Tuesday                            
+2045/5/24         8                       Wednesday                          
+2045/5/25         9                       Thursday                           
+2045/5/26         10                      Friday                             
+2045/5/27         11                      Saturday                           
+2045/5/28         12                      Sunday                             
+2045/5/29         13                      Monday                             
+2045/5/30         14                      Tuesday                            
+2045/5/31         15                      Wednesday                          
+2045/6/1          16                      Thursday                           
+2045/6/2          17                      Friday                             
+2045/6/3          18                      Saturday                           
+2045/6/4          19                      Sunday                             
+2045/6/5          20                      Monday         Corn on Ear         
+2045/6/6          21                      Tuesday                            
+2045/6/7          22                      Wednesday                          
+2045/6/8          23                      Thursday                           
+2045/6/9          24                      Friday                             
+2045/6/10         25                      Saturday                           
+2045/6/11         26                      Sunday                             
+2045/6/12         27                      Monday                             
+2045/6/13         28                      Tuesday                            
+2045/6/14         29                      Wednesday                          
+2045/6/15         5th Lunar Month         Thursday                           
+2045/6/16         2                       Friday                             
+2045/6/17         3                       Saturday                           
+2045/6/18         4                       Sunday                             
+2045/6/19         5                       Monday                             
+2045/6/20         6                       Tuesday                            
+2045/6/21         7                       Wednesday      Summer Solstice     
+2045/6/22         8                       Thursday                           
+2045/6/23         9                       Friday                             
+2045/6/24         10                      Saturday                           
+2045/6/25         11                      Sunday                             
+2045/6/26         12                      Monday                             
+2045/6/27         13                      Tuesday                            
+2045/6/28         14                      Wednesday                          
+2045/6/29         15                      Thursday                           
+2045/6/30         16                      Friday                             
+2045/7/1          17                      Saturday                           
+2045/7/2          18                      Sunday                             
+2045/7/3          19                      Monday                             
+2045/7/4          20                      Tuesday                            
+2045/7/5          21                      Wednesday                          
+2045/7/6          22                      Thursday                           
+2045/7/7          23                      Friday         Moderate Heat       
+2045/7/8          24                      Saturday                           
+2045/7/9          25                      Sunday                             
+2045/7/10         26                      Monday                             
+2045/7/11         27                      Tuesday                            
+2045/7/12         28                      Wednesday                          
+2045/7/13         29                      Thursday                           
+2045/7/14         6th Lunar Month         Friday                             
+2045/7/15         2                       Saturday                           
+2045/7/16         3                       Sunday                             
+2045/7/17         4                       Monday                             
+2045/7/18         5                       Tuesday                            
+2045/7/19         6                       Wednesday                          
+2045/7/20         7                       Thursday                           
+2045/7/21         8                       Friday                             
+2045/7/22         9                       Saturday       Great Heat          
+2045/7/23         10                      Sunday                             
+2045/7/24         11                      Monday                             
+2045/7/25         12                      Tuesday                            
+2045/7/26         13                      Wednesday                          
+2045/7/27         14                      Thursday                           
+2045/7/28         15                      Friday                             
+2045/7/29         16                      Saturday                           
+2045/7/30         17                      Sunday                             
+2045/7/31         18                      Monday                             
+2045/8/1          19                      Tuesday                            
+2045/8/2          20                      Wednesday                          
+2045/8/3          21                      Thursday                           
+2045/8/4          22                      Friday                             
+2045/8/5          23                      Saturday                           
+2045/8/6          24                      Sunday                             
+2045/8/7          25                      Monday         Autumn Commences    
+2045/8/8          26                      Tuesday                            
+2045/8/9          27                      Wednesday                          
+2045/8/10         28                      Thursday                           
+2045/8/11         29                      Friday                             
+2045/8/12         30                      Saturday                           
+2045/8/13         7th Lunar Month         Sunday                             
+2045/8/14         2                       Monday                             
+2045/8/15         3                       Tuesday                            
+2045/8/16         4                       Wednesday                          
+2045/8/17         5                       Thursday                           
+2045/8/18         6                       Friday                             
+2045/8/19         7                       Saturday                           
+2045/8/20         8                       Sunday                             
+2045/8/21         9                       Monday                             
+2045/8/22         10                      Tuesday                            
+2045/8/23         11                      Wednesday      End of Heat         
+2045/8/24         12                      Thursday                           
+2045/8/25         13                      Friday                             
+2045/8/26         14                      Saturday                           
+2045/8/27         15                      Sunday                             
+2045/8/28         16                      Monday                             
+2045/8/29         17                      Tuesday                            
+2045/8/30         18                      Wednesday                          
+2045/8/31         19                      Thursday                           
+2045/9/1          20                      Friday                             
+2045/9/2          21                      Saturday                           
+2045/9/3          22                      Sunday                             
+2045/9/4          23                      Monday                             
+2045/9/5          24                      Tuesday                            
+2045/9/6          25                      Wednesday                          
+2045/9/7          26                      Thursday       White Dew           
+2045/9/8          27                      Friday                             
+2045/9/9          28                      Saturday                           
+2045/9/10         29                      Sunday                             
+2045/9/11         8th Lunar Month         Monday                             
+2045/9/12         2                       Tuesday                            
+2045/9/13         3                       Wednesday                          
+2045/9/14         4                       Thursday                           
+2045/9/15         5                       Friday                             
+2045/9/16         6                       Saturday                           
+2045/9/17         7                       Sunday                             
+2045/9/18         8                       Monday                             
+2045/9/19         9                       Tuesday                            
+2045/9/20         10                      Wednesday                          
+2045/9/21         11                      Thursday                           
+2045/9/22         12                      Friday         Autumnal Equinox    
+2045/9/23         13                      Saturday                           
+2045/9/24         14                      Sunday                             
+2045/9/25         15                      Monday                             
+2045/9/26         16                      Tuesday                            
+2045/9/27         17                      Wednesday                          
+2045/9/28         18                      Thursday                           
+2045/9/29         19                      Friday                             
+2045/9/30         20                      Saturday                           
+2045/10/1         21                      Sunday                             
+2045/10/2         22                      Monday                             
+2045/10/3         23                      Tuesday                            
+2045/10/4         24                      Wednesday                          
+2045/10/5         25                      Thursday                           
+2045/10/6         26                      Friday                             
+2045/10/7         27                      Saturday                           
+2045/10/8         28                      Sunday         Cold Dew            
+2045/10/9         29                      Monday                             
+2045/10/10        9th Lunar Month         Tuesday                            
+2045/10/11        2                       Wednesday                          
+2045/10/12        3                       Thursday                           
+2045/10/13        4                       Friday                             
+2045/10/14        5                       Saturday                           
+2045/10/15        6                       Sunday                             
+2045/10/16        7                       Monday                             
+2045/10/17        8                       Tuesday                            
+2045/10/18        9                       Wednesday                          
+2045/10/19        10                      Thursday                           
+2045/10/20        11                      Friday                             
+2045/10/21        12                      Saturday                           
+2045/10/22        13                      Sunday                             
+2045/10/23        14                      Monday         Frost               
+2045/10/24        15                      Tuesday                            
+2045/10/25        16                      Wednesday                          
+2045/10/26        17                      Thursday                           
+2045/10/27        18                      Friday                             
+2045/10/28        19                      Saturday                           
+2045/10/29        20                      Sunday                             
+2045/10/30        21                      Monday                             
+2045/10/31        22                      Tuesday                            
+2045/11/1         23                      Wednesday                          
+2045/11/2         24                      Thursday                           
+2045/11/3         25                      Friday                             
+2045/11/4         26                      Saturday                           
+2045/11/5         27                      Sunday                             
+2045/11/6         28                      Monday                             
+2045/11/7         29                      Tuesday        Winter Commences    
+2045/11/8         30                      Wednesday                          
+2045/11/9         10th Lunar Month        Thursday                           
+2045/11/10        2                       Friday                             
+2045/11/11        3                       Saturday                           
+2045/11/12        4                       Sunday                             
+2045/11/13        5                       Monday                             
+2045/11/14        6                       Tuesday                            
+2045/11/15        7                       Wednesday                          
+2045/11/16        8                       Thursday                           
+2045/11/17        9                       Friday                             
+2045/11/18        10                      Saturday                           
+2045/11/19        11                      Sunday                             
+2045/11/20        12                      Monday                             
+2045/11/21        13                      Tuesday                            
+2045/11/22        14                      Wednesday      Light Snow          
+2045/11/23        15                      Thursday                           
+2045/11/24        16                      Friday                             
+2045/11/25        17                      Saturday                           
+2045/11/26        18                      Sunday                             
+2045/11/27        19                      Monday                             
+2045/11/28        20                      Tuesday                            
+2045/11/29        21                      Wednesday                          
+2045/11/30        22                      Thursday                           
+2045/12/1         23                      Friday                             
+2045/12/2         24                      Saturday                           
+2045/12/3         25                      Sunday                             
+2045/12/4         26                      Monday                             
+2045/12/5         27                      Tuesday                            
+2045/12/6         28                      Wednesday                          
+2045/12/7         29                      Thursday       Heavy Snow          
+2045/12/8         11th Lunar Month        Friday                             
+2045/12/9         2                       Saturday                           
+2045/12/10        3                       Sunday                             
+2045/12/11        4                       Monday                             
+2045/12/12        5                       Tuesday                            
+2045/12/13        6                       Wednesday                          
+2045/12/14        7                       Thursday                           
+2045/12/15        8                       Friday                             
+2045/12/16        9                       Saturday                           
+2045/12/17        10                      Sunday                             
+2045/12/18        11                      Monday                             
+2045/12/19        12                      Tuesday                            
+2045/12/20        13                      Wednesday                          
+2045/12/21        14                      Thursday       Winter Solstice     
+2045/12/22        15                      Friday                             
+2045/12/23        16                      Saturday                           
+2045/12/24        17                      Sunday                             
+2045/12/25        18                      Monday                             
+2045/12/26        19                      Tuesday                            
+2045/12/27        20                      Wednesday                          
+2045/12/28        21                      Thursday                           
+2045/12/29        22                      Friday                             
+2045/12/30        23                      Saturday                           
+2045/12/31        24                      Sunday                             

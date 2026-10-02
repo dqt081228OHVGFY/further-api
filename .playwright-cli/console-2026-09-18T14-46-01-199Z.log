@@ -1,0 +1,53 @@
+[     140ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[     141ms] [LOG] [Fixture] Loaded state from localStorage @ http://127.0.0.1:23000/fixtures/fixture-data.js:189
+[     141ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 500000, tokens: 1, checked_in_today: false} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[     141ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[     141ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[     141ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[     141ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[     165ms] [LOG] [Fixture] GET /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[     175ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/#overview:0
+[     312ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[     313ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[     313ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[     313ms] [LOG] [Fixture] GET /api/user/billing-promotions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[     313ms] [LOG] [Fixture] GET /api/user/payments/config @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   50516ms] [LOG] [Fixture] POST /api/user/public-benefits/token-loan/borrow @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   50631ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   50632ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   50632ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   52365ms] [LOG] [Fixture] POST /api/user/public-benefits/token-loan/check-in @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   52446ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   52446ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59498ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[   59499ms] [LOG] [Fixture] Loaded state from localStorage @ http://127.0.0.1:23000/fixtures/fixture-data.js:189
+[   59499ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 520000, tokens: 1, checked_in_today: true} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[   59499ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[   59499ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[   59500ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[   59500ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[   59525ms] [LOG] [Fixture] GET /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59534ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/:0
+[   59684ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59685ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59685ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59685ms] [LOG] [Fixture] GET /api/user/billing-promotions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   59685ms] [LOG] [Fixture] GET /api/user/payments/config @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64638ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[   64638ms] [LOG] [Fixture] Loaded state from localStorage @ http://127.0.0.1:23000/fixtures/fixture-data.js:189
+[   64639ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 520000, tokens: 1, checked_in_today: true} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[   64639ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[   64639ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[   64639ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[   64639ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[   64654ms] [LOG] [Fixture] GET /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64662ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/:0
+[   64801ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64801ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64801ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64801ms] [LOG] [Fixture] GET /api/user/billing-promotions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   64801ms] [LOG] [Fixture] GET /api/user/payments/config @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   66694ms] [LOG] [Fixture] GET /api/user/subscriptions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   66694ms] [LOG] [Fixture] GET /api/user/subscription-plans @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   66695ms] [LOG] [Fixture] GET /api/user/timed-quotas @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   66695ms] [LOG] [Fixture] GET /api/user/security/totp @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53

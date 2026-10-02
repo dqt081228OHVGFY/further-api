@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2031 (Xin-hai  -  year of the Pig)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2031/1/1          8                       Wednesday                          
+2031/1/2          9                       Thursday                           
+2031/1/3          10                      Friday                             
+2031/1/4          11                      Saturday                           
+2031/1/5          12                      Sunday         Moderate Cold       
+2031/1/6          13                      Monday                             
+2031/1/7          14                      Tuesday                            
+2031/1/8          15                      Wednesday                          
+2031/1/9          16                      Thursday                           
+2031/1/10         17                      Friday                             
+2031/1/11         18                      Saturday                           
+2031/1/12         19                      Sunday                             
+2031/1/13         20                      Monday                             
+2031/1/14         21                      Tuesday                            
+2031/1/15         22                      Wednesday                          
+2031/1/16         23                      Thursday                           
+2031/1/17         24                      Friday                             
+2031/1/18         25                      Saturday                           
+2031/1/19         26                      Sunday                             
+2031/1/20         27                      Monday         Severe Cold         
+2031/1/21         28                      Tuesday                            
+2031/1/22         29                      Wednesday                          
+2031/1/23         1st Lunar Month         Thursday                           
+2031/1/24         2                       Friday                             
+2031/1/25         3                       Saturday                           
+2031/1/26         4                       Sunday                             
+2031/1/27         5                       Monday                             
+2031/1/28         6                       Tuesday                            
+2031/1/29         7                       Wednesday                          
+2031/1/30         8                       Thursday                           
+2031/1/31         9                       Friday                             
+2031/2/1          10                      Saturday                           
+2031/2/2          11                      Sunday                             
+2031/2/3          12                      Monday                             
+2031/2/4          13                      Tuesday        Spring Commences    
+2031/2/5          14                      Wednesday                          
+2031/2/6          15                      Thursday                           
+2031/2/7          16                      Friday                             
+2031/2/8          17                      Saturday                           
+2031/2/9          18                      Sunday                             
+2031/2/10         19                      Monday                             
+2031/2/11         20                      Tuesday                            
+2031/2/12         21                      Wednesday                          
+2031/2/13         22                      Thursday                           
+2031/2/14         23                      Friday                             
+2031/2/15         24                      Saturday                           
+2031/2/16         25                      Sunday                             
+2031/2/17         26                      Monday                             
+2031/2/18         27                      Tuesday                            
+2031/2/19         28                      Wednesday      Spring Showers      
+2031/2/20         29                      Thursday                           
+2031/2/21         2nd Lunar Month         Friday                             
+2031/2/22         2                       Saturday                           
+2031/2/23         3                       Sunday                             
+2031/2/24         4                       Monday                             
+2031/2/25         5                       Tuesday                            
+2031/2/26         6                       Wednesday                          
+2031/2/27         7                       Thursday                           
+2031/2/28         8                       Friday                             
+2031/3/1          9                       Saturday                           
+2031/3/2          10                      Sunday                             
+2031/3/3          11                      Monday                             
+2031/3/4          12                      Tuesday                            
+2031/3/5          13                      Wednesday                          
+2031/3/6          14                      Thursday       Insects Waken       
+2031/3/7          15                      Friday                             
+2031/3/8          16                      Saturday                           
+2031/3/9          17                      Sunday                             
+2031/3/10         18                      Monday                             
+2031/3/11         19                      Tuesday                            
+2031/3/12         20                      Wednesday                          
+2031/3/13         21                      Thursday                           
+2031/3/14         22                      Friday                             
+2031/3/15         23                      Saturday                           
+2031/3/16         24                      Sunday                             
+2031/3/17         25                      Monday                             
+2031/3/18         26                      Tuesday                            
+2031/3/19         27                      Wednesday                          
+2031/3/20         28                      Thursday                           
+2031/3/21         29                      Friday         Vernal Equinox      
+2031/3/22         30                      Saturday                           
+2031/3/23         3rd Lunar Month         Sunday                             
+2031/3/24         2                       Monday                             
+2031/3/25         3                       Tuesday                            
+2031/3/26         4                       Wednesday                          
+2031/3/27         5                       Thursday                           
+2031/3/28         6                       Friday                             
+2031/3/29         7                       Saturday                           
+2031/3/30         8                       Sunday                             
+2031/3/31         9                       Monday                             
+2031/4/1          10                      Tuesday                            
+2031/4/2          11                      Wednesday                          
+2031/4/3          12                      Thursday                           
+2031/4/4          13                      Friday                             
+2031/4/5          14                      Saturday       Bright & Clear      
+2031/4/6          15                      Sunday                             
+2031/4/7          16                      Monday                             
+2031/4/8          17                      Tuesday                            
+2031/4/9          18                      Wednesday                          
+2031/4/10         19                      Thursday                           
+2031/4/11         20                      Friday                             
+2031/4/12         21                      Saturday                           
+2031/4/13         22                      Sunday                             
+2031/4/14         23                      Monday                             
+2031/4/15         24                      Tuesday                            
+2031/4/16         25                      Wednesday                          
+2031/4/17         26                      Thursday                           
+2031/4/18         27                      Friday                             
+2031/4/19         28                      Saturday                           
+2031/4/20         29                      Sunday         Corn Rain           
+2031/4/21         30                      Monday                             
+2031/4/22         3rd Lunar Month         Tuesday                            
+2031/4/23         2                       Wednesday                          
+2031/4/24         3                       Thursday                           
+2031/4/25         4                       Friday                             
+2031/4/26         5                       Saturday                           
+2031/4/27         6                       Sunday                             
+2031/4/28         7                       Monday                             
+2031/4/29         8                       Tuesday                            
+2031/4/30         9                       Wednesday                          
+2031/5/1          10                      Thursday                           
+2031/5/2          11                      Friday                             
+2031/5/3          12                      Saturday                           
+2031/5/4          13                      Sunday                             
+2031/5/5          14                      Monday                             
+2031/5/6          15                      Tuesday        Summer Commences    
+2031/5/7          16                      Wednesday                          
+2031/5/8          17                      Thursday                           
+2031/5/9          18                      Friday                             
+2031/5/10         19                      Saturday                           
+2031/5/11         20                      Sunday                             
+2031/5/12         21                      Monday                             
+2031/5/13         22                      Tuesday                            
+2031/5/14         23                      Wednesday                          
+2031/5/15         24                      Thursday                           
+2031/5/16         25                      Friday                             
+2031/5/17         26                      Saturday                           
+2031/5/18         27                      Sunday                             
+2031/5/19         28                      Monday                             
+2031/5/20         29                      Tuesday                            
+2031/5/21         4th Lunar Month         Wednesday      Corn Forms          
+2031/5/22         2                       Thursday                           
+2031/5/23         3                       Friday                             
+2031/5/24         4                       Saturday                           
+2031/5/25         5                       Sunday                             
+2031/5/26         6                       Monday                             
+2031/5/27         7                       Tuesday                            
+2031/5/28         8                       Wednesday                          
+2031/5/29         9                       Thursday                           
+2031/5/30         10                      Friday                             
+2031/5/31         11                      Saturday                           
+2031/6/1          12                      Sunday                             
+2031/6/2          13                      Monday                             
+2031/6/3          14                      Tuesday                            
+2031/6/4          15                      Wednesday                          
+2031/6/5          16                      Thursday                           
+2031/6/6          17                      Friday         Corn on Ear         
+2031/6/7          18                      Saturday                           
+2031/6/8          19                      Sunday                             
+2031/6/9          20                      Monday                             
+2031/6/10         21                      Tuesday                            
+2031/6/11         22                      Wednesday                          
+2031/6/12         23                      Thursday                           
+2031/6/13         24                      Friday                             
+2031/6/14         25                      Saturday                           
+2031/6/15         26                      Sunday                             
+2031/6/16         27                      Monday                             
+2031/6/17         28                      Tuesday                            
+2031/6/18         29                      Wednesday                          
+2031/6/19         30                      Thursday                           
+2031/6/20         5th Lunar Month         Friday                             
+2031/6/21         2                       Saturday       Summer Solstice     
+2031/6/22         3                       Sunday                             
+2031/6/23         4                       Monday                             
+2031/6/24         5                       Tuesday                            
+2031/6/25         6                       Wednesday                          
+2031/6/26         7                       Thursday                           
+2031/6/27         8                       Friday                             
+2031/6/28         9                       Saturday                           
+2031/6/29         10                      Sunday                             
+2031/6/30         11                      Monday                             
+2031/7/1          12                      Tuesday                            
+2031/7/2          13                      Wednesday                          
+2031/7/3          14                      Thursday                           
+2031/7/4          15                      Friday                             
+2031/7/5          16                      Saturday                           
+2031/7/6          17                      Sunday                             
+2031/7/7          18                      Monday         Moderate Heat       
+2031/7/8          19                      Tuesday                            
+2031/7/9          20                      Wednesday                          
+2031/7/10         21                      Thursday                           
+2031/7/11         22                      Friday                             
+2031/7/12         23                      Saturday                           
+2031/7/13         24                      Sunday                             
+2031/7/14         25                      Monday                             
+2031/7/15         26                      Tuesday                            
+2031/7/16         27                      Wednesday                          
+2031/7/17         28                      Thursday                           
+2031/7/18         29                      Friday                             
+2031/7/19         6th Lunar Month         Saturday                           
+2031/7/20         2                       Sunday                             
+2031/7/21         3                       Monday                             
+2031/7/22         4                       Tuesday                            
+2031/7/23         5                       Wednesday      Great Heat          
+2031/7/24         6                       Thursday                           
+2031/7/25         7                       Friday                             
+2031/7/26         8                       Saturday                           
+2031/7/27         9                       Sunday                             
+2031/7/28         10                      Monday                             
+2031/7/29         11                      Tuesday                            
+2031/7/30         12                      Wednesday                          
+2031/7/31         13                      Thursday                           
+2031/8/1          14                      Friday                             
+2031/8/2          15                      Saturday                           
+2031/8/3          16                      Sunday                             
+2031/8/4          17                      Monday                             
+2031/8/5          18                      Tuesday                            
+2031/8/6          19                      Wednesday                          
+2031/8/7          20                      Thursday                           
+2031/8/8          21                      Friday         Autumn Commences    
+2031/8/9          22                      Saturday                           
+2031/8/10         23                      Sunday                             
+2031/8/11         24                      Monday                             
+2031/8/12         25                      Tuesday                            
+2031/8/13         26                      Wednesday                          
+2031/8/14         27                      Thursday                           
+2031/8/15         28                      Friday                             
+2031/8/16         29                      Saturday                           
+2031/8/17         30                      Sunday                             
+2031/8/18         7th Lunar Month         Monday                             
+2031/8/19         2                       Tuesday                            
+2031/8/20         3                       Wednesday                          
+2031/8/21         4                       Thursday                           
+2031/8/22         5                       Friday                             
+2031/8/23         6                       Saturday       End of Heat         
+2031/8/24         7                       Sunday                             
+2031/8/25         8                       Monday                             
+2031/8/26         9                       Tuesday                            
+2031/8/27         10                      Wednesday                          
+2031/8/28         11                      Thursday                           
+2031/8/29         12                      Friday                             
+2031/8/30         13                      Saturday                           
+2031/8/31         14                      Sunday                             
+2031/9/1          15                      Monday                             
+2031/9/2          16                      Tuesday                            
+2031/9/3          17                      Wednesday                          
+2031/9/4          18                      Thursday                           
+2031/9/5          19                      Friday                             
+2031/9/6          20                      Saturday                           
+2031/9/7          21                      Sunday                             
+2031/9/8          22                      Monday         White Dew           
+2031/9/9          23                      Tuesday                            
+2031/9/10         24                      Wednesday                          
+2031/9/11         25                      Thursday                           
+2031/9/12         26                      Friday                             
+2031/9/13         27                      Saturday                           
+2031/9/14         28                      Sunday                             
+2031/9/15         29                      Monday                             
+2031/9/16         30                      Tuesday                            
+2031/9/17         8th Lunar Month         Wednesday                          
+2031/9/18         2                       Thursday                           
+2031/9/19         3                       Friday                             
+2031/9/20         4                       Saturday                           
+2031/9/21         5                       Sunday                             
+2031/9/22         6                       Monday                             
+2031/9/23         7                       Tuesday        Autumnal Equinox    
+2031/9/24         8                       Wednesday                          
+2031/9/25         9                       Thursday                           
+2031/9/26         10                      Friday                             
+2031/9/27         11                      Saturday                           
+2031/9/28         12                      Sunday                             
+2031/9/29         13                      Monday                             
+2031/9/30         14                      Tuesday                            
+2031/10/1         15                      Wednesday                          
+2031/10/2         16                      Thursday                           
+2031/10/3         17                      Friday                             
+2031/10/4         18                      Saturday                           
+2031/10/5         19                      Sunday                             
+2031/10/6         20                      Monday                             
+2031/10/7         21                      Tuesday                            
+2031/10/8         22                      Wednesday      Cold Dew            
+2031/10/9         23                      Thursday                           
+2031/10/10        24                      Friday                             
+2031/10/11        25                      Saturday                           
+2031/10/12        26                      Sunday                             
+2031/10/13        27                      Monday                             
+2031/10/14        28                      Tuesday                            
+2031/10/15        29                      Wednesday                          
+2031/10/16        9th Lunar Month         Thursday                           
+2031/10/17        2                       Friday                             
+2031/10/18        3                       Saturday                           
+2031/10/19        4                       Sunday                             
+2031/10/20        5                       Monday                             
+2031/10/21        6                       Tuesday                            
+2031/10/22        7                       Wednesday                          
+2031/10/23        8                       Thursday       Frost               
+2031/10/24        9                       Friday                             
+2031/10/25        10                      Saturday                           
+2031/10/26        11                      Sunday                             
+2031/10/27        12                      Monday                             
+2031/10/28        13                      Tuesday                            
+2031/10/29        14                      Wednesday                          
+2031/10/30        15                      Thursday                           
+2031/10/31        16                      Friday                             
+2031/11/1         17                      Saturday                           
+2031/11/2         18                      Sunday                             
+2031/11/3         19                      Monday                             
+2031/11/4         20                      Tuesday                            
+2031/11/5         21                      Wednesday                          
+2031/11/6         22                      Thursday                           
+2031/11/7         23                      Friday         Winter Commences    
+2031/11/8         24                      Saturday                           
+2031/11/9         25                      Sunday                             
+2031/11/10        26                      Monday                             
+2031/11/11        27                      Tuesday                            
+2031/11/12        28                      Wednesday                          
+2031/11/13        29                      Thursday                           
+2031/11/14        30                      Friday                             
+2031/11/15        10th Lunar Month        Saturday                           
+2031/11/16        2                       Sunday                             
+2031/11/17        3                       Monday                             
+2031/11/18        4                       Tuesday                            
+2031/11/19        5                       Wednesday                          
+2031/11/20        6                       Thursday                           
+2031/11/21        7                       Friday                             
+2031/11/22        8                       Saturday       Light Snow          
+2031/11/23        9                       Sunday                             
+2031/11/24        10                      Monday                             
+2031/11/25        11                      Tuesday                            
+2031/11/26        12                      Wednesday                          
+2031/11/27        13                      Thursday                           
+2031/11/28        14                      Friday                             
+2031/11/29        15                      Saturday                           
+2031/11/30        16                      Sunday                             
+2031/12/1         17                      Monday                             
+2031/12/2         18                      Tuesday                            
+2031/12/3         19                      Wednesday                          
+2031/12/4         20                      Thursday                           
+2031/12/5         21                      Friday                             
+2031/12/6         22                      Saturday                           
+2031/12/7         23                      Sunday         Heavy Snow          
+2031/12/8         24                      Monday                             
+2031/12/9         25                      Tuesday                            
+2031/12/10        26                      Wednesday                          
+2031/12/11        27                      Thursday                           
+2031/12/12        28                      Friday                             
+2031/12/13        29                      Saturday                           
+2031/12/14        11th Lunar Month        Sunday                             
+2031/12/15        2                       Monday                             
+2031/12/16        3                       Tuesday                            
+2031/12/17        4                       Wednesday                          
+2031/12/18        5                       Thursday                           
+2031/12/19        6                       Friday                             
+2031/12/20        7                       Saturday                           
+2031/12/21        8                       Sunday                             
+2031/12/22        9                       Monday         Winter Solstice     
+2031/12/23        10                      Tuesday                            
+2031/12/24        11                      Wednesday                          
+2031/12/25        12                      Thursday                           
+2031/12/26        13                      Friday                             
+2031/12/27        14                      Saturday                           
+2031/12/28        15                      Sunday                             
+2031/12/29        16                      Monday                             
+2031/12/30        17                      Tuesday                            
+2031/12/31        18                      Wednesday                          

@@ -1,0 +1,184 @@
+[     118ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[     188ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 500000, tokens: 1, checked_in_today: false} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[     189ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[     190ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[     190ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[     190ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[     512ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/:0
+[   38811ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0
+[   38811ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0
+[   38811ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0
+[   62562ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[   62564ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 500000, tokens: 1, checked_in_today: false} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[   62564ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[   62564ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[   62564ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[   62564ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[   62620ms] [LOG] [Fixture] GET /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62635ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/:0
+[   62784ms] [LOG] [Fixture] PATCH /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62877ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62878ms] [LOG] [Fixture] GET /api/user/benefits @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62879ms] [LOG] [Fixture] GET /api/user/public-benefits/token-loan @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62881ms] [LOG] [Fixture] GET /api/user/billing-promotions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62882ms] [LOG] [Fixture] GET /api/user/payments/config @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[   62883ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/payments/config
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadPaymentConfig [as paymentConfig] (http://127.0.0.1:23000/console.js:1455:28)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 1)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  360314ms] [LOG] [Fixture] GET /api/user/models @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  360314ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/models
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadModels [as models] (http://127.0.0.1:23000/console-models.js:240:31)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  361281ms] [LOG] [Fixture] GET /api/user/models @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  361281ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/models
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadModels [as models] (http://127.0.0.1:23000/console-models.js:240:31)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  371056ms] [LOG] [Fixture] GET /api/user/logs @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  371056ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/logs
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadLogs [as logs] (http://127.0.0.1:23000/console.js:928:31)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  372694ms] [LOG] [Fixture] GET /api/user/subscriptions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  372694ms] [LOG] [Fixture] GET /api/user/subscription-plans @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  372694ms] [LOG] [Fixture] GET /api/user/timed-quotas @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  372694ms] [LOG] [Fixture] GET /api/user/security/totp @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  372695ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscriptions
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptions [as subscriptions] (http://127.0.0.1:23000/console.js:402:30)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  372695ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscription-plans
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptionPlanCatalog [as plans] (http://127.0.0.1:23000/console.js:350:29)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 1)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  372695ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/timed-quotas
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadTimedQuotas [as timedQuotas] (http://127.0.0.1:23000/console.js:462:26)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 2)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  375848ms] [LOG] [Fixture] GET /api/user/subscriptions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  375848ms] [LOG] [Fixture] GET /api/user/subscription-plans @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  375848ms] [LOG] [Fixture] GET /api/user/timed-quotas @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  375848ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscriptions
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptions [as subscriptions] (http://127.0.0.1:23000/console.js:402:30)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  375848ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscription-plans
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptionPlanCatalog [as plans] (http://127.0.0.1:23000/console.js:350:29)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 1)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  375849ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/timed-quotas
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadTimedQuotas [as timedQuotas] (http://127.0.0.1:23000/console.js:462:26)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 2)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  383642ms] [LOG] [Fixture] GET /api/user/subscriptions @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  383642ms] [LOG] [Fixture] GET /api/user/subscription-plans @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  383642ms] [LOG] [Fixture] GET /api/user/timed-quotas @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  383643ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscriptions
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptions [as subscriptions] (http://127.0.0.1:23000/console.js:402:30)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 0)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  383643ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/subscription-plans
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadSubscriptionPlanCatalog [as plans] (http://127.0.0.1:23000/console.js:350:29)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 1)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  383643ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: GET /api/user/timed-quotas
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at Object.loadTimedQuotas [as timedQuotas] (http://127.0.0.1:23000/console.js:462:26)
+    at http://127.0.0.1:23000/resource-loader.js:11:31
+    at async Promise.allSettled (index 2)
+    at async Object.load (http://127.0.0.1:23000/resource-loader.js:21:23) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  419110ms] [LOG] [Fixture] POST /api/user/security/totp/setup @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  419111ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: POST /api/user/security/totp/setup
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at HTMLButtonElement.<anonymous> (http://127.0.0.1:23000/console.js:206:34) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  424491ms] [LOG] [Fixture] POST /api/user/security/totp/setup @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  424491ms] [ERROR] [Fixture] Error: Error: Endpoint not implemented: POST /api/user/security/totp/setup
+    at Object.handle (http://127.0.0.1:23000/fixtures/fixture-endpoints.js:270:19)
+    at handleFixtureRequest (http://127.0.0.1:23000/fixtures/fixture-engine.js:57:44)
+    at fixtureAwareFetch (http://127.0.0.1:23000/fixtures/fixture-engine.js:98:16)
+    at Object.request (http://127.0.0.1:23000/app.js:197:28)
+    at HTMLButtonElement.<anonymous> (http://127.0.0.1:23000/console.js:206:34) @ http://127.0.0.1:23000/fixtures/fixture-engine.js:68
+[  675633ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
+[  675635ms] [LOG] [Fixture] Loaded state from localStorage @ http://127.0.0.1:23000/fixtures/fixture-data.js:189
+[  675635ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 500000, tokens: 1, checked_in_today: false} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
+[  675636ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
+[  675636ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
+[  675636ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
+[  675636ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
+[  675660ms] [LOG] [Fixture] GET /api/user/ui-preferences @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  675667ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/#profile:0
+[  675798ms] [LOG] [Fixture] GET /api/user/overview @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  675798ms] [LOG] [Fixture] GET /api/user/security/totp @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  675798ms] [LOG] [Fixture] GET /api/user/payments/config @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  740082ms] [LOG] [Fixture] POST /api/user/security/totp/setup @ http://127.0.0.1:23000/fixtures/fixture-engine.js:53
+[  750998ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0
+[  750998ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0
+[  750998ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/admin/#overview:0

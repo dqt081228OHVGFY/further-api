@@ -1,0 +1,367 @@
+Gregorian-Lunar Calendar Conversion Table of 2033 (Gui-chou  -  year of the Ox)
+Gregorian date    Lunar date              Day-of-week    Solar terms
+2033/1/1          12th Lunar Month        Saturday                           
+2033/1/2          2                       Sunday                             
+2033/1/3          3                       Monday                             
+2033/1/4          4                       Tuesday                            
+2033/1/5          5                       Wednesday      Moderate Cold       
+2033/1/6          6                       Thursday                           
+2033/1/7          7                       Friday                             
+2033/1/8          8                       Saturday                           
+2033/1/9          9                       Sunday                             
+2033/1/10         10                      Monday                             
+2033/1/11         11                      Tuesday                            
+2033/1/12         12                      Wednesday                          
+2033/1/13         13                      Thursday                           
+2033/1/14         14                      Friday                             
+2033/1/15         15                      Saturday                           
+2033/1/16         16                      Sunday                             
+2033/1/17         17                      Monday                             
+2033/1/18         18                      Tuesday                            
+2033/1/19         19                      Wednesday                          
+2033/1/20         20                      Thursday       Severe Cold         
+2033/1/21         21                      Friday                             
+2033/1/22         22                      Saturday                           
+2033/1/23         23                      Sunday                             
+2033/1/24         24                      Monday                             
+2033/1/25         25                      Tuesday                            
+2033/1/26         26                      Wednesday                          
+2033/1/27         27                      Thursday                           
+2033/1/28         28                      Friday                             
+2033/1/29         29                      Saturday                           
+2033/1/30         30                      Sunday                             
+2033/1/31         1st Lunar Month         Monday                             
+2033/2/1          2                       Tuesday                            
+2033/2/2          3                       Wednesday                          
+2033/2/3          4                       Thursday       Spring Commences    
+2033/2/4          5                       Friday                             
+2033/2/5          6                       Saturday                           
+2033/2/6          7                       Sunday                             
+2033/2/7          8                       Monday                             
+2033/2/8          9                       Tuesday                            
+2033/2/9          10                      Wednesday                          
+2033/2/10         11                      Thursday                           
+2033/2/11         12                      Friday                             
+2033/2/12         13                      Saturday                           
+2033/2/13         14                      Sunday                             
+2033/2/14         15                      Monday                             
+2033/2/15         16                      Tuesday                            
+2033/2/16         17                      Wednesday                          
+2033/2/17         18                      Thursday                           
+2033/2/18         19                      Friday         Spring Showers      
+2033/2/19         20                      Saturday                           
+2033/2/20         21                      Sunday                             
+2033/2/21         22                      Monday                             
+2033/2/22         23                      Tuesday                            
+2033/2/23         24                      Wednesday                          
+2033/2/24         25                      Thursday                           
+2033/2/25         26                      Friday                             
+2033/2/26         27                      Saturday                           
+2033/2/27         28                      Sunday                             
+2033/2/28         29                      Monday                             
+2033/3/1          2nd Lunar Month         Tuesday                            
+2033/3/2          2                       Wednesday                          
+2033/3/3          3                       Thursday                           
+2033/3/4          4                       Friday                             
+2033/3/5          5                       Saturday       Insects Waken       
+2033/3/6          6                       Sunday                             
+2033/3/7          7                       Monday                             
+2033/3/8          8                       Tuesday                            
+2033/3/9          9                       Wednesday                          
+2033/3/10         10                      Thursday                           
+2033/3/11         11                      Friday                             
+2033/3/12         12                      Saturday                           
+2033/3/13         13                      Sunday                             
+2033/3/14         14                      Monday                             
+2033/3/15         15                      Tuesday                            
+2033/3/16         16                      Wednesday                          
+2033/3/17         17                      Thursday                           
+2033/3/18         18                      Friday                             
+2033/3/19         19                      Saturday                           
+2033/3/20         20                      Sunday         Vernal Equinox      
+2033/3/21         21                      Monday                             
+2033/3/22         22                      Tuesday                            
+2033/3/23         23                      Wednesday                          
+2033/3/24         24                      Thursday                           
+2033/3/25         25                      Friday                             
+2033/3/26         26                      Saturday                           
+2033/3/27         27                      Sunday                             
+2033/3/28         28                      Monday                             
+2033/3/29         29                      Tuesday                            
+2033/3/30         30                      Wednesday                          
+2033/3/31         3rd Lunar Month         Thursday                           
+2033/4/1          2                       Friday                             
+2033/4/2          3                       Saturday                           
+2033/4/3          4                       Sunday                             
+2033/4/4          5                       Monday         Bright & Clear      
+2033/4/5          6                       Tuesday                            
+2033/4/6          7                       Wednesday                          
+2033/4/7          8                       Thursday                           
+2033/4/8          9                       Friday                             
+2033/4/9          10                      Saturday                           
+2033/4/10         11                      Sunday                             
+2033/4/11         12                      Monday                             
+2033/4/12         13                      Tuesday                            
+2033/4/13         14                      Wednesday                          
+2033/4/14         15                      Thursday                           
+2033/4/15         16                      Friday                             
+2033/4/16         17                      Saturday                           
+2033/4/17         18                      Sunday                             
+2033/4/18         19                      Monday                             
+2033/4/19         20                      Tuesday                            
+2033/4/20         21                      Wednesday      Corn Rain           
+2033/4/21         22                      Thursday                           
+2033/4/22         23                      Friday                             
+2033/4/23         24                      Saturday                           
+2033/4/24         25                      Sunday                             
+2033/4/25         26                      Monday                             
+2033/4/26         27                      Tuesday                            
+2033/4/27         28                      Wednesday                          
+2033/4/28         29                      Thursday                           
+2033/4/29         4th Lunar Month         Friday                             
+2033/4/30         2                       Saturday                           
+2033/5/1          3                       Sunday                             
+2033/5/2          4                       Monday                             
+2033/5/3          5                       Tuesday                            
+2033/5/4          6                       Wednesday                          
+2033/5/5          7                       Thursday       Summer Commences    
+2033/5/6          8                       Friday                             
+2033/5/7          9                       Saturday                           
+2033/5/8          10                      Sunday                             
+2033/5/9          11                      Monday                             
+2033/5/10         12                      Tuesday                            
+2033/5/11         13                      Wednesday                          
+2033/5/12         14                      Thursday                           
+2033/5/13         15                      Friday                             
+2033/5/14         16                      Saturday                           
+2033/5/15         17                      Sunday                             
+2033/5/16         18                      Monday                             
+2033/5/17         19                      Tuesday                            
+2033/5/18         20                      Wednesday                          
+2033/5/19         21                      Thursday                           
+2033/5/20         22                      Friday                             
+2033/5/21         23                      Saturday       Corn Forms          
+2033/5/22         24                      Sunday                             
+2033/5/23         25                      Monday                             
+2033/5/24         26                      Tuesday                            
+2033/5/25         27                      Wednesday                          
+2033/5/26         28                      Thursday                           
+2033/5/27         29                      Friday                             
+2033/5/28         5th Lunar Month         Saturday                           
+2033/5/29         2                       Sunday                             
+2033/5/30         3                       Monday                             
+2033/5/31         4                       Tuesday                            
+2033/6/1          5                       Wednesday                          
+2033/6/2          6                       Thursday                           
+2033/6/3          7                       Friday                             
+2033/6/4          8                       Saturday                           
+2033/6/5          9                       Sunday         Corn on Ear         
+2033/6/6          10                      Monday                             
+2033/6/7          11                      Tuesday                            
+2033/6/8          12                      Wednesday                          
+2033/6/9          13                      Thursday                           
+2033/6/10         14                      Friday                             
+2033/6/11         15                      Saturday                           
+2033/6/12         16                      Sunday                             
+2033/6/13         17                      Monday                             
+2033/6/14         18                      Tuesday                            
+2033/6/15         19                      Wednesday                          
+2033/6/16         20                      Thursday                           
+2033/6/17         21                      Friday                             
+2033/6/18         22                      Saturday                           
+2033/6/19         23                      Sunday                             
+2033/6/20         24                      Monday                             
+2033/6/21         25                      Tuesday        Summer Solstice     
+2033/6/22         26                      Wednesday                          
+2033/6/23         27                      Thursday                           
+2033/6/24         28                      Friday                             
+2033/6/25         29                      Saturday                           
+2033/6/26         30                      Sunday                             
+2033/6/27         6th Lunar Month         Monday                             
+2033/6/28         2                       Tuesday                            
+2033/6/29         3                       Wednesday                          
+2033/6/30         4                       Thursday                           
+2033/7/1          5                       Friday                             
+2033/7/2          6                       Saturday                           
+2033/7/3          7                       Sunday                             
+2033/7/4          8                       Monday                             
+2033/7/5          9                       Tuesday                            
+2033/7/6          10                      Wednesday                          
+2033/7/7          11                      Thursday       Moderate Heat       
+2033/7/8          12                      Friday                             
+2033/7/9          13                      Saturday                           
+2033/7/10         14                      Sunday                             
+2033/7/11         15                      Monday                             
+2033/7/12         16                      Tuesday                            
+2033/7/13         17                      Wednesday                          
+2033/7/14         18                      Thursday                           
+2033/7/15         19                      Friday                             
+2033/7/16         20                      Saturday                           
+2033/7/17         21                      Sunday                             
+2033/7/18         22                      Monday                             
+2033/7/19         23                      Tuesday                            
+2033/7/20         24                      Wednesday                          
+2033/7/21         25                      Thursday                           
+2033/7/22         26                      Friday         Great Heat          
+2033/7/23         27                      Saturday                           
+2033/7/24         28                      Sunday                             
+2033/7/25         29                      Monday                             
+2033/7/26         7th Lunar Month         Tuesday                            
+2033/7/27         2                       Wednesday                          
+2033/7/28         3                       Thursday                           
+2033/7/29         4                       Friday                             
+2033/7/30         5                       Saturday                           
+2033/7/31         6                       Sunday                             
+2033/8/1          7                       Monday                             
+2033/8/2          8                       Tuesday                            
+2033/8/3          9                       Wednesday                          
+2033/8/4          10                      Thursday                           
+2033/8/5          11                      Friday                             
+2033/8/6          12                      Saturday                           
+2033/8/7          13                      Sunday         Autumn Commences    
+2033/8/8          14                      Monday                             
+2033/8/9          15                      Tuesday                            
+2033/8/10         16                      Wednesday                          
+2033/8/11         17                      Thursday                           
+2033/8/12         18                      Friday                             
+2033/8/13         19                      Saturday                           
+2033/8/14         20                      Sunday                             
+2033/8/15         21                      Monday                             
+2033/8/16         22                      Tuesday                            
+2033/8/17         23                      Wednesday                          
+2033/8/18         24                      Thursday                           
+2033/8/19         25                      Friday                             
+2033/8/20         26                      Saturday                           
+2033/8/21         27                      Sunday                             
+2033/8/22         28                      Monday                             
+2033/8/23         29                      Tuesday        End of Heat         
+2033/8/24         30                      Wednesday                          
+2033/8/25         8th Lunar Month         Thursday                           
+2033/8/26         2                       Friday                             
+2033/8/27         3                       Saturday                           
+2033/8/28         4                       Sunday                             
+2033/8/29         5                       Monday                             
+2033/8/30         6                       Tuesday                            
+2033/8/31         7                       Wednesday                          
+2033/9/1          8                       Thursday                           
+2033/9/2          9                       Friday                             
+2033/9/3          10                      Saturday                           
+2033/9/4          11                      Sunday                             
+2033/9/5          12                      Monday                             
+2033/9/6          13                      Tuesday                            
+2033/9/7          14                      Wednesday      White Dew           
+2033/9/8          15                      Thursday                           
+2033/9/9          16                      Friday                             
+2033/9/10         17                      Saturday                           
+2033/9/11         18                      Sunday                             
+2033/9/12         19                      Monday                             
+2033/9/13         20                      Tuesday                            
+2033/9/14         21                      Wednesday                          
+2033/9/15         22                      Thursday                           
+2033/9/16         23                      Friday                             
+2033/9/17         24                      Saturday                           
+2033/9/18         25                      Sunday                             
+2033/9/19         26                      Monday                             
+2033/9/20         27                      Tuesday                            
+2033/9/21         28                      Wednesday                          
+2033/9/22         29                      Thursday                           
+2033/9/23         9th Lunar Month         Friday         Autumnal Equinox    
+2033/9/24         2                       Saturday                           
+2033/9/25         3                       Sunday                             
+2033/9/26         4                       Monday                             
+2033/9/27         5                       Tuesday                            
+2033/9/28         6                       Wednesday                          
+2033/9/29         7                       Thursday                           
+2033/9/30         8                       Friday                             
+2033/10/1         9                       Saturday                           
+2033/10/2         10                      Sunday                             
+2033/10/3         11                      Monday                             
+2033/10/4         12                      Tuesday                            
+2033/10/5         13                      Wednesday                          
+2033/10/6         14                      Thursday                           
+2033/10/7         15                      Friday                             
+2033/10/8         16                      Saturday       Cold Dew            
+2033/10/9         17                      Sunday                             
+2033/10/10        18                      Monday                             
+2033/10/11        19                      Tuesday                            
+2033/10/12        20                      Wednesday                          
+2033/10/13        21                      Thursday                           
+2033/10/14        22                      Friday                             
+2033/10/15        23                      Saturday                           
+2033/10/16        24                      Sunday                             
+2033/10/17        25                      Monday                             
+2033/10/18        26                      Tuesday                            
+2033/10/19        27                      Wednesday                          
+2033/10/20        28                      Thursday                           
+2033/10/21        29                      Friday                             
+2033/10/22        30                      Saturday                           
+2033/10/23        10th Lunar Month        Sunday         Frost               
+2033/10/24        2                       Monday                             
+2033/10/25        3                       Tuesday                            
+2033/10/26        4                       Wednesday                          
+2033/10/27        5                       Thursday                           
+2033/10/28        6                       Friday                             
+2033/10/29        7                       Saturday                           
+2033/10/30        8                       Sunday                             
+2033/10/31        9                       Monday                             
+2033/11/1         10                      Tuesday                            
+2033/11/2         11                      Wednesday                          
+2033/11/3         12                      Thursday                           
+2033/11/4         13                      Friday                             
+2033/11/5         14                      Saturday                           
+2033/11/6         15                      Sunday                             
+2033/11/7         16                      Monday         Winter Commences    
+2033/11/8         17                      Tuesday                            
+2033/11/9         18                      Wednesday                          
+2033/11/10        19                      Thursday                           
+2033/11/11        20                      Friday                             
+2033/11/12        21                      Saturday                           
+2033/11/13        22                      Sunday                             
+2033/11/14        23                      Monday                             
+2033/11/15        24                      Tuesday                            
+2033/11/16        25                      Wednesday                          
+2033/11/17        26                      Thursday                           
+2033/11/18        27                      Friday                             
+2033/11/19        28                      Saturday                           
+2033/11/20        29                      Sunday                             
+2033/11/21        30                      Monday                             
+2033/11/22        11th Lunar Month        Tuesday        Light Snow          
+2033/11/23        2                       Wednesday                          
+2033/11/24        3                       Thursday                           
+2033/11/25        4                       Friday                             
+2033/11/26        5                       Saturday                           
+2033/11/27        6                       Sunday                             
+2033/11/28        7                       Monday                             
+2033/11/29        8                       Tuesday                            
+2033/11/30        9                       Wednesday                          
+2033/12/1         10                      Thursday                           
+2033/12/2         11                      Friday                             
+2033/12/3         12                      Saturday                           
+2033/12/4         13                      Sunday                             
+2033/12/5         14                      Monday                             
+2033/12/6         15                      Tuesday                            
+2033/12/7         16                      Wednesday      Heavy Snow          
+2033/12/8         17                      Thursday                           
+2033/12/9         18                      Friday                             
+2033/12/10        19                      Saturday                           
+2033/12/11        20                      Sunday                             
+2033/12/12        21                      Monday                             
+2033/12/13        22                      Tuesday                            
+2033/12/14        23                      Wednesday                          
+2033/12/15        24                      Thursday                           
+2033/12/16        25                      Friday                             
+2033/12/17        26                      Saturday                           
+2033/12/18        27                      Sunday                             
+2033/12/19        28                      Monday                             
+2033/12/20        29                      Tuesday                            
+2033/12/21        30                      Wednesday      Winter Solstice     
+2033/12/22        11th Lunar Month        Thursday                           
+2033/12/23        2                       Friday                             
+2033/12/24        3                       Saturday                           
+2033/12/25        4                       Sunday                             
+2033/12/26        5                       Monday                             
+2033/12/27        6                       Tuesday                            
+2033/12/28        7                       Wednesday                          
+2033/12/29        8                       Thursday                           
+2033/12/30        9                       Friday                             
+2033/12/31        10                      Saturday                           

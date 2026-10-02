@@ -1,0 +1,41 @@
+.festival-plans { margin:36px 0; padding:30px; border:1px solid var(--festival-line,var(--md-sys-color-outline-variant)); border-radius:24px; color:var(--md-sys-color-on-surface); background:var(--md-sys-color-surface-container-low); }
+.festival-plans-heading { display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:18px; margin-bottom:24px; }
+.festival-plans-eyebrow { color:var(--md-sys-color-primary); font-size:10px; letter-spacing:2px; }
+.festival-plans-heading h2 { margin:10px 0; font-family:'Noto Serif SC','Songti SC',SimSun,serif; font-size:27px; font-weight:500; }
+.festival-plans-heading p,.festival-plans-footnote,.festival-plans-notice { color:var(--md-sys-color-on-surface-variant); font-size:12px; line-height:1.8; margin:0; }
+.festival-plans a { color:var(--md-sys-color-primary); font-size:12px; text-decoration:none; }
+.festival-plans a:hover { text-decoration:underline; text-underline-offset:4px; }
+.festival-plan-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+.festival-plan-card { display:flex; flex-direction:column; min-width:0; padding:23px; border:1px solid var(--md-sys-color-outline-variant); border-radius:16px; background:var(--md-sys-color-surface); }
+.festival-plan-top { display:flex; justify-content:space-between; gap:10px; font-size:10px; letter-spacing:1px; color:var(--md-sys-color-primary); }
+.festival-plan-card h3 { font-size:21px; line-height:1.5; margin:22px 0 8px; overflow-wrap:anywhere; }
+.festival-plan-card > p { font-size:12px; color:var(--md-sys-color-on-surface-variant); line-height:1.8; margin:0; }
+.festival-plan-price { display:flex; flex-wrap:wrap; gap:6px 10px; align-items:baseline; margin:24px 0 8px; }
+.festival-plan-price strong { font-size:26px; font-weight:550; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.festival-plan-price span { color:var(--md-sys-color-on-surface-variant); font-size:12px; }
+.festival-plan-card dl { margin:12px 0 24px; font-size:12px; }
+.festival-plan-card dl > div { display:flex; justify-content:space-between; gap:16px; padding:10px 0; border-bottom:1px solid var(--md-sys-color-outline-variant); }
+.festival-plan-card dt { color:var(--md-sys-color-on-surface-variant); flex-shrink:0; }
+.festival-plan-card dd { margin:0; text-align:right; overflow-wrap:anywhere; }
+.festival-plan-card .md-btn { width:100%; margin-top:auto; min-height:44px; }
+.festival-payment-logo { width:22px; height:22px; object-fit:contain; flex-shrink:0; }
+.festival-plan-card .festival-plan-feedback { margin-top:12px; min-height:0; }
+.festival-plan-feedback:empty { display:none; }
+.festival-plan-feedback.is-error { color:var(--md-sys-color-error,#b3261e); }
+.festival-plans-footnote { margin:18px 0 0; }
+.festival-plans-notice { padding:12px 0; }
+.festival-plans-empty { display:flex; flex-wrap:wrap; align-items:center; gap:18px; padding:28px; border:1px dashed var(--md-sys-color-outline-variant); border-radius:16px; }
+.festival-plans-empty > span { font-size:40px; color:var(--md-sys-color-primary); }
+.festival-plans-empty h3 { margin:0 0 6px; font-size:16px; }
+.festival-plans-empty p { margin:0; color:var(--md-sys-color-on-surface-variant); font-size:12px; line-height:1.8; }
+.festival-plans-empty a { margin-left:auto; }
+.festival-admin-plans { padding:18px; border:1px solid var(--md-sys-color-outline-variant); border-radius:14px; margin:18px 0; }
+.festival-admin-plans-heading { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px; }
+.festival-admin-plans a { color:var(--md-sys-color-primary); font-size:11px; }
+.festival-admin-plans p { font-size:11px; line-height:1.8; color:var(--md-sys-color-on-surface-variant); }
+.festival-plan-option { display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--md-sys-color-outline-variant); cursor:pointer; }
+.festival-plan-option input { width:18px; height:18px; accent-color:var(--md-sys-color-primary); flex-shrink:0; }
+.festival-plan-option span { display:grid; gap:5px; min-width:0; overflow-wrap:anywhere; }
+.festival-plan-option b { font-size:12px; font-weight:550; }
+.festival-plan-option small { font-size:11px; color:var(--md-sys-color-on-surface-variant); }
+@media(max-width:600px) { .festival-plans { padding:20px 16px; } .festival-plans-heading h2 { font-size:23px; } .festival-plan-grid { grid-template-columns:minmax(0,1fr); } .festival-plan-card { padding:20px; } .festival-plans-empty { padding:20px; } }
