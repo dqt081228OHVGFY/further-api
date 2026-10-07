@@ -3,28 +3,22 @@ package baidu
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
-	"strings"
-	"sync"
-	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/samber/lo"
 
 	"github.com/gin-gonic/gin"
 )
 
 // https://cloud.baidu.com/doc/WENXINWORKSHOP/s/flfmc9do2
-
-var baiduTokenStore sync.Map
 
 func requestOpenAI2Baidu(request dto.GeneralOpenAIRequest) *BaiduChatRequest {
 	baiduRequest := BaiduChatRequest{
@@ -114,133 +108,73 @@ func embeddingResponseBaidu2OpenAI(response *BaiduEmbeddingResponse) *dto.OpenAI
 	return &openAIEmbeddingResponse
 }
 
-func baiduStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*types.NewAPIError, *dto.Usage) {
-	usage := &dto.Usage{}
-	helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-		var baiduResponse BaiduChatStreamResponse
-		if err := common.Unmarshal([]byte(data), &baiduResponse); err != nil {
-			common.SysLog("error unmarshalling stream response: " + err.Error())
-			sr.Error(err)
-			return
+func baiduStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*types.GatewayError, *dto.Usage) {
+	usage, failure := openai.NativeTextStream(c, info, response, func(data []byte) (*dto.ChatCompletionsStreamResponse, *types.GatewayError) {
+		var wire BaiduChatStreamResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 		}
-		if baiduResponse.Usage.TotalTokens != 0 {
-			usage.TotalTokens = baiduResponse.Usage.TotalTokens
-			usage.PromptTokens = baiduResponse.Usage.PromptTokens
-			usage.CompletionTokens = baiduResponse.Usage.TotalTokens - baiduResponse.Usage.PromptTokens
+		if wire.ErrorCode != 0 {
+			return nil, types.NewOpenAIError(errors.New(wire.ErrorMsg), types.ErrorCodeBadResponseBody, http.StatusBadGateway)
 		}
-		response := streamResponseBaidu2OpenAI(&baiduResponse)
-		if err := helper.ObjectData(c, response); err != nil {
-			common.SysLog("error sending stream response: " + err.Error())
-			sr.Error(err)
-		}
-	})
-	service.CloseResponseBodyGracefully(resp)
-	return nil, usage
-}
-
-func baiduHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*types.NewAPIError, *dto.Usage) {
-	var baiduResponse BaiduChatResponse
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	service.CloseResponseBodyGracefully(resp)
-	err = json.Unmarshal(responseBody, &baiduResponse)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	if baiduResponse.ErrorMsg != "" {
-		return types.NewError(fmt.Errorf("%s", baiduResponse.ErrorMsg), types.ErrorCodeBadResponseBody), nil
-	}
-	fullTextResponse := responseBaidu2OpenAI(&baiduResponse)
-	jsonResponse, err := json.Marshal(fullTextResponse)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
-	return nil, &fullTextResponse.Usage
-}
-
-func baiduEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*types.NewAPIError, *dto.Usage) {
-	var baiduResponse BaiduEmbeddingResponse
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	service.CloseResponseBodyGracefully(resp)
-	err = json.Unmarshal(responseBody, &baiduResponse)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	if baiduResponse.ErrorMsg != "" {
-		return types.NewError(fmt.Errorf("%s", baiduResponse.ErrorMsg), types.ErrorCodeBadResponseBody), nil
-	}
-	fullTextResponse := embeddingResponseBaidu2OpenAI(&baiduResponse)
-	jsonResponse, err := json.Marshal(fullTextResponse)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
-	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
-	return nil, &fullTextResponse.Usage
-}
-
-func getBaiduAccessToken(apiKey string) (string, error) {
-	if val, ok := baiduTokenStore.Load(apiKey); ok {
-		var accessToken BaiduAccessToken
-		if accessToken, ok = val.(BaiduAccessToken); ok {
-			// soon this will expire
-			if time.Now().Add(time.Hour).After(accessToken.ExpiresAt) {
-				go func() {
-					_, _ = getBaiduAccessTokenHelper(apiKey)
-				}()
+		frame := streamResponseBaidu2OpenAI(&wire)
+		frame.Model = info.UpstreamModelName
+		if wire.Usage.TotalTokens > 0 {
+			snapshot := wire.Usage
+			if snapshot.CompletionTokens == 0 {
+				snapshot.CompletionTokens = max(0, snapshot.TotalTokens-snapshot.PromptTokens)
 			}
-			return accessToken.AccessToken, nil
+			frame.Usage = &snapshot
 		}
-	}
-	accessToken, err := getBaiduAccessTokenHelper(apiKey)
-	if err != nil {
-		return "", err
-	}
-	if accessToken == nil {
-		return "", errors.New("getBaiduAccessToken return a nil token")
-	}
-	return (*accessToken).AccessToken, nil
+		return frame, nil
+	})
+	return failure, usage
 }
 
-func getBaiduAccessTokenHelper(apiKey string) (*BaiduAccessToken, error) {
-	parts := strings.Split(apiKey, "|")
-	if len(parts) != 2 {
-		return nil, errors.New("invalid baidu apikey")
-	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-		parts[0], parts[1]), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-	res, err := service.GetHttpClient().Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
+func baiduHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*types.GatewayError, *dto.Usage) {
+	usage, failure := openai.NativeTextResponse(c, info, response, func(data []byte) (*dto.OpenAITextResponse, *types.GatewayError) {
+		var wire BaiduChatResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		}
+		if wire.ErrorCode != 0 {
+			return nil, types.NewOpenAIError(errors.New(wire.ErrorMsg), types.ErrorCodeBadResponseBody, http.StatusBadGateway)
+		}
+		output := responseBaidu2OpenAI(&wire)
+		output.Model = info.UpstreamModelName
+		if wire.IsTruncated && len(output.Choices) > 0 {
+			output.Choices[0].FinishReason = "length"
+		}
+		return output, nil
+	})
+	return failure, usage
+}
 
-	var accessToken BaiduAccessToken
-	err = json.NewDecoder(res.Body).Decode(&accessToken)
+func baiduEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*types.GatewayError, *dto.Usage) {
+	if c == nil || info == nil || !info.HasChannelMeta() || response == nil || response.Body == nil {
+		return types.NewError(errors.New("Baidu embedding context is missing"), types.ErrorCodeBadResponseBody), nil
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return types.NewError(err, types.ErrorCodeReadResponseBodyFailed), nil
 	}
-	if accessToken.Error != "" {
-		return nil, errors.New(accessToken.Error + ": " + accessToken.ErrorDescription)
+	var wire *BaiduEmbeddingResponse
+	if err = json.Unmarshal(body, &wire); err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
 	}
-	if accessToken.AccessToken == "" {
-		return nil, errors.New("getBaiduAccessTokenHelper get empty access token")
+	if wire == nil {
+		return types.NewError(errors.New("Baidu embedding response must be an object"), types.ErrorCodeBadResponseBody), nil
 	}
-	accessToken.ExpiresAt = time.Now().Add(time.Duration(accessToken.ExpiresIn) * time.Second)
-	baiduTokenStore.Store(apiKey, accessToken)
-	return &accessToken, nil
+	if wire.ErrorCode != 0 {
+		return types.NewError(errors.New(wire.ErrorMsg), types.ErrorCodeBadResponseBody), nil
+	}
+	output := embeddingResponseBaidu2OpenAI(wire)
+	output.Model = info.UpstreamModelName
+	body, err = json.Marshal(output)
+	if err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), nil
+	}
+	service.IOCopyBytesGracefully(c, response, body)
+	return nil, &output.Usage
 }

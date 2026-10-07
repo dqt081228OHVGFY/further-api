@@ -8,13 +8,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/setting/model_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/setting/model_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -241,7 +241,7 @@ func TestDistributeHidesTaskPluginDetailsButLogsDiagnostics(t *testing.T) {
 				require.Equal(t, http.StatusServiceUnavailable, recorder.Code)
 				requestID := recorder.Header().Get(common.RequestIdKey)
 				require.NotEmpty(t, requestID)
-				assert.JSONEq(t, fmt.Sprintf(`{"error":{"message":%q,"type":"new_api_error","code":"model_not_found"}}`,
+				assert.JSONEq(t, fmt.Sprintf(`{"error":{"message":%q,"type":"gateway_error","code":"model_not_found"}}`,
 					locale.message+" (request id: "+requestID+")"), recorder.Body.String())
 				assert.NotContains(t, recorder.Body.String(), "disable or override")
 				for _, key := range keys {
@@ -291,18 +291,18 @@ func TestSharedEndpointRebindsToSelectedType61Plugin(t *testing.T) {
 	assert.Equal(t, "beta", c.MustGet(jsplugin.ContextKeyPinnedEndpoint).(jsplugin.PinnedEndpoint).Plugin.Meta.Key)
 }
 
-func TestChannelMatchesExpectedTaskPluginUsesNewAPIExtensions(t *testing.T) {
-	channel := &model.Channel{Type: constant.ChannelTypeNewAPI}
+func TestChannelMatchesExpectedTaskPluginUsesGatewayExtensions(t *testing.T) {
+	channel := &model.Channel{Type: constant.ChannelTypeGateway}
 	channel.SetSetting(dto.ChannelSettings{TaskPluginKey: "single", TaskExtendPluginKeys: []string{"ext-alpha", "ext-beta"}})
 
 	assert.True(t, channelMatchesExpectedTaskPlugin(nil, channel, "ext-alpha"))
-	assert.True(t, channelMatchesExpectedTaskPlugin(nil, channel, "single"), "the single key stays valid on a New API channel")
+	assert.True(t, channelMatchesExpectedTaskPlugin(nil, channel, "single"), "the single key stays valid on a further-api channel")
 	assert.False(t, channelMatchesExpectedTaskPlugin(nil, channel, "ext-gamma"))
 	assert.True(t, channelMatchesExpectedTaskPlugin(nil, channel, ""), "requests without a pinned plugin still use the gateway")
-	assert.False(t, channelMatchesExpectedTaskPlugin(nil, &model.Channel{Type: constant.ChannelTypeNewAPI}, "ext-alpha"))
+	assert.False(t, channelMatchesExpectedTaskPlugin(nil, &model.Channel{Type: constant.ChannelTypeGateway}, "ext-alpha"))
 }
 
-func TestSharedEndpointRebindsToBoundNewAPIExtension(t *testing.T) {
+func TestSharedEndpointRebindsToBoundGatewayExtension(t *testing.T) {
 	registry := jsplugin.NewRegistry()
 	for _, key := range []string{"alpha", "beta"} {
 		source := strings.Replace(distributorEndpointPluginSource(key, 0), "channelTypes: [0],", "", 1)
@@ -324,7 +324,7 @@ func TestSharedEndpointRebindsToBoundNewAPIExtension(t *testing.T) {
 		return c
 	}
 
-	channel := &model.Channel{Id: 3, Type: constant.ChannelTypeNewAPI}
+	channel := &model.Channel{Id: 3, Type: constant.ChannelTypeGateway}
 	channel.SetSetting(dto.ChannelSettings{TaskExtendPluginKeys: []string{"unrelated"}})
 	assert.False(t, channelMatchesExpectedTaskPlugin(pin("alpha"), channel, "alpha"))
 

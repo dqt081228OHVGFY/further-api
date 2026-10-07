@@ -3,6 +3,13 @@ package constant
 var StreamingTimeout int
 var DifyDebug bool
 var MaxFileDownloadMB int
+var FileFetchRequestMaxMB = 128
+var FileFetchMaxConcurrency = 4
+var ExternalPayloadMemoryBudgetMB = 2048
+var RequestJSONMaxNodes = 100000
+var RequestJSONMaxDepth = 128
+var TaskPollMaxResponseMB = 64
+var TaskPollMaxConcurrency = 4
 var StreamScannerMaxBufferMB int
 var ForceStreamOption bool
 var CountToken bool

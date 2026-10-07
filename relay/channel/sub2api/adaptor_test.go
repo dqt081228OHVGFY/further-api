@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -28,7 +28,7 @@ func TestGetRequestURLAlphaSearch(t *testing.T) {
 	assert.Equal(t, "https://sub2api.example/v1/alpha/search", url)
 }
 
-func TestAdaptorInheritsNewAPIResponsesCompactSupport(t *testing.T) {
+func TestAdaptorInheritsFurtherAPIResponsesCompactSupport(t *testing.T) {
 	adaptor := &Adaptor{}
 	info := &relaycommon.RelayInfo{
 		ChannelMeta: &relaycommon.ChannelMeta{

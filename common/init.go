@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 )
 
 var (
@@ -23,10 +23,9 @@ var (
 )
 
 func printHelp() {
-	fmt.Println("NewAPI(Based OneAPI) " + Version + " - The next-generation LLM gateway and AI asset management system supports multiple languages.")
-	fmt.Println("Original Project: OneAPI by JustSong - https://github.com/songquanpeng/one-api")
-	fmt.Println("Maintainer: QuantumNous - https://github.com/QuantumNous/new-api")
-	fmt.Println("Usage: newapi [--port <port>] [--log-dir <log directory>] [--version] [--help]")
+	fmt.Println("further-api " + Version + " - AI model gateway")
+	fmt.Println("Repository: https://github.com/dqt081228OHVGFY/further-api")
+	fmt.Println("Usage: further-api [--port <port>] [--log-dir <log directory>] [--version] [--help]")
 }
 
 func InitEnv() {
@@ -46,13 +45,25 @@ func InitEnv() {
 		printHelp()
 		os.Exit(0)
 	}
+	if err := LoadEnvironment(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// LoadEnvironment applies validated configuration without terminating the
+// process, allowing the caller to roll back initialized resources on failure.
+func LoadEnvironment() error {
+	if err := ValidateEnvironment(); err != nil {
+		return err
+	}
+	if envVersion := os.Getenv("VERSION"); envVersion != "" {
+		Version = envVersion
+	}
 
 	if os.Getenv("SESSION_SECRET") != "" {
 		ss := os.Getenv("SESSION_SECRET")
 		if ss == "random_string" {
-			log.Println("WARNING: SESSION_SECRET is set to the default value 'random_string', please change it to a random string.")
-			log.Println("警告：SESSION_SECRET被设置为默认值'random_string'，请修改为随机字符串。")
-			log.Fatal("Please set SESSION_SECRET to a random string.")
+			return fmt.Errorf("SESSION_SECRET must be a random secret; the example value is not accepted")
 		} else {
 			SessionSecret = ss
 		}
@@ -63,7 +74,7 @@ func InitEnv() {
 		CryptoSecret = SessionSecret
 	}
 	if err := InitSessionCookieSettings(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	initUserSessionSettings()
 	if os.Getenv("SQLITE_PATH") != "" {
@@ -73,13 +84,10 @@ func InitEnv() {
 		var err error
 		*LogDir, err = filepath.Abs(*LogDir)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("resolve log directory: %w", err)
 		}
-		if _, err := os.Stat(*LogDir); os.IsNotExist(err) {
-			err = os.Mkdir(*LogDir, 0777)
-			if err != nil {
-				log.Fatal(err)
-			}
+		if err := os.MkdirAll(*LogDir, 0700); err != nil {
+			return fmt.Errorf("create log directory: %w", err)
 		}
 	}
 
@@ -136,6 +144,7 @@ func InitEnv() {
 	SearchRateLimitNum = GetEnvOrDefault("SEARCH_RATE_LIMIT", 10)
 	SearchRateLimitDuration = int64(GetEnvOrDefault("SEARCH_RATE_LIMIT_DURATION", 60))
 	initConstantEnv()
+	return nil
 }
 
 func initUserSessionSettings() {
@@ -179,6 +188,13 @@ func initConstantEnv() {
 	constant.StreamingTimeout = GetEnvOrDefault("STREAMING_TIMEOUT", 300)
 	constant.DifyDebug = GetEnvOrDefaultBool("DIFY_DEBUG", true)
 	constant.MaxFileDownloadMB = GetEnvOrDefault("MAX_FILE_DOWNLOAD_MB", 64)
+	constant.FileFetchRequestMaxMB = GetEnvOrDefault("FILE_FETCH_REQUEST_MAX_MB", 128)
+	constant.FileFetchMaxConcurrency = GetEnvOrDefault("FILE_FETCH_MAX_CONCURRENCY", 4)
+	constant.ExternalPayloadMemoryBudgetMB = GetEnvOrDefault("EXTERNAL_PAYLOAD_MEMORY_BUDGET_MB", 2048)
+	constant.RequestJSONMaxNodes = GetEnvOrDefault("REQUEST_JSON_MAX_NODES", 100000)
+	constant.RequestJSONMaxDepth = GetEnvOrDefault("REQUEST_JSON_MAX_DEPTH", 128)
+	constant.TaskPollMaxResponseMB = GetEnvOrDefault("TASK_POLL_MAX_RESPONSE_MB", 64)
+	constant.TaskPollMaxConcurrency = GetEnvOrDefault("TASK_POLL_MAX_CONCURRENCY", 4)
 	constant.StreamScannerMaxBufferMB = GetEnvOrDefault("STREAM_SCANNER_MAX_BUFFER_MB", 128)
 	// MaxRequestBodyMB 请求体最大大小（解压后），用于防止超大请求/zip bomb导致内存暴涨
 	constant.MaxRequestBodyMB = GetEnvOrDefault("MAX_REQUEST_BODY_MB", 128)

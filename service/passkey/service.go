@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 
 	"github.com/go-webauthn/webauthn/protocol"
 	webauthn "github.com/go-webauthn/webauthn/webauthn"
@@ -29,10 +29,7 @@ func BuildWebAuthn(r *http.Request) (*webauthn.WebAuthn, error) {
 func BuildWebAuthnForRPID(r *http.Request, selectedRPID string) (*webauthn.WebAuthn, error) {
 	settings := system_setting.PasskeySettingsSnapshot()
 
-	displayName := strings.TrimSpace(settings.RPDisplayName)
-	if displayName == "" {
-		displayName = common.SystemName
-	}
+	displayName := common.ProductName
 
 	origins, err := resolveOrigins(r, &settings)
 	if err != nil {

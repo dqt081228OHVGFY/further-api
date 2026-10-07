@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "后台管理接口",
-    "description": "",
+    "title": "further-api 后台管理接口",
+    "description": "further-api 控制台的管理 API。接口需要面板身份与相应权限；模型 API Key 不授予管理权限。",
     "version": "1.0.0"
   },
   "tags": [
@@ -76,10 +76,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -116,10 +113,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -141,10 +135,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -166,10 +157,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -191,10 +179,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -216,10 +201,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -241,10 +223,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -266,10 +245,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -291,10 +267,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -316,10 +289,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -341,10 +311,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -366,10 +333,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -391,10 +355,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -426,10 +387,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -461,10 +419,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -506,10 +461,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -557,10 +509,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -619,10 +568,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -682,10 +628,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -843,10 +786,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -868,10 +808,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -913,10 +850,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -954,10 +888,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -995,10 +926,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1026,10 +954,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1057,10 +982,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1112,10 +1034,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1143,10 +1062,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1259,10 +1175,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1333,10 +1246,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1358,10 +1268,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -1404,10 +1311,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -1427,10 +1331,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1452,10 +1353,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1477,10 +1375,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1502,10 +1397,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -1525,10 +1417,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1550,10 +1439,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1575,10 +1461,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1600,10 +1483,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1625,10 +1505,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1650,10 +1527,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1689,10 +1563,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1737,10 +1608,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1762,10 +1630,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1806,10 +1671,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -1838,10 +1700,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -1870,10 +1729,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1895,10 +1751,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1939,10 +1792,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -1975,10 +1825,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -2009,10 +1856,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2045,10 +1889,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2081,10 +1922,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2130,10 +1968,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2142,23 +1977,40 @@
       "get": {
         "summary": "获取充值信息",
         "deprecated": false,
-        "description": "🔐 需要登录（User权限）",
+        "description": "需要登录。仅发布当前真实可用支付方式和公开固定产品，不返回商户密钥。",
         "tags": [
           "充值"
         ],
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功",
-            "headers": {}
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayTopUpInfo"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2180,37 +2032,98 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
     },
     "/api/user/pay": {
       "post": {
-        "summary": "发起易支付",
-        "deprecated": false,
-        "description": "🔐 需要登录（User权限）",
+        "summary": "创建 epay 支付订单",
+        "description": "固定渠道为 epay；兼容客户端路径，使用与统一创建接口相同的独立订单执行与鉴权。",
         "tags": [
           "充值"
         ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "headers": {}
-          }
-        },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "epay"
+                    ]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,6})?$"
+                      },
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "充值信息中当前可用支付方式的 type"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "Creem 固定产品 ID"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "description": "本站相对路径或同站绝对地址，默认 /wallet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
       }
     },
     "/api/user/amount": {
@@ -2230,37 +2143,98 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
     },
     "/api/user/stripe/pay": {
       "post": {
-        "summary": "发起Stripe支付",
-        "deprecated": false,
-        "description": "🔐 需要登录（User权限）",
+        "summary": "创建 stripe 支付订单",
+        "description": "固定渠道为 stripe；兼容客户端路径，使用与统一创建接口相同的独立订单执行与鉴权。",
         "tags": [
           "充值"
         ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "headers": {}
-          }
-        },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "stripe"
+                    ]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,6})?$"
+                      },
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "充值信息中当前可用支付方式的 type"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "Creem 固定产品 ID"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "description": "本站相对路径或同站绝对地址，默认 /wallet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
       }
     },
     "/api/user/stripe/amount": {
@@ -2280,37 +2254,98 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
     },
     "/api/user/creem/pay": {
       "post": {
-        "summary": "发起Creem支付",
-        "deprecated": false,
-        "description": "🔐 需要登录（User权限）",
+        "summary": "创建 creem 支付订单",
+        "description": "固定渠道为 creem；兼容客户端路径，使用与统一创建接口相同的独立订单执行与鉴权。",
         "tags": [
           "充值"
         ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "headers": {}
-          }
-        },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "creem"
+                    ]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,6})?$"
+                      },
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "充值信息中当前可用支付方式的 type"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "Creem 固定产品 ID"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "description": "本站相对路径或同站绝对地址，默认 /wallet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
       }
     },
     "/api/user/epay/notify": {
@@ -2330,10 +2365,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2355,10 +2387,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2380,10 +2409,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2405,10 +2431,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2430,10 +2453,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2469,10 +2489,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2508,10 +2525,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2533,10 +2547,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2558,10 +2569,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2583,10 +2591,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2608,10 +2613,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2688,10 +2690,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -2733,10 +2732,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -2765,10 +2761,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2818,10 +2811,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2843,10 +2833,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2868,10 +2855,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2904,10 +2888,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -2938,10 +2919,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2974,10 +2952,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -2999,10 +2974,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3035,10 +3007,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3060,10 +3029,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3096,10 +3062,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3121,10 +3084,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3163,10 +3123,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3188,10 +3145,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3224,10 +3178,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3288,10 +3239,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3333,10 +3281,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3368,10 +3313,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3407,10 +3349,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3446,10 +3385,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3494,10 +3430,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3548,10 +3481,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3602,10 +3532,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3646,10 +3573,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -3678,10 +3602,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -3710,10 +3631,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3745,10 +3663,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3781,10 +3696,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -3815,10 +3727,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3857,10 +3766,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3893,10 +3799,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -3937,10 +3840,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -3969,10 +3869,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4001,10 +3898,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4036,10 +3930,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4072,10 +3963,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4106,10 +3994,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4131,10 +4016,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4175,10 +4057,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4210,10 +4089,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4235,10 +4111,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4260,10 +4133,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4295,10 +4165,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4320,10 +4187,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4355,10 +4219,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4390,10 +4251,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4415,10 +4273,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4440,10 +4295,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4465,10 +4317,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4490,10 +4339,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4513,10 +4359,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4536,10 +4379,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4572,10 +4412,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4597,10 +4434,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4622,10 +4456,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4647,10 +4478,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4672,10 +4500,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4697,10 +4522,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4720,10 +4542,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4743,10 +4562,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4778,10 +4594,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4814,10 +4627,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4848,10 +4658,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4873,10 +4680,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4896,10 +4700,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -4919,10 +4720,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4954,10 +4752,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -4990,10 +4785,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -5024,10 +4816,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5049,10 +4838,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5074,10 +4860,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5099,10 +4882,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5124,10 +4904,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       },
@@ -5147,10 +4924,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5172,10 +4946,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5197,10 +4968,7 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
       }
@@ -5222,12 +4990,335 @@
         },
         "security": [
           {
-            "Combination343": []
-          },
-          {
-            "Combination1243": []
+            "AccessToken1": []
           }
         ]
+      }
+    },
+    "/api/further/workspace/site-settings": {
+      "get": {
+        "tags": [
+          "系统"
+        ],
+        "summary": "读取站点与 Linux DO 配置",
+        "description": "需要超级管理员面板身份。",
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "站点配置与凭据状态；不返回凭据值。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "settings": {
+                          "$ref": "#/components/schemas/WorkspaceSiteSettings"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "系统"
+        ],
+        "summary": "原子保存站点与 Linux DO 配置",
+        "description": "验证全部输入后在同一事务保存；失败不会保存部分字段。需要超级管理员面板身份。",
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceSiteChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "站点配置与凭据状态；不返回凭据值。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "settings": {
+                          "$ref": "#/components/schemas/WorkspaceSiteSettings"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入不合法或启用登录所需的凭据不完整。"
+          },
+          "401": {
+            "description": "未验证面板身份。"
+          },
+          "403": {
+            "description": "权限不足。"
+          }
+        }
+      }
+    },
+    "/api/user/checkout": {
+      "post": {
+        "summary": "创建支付订单",
+        "description": "需要登录。只开放完成收款确认与真实配置的渠道；额度、金额和币种由服务器冻结。LDC 充值使用其独立报价与付款接口。",
+        "tags": [
+          "充值"
+        ],
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayCheckoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
+      }
+    },
+    "/api/user/waffo/pay": {
+      "post": {
+        "summary": "创建 waffo 支付订单",
+        "description": "固定渠道为 waffo；兼容客户端路径，使用与统一创建接口相同的独立订单执行与鉴权。",
+        "tags": [
+          "充值"
+        ],
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "waffo"
+                    ]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,6})?$"
+                      },
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "充值信息中当前可用支付方式的 type"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "Creem 固定产品 ID"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "description": "本站相对路径或同站绝对地址，默认 /wallet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
+      }
+    },
+    "/api/user/waffo-pancake/pay": {
+      "post": {
+        "summary": "创建 waffo_pancake 支付订单",
+        "description": "固定渠道为 waffo_pancake；兼容客户端路径，使用与统一创建接口相同的独立订单执行与鉴权。",
+        "tags": [
+          "充值"
+        ],
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "waffo_pancake"
+                    ]
+                  },
+                  "amount": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d+(\\.\\d{1,6})?$"
+                      },
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "description": "充值信息中当前可用支付方式的 type"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "Creem 固定产品 ID"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "description": "本站相对路径或同站绝对地址，默认 /wallet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GatewayCheckout"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "需要有效面板身份"
+          }
+        }
       }
     }
   },
@@ -5433,6 +5524,278 @@
             "type": "integer"
           }
         }
+      },
+      "WorkspaceSiteSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "system_name": {
+            "type": "string",
+            "enum": [
+              "further-api"
+            ]
+          },
+          "logo": {
+            "type": "string",
+            "enum": [
+              "/further-api-logo.svg"
+            ]
+          },
+          "server_address": {
+            "type": "string",
+            "description": "HTTP 或 HTTPS 来源地址，不含用户信息、路径或查询参数。"
+          },
+          "linuxdo_enabled": {
+            "type": "boolean"
+          },
+          "linuxdo_client_id": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "linuxdo_minimum_trust_level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "linuxdo_client_secret_configured": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "linuxdo_redirect_url": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "WorkspaceSiteChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "system_name": {
+            "type": "string",
+            "enum": [
+              "further-api"
+            ]
+          },
+          "logo": {
+            "type": "string",
+            "enum": [
+              "/further-api-logo.svg"
+            ]
+          },
+          "server_address": {
+            "type": "string",
+            "description": "HTTP 或 HTTPS 来源地址，不含用户信息、路径或查询参数。"
+          },
+          "linuxdo_enabled": {
+            "type": "boolean"
+          },
+          "linuxdo_client_id": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "linuxdo_minimum_trust_level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "linuxdo_client_secret": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 4096,
+            "description": "留空保留已配置的密钥。"
+          }
+        }
+      },
+      "GatewayCheckoutRequest": {
+        "type": "object",
+        "required": [
+          "provider",
+          "amount"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "epay",
+              "stripe",
+              "creem",
+              "waffo",
+              "waffo_pancake"
+            ]
+          },
+          "amount": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d{1,6})?$"
+              },
+              {
+                "type": "number",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              }
+            ]
+          },
+          "method": {
+            "type": "string",
+            "description": "充值信息中当前可用支付方式的 type"
+          },
+          "product_id": {
+            "type": "string",
+            "description": "Creem 固定产品 ID"
+          },
+          "return_url": {
+            "type": "string",
+            "description": "本站相对路径或同站绝对地址，默认 /wallet"
+          }
+        }
+      },
+      "GatewayCheckout": {
+        "type": "object",
+        "required": [
+          "trade_no",
+          "url",
+          "method",
+          "wallet_units",
+          "money",
+          "currency"
+        ],
+        "properties": {
+          "trade_no": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST"
+            ]
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "POST 订单按此已签名表单提交；客户端不能重新计算签名"
+          },
+          "wallet_units": {
+            "type": "string",
+            "description": "服务器冻结的到账 USD 额度"
+          },
+          "money": {
+            "type": "number",
+            "description": "服务器冻结的实付金额"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "GatewayPaymentMethod": {
+        "type": "object",
+        "required": [
+          "provider",
+          "type",
+          "name",
+          "currency",
+          "min_topup"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "epay",
+              "stripe",
+              "creem",
+              "waffo",
+              "waffo_pancake",
+              "ldc"
+            ]
+          },
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "min_topup": {
+            "type": "string"
+          }
+        }
+      },
+      "GatewayTopUpInfo": {
+        "type": "object",
+        "required": [
+          "pay_methods",
+          "creem_products",
+          "wallet_unit"
+        ],
+        "properties": {
+          "pay_methods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GatewayPaymentMethod"
+            }
+          },
+          "creem_products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "productId",
+                "price",
+                "quota",
+                "currency"
+              ],
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "quota": {
+                  "type": "number"
+                },
+                "currency": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "wallet_unit": {
+            "type": "string",
+            "enum": [
+              "USD"
+            ]
+          },
+          "enable_ldc_topup": {
+            "type": "boolean"
+          },
+          "enable_online_topup": {
+            "type": "boolean"
+          },
+          "enable_stripe_topup": {
+            "type": "boolean"
+          },
+          "enable_creem_topup": {
+            "type": "boolean"
+          },
+          "enable_waffo_topup": {
+            "type": "boolean"
+          },
+          "enable_waffo_pancake_topup": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "responses": {
@@ -5458,28 +5821,16 @@
       }
     },
     "securitySchemes": {
-      "SessionAuth1": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "session",
-        "description": "已废弃：Gin session 不再用于面板鉴权"
-      },
       "AccessToken1": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT or PAT",
-        "description": "面板短期 JWT 或 User.AccessToken PAT；不再要求 New-Api-User"
-      },
-      "NewApiUser1": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "New-Api-User",
-        "description": "已废弃且不再参与鉴权；PAT 客户端可以移除此请求头"
+        "description": "further-api 面板短期 JWT 或 User.AccessToken PAT"
       },
       "RefreshCookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "new_api_refresh",
+        "name": "further_api_refresh",
         "description": "仅 refresh/logout 使用的 HttpOnly、SameSite=Strict Cookie"
       },
       "SecurityProof": {
@@ -5487,1952 +5838,13 @@
         "in": "header",
         "name": "X-Security-Proof",
         "description": "绑定用户、登录会话和 scope 的短期二次验证 Proof"
-      },
-      "Combination222": {
-        "group": [
-          {
-            "id": 573667
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1122": {
-        "group": [
-          {
-            "id": 573667
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination223": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1123": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination224": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1124": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination225": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1125": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination226": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1126": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination227": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1127": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination228": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1128": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination229": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1129": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination230": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1130": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination231": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1131": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination232": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1132": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination233": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1133": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination234": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1134": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination235": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1135": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination236": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1136": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination237": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1137": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination238": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1138": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination239": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1139": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination240": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1140": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination241": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1141": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination242": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1142": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination243": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1143": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination244": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1144": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination245": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1145": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination246": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1146": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination247": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1147": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination248": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1148": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination249": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1149": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination250": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1150": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination251": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1151": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination252": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1152": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination253": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1153": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination254": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1154": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination255": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1155": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination256": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1156": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination257": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1157": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination258": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1158": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination259": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1159": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination260": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1160": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination261": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1161": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination262": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1162": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination263": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1163": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination264": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1164": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination265": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1165": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination266": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1166": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination267": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1167": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination268": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1168": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination269": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1169": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination270": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1170": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination271": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1171": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination272": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1172": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination273": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1173": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination274": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1174": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination275": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1175": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination276": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1176": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination277": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1177": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination278": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1178": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination279": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1179": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination280": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1180": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination281": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1181": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination282": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1182": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination283": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1183": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination284": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1184": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination285": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1185": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination286": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1186": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination287": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1187": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination288": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1188": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination289": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1189": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination290": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1190": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination291": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1191": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination292": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1192": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination293": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1193": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination294": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1194": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination295": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1195": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination296": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1196": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination297": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1197": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination298": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1198": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination299": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1199": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination300": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1200": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination301": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1201": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination302": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1202": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination303": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1203": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination304": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1204": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination305": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1205": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination306": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1206": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination307": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1207": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination308": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1208": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination309": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1209": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination310": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1210": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination311": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1211": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination312": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1212": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination313": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1213": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination314": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1214": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination315": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1215": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination316": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1216": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination317": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1217": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination318": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1218": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination319": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1219": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination320": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1220": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination321": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1221": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination322": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1222": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination323": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1223": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination324": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1224": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination325": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1225": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination326": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1226": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination327": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1227": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination328": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1228": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination329": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1229": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination330": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1230": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination331": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1231": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination332": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1232": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination333": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1233": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination334": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1234": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination335": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1235": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination336": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1236": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination337": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1237": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination338": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1238": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination339": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1239": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination340": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1240": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination341": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1241": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination342": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
-      },
-      "Combination1242": {
-        "group": [
-          {
-            "id": "AccessToken"
-          }
-        ],
-        "type": "combination"
       }
     }
   },
   "servers": [],
   "security": [
     {
-      "Combination343": []
-    },
-    {
-      "Combination1243": []
+      "AccessToken1": []
     }
   ]
 }

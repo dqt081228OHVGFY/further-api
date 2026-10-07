@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,13 +19,13 @@ var globalStats = &HTTPStats{}
 func StatsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startedAt := time.Now().UTC()
-		c.Set("relayfor_stats_active", true)
+		c.Set("further_stats_active", true)
 		// 增加活跃连接数
 		atomic.AddInt64(&globalStats.activeConnections, 1)
 
 		// 确保在请求结束时减少连接数
 		defer func() {
-			if value, exists := c.Get("relayfor_request_end_callbacks"); exists {
+			if value, exists := c.Get("further_request_end_callbacks"); exists {
 				if callbacks, ok := value.([]func()); ok {
 					for _, callback := range callbacks {
 						callback()

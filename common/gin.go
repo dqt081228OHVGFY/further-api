@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 	"github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
@@ -66,7 +66,7 @@ func GetRequestBody(c *gin.Context) (io.Seeker, error) {
 	contentLength := c.Request.ContentLength
 
 	// 使用新的存储系统
-	storage, err := CreateBodyStorageFromReader(c.Request.Body, contentLength, maxBytes)
+	storage, err := CreateBodyStorageFromReaderContext(c.Request.Context(), c.Request.Body, contentLength, maxBytes)
 	_ = c.Request.Body.Close()
 
 	if err != nil {
@@ -76,6 +76,10 @@ func GetRequestBody(c *gin.Context) (io.Seeker, error) {
 		return nil, err
 	}
 
+	if err := ValidateRequestJSONStructure(c.Request.Context(), storage); err != nil {
+		_ = storage.Close()
+		return nil, err
+	}
 	// 缓存存储对象
 	c.Set(KeyBodyStorage, storage)
 
@@ -197,6 +201,11 @@ func GetContextKeyType[T any](c *gin.Context, key constant.ContextKey) (T, bool)
 }
 
 func ApiError(c *gin.Context, err error) {
+	if errors.Is(err, ErrPasswordKDFBusy) {
+		c.Header("Retry-After", "1")
+		c.JSON(http.StatusServiceUnavailable, gin.H{"success": false, "code": "AUTH_BUSY", "message": ErrPasswordKDFBusy.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": false,
 		"message": err.Error(),

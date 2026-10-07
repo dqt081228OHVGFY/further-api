@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/convdiag"
-	relaymedia "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/media"
-	sharedclaude "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/claude"
-	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/convdiag"
+	relaymedia "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/media"
+	sharedclaude "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/shared/claude"
+	kitutil "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/reasoning"
 )
 
 func convertOpenAIResponsesRequestToClaudeMessages(c context.Context, info convmeta.Meta, request any) (any, error) {
@@ -185,17 +185,9 @@ func responsesInputContentToClaudeMediaMessages(c context.Context, content any) 
 			if err != nil {
 				return nil, fmt.Errorf("get file data failed: %s", err.Error())
 			}
-			claudePart := dto.ClaudeMediaMessage{
-				Source: &dto.ClaudeMessageSource{
-					Type:      "base64",
-					MediaType: mimeType,
-					Data:      base64Data,
-				},
-			}
-			if strings.HasPrefix(mimeType, "application/pdf") {
-				claudePart.Type = "document"
-			} else {
-				claudePart.Type = "image"
+			claudePart, err := sharedclaude.MediaMessage(base64Data, mimeType)
+			if err != nil {
+				return nil, err
 			}
 			parts = append(parts, claudePart)
 		}

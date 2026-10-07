@@ -4,298 +4,200 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net/http"
-	"os"
+	"net/textproto"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/samber/lo"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-func uploadDifyFile(c *gin.Context, info *relaycommon.RelayInfo, user string, media dto.MediaContent) *DifyFile {
-	uploadUrl := fmt.Sprintf("%s/v1/files/upload", info.ChannelBaseUrl)
-	switch media.Type {
-	case dto.ContentTypeImageURL:
-		// Decode base64 data
-		imageMedia := media.GetImageMedia()
-		base64Data := imageMedia.Url
-		// Remove base64 prefix if exists (e.g., "data:image/jpeg;base64,")
-		if idx := strings.Index(base64Data, ","); idx != -1 {
-			base64Data = base64Data[idx+1:]
-		}
-
-		// Decode base64 string
-		decodedData, err := base64.StdEncoding.DecodeString(base64Data)
-		if err != nil {
-			common.SysLog("failed to decode base64: " + err.Error())
-			return nil
-		}
-
-		// Create temporary file
-		tempFile, err := os.CreateTemp("", "dify-upload-*")
-		if err != nil {
-			common.SysLog("failed to create temp file: " + err.Error())
-			return nil
-		}
-		defer tempFile.Close()
-		defer os.Remove(tempFile.Name())
-
-		// Write decoded data to temp file
-		if _, err := tempFile.Write(decodedData); err != nil {
-			common.SysLog("failed to write to temp file: " + err.Error())
-			return nil
-		}
-
-		// Create multipart form
-		body := &bytes.Buffer{}
-		writer := multipart.NewWriter(body)
-
-		// Add user field
-		if err := writer.WriteField("user", user); err != nil {
-			common.SysLog("failed to add user field: " + err.Error())
-			return nil
-		}
-
-		// Create form file with proper mime type
-		mimeType := imageMedia.MimeType
-		if mimeType == "" {
-			mimeType = "image/jpeg" // default mime type
-		}
-
-		// Create form file
-		part, err := writer.CreateFormFile("file", fmt.Sprintf("image.%s", strings.TrimPrefix(mimeType, "image/")))
-		if err != nil {
-			common.SysLog("failed to create form file: " + err.Error())
-			return nil
-		}
-
-		// Copy file content to form
-		if _, err = io.Copy(part, bytes.NewReader(decodedData)); err != nil {
-			common.SysLog("failed to copy file content: " + err.Error())
-			return nil
-		}
-		writer.Close()
-
-		// Create HTTP request
-		req, err := http.NewRequest("POST", uploadUrl, body)
-		if err != nil {
-			common.SysLog("failed to create request: " + err.Error())
-			return nil
-		}
-
-		req.Header.Set("Content-Type", writer.FormDataContentType())
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", info.ApiKey))
-
-		// Send request
-		client := service.GetHttpClient()
-		resp, err := client.Do(req)
-		if err != nil {
-			common.SysLog("failed to send request: " + err.Error())
-			return nil
-		}
-		defer resp.Body.Close()
-
-		// Parse response
-		var result struct {
-			Id string `json:"id"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			common.SysLog("failed to decode response: " + err.Error())
-			return nil
-		}
-
-		return &DifyFile{
-			UploadFileId: result.Id,
-			Type:         "image",
-			TransferMode: "local_file",
-		}
+func uploadDifyFile(c *gin.Context, info *relaycommon.RelayInfo, user string, media dto.MediaContent) (*DifyFile, error) {
+	if c == nil || c.Request == nil || info == nil || !info.HasChannelMeta() {
+		return nil, errors.New("Dify upload context is missing")
 	}
-	return nil
-}
-
-func requestOpenAI2Dify(c *gin.Context, info *relaycommon.RelayInfo, request dto.GeneralOpenAIRequest) *DifyChatRequest {
-	difyReq := DifyChatRequest{
-		Inputs:           make(map[string]interface{}),
-		AutoGenerateName: false,
+	source := media.ToFileSource()
+	if source == nil {
+		return nil, errors.New("Dify image source is missing")
 	}
-
-	user := request.User
-	if len(user) == 0 {
-		user = json.RawMessage(helper.GetResponseID(c))
-	}
-	var stringUser string
-	err := json.Unmarshal(user, &stringUser)
+	encoded, contentType, err := service.GetBase64Data(c, source, "Dify inline image")
 	if err != nil {
-		common.SysLog("failed to unmarshal user: " + err.Error())
-		stringUser = helper.GetResponseID(c)
+		return nil, err
 	}
-	difyReq.User = stringUser
-
-	files := make([]DifyFile, 0)
-	var content strings.Builder
+	data, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+	endpoint, err := openai.ProviderEndpoint(info.ChannelBaseUrl, "/v1/files/upload")
+	if err != nil {
+		return nil, err
+	}
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	if err = writer.WriteField("user", user); err != nil {
+		return nil, err
+	}
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", mime.FormatMediaType("form-data", map[string]string{"name": "file", "filename": "image." + strings.TrimPrefix(contentType, "image/")}))
+	header.Set("Content-Type", contentType)
+	part, err := writer.CreatePart(header)
+	if err != nil {
+		return nil, err
+	}
+	if _, err = part.Write(data); err != nil {
+		return nil, err
+	}
+	if err = writer.Close(); err != nil {
+		return nil, err
+	}
+	request, err := http.NewRequestWithContext(c.Request.Context(), http.MethodPost, endpoint, body)
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	request.Header.Set("Authorization", "Bearer "+info.ApiKey)
+	client, err := service.GetHttpClientWithProxySettings(info.ChannelSetting.Proxy, info.ChannelSetting)
+	if err != nil {
+		return nil, err
+	}
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return nil, fmt.Errorf("Dify image upload failed (HTTP %d)", response.StatusCode)
+	}
+	var wire struct {
+		ID string `json:"id"`
+	}
+	if err = json.NewDecoder(io.LimitReader(response.Body, 1<<20)).Decode(&wire); err != nil {
+		return nil, err
+	}
+	if wire.ID == "" {
+		return nil, errors.New("Dify image upload returned no file ID")
+	}
+	return &DifyFile{Type: "image", TransferMode: "local_file", UploadFileId: wire.ID}, nil
+}
+func requestOpenAI2Dify(c *gin.Context, info *relaycommon.RelayInfo, request dto.GeneralOpenAIRequest) (*DifyChatRequest, error) {
+	if info == nil || !info.HasChannelMeta() {
+		return nil, errors.New("Dify provider configuration is missing")
+	}
+	user := ""
+	if len(request.User) > 0 {
+		_ = json.Unmarshal(request.User, &user)
+	}
+	if user == "" {
+		user = helper.GetResponseID(c)
+	}
+	output := &DifyChatRequest{Inputs: make(map[string]any), User: user, Files: make([]DifyFile, 0), ResponseMode: "blocking"}
+	if request.Stream != nil && *request.Stream {
+		output.ResponseMode = "streaming"
+	}
+	var text strings.Builder
 	for _, message := range request.Messages {
-		if message.Role == "system" {
-			content.WriteString("SYSTEM: \n" + message.StringContent() + "\n")
-		} else if message.Role == "assistant" {
-			content.WriteString("ASSISTANT: \n" + message.StringContent() + "\n")
-		} else {
-			parseContent := message.ParseContent()
-			for _, mediaContent := range parseContent {
-				switch mediaContent.Type {
-				case dto.ContentTypeText:
-					content.WriteString("USER: \n" + mediaContent.Text + "\n")
-				case dto.ContentTypeImageURL:
-					media := mediaContent.GetImageMedia()
-					var file *DifyFile
-					if media.IsRemoteImage() {
-						// 修复 #2083: 远程图片分支此前未初始化 file，
-						// 导致 file.Type = ... 触发 nil pointer dereference
-						// 而 panic（500: "invalid memory address or nil pointer dereference"）。
-						file = &DifyFile{
-							Type:         media.MimeType,
-							TransferMode: "remote_url",
-							URL:          media.Url,
-						}
-					} else {
-						file = uploadDifyFile(c, info, difyReq.User, mediaContent)
-					}
-					if file != nil {
-						files = append(files, *file)
-					}
+		role := strings.ToUpper(message.Role)
+		if role == "DEVELOPER" {
+			role = "SYSTEM"
+		}
+		for _, part := range message.ParseContent() {
+			switch part.Type {
+			case dto.ContentTypeText:
+				text.WriteString(role + ": \n" + part.Text + "\n")
+			case dto.ContentTypeImageURL:
+				media := part.GetImageMedia()
+				if media == nil || media.Url == "" {
+					return nil, errors.New("Dify image URL is missing")
 				}
+				if media.IsRemoteImage() {
+					output.Files = append(output.Files, DifyFile{Type: "image", TransferMode: "remote_url", URL: media.Url})
+				} else {
+					file, err := uploadDifyFile(c, info, user, part)
+					if err != nil {
+						return nil, err
+					}
+					output.Files = append(output.Files, *file)
+				}
+			default:
+				return nil, openai.UnsupportedOperation("Dify", "this message content type")
 			}
 		}
 	}
-	difyReq.Query = content.String()
-	difyReq.Files = files
-	mode := "blocking"
-	if lo.FromPtrOr(request.Stream, false) {
-		mode = "streaming"
-	}
-	difyReq.ResponseMode = mode
-	return &difyReq
+	output.Query = text.String()
+	return output, nil
 }
-
-func streamResponseDify2OpenAI(difyResponse DifyChunkChatCompletionResponse) *dto.ChatCompletionsStreamResponse {
-	response := dto.ChatCompletionsStreamResponse{
-		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
-		Model:   "dify",
-	}
-	var choice dto.ChatCompletionsStreamResponseChoice
-	if strings.HasPrefix(difyResponse.Event, "workflow_") {
+func streamResponseDify2OpenAI(wire DifyChunkChatCompletionResponse) *dto.ChatCompletionsStreamResponse {
+	frame := &dto.ChatCompletionsStreamResponse{Id: wire.ConversationId, Object: "chat.completion.chunk", Created: common.GetTimestamp(), Choices: []dto.ChatCompletionsStreamResponseChoice{{Index: 0}}}
+	choice := &frame.Choices[0]
+	switch wire.Event {
+	case "message", "agent_message":
+		answer := wire.Answer
+		if strings.HasPrefix(answer, "<details") && strings.Contains(answer, "Thinking...") {
+			answer = "<think>"
+		} else if answer == "</details>" {
+			answer = "</think>"
+		}
+		choice.Delta.SetContentString(answer)
+	case "message_end":
+		reason := "stop"
+		choice.FinishReason = &reason
+		frame.Usage = &wire.MetaData.Usage
+	default:
 		if constant.DifyDebug {
-			text := "Workflow: " + difyResponse.Data.WorkflowId
-			if difyResponse.Event == "workflow_finished" {
-				text += " " + difyResponse.Data.Status
+			if strings.HasPrefix(wire.Event, "workflow_") {
+				choice.Delta.SetReasoningContent("Workflow: " + wire.Data.WorkflowId + " " + wire.Data.Status + "\n")
+			} else if strings.HasPrefix(wire.Event, "node_") {
+				choice.Delta.SetReasoningContent("Node: " + wire.Data.NodeType + " " + wire.Data.Status + "\n")
 			}
-			choice.Delta.SetReasoningContent(text + "\n")
 		}
-	} else if strings.HasPrefix(difyResponse.Event, "node_") {
-		if constant.DifyDebug {
-			text := "Node: " + difyResponse.Data.NodeType
-			if difyResponse.Event == "node_finished" {
-				text += " " + difyResponse.Data.Status
-			}
-			choice.Delta.SetReasoningContent(text + "\n")
-		}
-	} else if difyResponse.Event == "message" || difyResponse.Event == "agent_message" {
-		if difyResponse.Answer == "<details style=\"color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;\" open> <summary> Thinking... </summary>\n" {
-			difyResponse.Answer = "<think>"
-		} else if difyResponse.Answer == "</details>" {
-			difyResponse.Answer = "</think>"
-		}
-
-		choice.Delta.SetContentString(difyResponse.Answer)
 	}
-	response.Choices = append(response.Choices, choice)
-	return &response
+	return frame
 }
-
-func difyStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var responseText string
-	usage := &dto.Usage{}
-	var nodeToken int
-	helper.SetEventStreamHeaders(c)
-	helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-		var difyResponse DifyChunkChatCompletionResponse
-		if err := json.Unmarshal([]byte(data), &difyResponse); err != nil {
-			common.SysLog("error unmarshalling stream response: " + err.Error())
-			sr.Error(err)
-			return
+func difyStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextStream(c, info, response, func(data []byte) (*dto.ChatCompletionsStreamResponse, *types.GatewayError) {
+		var wire *DifyChunkChatCompletionResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 		}
-		if difyResponse.Event == "message_end" {
-			usage = &difyResponse.MetaData.Usage
-			sr.Done()
-			return
-		} else if difyResponse.Event == "error" {
-			sr.Stop(fmt.Errorf("dify error event"))
-			return
+		if wire == nil {
+			return nil, types.NewError(errors.New("Dify stream frame must be an object"), types.ErrorCodeBadResponseBody)
 		}
-		openaiResponse := *streamResponseDify2OpenAI(difyResponse)
-		if len(openaiResponse.Choices) != 0 {
-			responseText += openaiResponse.Choices[0].Delta.GetContentString()
-			if openaiResponse.Choices[0].Delta.ReasoningContent != nil {
-				nodeToken += 1
+		if wire.Event == "error" {
+			var detail struct {
+				Message string `json:"message"`
 			}
+			_ = json.Unmarshal(data, &detail)
+			if detail.Message == "" {
+				detail.Message = "Dify stream failed"
+			}
+			return nil, types.NewError(errors.New(detail.Message), types.ErrorCodeBadResponseBody)
 		}
-		if err := helper.ObjectData(c, openaiResponse); err != nil {
-			common.SysLog(err.Error())
-			sr.Error(err)
-		}
+		frame := streamResponseDify2OpenAI(*wire)
+		frame.Model = info.UpstreamModelName
+		return frame, nil
 	})
-	helper.Done(c)
-	if usage.TotalTokens == 0 {
-		usage = service.ResponseText2Usage(c, responseText, info.UpstreamModelName, info.GetEstimatePromptTokens())
-	}
-	usage.CompletionTokens += nodeToken
-	return usage, nil
 }
-
-func difyHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var difyResponse DifyChatCompletionResponse
-	responseBody, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-	service.CloseResponseBodyGracefully(resp)
-	err = json.Unmarshal(responseBody, &difyResponse)
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-	fullTextResponse := dto.OpenAITextResponse{
-		Id:      difyResponse.ConversationId,
-		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
-		Usage:   difyResponse.MetaData.Usage,
-	}
-	choice := dto.OpenAITextResponseChoice{
-		Index: 0,
-		Message: dto.Message{
-			Role:    "assistant",
-			Content: difyResponse.Answer,
-		},
-		FinishReason: "stop",
-	}
-	fullTextResponse.Choices = append(fullTextResponse.Choices, choice)
-	jsonResponse, err := json.Marshal(fullTextResponse)
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	c.Writer.Write(jsonResponse)
-	return &difyResponse.MetaData.Usage, nil
+func difyHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextResponse(c, info, response, func(data []byte) (*dto.OpenAITextResponse, *types.GatewayError) {
+		var wire *DifyChatCompletionResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		}
+		if wire == nil {
+			return nil, types.NewError(errors.New("Dify response must be an object"), types.ErrorCodeBadResponseBody)
+		}
+		return &dto.OpenAITextResponse{Id: wire.ConversationId, Object: "chat.completion", Created: wire.CreateAt, Model: info.UpstreamModelName, Usage: wire.MetaData.Usage, Choices: []dto.OpenAITextResponseChoice{{Index: 0, Message: dto.Message{Role: "assistant", Content: wire.Answer}, FinishReason: "stop"}}}, nil
+	})
 }

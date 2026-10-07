@@ -3,8 +3,8 @@ package helper
 import (
 	"errors"
 
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 // StreamResult is passed to each dataHandler invocation, providing methods
@@ -26,7 +26,7 @@ func (r *StreamResult) Error(err error) {
 		return
 	}
 	r.status.RecordError(err.Error())
-	var apiErr *types.NewAPIError
+	var apiErr *types.GatewayError
 	if errors.As(err, &apiErr) {
 		r.status.MarkFailed(string(apiErr.GetErrorCode()), apiErr.ToOpenAIError().Type, apiErr.StatusCode)
 	}

@@ -5,12 +5,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 	"github.com/gin-gonic/gin"
 )
 
@@ -97,7 +97,7 @@ func (s *RequestPolicyState) BeginAttempt(channel *model.Channel, group string) 
 // RecordPolicyFailure appends the failed attempt and the retry decision made
 // for it. The health entry mirrors the check in ProcessChannelError, which
 // performs the actual disable.
-func RecordPolicyFailure(c *gin.Context, channelID int, err *types.NewAPIError, decision PolicyDecision) {
+func RecordPolicyFailure(c *gin.Context, channelID int, err *types.GatewayError, decision PolicyDecision) {
 	if c == nil || err == nil {
 		return
 	}
@@ -107,7 +107,7 @@ func RecordPolicyFailure(c *gin.Context, channelID int, err *types.NewAPIError, 
 		source = "channel"
 	case err.GetErrorCode() == types.ErrorCodeDoRequestFailed:
 		source = "transport"
-	case err.GetErrorType() == types.ErrorTypeNewAPIError:
+	case err.GetErrorType() == types.ErrorTypeGatewayError:
 		source = "local"
 	}
 	state := RequestPolicy(c)
@@ -166,7 +166,7 @@ func EffectiveSessionMode(setting *operation_setting.ChannelAffinitySetting, rul
 // stopped. It never writes a log row itself: the per-channel error log written
 // by ProcessChannelError already carries the decision record, so a second row
 // here would duplicate it.
-func RecordRequestPolicyTermination(c *gin.Context, apiErr *types.NewAPIError) {
+func RecordRequestPolicyTermination(c *gin.Context, apiErr *types.GatewayError) {
 	if c == nil || apiErr == nil {
 		return
 	}

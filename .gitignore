@@ -14,8 +14,7 @@ logs
 web/dist
 web/node_modules
 .env
-one-api
-new-api
+further-api
 /__debug_bin*
 .DS_Store
 tiktoken_cache
@@ -37,7 +36,7 @@ electron/dist
 token_estimator_test.go
 skills-lock.json
 .playwright-mcp
-.agent-work/local-preview/
+/.agent-work/
 
 # Local-only live probes and scratch test workspaces.
 .local-tests/
@@ -45,3 +44,33 @@ relaykit/relayconvert/chat_responses_live_local_test.go
 service/openaicompat/chat_responses_live_local_test.go
 go.work
 go.work.sum
+/work/
+/.playwright-cli/
+/output/
+
+# Dependency installs and generated bundles at every workspace level.
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local deployment credentials; keep only the checked-in empty examples.
+.env.*
+!.env.example
+compose.env
+compose.env.*
+!compose.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime output and alternate SQLite database names.
+*.log
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal

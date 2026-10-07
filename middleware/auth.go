@@ -8,16 +8,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/service/authz"
-	"github.com/QuantumNous/new-api/setting/ratio_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/service/authz"
+	"github.com/dqt081228OHVGFY/further-api/setting/ratio_setting"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -91,6 +91,14 @@ func TryUserAuth() func(c *gin.Context) {
 			return
 		}
 		if credentialKind != dashboardCredentialUnmatched {
+			if user.Status != common.UserStatusEnabled {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "code": "AUTH_USER_DISABLED", "message": common.TranslateMessage(c, i18n.MsgAuthUserBanned)})
+				return
+			}
+			if !validUserInfo(user.Username, user.Role) {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "code": "AUTH_USER_INVALID", "message": common.TranslateMessage(c, i18n.MsgAuthUserInfoInvalid)})
+				return
+			}
 			setDashboardAuthContext(c, user, identity, credentialKind == dashboardCredentialPAT)
 		}
 		c.Next()
@@ -331,6 +339,15 @@ func TokenAuthReadOnly() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
+		// Read-only usage/log queries retain expired or exhausted credentials,
+		// but must honor the same network boundary as relay requests.
+		if allowedIPs := token.GetIpLimits(); len(allowedIPs) > 0 {
+			clientIP := net.ParseIP(c.ClientIP())
+			if clientIP == nil || !common.IsIpInCIDRList(clientIP, allowedIPs) {
+				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"success": false, "code": "TOKEN_IP_FORBIDDEN", "message": "您的 IP 不在令牌允许访问的列表中"})
+				return
+			}
+		}
 
 		userCache, err := model.GetUserCache(token.UserId)
 		if err != nil {
@@ -377,6 +394,15 @@ func TokenAuth() func(c *gin.Context) {
 			skKey := c.Query("key")
 			if skKey != "" {
 				c.Request.Header.Set("Authorization", "Bearer "+skKey)
+				// Preserve Gemini's response-format selection without retaining
+				// the client credential in URLs, errors, or provider requests.
+				if c.Request.Header.Get("x-goog-api-key") == "" {
+					c.Request.Header.Set("x-goog-api-key", skKey)
+				}
+				query := c.Request.URL.Query()
+				query.Del("key")
+				c.Request.URL.RawQuery = query.Encode()
+				c.Request.RequestURI = c.Request.URL.RequestURI()
 			}
 			// 从x-goog-api-key header中获取key
 			xGoogKey := c.Request.Header.Get("x-goog-api-key")

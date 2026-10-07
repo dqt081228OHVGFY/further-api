@@ -1,138 +1,106 @@
 package relay
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-func AlphaSearchHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types.NewAPIError) {
-	info.InitChannelMeta(c)
-
+func AlphaSearchHelper(c *gin.Context, info *relaycommon.RelayInfo) *types.GatewayError {
+	attempt, err := beginProtocolAttempt(c, info)
+	if err != nil {
+		return err
+	}
 	switch info.ChannelType {
-	case constant.ChannelTypeSub2API,
-		constant.ChannelTypeNewAPI,
-		constant.ChannelTypeCodex,
-		constant.ChannelTypeAdvancedCustom:
+	case constant.ChannelTypeSub2API, constant.ChannelTypeGateway, constant.ChannelTypeCodex, constant.ChannelTypeAdvancedCustom:
 	default:
-		// Allow retry onto another channel that may support this endpoint.
-		return types.NewError(
-			errors.New("channel does not support /v1/alpha/search"),
-			types.ErrorCodeInvalidRequest,
-		)
+		return types.NewError(errors.New("此渠道不支持 /v1/alpha/search。"), types.ErrorCodeInvalidRequest)
 	}
-
-	request, ok := info.Request.(*dto.AlphaSearchRequest)
-	if !ok {
-		return types.NewErrorWithStatusCode(
-			fmt.Errorf("invalid request type, expected *dto.AlphaSearchRequest, got %T", info.Request),
-			types.ErrorCodeInvalidRequest,
-			http.StatusBadRequest,
-			types.ErrOptionWithSkipRetry(),
-		)
-	}
-
-	err := helper.ModelMappedHelper(c, info, request)
+	request, err := cloneProtocolRequest[*dto.AlphaSearchRequest](attempt, false)
 	if err != nil {
-		return types.NewError(err, types.ErrorCodeChannelModelMappedError, types.ErrOptionWithSkipRetry())
+		return err
 	}
-
-	jsonData, err := buildAlphaSearchRequestBody(request.RawBody, info.OriginModelName, info.UpstreamModelName)
+	raw, rawErr := buildAlphaSearchRequestBody(request.RawBody, info.OriginModelName, info.UpstreamModelName)
+	if rawErr != nil {
+		return newConvertRequestFailedError(c, info, rawErr)
+	}
+	body, err := attempt.jsonBytes(raw, false, true, nil)
 	if err != nil {
-		return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+		return err
 	}
-
-	if len(info.ParamOverride) > 0 {
-		jsonData, err = relaycommon.ApplyParamOverrideWithRelayInfo(jsonData, info)
-		if err != nil {
-			return newAPIErrorFromParamOverride(err)
+	defer body.Close()
+	response, err := attempt.send(body.reader)
+	if err != nil {
+		return err
+	}
+	if response == nil {
+		return types.NewErrorWithStatusCode(errors.New("搜索上游未返回 HTTP 响应。"), types.ErrorCodeBadResponse, http.StatusBadGateway, types.ErrOptionWithSkipRetry())
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return attempt.mapError(service.RelayErrorHandler(c.Request.Context(), response, false))
+	}
+	connectionFields := make(map[string]bool)
+	for _, value := range response.Header.Values("Connection") {
+		for _, name := range strings.Split(value, ",") {
+			connectionFields[strings.ToLower(strings.TrimSpace(name))] = true
 		}
 	}
-
-	logger.LogDebug(c, "requestBody: %s", jsonData)
-	body, closer, err := relaycommon.NewOutboundJSONBody(jsonData)
-	if err != nil {
-		return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+	for name, values := range response.Header {
+		if !service.ShouldCopyUpstreamHeader(c, name, values) || connectionFields[strings.ToLower(name)] {
+			continue
+		}
+		c.Writer.Header().Del(name)
+		for _, value := range values {
+			c.Writer.Header().Add(name, value)
+		}
 	}
-	defer closer.Close()
-
-	adaptor := GetAdaptor(info.ApiType)
-	if adaptor == nil {
-		return types.NewError(fmt.Errorf("invalid api type: %d", info.ApiType), types.ErrorCodeInvalidApiType, types.ErrOptionWithSkipRetry())
-	}
-	adaptor.Init(info)
-
-	resp, err := adaptor.DoRequest(c, info, body)
-	if err != nil {
-		return types.NewOpenAIError(err, types.ErrorCodeDoRequestFailed, http.StatusInternalServerError)
-	}
-
-	statusCodeMappingStr := c.GetString("status_code_mapping")
-	httpResp, ok := resp.(*http.Response)
-	if !ok || httpResp == nil {
-		return types.NewOpenAIError(errors.New("invalid http response"), types.ErrorCodeDoRequestFailed, http.StatusInternalServerError)
-	}
-	defer httpResp.Body.Close()
-
-	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
-		newAPIError = service.RelayErrorHandler(c.Request.Context(), httpResp, false)
-		service.ResetStatusCode(newAPIError, statusCodeMappingStr)
-		return newAPIError
-	}
-
-	if contentType := httpResp.Header.Get("Content-Type"); contentType != "" {
-		c.Writer.Header().Set("Content-Type", contentType)
-	}
-	c.Writer.WriteHeader(httpResp.StatusCode)
-	if _, err := io.Copy(c.Writer, httpResp.Body); err != nil {
+	c.Writer.WriteHeader(response.StatusCode)
+	if _, err := io.Copy(c.Writer, response.Body); err != nil {
+		if cancel := protocolCancellation(c); cancel != nil {
+			return cancel
+		}
 		return types.NewError(err, types.ErrorCodeDoRequestFailed, types.ErrOptionWithSkipRetry())
 	}
-
-	// Upstream alpha search returns no usage; bill one web_search_preview call.
 	if info.ResponsesUsageInfo == nil {
-		info.ResponsesUsageInfo = &relaycommon.ResponsesUsageInfo{
-			BuiltInTools: make(map[string]*relaycommon.BuildInToolInfo),
-		}
+		info.ResponsesUsageInfo = &relaycommon.ResponsesUsageInfo{}
 	}
 	if info.ResponsesUsageInfo.BuiltInTools == nil {
 		info.ResponsesUsageInfo.BuiltInTools = make(map[string]*relaycommon.BuildInToolInfo)
 	}
-	info.ResponsesUsageInfo.BuiltInTools[dto.BuildInToolWebSearchPreview] = &relaycommon.BuildInToolInfo{
-		ToolName:  dto.BuildInToolWebSearchPreview,
-		CallCount: 1,
-	}
-
-	usage := &dto.Usage{}
-	service.PostTextConsumeQuota(c, info, usage, nil)
+	info.ResponsesUsageInfo.BuiltInTools[dto.BuildInToolWebSearchPreview] = &relaycommon.BuildInToolInfo{ToolName: dto.BuildInToolWebSearchPreview, CallCount: 1}
+	service.PostTextConsumeQuota(c, info, &dto.Usage{}, nil)
 	return nil
 }
 
-// buildAlphaSearchRequestBody returns RawBody unchanged unless the model was
-// mapped, in which case only the "model" field is rewritten so unknown fields
-// are preserved.
-func buildAlphaSearchRequestBody(rawBody []byte, originModel, upstreamModel string) ([]byte, error) {
-	if len(rawBody) == 0 {
-		return nil, errors.New("empty alpha search request body")
+func buildAlphaSearchRequestBody(raw []byte, original, upstream string) ([]byte, error) {
+	if len(raw) == 0 {
+		return nil, errors.New("搜索请求内容为空。")
 	}
-	if upstreamModel == "" || upstreamModel == originModel {
-		return rawBody, nil
+	if upstream == "" || upstream == original {
+		return raw, nil
 	}
-	var body map[string]any
-	if err := common.Unmarshal(rawBody, &body); err != nil {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &fields); err != nil {
 		return nil, err
 	}
-	body["model"] = upstreamModel
-	return common.Marshal(body)
+	if fields == nil {
+		return nil, fmt.Errorf("搜索请求必须为 JSON 对象。")
+	}
+	model, err := json.Marshal(upstream)
+	if err != nil {
+		return nil, err
+	}
+	fields["model"] = model
+	return json.Marshal(fields)
 }

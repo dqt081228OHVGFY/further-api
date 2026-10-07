@@ -1,8 +1,8 @@
 export type JSONValue = null | boolean | number | string | readonly JSONValue[] | {readonly [key: string]: JSONValue};
 export type HostCapability = "json-clone@1" | "submit-sse-delta@1";
-/** Kinds of upstream a driver can address: the vendor API itself, or another New API gateway with the same plugin installed. */
-export type UpstreamKind = "vendor" | "new_api";
-/** Host-injected on every driver hook context. With "new_api" the driver uses its own native-route prefix and the host already set Bearer credentials. */
+/** Kinds of upstream a driver can address: the vendor API itself, or another gateway with the same plugin installed. */
+export type UpstreamKind = "vendor" | "gateway";
+/** Host-injected on every driver hook context. With "gateway" the driver uses its own native-route prefix and the host already set Bearer credentials. */
 export interface UpstreamContext {kind: UpstreamKind}
 export type MutableJSON<T> = T extends readonly (infer Item)[] ? MutableJSON<Item>[] : T extends object ? {-readonly [Key in keyof T]: MutableJSON<T[Key]>} : T;
 export interface HostUtils {

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 )
 
 const (

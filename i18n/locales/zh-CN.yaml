@@ -2,7 +2,7 @@
 # 中文（简体）翻译文件
 
 # Task plugin messages
-task_plugin.unknown_meta_field: '插件元数据包含未知字段“{{.Field}}”。如果插件来自官方市场，可能需要更高版本的 new-api。请尝试更新 new-api 后重新安装插件。'
+task_plugin.unknown_meta_field: '插件元数据包含未知字段“{{.Field}}”。如果插件来自官方市场，可能需要更高版本的 further-api。请尝试更新 further-api 后重新安装插件。'
 
 # Common messages
 common.invalid_params: "无效的参数"
@@ -31,9 +31,9 @@ common.batch_too_many: "批量请求数量过多，最多 {{.Max}} 条"
 auth.not_logged_in: "无权进行此操作，未登录且未提供 access token"
 auth.access_token_invalid: "无权进行此操作，access token 无效"
 auth.user_info_invalid: "无权进行此操作，用户信息无效"
-auth.user_id_not_provided: "无权进行此操作，未提供 New-Api-User"
-auth.user_id_format_error: "无权进行此操作，New-Api-User 格式错误"
-auth.user_id_mismatch: "无权进行此操作，New-Api-User 与登录用户不匹配"
+auth.user_id_not_provided: "无权进行此操作，未提供用户身份请求头"
+auth.user_id_format_error: "无权进行此操作，用户身份请求头格式错误"
+auth.user_id_mismatch: "无权进行此操作，用户身份与登录用户不匹配"
 auth.user_banned: "用户已被封禁"
 auth.insufficient_privilege: "无权进行此操作，权限不足"
 

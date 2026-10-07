@@ -2,17 +2,17 @@ package ollama
 
 import (
 	"errors"
-	"fmt"
+
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,50 +20,55 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	return nil, errors.New("not implemented")
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	converted, err := openai.ChatFrom(c, info, request)
+	if err != nil {
+		return nil, err
+	}
+	return a.ConvertOpenAIRequest(c, info, converted)
 }
 
 func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
-	adaptor := claude.Adaptor{}
-	return adaptor.ConvertClaudeRequest(c, info, request)
+	return claude.NativeMessages(c, info, request)
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("ollama", "audio operations")
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("ollama", "image generation")
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 	// OpenAI-compatible chat responses are handled by the OpenAI adaptor, which
 	// relies on the thinking-to-content state initialized here.
-	(&openai.Adaptor{}).Init(info)
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		return (&claude.Adaptor{}).GetRequestURL(info)
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("Ollama provider configuration is missing")
+	}
+	if info.RelayFormat == types.RelayFormatClaude {
+		return claude.MessagesEndpoint(info)
+	}
+	route := "/api/chat"
+	switch info.RelayMode {
+	case relayconstant.RelayModeEmbeddings:
+		route = "/api/embed"
+	case relayconstant.RelayModeResponses:
+		route = "/v1/responses"
+	case relayconstant.RelayModeResponsesCompact:
+		route = "/v1/responses/compact"
+	case relayconstant.RelayModeCompletions:
+		route = "/api/generate"
 	default:
-		switch info.RelayMode {
-		case relayconstant.RelayModeEmbeddings:
-			return fmt.Sprintf("%s/api/embed", info.ChannelBaseUrl), nil
-		case relayconstant.RelayModeResponses:
-			return fmt.Sprintf("%s/v1/responses", info.ChannelBaseUrl), nil
-		case relayconstant.RelayModeResponsesCompact:
-			return fmt.Sprintf("%s/v1/responses/compact", info.ChannelBaseUrl), nil
-		case relayconstant.RelayModeCompletions:
-			return fmt.Sprintf("%s/api/generate", info.ChannelBaseUrl), nil
-		default:
-			if info.ChannelOtherSettings.OllamaOpenAIChat {
-				return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
-			}
-			return fmt.Sprintf("%s/api/chat", info.ChannelBaseUrl), nil
+		if info.ChannelOtherSettings.OllamaOpenAIChat {
+			route = "/v1/chat/completions"
 		}
 	}
+	return openai.ProviderEndpoint(info.ChannelBaseUrl, route)
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
@@ -90,14 +95,14 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 		return openAIToGenerate(c, request)
 	default:
 		if info.ChannelOtherSettings.OllamaOpenAIChat {
-			return (&openai.Adaptor{}).ConvertOpenAIRequest(c, info, request)
+			return openai.NativeChat(c, info, request)
 		}
 		return openAIChatToOllamaChat(c, request)
 	}
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
+	return nil, openai.UnsupportedOperation("ollama", "reranking")
 }
 
 func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
@@ -105,31 +110,27 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.ConvertOpenAIResponsesRequest(c, info, request)
+	return openai.NativeResponses(c, info, request)
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
-		adaptor := claude.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return claude.MessagesResponse(c, resp, info)
 	default:
 		switch info.RelayMode {
 		case relayconstant.RelayModeEmbeddings:
 			return ollamaEmbeddingHandler(c, info, resp)
 		case relayconstant.RelayModeResponses, relayconstant.RelayModeResponsesCompact:
-			adaptor := openai.Adaptor{}
-			return adaptor.DoResponse(c, resp, info)
+			return openai.ProtocolResponse(c, resp, info, "")
 		default:
 			// /api/generate always returns native NDJSON; chat follows the channel setting.
 			if info.RelayMode != relayconstant.RelayModeCompletions && info.ChannelOtherSettings.OllamaOpenAIChat {
-				adaptor := openai.Adaptor{}
-				return adaptor.DoResponse(c, resp, info)
+				return openai.ProtocolResponse(c, resp, info, "")
 			}
 			if info.IsStream {
 				return ollamaStreamHandler(c, info, resp)
@@ -140,7 +141,7 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

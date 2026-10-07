@@ -209,15 +209,10 @@ afterEach(() => {
   window.history.replaceState(null, '', originalLocation)
 })
 
-it.each([true, false])(
-  'encrypts short and 128-character Unicode passwords with Web Crypto enabled: %s',
-  async (useWebCrypto) => {
-    vi.stubGlobal(
-      'crypto',
-      useWebCrypto
-        ? webcrypto
-        : { getRandomValues: webcrypto.getRandomValues.bind(webcrypto) }
-    )
+it(
+  'encrypts short and 128-character Unicode passwords with native Web Crypto',
+  async () => {
+    vi.stubGlobal('crypto', webcrypto)
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048,
     })

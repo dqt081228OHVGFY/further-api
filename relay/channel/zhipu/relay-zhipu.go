@@ -3,249 +3,158 @@ package zhipu
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/samber/lo"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-// https://open.bigmodel.cn/doc/api#chatglm_std
-// chatglm_std, chatglm_lite
-// https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_std/invoke
-// https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_std/sse-invoke
-
-var zhipuTokens sync.Map
 var expSeconds int64 = 24 * 3600
 
-func getZhipuToken(apikey string) string {
-	data, ok := zhipuTokens.Load(apikey)
-	if ok {
-		tokenData := data.(zhipuTokenData)
-		if time.Now().Before(tokenData.ExpiryTime) {
-			return tokenData.Token
-		}
+func getZhipuToken(key string) (string, error) {
+	id, secret, valid := strings.Cut(key, ".")
+	if !valid || id == "" || secret == "" || strings.Contains(secret, ".") {
+		return "", errors.New("Zhipu credentials require id.secret")
 	}
-
-	split := strings.Split(apikey, ".")
-	if len(split) != 2 {
-		common.SysLog("invalid zhipu key: " + apikey)
-		return ""
-	}
-
-	id := split[0]
-	secret := split[1]
-
-	expMillis := time.Now().Add(time.Duration(expSeconds)*time.Second).UnixNano() / 1e6
-	expiryTime := time.Now().Add(time.Duration(expSeconds) * time.Second)
-
-	timestamp := time.Now().UnixNano() / 1e6
-
-	payload := jwt.MapClaims{
-		"api_key":   id,
-		"exp":       expMillis,
-		"timestamp": timestamp,
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-
-	token.Header["alg"] = "HS256"
+	now := time.Now()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"api_key": id, "exp": now.Add(time.Duration(expSeconds) * time.Second).UnixMilli(), "timestamp": now.UnixMilli()})
 	token.Header["sign_type"] = "SIGN"
-
-	tokenString, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return ""
-	}
-
-	zhipuTokens.Store(apikey, zhipuTokenData{
-		Token:      tokenString,
-		ExpiryTime: expiryTime,
-	})
-
-	return tokenString
+	return token.SignedString([]byte(secret))
 }
-
 func requestOpenAI2Zhipu(request dto.GeneralOpenAIRequest) *ZhipuRequest {
-	messages := make([]ZhipuMessage, 0, len(request.Messages))
+	output := &ZhipuRequest{Prompt: make([]ZhipuMessage, 0, len(request.Messages)), Temperature: request.Temperature}
+	if request.TopP != nil {
+		output.TopP = *request.TopP
+	}
 	for _, message := range request.Messages {
-		if message.Role == "system" {
-			messages = append(messages, ZhipuMessage{
-				Role:    "system",
-				Content: message.StringContent(),
-			})
-			messages = append(messages, ZhipuMessage{
-				Role:    "user",
-				Content: "Okay",
-			})
+		role := message.Role
+		if role == "developer" {
+			role = "system"
+		}
+		output.Prompt = append(output.Prompt, ZhipuMessage{Role: role, Content: message.StringContent()})
+		if role == "system" {
+			output.Prompt = append(output.Prompt, ZhipuMessage{Role: "user", Content: "Okay"})
+		}
+	}
+	return output
+}
+func responseZhipu2OpenAI(wire *ZhipuResponse) *dto.OpenAITextResponse {
+	output := &dto.OpenAITextResponse{Id: wire.Data.TaskId, Object: "chat.completion", Created: common.GetTimestamp(), Usage: wire.Data.Usage, Choices: make([]dto.OpenAITextResponseChoice, 0, len(wire.Data.Choices))}
+	for index, choice := range wire.Data.Choices {
+		output.Choices = append(output.Choices, dto.OpenAITextResponseChoice{Index: index, Message: dto.Message{Role: choice.Role, Content: strings.Trim(choice.Content, "\"")}, FinishReason: "stop"})
+	}
+	return output
+}
+func streamResponseZhipu2OpenAI(text string) *dto.ChatCompletionsStreamResponse {
+	frame := &dto.ChatCompletionsStreamResponse{Object: "chat.completion.chunk", Created: common.GetTimestamp(), Choices: []dto.ChatCompletionsStreamResponseChoice{{Index: 0}}}
+	frame.Choices[0].Delta.SetContentString(text)
+	return frame
+}
+func streamMetaResponseZhipu2OpenAI(wire *ZhipuStreamMetaResponse) (*dto.ChatCompletionsStreamResponse, *dto.Usage) {
+	reason := "stop"
+	usage := wire.Usage
+	frame := &dto.ChatCompletionsStreamResponse{Id: wire.RequestId, Object: "chat.completion.chunk", Created: common.GetTimestamp(), Choices: []dto.ChatCompletionsStreamResponseChoice{{Index: 0, FinishReason: &reason}}, Usage: &usage}
+	return frame, &usage
+}
+
+type zhipuEventBody struct {
+	source  io.ReadCloser
+	scanner *bufio.Scanner
+	pending []byte
+}
+
+func (body *zhipuEventBody) Read(target []byte) (int, error) {
+	if len(target) == 0 {
+		return 0, nil
+	}
+	for len(body.pending) == 0 {
+		if !body.scanner.Scan() {
+			if err := body.scanner.Err(); err != nil {
+				return 0, err
+			}
+			return 0, io.EOF
+		}
+		line := strings.TrimSuffix(body.scanner.Text(), "\r")
+		var envelope any
+		if value, found := strings.CutPrefix(line, "meta:"); found {
+			var meta ZhipuStreamMetaResponse
+			if err := json.Unmarshal([]byte(value), &meta); err != nil {
+				return 0, err
+			}
+			envelope = map[string]any{"meta": meta}
+		} else if value, found := strings.CutPrefix(line, "data:"); found {
+			value = strings.TrimPrefix(value, " ")
+			if value == "[DONE]" {
+				body.pending = []byte("data: [DONE]\n\n")
+				break
+			}
+			envelope = map[string]string{"text": value}
 		} else {
-			messages = append(messages, ZhipuMessage{
-				Role:    message.Role,
-				Content: message.StringContent(),
-			})
+			continue
 		}
+		encoded, err := json.Marshal(envelope)
+		if err != nil {
+			return 0, err
+		}
+		body.pending = append([]byte("data: "), encoded...)
+		body.pending = append(body.pending, '\n', '\n')
 	}
-	return &ZhipuRequest{
-		Prompt:      messages,
-		Temperature: request.Temperature,
-		TopP:        lo.FromPtrOr(request.TopP, 0),
-		Incremental: false,
-	}
+	n := copy(target, body.pending)
+	body.pending = body.pending[n:]
+	return n, nil
 }
-
-func responseZhipu2OpenAI(response *ZhipuResponse) *dto.OpenAITextResponse {
-	fullTextResponse := dto.OpenAITextResponse{
-		Id:      response.Data.TaskId,
-		Object:  "chat.completion",
-		Created: common.GetTimestamp(),
-		Choices: make([]dto.OpenAITextResponseChoice, 0, len(response.Data.Choices)),
-		Usage:   response.Data.Usage,
+func (body *zhipuEventBody) Close() error { return body.source.Close() }
+func zhipuStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if response == nil || response.Body == nil {
+		return nil, types.NewError(errors.New("Zhipu stream body is missing"), types.ErrorCodeBadResponseBody)
 	}
-	for i, choice := range response.Data.Choices {
-		openaiChoice := dto.OpenAITextResponseChoice{
-			Index: i,
-			Message: dto.Message{
-				Role:    choice.Role,
-				Content: strings.Trim(choice.Content, "\""),
-			},
-			FinishReason: "",
+	adapted := *response
+	adapted.Body = &zhipuEventBody{source: response.Body, scanner: helper.NewStreamScanner(response.Body)}
+	return openai.NativeTextStream(c, info, &adapted, func(data []byte) (*dto.ChatCompletionsStreamResponse, *types.GatewayError) {
+		var wire struct {
+			Text string                   `json:"text"`
+			Meta *ZhipuStreamMetaResponse `json:"meta"`
 		}
-		if i == len(response.Data.Choices)-1 {
-			openaiChoice.FinishReason = "stop"
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 		}
-		fullTextResponse.Choices = append(fullTextResponse.Choices, openaiChoice)
-	}
-	return &fullTextResponse
-}
-
-func streamResponseZhipu2OpenAI(zhipuResponse string) *dto.ChatCompletionsStreamResponse {
-	var choice dto.ChatCompletionsStreamResponseChoice
-	choice.Delta.SetContentString(zhipuResponse)
-	response := dto.ChatCompletionsStreamResponse{
-		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
-		Model:   "chatglm",
-		Choices: []dto.ChatCompletionsStreamResponseChoice{choice},
-	}
-	return &response
-}
-
-func streamMetaResponseZhipu2OpenAI(zhipuResponse *ZhipuStreamMetaResponse) (*dto.ChatCompletionsStreamResponse, *dto.Usage) {
-	var choice dto.ChatCompletionsStreamResponseChoice
-	choice.Delta.SetContentString("")
-	choice.FinishReason = &constant.FinishReasonStop
-	response := dto.ChatCompletionsStreamResponse{
-		Id:      zhipuResponse.RequestId,
-		Object:  "chat.completion.chunk",
-		Created: common.GetTimestamp(),
-		Model:   "chatglm",
-		Choices: []dto.ChatCompletionsStreamResponseChoice{choice},
-	}
-	return &response, &zhipuResponse.Usage
-}
-
-func zhipuStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var usage *dto.Usage
-	scanner := helper.NewStreamScanner(resp.Body)
-	scanner.Split(bufio.ScanLines)
-	dataChan := make(chan string)
-	metaChan := make(chan string)
-	stopChan := make(chan bool)
-	go func() {
-		for scanner.Scan() {
-			data := scanner.Text()
-			lines := strings.Split(data, "\n")
-			for i, line := range lines {
-				if len(line) < 5 {
-					continue
-				}
-				if line[:5] == "data:" {
-					dataChan <- line[5:]
-					if i != len(lines)-1 {
-						dataChan <- "\n"
-					}
-				} else if line[:5] == "meta:" {
-					metaChan <- line[5:]
-				}
-			}
+		var frame *dto.ChatCompletionsStreamResponse
+		if wire.Meta != nil {
+			frame, _ = streamMetaResponseZhipu2OpenAI(wire.Meta)
+		} else {
+			frame = streamResponseZhipu2OpenAI(wire.Text)
 		}
-		if err := scanner.Err(); err != nil {
-			common.SysLog("error reading stream: " + err.Error())
+		frame.Model = info.UpstreamModelName
+		if frame.Id == "" {
+			frame.Id = helper.GetResponseID(c)
 		}
-		stopChan <- true
-	}()
-	helper.SetEventStreamHeaders(c)
-	c.Stream(func(w io.Writer) bool {
-		select {
-		case data := <-dataChan:
-			response := streamResponseZhipu2OpenAI(data)
-			jsonResponse, err := json.Marshal(response)
-			if err != nil {
-				common.SysLog("error marshalling stream response: " + err.Error())
-				return true
-			}
-			c.Render(-1, common.CustomEvent{Data: "data: " + string(jsonResponse)})
-			return true
-		case data := <-metaChan:
-			var zhipuResponse ZhipuStreamMetaResponse
-			err := json.Unmarshal([]byte(data), &zhipuResponse)
-			if err != nil {
-				common.SysLog("error unmarshalling stream response: " + err.Error())
-				return true
-			}
-			response, zhipuUsage := streamMetaResponseZhipu2OpenAI(&zhipuResponse)
-			jsonResponse, err := json.Marshal(response)
-			if err != nil {
-				common.SysLog("error marshalling stream response: " + err.Error())
-				return true
-			}
-			usage = zhipuUsage
-			c.Render(-1, common.CustomEvent{Data: "data: " + string(jsonResponse)})
-			return true
-		case <-stopChan:
-			c.Render(-1, common.CustomEvent{Data: "data: [DONE]"})
-			return false
-		}
+		return frame, nil
 	})
-	service.CloseResponseBodyGracefully(resp)
-	return usage, nil
 }
-
-func zhipuHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var zhipuResponse ZhipuResponse
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
-	}
-	service.CloseResponseBodyGracefully(resp)
-	err = json.Unmarshal(responseBody, &zhipuResponse)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	if !zhipuResponse.Success {
-		return nil, types.WithOpenAIError(types.OpenAIError{
-			Message: zhipuResponse.Msg,
-			Code:    zhipuResponse.Code,
-		}, resp.StatusCode)
-	}
-	fullTextResponse := responseZhipu2OpenAI(&zhipuResponse)
-	jsonResponse, err := json.Marshal(fullTextResponse)
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
-	return &fullTextResponse.Usage, nil
+func zhipuHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextResponse(c, info, response, func(data []byte) (*dto.OpenAITextResponse, *types.GatewayError) {
+		var wire *ZhipuResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		}
+		if wire == nil {
+			return nil, types.NewError(errors.New("Zhipu response must be an object"), types.ErrorCodeBadResponseBody)
+		}
+		if !wire.Success {
+			return nil, types.NewError(errors.New(wire.Msg), types.ErrorCodeBadResponseBody)
+		}
+		output := responseZhipu2OpenAI(wire)
+		output.Model = info.UpstreamModelName
+		return output, nil
+	})
 }

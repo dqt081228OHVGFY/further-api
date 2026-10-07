@@ -1,81 +1,23 @@
-# New API Electron Desktop App
+# further-api Desktop
 
-This directory contains the Electron wrapper for New API, providing a native desktop application with system tray support for Windows, macOS, and Linux.
+The Electron wrapper runs the local `further-api` Go service and opens its console in a native window with a system tray icon.
 
-## Prerequisites
+## Build
 
-### 1. Go Binary (Required)
-The Electron app requires the compiled Go binary to function. You have two options:
+The build script builds the frontend and Go binary before packaging. From the repository root:
 
-**Option A: Use existing binary (without Go installed)**
 ```bash
-# If you have a pre-built binary (e.g., new-api-macos)
-cp ../new-api-macos ../new-api
+./electron/build.sh
 ```
 
-**Option B: Build from source (requires Go)**
-TODO
+The script resolves paths from its own location and can also be run as `./build.sh` from `electron/`. It installs frontend dependencies with `bun install --frozen-lockfile` and Electron dependencies with `npm ci`, builds the complete web application, compiles the Go service as `further-api` (or `further-api.exe` on Windows), and creates the platform package in `electron/dist/`. Run it in Bash (Git Bash on Windows).
 
-### 2. Electron Dependencies
-```bash
-cd electron
-npm install
-```
+Frontend build metadata, the Go service version, and installer metadata are read from the root `VERSION` file. Installer metadata removes the leading `v` while retaining prerelease identifiers; package manifests and lockfiles are unchanged. The Go build uses `GOWORK=off` and `CGO_ENABLED=0`; generated frontend bundles and the gateway binary must come from the same source revision. Docker development builds also disable unrelated local Go workspaces.
 
-## Development
+The web sources are shared with the browser edition: [`further-ui/`](../further-ui/) contains page documents and assets, and [`web/src/further/`](../web/src/further/) contains public pages and feature workspaces. The `web/` build invokes `scripts/build-further.mjs` to publish all pages into `web/dist/` before Go embeds them. No separate desktop page tree is maintained, and the previous web route tree is no longer built.
 
-Start the backend, the frontend, and Electron in separate terminals:
-```bash
-# Repository root
-go run main.go
+For development, run the Go service at port `3000`, run `bun run dev --port 5173` from `web/`, and use `npm run dev-app` from this directory. Production packages include the Go binary and the license files.
 
-# Repository root
-make dev-web
+The desktop database is stored as `further-api.db` in the app data directory. Back up an existing database before replacing a previous desktop installation. See the root [README](../README.md), [LICENSE](../LICENSE), and [NOTICE](../NOTICE).
 
-# electron/
-npm run dev-app
-```
-
-This will:
-- Use the Go backend on port 3000
-- Use the Rsbuild frontend development server on port 5173
-- Open an Electron window with DevTools enabled
-- Create a system tray icon (menu bar on macOS)
-- Store database in `../data/new-api.db`
-
-## Building for Production
-
-### Quick Build
-```bash
-# From electron/, build the frontend, Go binary, and desktop package
-./build.sh
-
-# Or package an existing binary for the current platform
-npm run build
-
-# Platform-specific builds
-npm run build:mac    # Creates .dmg and .zip
-npm run build:win    # Creates .exe installer
-npm run build:linux  # Creates .AppImage and .deb
-```
-
-### Build Output
-- Built applications are in `electron/dist/`
-- macOS: `.dmg` (installer) and `.zip` (portable)
-- Windows: `.exe` (installer) and portable exe
-- Linux: `.AppImage` and `.deb`
-
-## Configuration
-
-### Port
-Default port is 3000. To change, edit `main.js`:
-```javascript
-const PORT = 3000; // Change to desired port
-```
-
-### Database Location
-- **Development**: `../data/new-api.db` (project directory)
-- **Production**:
-  - macOS: `~/Library/Application Support/New API/data/`
-  - Windows: `%APPDATA%/New API/data/`
-  - Linux: `~/.config/New API/data/`
+The desktop package uses the same rewritten authentication, configuration, subscription, provider execution, billing, task, and payment services as the browser edition. Official protocol DTOs, third-party SDKs, data migrations, and historical license obligations remain part of the project. Packaging is a separate validation step; verify the final installer on its target platform. See [backend implementation and migration](../docs/backend-architecture.md) for the implementation and compatibility boundaries.

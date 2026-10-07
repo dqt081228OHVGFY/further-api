@@ -12,9 +12,13 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "RelayFor"
+const ProductName = "further-api"
+const ProductLogo = "/further-api-logo.svg?v=handshake-20261004"
+
+// Retained for gateway adapters; stored settings cannot change product branding.
+var SystemName = ProductName
 var Footer = ""
-var Logo = "/relayfor-logo.svg"
+var Logo = ProductLogo
 var TopUpLink = ""
 
 // var ChatLink = ""
@@ -185,7 +189,7 @@ var GeminiSafetySetting string
 var CohereSafetySetting string
 
 const (
-	RequestIdKey         = "X-Oneapi-Request-Id"
+	RequestIdKey         = "X-Further-Request-Id"
 	UpstreamRequestIdKey = "X-Upstream-Request-Id"
 )
 

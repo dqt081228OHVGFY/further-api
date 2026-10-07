@@ -16,11 +16,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/oauth"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
@@ -194,6 +194,7 @@ func telegramIdentityClaims(id any) jwt.MapClaims {
 func telegramOAuthCallback(state, code string, identity service.AuthIdentity) *httptest.ResponseRecorder {
 	path := "/api/oauth/telegram?" + url.Values{"state": {state}, "code": {code}}.Encode()
 	return securityEnrollmentRequest("GET", path, "", "", identity, func(c *gin.Context) {
+		addOAuthTestBrowserCookie(c.Request, state)
 		c.Params = gin.Params{{Key: "provider", Value: "telegram"}}
 		HandleOAuth(c)
 	})
@@ -361,10 +362,14 @@ func TestTelegramOAuthConfigurationAndLegacyEndpoints(t *testing.T) {
 	fixture := setupTelegramOAuthTest(t)
 	previousBotToken := common.TelegramBotToken
 	t.Cleanup(func() { common.TelegramBotToken = previousBotToken })
-	require.NoError(t, model.UpdateOptionsBulk(map[string]string{
-		"telegram.client_id": "12345", "telegram.client_secret": "telegram-client-secret",
-		"TelegramBotToken": "stored-legacy-token", "TelegramOAuthEnabled": "true",
-	}))
+	// Seed persisted configuration directly: this isolated fixture does not run
+	// the application bootstrap that initializes SQL column quoting globals.
+	require.NoError(t, model.DB.Create(&[]model.Option{
+		{Key: "telegram.client_id", Value: "12345"},
+		{Key: "telegram.client_secret", Value: "telegram-client-secret"},
+		{Key: "TelegramBotToken", Value: "stored-legacy-token"},
+		{Key: "TelegramOAuthEnabled", Value: "true"},
+	}).Error)
 	for range 2 {
 		*system_setting.GetTelegramSettings() = system_setting.TelegramSettings{}
 		common.TelegramOAuthEnabled = false

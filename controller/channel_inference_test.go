@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -138,13 +138,13 @@ unrelated_metric 123
 
 // Opt-in verification against an operator-provided instance; credentials stay in the environment.
 func TestVLLMStatusLive(t *testing.T) {
-	base := os.Getenv("NEW_API_VLLM_TEST_URL")
+	base := os.Getenv("FURTHER_API_VLLM_TEST_URL")
 	if base == "" {
-		t.Skip("NEW_API_VLLM_TEST_URL is not configured")
+		t.Skip("FURTHER_API_VLLM_TEST_URL is not configured")
 	}
 	service.InitHttpClient()
 	status, err := fetchInferenceStatus(context.Background(), &model.Channel{
-		Type: constant.ChannelTypeVLLM, BaseURL: &base, Key: os.Getenv("NEW_API_VLLM_TEST_KEY"),
+		Type: constant.ChannelTypeVLLM, BaseURL: &base, Key: os.Getenv("FURTHER_API_VLLM_TEST_KEY"),
 	})
 	require.NoError(t, err)
 	for path, endpoint := range status.Endpoints {

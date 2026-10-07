@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 
 	"golang.org/x/net/proxy"
 )
@@ -27,7 +27,8 @@ var (
 		clients: make(map[string]*http.Client),
 		aliases: make(map[string]string),
 	}
-	legacyProxyURLWarnings sync.Map
+	legacyProxyURLWarnings    sync.Map
+	protectedProxyHTTPClients sync.Map
 )
 
 type proxyHTTPClientCache struct {
@@ -161,6 +162,32 @@ func GetSSRFProtectedHTTPClient() *http.Client {
 		return GetHttpClient()
 	}
 	return ssrfProtectedHTTPClient
+}
+
+// GetSSRFProtectedHTTPClientWithProxy separates arbitrary file destinations
+// from operator-managed provider traffic. The proxy itself remains trusted;
+// only the untrusted destination is resolved and checked before proxy routing.
+func GetSSRFProtectedHTTPClientWithProxy(rawProxyURL string) (*http.Client, error) {
+	if strings.TrimSpace(rawProxyURL) == "" {
+		return GetSSRFProtectedHTTPClient(), nil
+	}
+	if !system_setting.GetFetchSetting().EnableSSRFProtection {
+		return GetHttpClientWithProxy(rawProxyURL)
+	}
+	canonical, err := NormalizeProxyURL(rawProxyURL)
+	if err != nil {
+		return nil, err
+	}
+	if cached, exists := protectedProxyHTTPClients.Load(canonical); exists {
+		return cached.(*http.Client), nil
+	}
+	parsed, err := url.Parse(canonical)
+	if err != nil {
+		return nil, fmt.Errorf("invalid fetch proxy URL")
+	}
+	client := newProtectedFetchHTTPClientWithProxy(nil, nil, nil, func(*http.Request) (*url.URL, error) { return parsed, nil })
+	actual, _ := protectedProxyHTTPClients.LoadOrStore(canonical, client)
+	return actual.(*http.Client), nil
 }
 
 func newProxyURLConfig(parsedURL *url.URL) *proxyURLConfig {
@@ -443,6 +470,9 @@ func InvalidateProxyClient(rawProxyURL string) {
 	for _, client := range proxyClients.removeProxy(config.cacheKey) {
 		client.CloseIdleConnections()
 	}
+	if cached, exists := protectedProxyHTTPClients.LoadAndDelete(config.cacheKey); exists {
+		cached.(*http.Client).CloseIdleConnections()
+	}
 }
 
 // ResetProxyClientCache clears cached proxy and non-default direct policy clients
@@ -455,6 +485,12 @@ func ResetProxyClientCache() {
 	for _, client := range proxyClients.reset() {
 		client.CloseIdleConnections()
 	}
+	protectedProxyHTTPClients.Range(func(key, value any) bool {
+		if cached, exists := protectedProxyHTTPClients.LoadAndDelete(key); exists {
+			cached.(*http.Client).CloseIdleConnections()
+		}
+		return true
+	})
 	if defaultClient == nil {
 		return
 	}

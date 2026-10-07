@@ -7,11 +7,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 func FetchCodexChannelModels(channel *model.Channel) ([]string, error) {
+	return FetchCodexChannelModelsContext(context.Background(), channel)
+}
+
+func FetchCodexChannelModelsContext(ctx context.Context, channel *model.Channel) ([]string, error) {
 	if channel == nil || channel.Type != constant.ChannelTypeCodex {
 		return nil, fmt.Errorf("channel type is not Codex")
 	}
@@ -23,7 +27,7 @@ func FetchCodexChannelModels(channel *model.Channel) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
 	clientVersion, err := GetLatestCodexClientVersion(ctx, client)

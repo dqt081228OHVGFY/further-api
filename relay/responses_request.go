@@ -1,87 +1,63 @@
 package relay
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	relaychannel "github.com/QuantumNous/new-api/relay/channel"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/setting/model_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 )
 
-// PrepareResponsesRequest applies the same model, conversion and channel rules
-// for HTTP and WebSocket requests. The caller closes closer after the attempt;
-// passthrough bodies remain owned by the incoming request's BodyStorage.
-// The returned adaptor retains route/conversion state for DoRequest/DoResponse.
-func PrepareResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.OpenAIResponsesRequest) (relaychannel.Adaptor, common.ReplayableBody, io.Closer, *types.NewAPIError) {
-	info.InitChannelMeta(c)
-	if info.RelayMode == relayconstant.RelayModeResponsesCompact &&
-		!common.SupportsResponsesCompact(info.ChannelType, info.ApiType) {
-		return nil, nil, nil, types.NewErrorWithStatusCode(
-			fmt.Errorf("unsupported endpoint %q for api type %d", "/v1/responses/compact", info.ApiType),
-			types.ErrorCodeInvalidRequest,
-			http.StatusBadRequest,
-			types.ErrOptionWithSkipRetry(),
-		)
-	}
+type attemptNoopCloser struct{}
 
-	request, err := common.DeepCopy(req)
-	if err != nil {
-		return nil, nil, nil, types.NewError(fmt.Errorf("failed to copy responses request: %w", err), types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
-	}
-	if err := helper.ModelMappedHelper(c, info, request); err != nil {
-		return nil, nil, nil, types.NewError(err, types.ErrorCodeChannelModelMappedError, types.ErrOptionWithSkipRetry())
-	}
-	if err := helper.ApplyReasoningModelSuffix(c, info, request); err != nil {
-		return nil, nil, nil, newConvertRequestFailedError(c, info, err)
-	}
+func (attemptNoopCloser) Close() error { return nil }
 
-	adaptor := GetAdaptor(info.ApiType)
-	if adaptor == nil {
-		return nil, nil, nil, types.NewError(fmt.Errorf("invalid api type: %d", info.ApiType), types.ErrorCodeInvalidApiType, types.ErrOptionWithSkipRetry())
-	}
-	adaptor.Init(info)
-	if model_setting.GetGlobalSettings().PassThroughRequestEnabled || info.ChannelSetting.PassThroughBodyEnabled {
-		storage, err := common.GetBodyStorage(c)
-		if err != nil {
-			return nil, nil, nil, types.NewError(err, types.ErrorCodeReadRequestBodyFailed, types.ErrOptionWithSkipRetry())
-		}
-		body := common.NewReplayableBodyReader(storage)
-		return adaptor, body, io.NopCloser(body), nil
-	}
-
-	convertedRequest, err := adaptor.ConvertOpenAIResponsesRequest(c, info, *request)
+// HTTP and WebSocket share a prepared adaptor and body ownership contract.
+// Keep the exact converted instance: providers retain conversion route state.
+func PrepareResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, source *dto.OpenAIResponsesRequest) (channel.Adaptor, common.ReplayableBody, io.Closer, *types.GatewayError) {
+	attempt, err := beginProtocolAttempt(c, info)
 	if err != nil {
-		return nil, nil, nil, newConvertRequestFailedError(c, info, err)
+		return nil, nil, nil, err
 	}
-	relaycommon.AppendRequestConversionFromRequest(info, convertedRequest)
-	jsonData, err := common.Marshal(convertedRequest)
+	if source == nil {
+		return nil, nil, nil, imageQuantityError(errors.New("Responses 请求内容缺失。"))
+	}
+	if info.RelayMode == relayconstant.RelayModeResponsesCompact && !common.SupportsResponsesCompact(info.ChannelType, info.ApiType) {
+		return nil, nil, nil, imageQuantityError(fmt.Errorf("渠道协议 %d 不支持 /v1/responses/compact。", info.ApiType))
+	}
+	request, copyErr := cloneProtocolDTO(source)
+	if copyErr != nil {
+		return nil, nil, nil, types.NewError(copyErr, types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
+	}
+	if copyErr = helper.ModelMappedHelper(c, info, request); copyErr != nil {
+		return nil, nil, nil, types.NewError(copyErr, types.ErrorCodeChannelModelMappedError, types.ErrOptionWithSkipRetry())
+	}
+	if copyErr = helper.ApplyReasoningModelSuffix(c, info, request); copyErr != nil {
+		return nil, nil, nil, newConvertRequestFailedError(c, info, copyErr)
+	}
+	if err = attempt.bindAdaptor(); err != nil {
+		return nil, nil, nil, err
+	}
+	body, err := attempt.convertedBody(true, func() (any, error) { return attempt.adaptor.ConvertOpenAIResponsesRequest(c, info, *request) }, nil)
 	if err != nil {
-		return nil, nil, nil, types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+		return nil, nil, nil, err
 	}
-	jsonData, err = relaycommon.RemoveDisabledFields(jsonData, info.ChannelOtherSettings, info.ChannelSetting.PassThroughBodyEnabled)
-	if err != nil {
-		return nil, nil, nil, types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
+	reader, ok := body.reader.(common.ReplayableBody)
+	if !ok {
+		body.Close()
+		return nil, nil, nil, types.NewErrorWithStatusCode(errors.New("Responses 请求体不支持安全重放。"), types.ErrorCodeConvertRequestFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 	}
-	if len(info.ParamOverride) > 0 {
-		jsonData, err = relaycommon.ApplyParamOverrideWithRelayInfo(jsonData, info)
-		if err != nil {
-			return nil, nil, nil, newAPIErrorFromParamOverride(err)
-		}
+	owner := body.owner
+	if owner == nil {
+		owner = attemptNoopCloser{}
 	}
-
-	logger.LogDebug(c, "requestBody: %s", jsonData)
-	body, closer, err := relaycommon.NewOutboundJSONBody(jsonData)
-	if err != nil {
-		return nil, nil, nil, types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
-	}
-	return adaptor, body, closer, nil
+	return attempt.adaptor, reader, owner, nil
 }

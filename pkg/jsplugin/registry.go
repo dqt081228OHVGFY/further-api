@@ -19,11 +19,11 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
 )
 
 const APIVersion1 = 1
@@ -111,11 +111,11 @@ type Meta struct {
 
 // Upstream kinds a plugin driver can address. Every driver speaks to its
 // vendor; a driver that also builds its own native-route URLs when the channel
-// points at another New API gateway declares UpstreamKindNewAPI in
+// points at a compatible gateway declares UpstreamKindGateway in
 // meta.upstreams, which is what makes it bindable to a type-60 channel.
 const (
-	UpstreamKindVendor = "vendor"
-	UpstreamKindNewAPI = "new_api"
+	UpstreamKindVendor  = "vendor"
+	UpstreamKindGateway = "gateway"
 )
 
 // SupportsUpstream reports whether the driver handles channels of the given
@@ -1193,7 +1193,7 @@ func normalizeV1Meta(meta *Meta) error {
 	}
 	seenUpstreams := make(map[string]bool, len(meta.Upstreams))
 	for _, kind := range meta.Upstreams {
-		if (kind != UpstreamKindVendor && kind != UpstreamKindNewAPI) || seenUpstreams[kind] {
+		if (kind != UpstreamKindVendor && kind != UpstreamKindGateway) || seenUpstreams[kind] {
 			return fmt.Errorf("unsupported or duplicate upstream kind %q", kind)
 		}
 		seenUpstreams[kind] = true
@@ -1295,8 +1295,8 @@ func normalizeV1Meta(meta *Meta) error {
 		if channelType == constant.ChannelTypeTaskPlugin {
 			return fmt.Errorf("plugin meta channelTypes must not contain the task plugin channel type")
 		}
-		if channelType == constant.ChannelTypeNewAPI {
-			return fmt.Errorf("plugin meta channelTypes must not contain the New API channel type; bind the plugin through task_extend_plugin_keys instead")
+		if channelType == constant.ChannelTypeGateway {
+			return fmt.Errorf("plugin meta channelTypes must not contain the gateway channel type; bind the plugin through task_extend_plugin_keys instead")
 		}
 		if _, duplicate := seenChannelTypes[channelType]; duplicate {
 			return fmt.Errorf("plugin meta channelTypes must be unique")
@@ -1945,6 +1945,15 @@ func normalizeMetaBaseURL(raw string) (string, error) {
 	if parsed.User != nil {
 		return "", fmt.Errorf("plugin meta baseUrl must not contain credentials")
 	}
+	if strings.HasSuffix(parsed.Host, ":") {
+		return "", fmt.Errorf("plugin meta baseUrl has an invalid port")
+	}
+	if port := parsed.Port(); port != "" {
+		number, parseErr := strconv.Atoi(port)
+		if parseErr != nil || number < 1 || number > 65535 {
+			return "", fmt.Errorf("plugin meta baseUrl has an invalid port")
+		}
+	}
 	hostname := parsed.Hostname()
 	for _, character := range hostname {
 		if character > unicode.MaxASCII {
@@ -1979,6 +1988,9 @@ func normalizeAllowedHost(raw string) (string, error) {
 	} else if strings.HasPrefix(entry, "[") && strings.HasSuffix(entry, "]") {
 		host = entry[1 : len(entry)-1]
 	}
+	if strings.HasSuffix(entry, ":") && !strings.HasSuffix(entry, "]") {
+		return "", fmt.Errorf("plugin meta allowedHosts port must be between 1 and 65535")
+	}
 	if host == "" {
 		return "", fmt.Errorf("plugin meta allowedHosts must contain hostnames (optionally with a port) without schemes, paths, or credentials")
 	}
@@ -1999,7 +2011,7 @@ func normalizeAllowedHost(raw string) (string, error) {
 		if err != nil || number < 1 || number > 65535 {
 			return "", fmt.Errorf("plugin meta allowedHosts port must be between 1 and 65535")
 		}
-		host += ":" + port
+		host += ":" + strconv.Itoa(number)
 	}
 	return host, nil
 }

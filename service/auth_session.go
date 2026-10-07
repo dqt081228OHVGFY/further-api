@@ -1,23 +1,29 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-const RefreshCookieName = "new_api_refresh"
+const RefreshCookieName = "further_api_refresh"
+
+const legacyRefreshCookieName = "new_api_refresh"
 
 // SessionHintCookieName is the script-readable companion to RefreshCookieName.
 // See writeSessionHintCookie for why it exists and what it is not.
-const SessionHintCookieName = "new_api_has_session"
+const SessionHintCookieName = "further_api_has_session"
+
+const legacySessionHintCookieName = "new_api_has_session"
 
 // SessionHintCookieValue is the only value the hint ever carries.
 const SessionHintCookieValue = "1"
@@ -50,18 +56,26 @@ type AuthBundle struct {
 }
 
 func CreateLoginSession(userID int, loginMethod, ip, userAgent string) (*AuthBundle, error) {
-	return createLoginSession(userID, 0, loginMethod, ip, userAgent)
+	return CreateLoginSessionContext(context.Background(), userID, loginMethod, ip, userAgent)
+}
+
+func CreateLoginSessionContext(ctx context.Context, userID int, loginMethod, ip, userAgent string) (*AuthBundle, error) {
+	return createLoginSession(ctx, userID, 0, loginMethod, ip, userAgent)
 }
 
 func CreateLoginSessionAtAuthVersion(userID int, expectedAuthVersion int64, loginMethod, ip, userAgent string) (*AuthBundle, error) {
+	return CreateLoginSessionAtAuthVersionContext(context.Background(), userID, expectedAuthVersion, loginMethod, ip, userAgent)
+}
+
+func CreateLoginSessionAtAuthVersionContext(ctx context.Context, userID int, expectedAuthVersion int64, loginMethod, ip, userAgent string) (*AuthBundle, error) {
 	if expectedAuthVersion <= 0 {
 		return nil, ErrLoginSessionInvalid
 	}
-	return createLoginSession(userID, expectedAuthVersion, loginMethod, ip, userAgent)
+	return createLoginSession(ctx, userID, expectedAuthVersion, loginMethod, ip, userAgent)
 }
 
-func createLoginSession(userID int, expectedAuthVersion int64, loginMethod, ip, userAgent string) (*AuthBundle, error) {
-	user, err := model.GetUserCache(userID)
+func createLoginSession(ctx context.Context, userID int, expectedAuthVersion int64, loginMethod, ip, userAgent string) (*AuthBundle, error) {
+	user, err := model.GetUserCacheContext(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,26 +85,14 @@ func createLoginSession(userID int, expectedAuthVersion int64, loginMethod, ip, 
 	if expectedAuthVersion > 0 && user.AuthVersion != expectedAuthVersion {
 		return nil, ErrLoginSessionRevoked
 	}
-	now := time.Now().Unix()
-	activeCount, err := model.CountActiveUserSessions(userID, now)
-	if err != nil {
-		return nil, err
-	}
-	if activeCount >= int64(common.UserSessionActiveLimit) {
-		return nil, model.ErrUserSessionLimit
-	}
-	issuanceCount, err := model.CountUserSessionsCreatedSince(userID, now-common.UserSessionIssuanceWindowSeconds)
-	if err != nil {
-		return nil, err
-	}
-	if issuanceCount >= int64(common.UserSessionIssuanceLimit) {
-		return nil, model.ErrUserSessionIssuanceLimit
-	}
 	session, refreshSecret, err := newLoginSession(userID, user.AuthVersion, loginMethod, ip, userAgent)
 	if err != nil {
 		return nil, err
 	}
-	if err := model.CreateUserSession(session); err != nil {
+	if err := model.CreateUserSessionForLoginContext(ctx, session); err != nil {
+		if errors.Is(err, model.ErrUserSessionInactive) {
+			return nil, ErrLoginSessionRevoked
+		}
 		return nil, err
 	}
 	bundle, err := issueAuthBundle(session, session.SID+"."+refreshSecret, true)
@@ -227,7 +229,12 @@ func RefreshLoginSession(rawRefreshToken, expectedSID, ip, userAgent string) (*A
 		if errors.Is(err, model.ErrUserSessionInactive) {
 			return nil, nil, ErrLoginSessionRevoked
 		}
-		return nil, nil, ErrRefreshTokenInvalid
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil, ErrRefreshTokenInvalid
+		}
+		// An unavailable database must not discard an otherwise valid browser
+		// session. The caller keeps the cookie and can retry after recovery.
+		return nil, nil, err
 	}
 	if session.Status != model.UserSessionStatusActive || session.RevokedAt != 0 || session.ExpiresAt <= time.Now().Unix() {
 		return nil, nil, ErrLoginSessionRevoked
@@ -256,7 +263,7 @@ func RefreshLoginSession(rawRefreshToken, expectedSID, ip, userAgent string) (*A
 			}
 			return bundle, currentUser, nil
 		}
-		if errors.Is(err, model.ErrUserSessionRefreshReuse) {
+		if errors.Is(err, model.ErrUserSessionRefreshReuse) || errors.Is(err, model.ErrUserSessionInactive) || errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, ErrLoginSessionRevoked
 		}
 		if errors.Is(err, model.ErrUserSessionRefreshInvalid) {
@@ -323,12 +330,30 @@ func WriteRefreshCookie(c *gin.Context, rawToken string) {
 		Secure:   common.SessionCookieSecure,
 		SameSite: http.SameSiteStrictMode,
 	})
+	clearNamedRefreshCookie(c, legacyRefreshCookieName)
 	writeSessionHintCookie(c, maxAge, expiresAt)
+	clearNamedSessionHintCookie(c, legacySessionHintCookieName)
+}
+
+// ReadRefreshCookie accepts sessions issued before the cookie-name migration.
+// The next successful refresh rotates them into the current cookie.
+func ReadRefreshCookie(c *gin.Context) (string, error) {
+	if value, err := c.Cookie(RefreshCookieName); err == nil && value != "" {
+		return value, nil
+	}
+	return c.Cookie(legacyRefreshCookieName)
 }
 
 func ClearRefreshCookie(c *gin.Context) {
+	clearNamedRefreshCookie(c, RefreshCookieName)
+	clearNamedRefreshCookie(c, legacyRefreshCookieName)
+	clearSessionHintCookie(c)
+	clearNamedSessionHintCookie(c, legacySessionHintCookieName)
+}
+
+func clearNamedRefreshCookie(c *gin.Context, name string) {
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     RefreshCookieName,
+		Name:     name,
 		Value:    "",
 		Path:     "/api/user/auth",
 		MaxAge:   -1,
@@ -337,7 +362,6 @@ func ClearRefreshCookie(c *gin.Context) {
 		Secure:   common.SessionCookieSecure,
 		SameSite: http.SameSiteStrictMode,
 	})
-	clearSessionHintCookie(c)
 }
 
 // writeSessionHintCookie mirrors the Refresh Cookie's lifetime with a
@@ -358,8 +382,12 @@ func ClearRefreshCookie(c *gin.Context) {
 // cookies then ride the same response with the same expiry, and no login path
 // can set one without the other.
 func writeSessionHintCookie(c *gin.Context, maxAge int, expiresAt time.Time) {
+	writeNamedSessionHintCookie(c, SessionHintCookieName, maxAge, expiresAt)
+}
+
+func writeNamedSessionHintCookie(c *gin.Context, name string, maxAge int, expiresAt time.Time) {
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     SessionHintCookieName,
+		Name:     name,
 		Value:    SessionHintCookieValue,
 		Path:     "/",
 		MaxAge:   maxAge,
@@ -371,8 +399,12 @@ func writeSessionHintCookie(c *gin.Context, maxAge int, expiresAt time.Time) {
 }
 
 func clearSessionHintCookie(c *gin.Context) {
+	clearNamedSessionHintCookie(c, SessionHintCookieName)
+}
+
+func clearNamedSessionHintCookie(c *gin.Context, name string) {
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     SessionHintCookieName,
+		Name:     name,
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,
@@ -428,11 +460,12 @@ func splitRefreshToken(raw string) (string, string, bool) {
 }
 
 func hashRefreshSecret(secret string) string {
-	return common.GenerateHMACWithKey(authSigningKey("refresh"), secret)
+	// Persisted session digests keep their original domain across JWT migrations.
+	return common.GenerateHMACWithKey(legacyAuthSigningKey("refresh"), secret)
 }
 
 func deriveNextRefreshSecret(sid, currentSecret string) string {
-	return common.GenerateHMACWithKey(authSigningKey("refresh-rotate"), sid+"."+currentSecret)
+	return common.GenerateHMACWithKey(legacyAuthSigningKey("refresh-rotate"), sid+"."+currentSecret)
 }
 
 func truncateAuthMetadata(value string, max int) string {

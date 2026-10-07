@@ -1,6 +1,6 @@
 package operation_setting
 
-import "github.com/QuantumNous/new-api/setting/config"
+import "github.com/dqt081228OHVGFY/further-api/setting/config"
 
 type PaymentSetting struct {
 	AmountOptions  []int           `json:"amount_options"`
@@ -31,7 +31,7 @@ func GetPaymentSetting() *PaymentSetting {
 }
 
 func IsPaymentComplianceConfirmed() bool {
-	// RelayFor no longer requires a typed acceptance step to use billing.
+	// Further no longer requires a typed acceptance step to use billing.
 	// Keep the legacy fields for database compatibility; do not fabricate an
 	// administrator's acceptance record. Gateway configuration and callback
 	// signature verification remain independently enforced.

@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/oauth"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -570,7 +570,7 @@ func UnbindCustomOAuth(c *gin.Context) {
 func UnbindCustomOAuthByAdmin(c *gin.Context) {
 	userIdStr := c.Param("id")
 	userId, err := strconv.Atoi(userIdStr)
-	if err != nil {
+	if err != nil || userId <= 0 {
 		common.ApiErrorMsg(c, "invalid user id")
 		return
 	}
@@ -589,15 +589,16 @@ func UnbindCustomOAuthByAdmin(c *gin.Context) {
 
 	providerIdStr := c.Param("provider_id")
 	providerId, err := strconv.Atoi(providerIdStr)
-	if err != nil {
+	if err != nil || providerId <= 0 {
 		common.ApiErrorMsg(c, "invalid provider id")
 		return
 	}
 
-	if err := model.DeleteUserOAuthBinding(userId, providerId); err != nil {
-		common.ApiError(c, err)
+	if _, err := model.MutateManagedAccountSecurityContext(c.Request.Context(), managedSecurityOperator(c), model.ManagedSecurityMutation{TargetID: userId, Action: "oauth-unbind", ProviderID: providerId}); err != nil {
+		writeSecurityOperationError(c, err)
 		return
 	}
+	recordManageAuditFor(c, userId, "user.binding_clear", map[string]any{"bindingType": "custom_oauth", "provider_id": providerId, "username": targetUser.Username})
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

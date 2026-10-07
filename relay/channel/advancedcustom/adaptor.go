@@ -8,17 +8,17 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	"github.com/QuantumNous/new-api/relay/channel/gemini"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/gemini"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 )
@@ -28,9 +28,7 @@ const ChannelName = "advanced_custom"
 const advancedCustomModelPlaceholder = "{model}"
 
 type Adaptor struct {
-	openaiAdaptor openai.Adaptor
-	claudeAdaptor claude.Adaptor
-	geminiAdaptor gemini.Adaptor
+	responseFormat string
 
 	resolved  bool
 	converted bool
@@ -39,9 +37,8 @@ type Adaptor struct {
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
-	a.openaiAdaptor.Init(info)
-	a.claudeAdaptor.Init(info)
-	a.geminiAdaptor.Init(info)
+	*a = Adaptor{}
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
@@ -75,7 +72,7 @@ func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayIn
 
 	switch converter {
 	case relayconvert.ConverterNone:
-		return a.claudeAdaptor.ConvertClaudeRequest(c, info, request)
+		return claude.NativeMessages(c, info, request)
 	case relayconvert.ConverterClaudeMessagesToOpenAIChat:
 		return a.convertCrossProtocolChatRequest(c, info, converter, request)
 	default:
@@ -91,7 +88,7 @@ func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayIn
 
 	switch converter {
 	case relayconvert.ConverterNone:
-		return a.geminiAdaptor.ConvertGeminiRequest(c, info, request)
+		return gemini.NativeContent(info, request)
 	case relayconvert.ConverterGeminiContentToOpenAIChat:
 		return a.convertCrossProtocolChatRequest(c, info, converter, request)
 	default:
@@ -159,7 +156,7 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
 	a.converted = true
-	return a.openaiAdaptor.ConvertRerankRequest(c, relayMode, request)
+	return request, nil
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
@@ -277,7 +274,7 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	if err := a.resolve(c, info); err != nil {
 		return nil, types.NewOpenAIError(err, types.ErrorCodeInvalidRequest, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 	}
@@ -289,13 +286,13 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 		return a.doNativeResponse(c, resp, info)
 	case relayconvert.ConverterClaudeMessagesToOpenAIChat,
 		relayconvert.ConverterGeminiContentToOpenAIChat:
-		return a.openaiAdaptor.DoResponse(c, resp, info)
+		return openai.ProtocolResponse(c, resp, info, a.responseFormat)
 	case relayconvert.ConverterOpenAIChatToClaudeMessages:
-		return a.claudeAdaptor.DoResponse(c, resp, info)
+		return claude.MessagesResponse(c, resp, info)
 	case relayconvert.ConverterOpenAIChatToGeminiContent:
-		return a.geminiAdaptor.DoResponse(c, resp, info)
+		return gemini.ContentResponse(c, resp, info)
 	case relayconvert.ConverterOpenAIResponsesToGemini:
-		return a.geminiAdaptor.DoResponse(c, resp, info)
+		return gemini.ContentResponse(c, resp, info)
 	case relayconvert.ConverterOpenAIChatToOpenAIResponses:
 		if info.IsStream {
 			return openai.OaiResponsesToChatStreamHandler(c, info, resp)
@@ -323,14 +320,14 @@ func (a *Adaptor) GetChannelName() string {
 	return ChannelName
 }
 
-func (a *Adaptor) doNativeResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (any, *types.NewAPIError) {
+func (a *Adaptor) doNativeResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (any, *types.GatewayError) {
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
-		return a.claudeAdaptor.DoResponse(c, resp, info)
+		return claude.MessagesResponse(c, resp, info)
 	case types.RelayFormatGemini:
-		return a.geminiAdaptor.DoResponse(c, resp, info)
+		return gemini.ContentResponse(c, resp, info)
 	default:
-		return a.openaiAdaptor.DoResponse(c, resp, info)
+		return openai.ProtocolResponse(c, resp, info, a.responseFormat)
 	}
 }
 
@@ -534,7 +531,7 @@ func (a *Adaptor) convertCrossProtocolChatRequest(c *gin.Context, info *relaycom
 func (a *Adaptor) convertOpenAICompatibleRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
 	old := info.ChannelType
 	info.ChannelType = constant.ChannelTypeOpenAI
-	converted, err := a.openaiAdaptor.ConvertOpenAIRequest(c, info, request)
+	converted, err := openai.NativeChat(c, info, request)
 	info.ChannelType = old
 	return converted, err
 }
@@ -542,31 +539,27 @@ func (a *Adaptor) convertOpenAICompatibleRequest(c *gin.Context, info *relaycomm
 func (a *Adaptor) convertOpenAICompatibleResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
 	old := info.ChannelType
 	info.ChannelType = constant.ChannelTypeOpenAI
-	converted, err := a.openaiAdaptor.ConvertOpenAIResponsesRequest(c, info, request)
+	converted, err := openai.NativeResponses(c, info, request)
 	info.ChannelType = old
 	return converted, err
 }
 
 func (a *Adaptor) convertOpenAICompatibleEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	old := info.ChannelType
-	info.ChannelType = constant.ChannelTypeOpenAI
-	converted, err := a.openaiAdaptor.ConvertEmbeddingRequest(c, info, request)
-	info.ChannelType = old
-	return converted, err
+	return request, nil
 }
 
 func (a *Adaptor) convertOpenAICompatibleAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	old := info.ChannelType
-	info.ChannelType = constant.ChannelTypeOpenAI
-	converted, err := a.openaiAdaptor.ConvertAudioRequest(c, info, request)
-	info.ChannelType = old
-	return converted, err
+	body, err := openai.AudioPayload(c, info, request)
+	if err == nil {
+		a.responseFormat = request.ResponseFormat
+	}
+	return body, err
 }
 
 func (a *Adaptor) convertOpenAICompatibleImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
 	old := info.ChannelType
 	info.ChannelType = constant.ChannelTypeOpenAI
-	converted, err := a.openaiAdaptor.ConvertImageRequest(c, info, request)
+	converted, err := openai.ImagePayload(c, info, request)
 	info.ChannelType = old
 	return converted, err
 }

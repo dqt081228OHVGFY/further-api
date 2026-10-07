@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b57d0">
+  <title>登录 · further-api</title>
+  <link rel="icon" type="image/svg+xml" href="/further-api-logo.svg?v=handshake-20261004">
+  <link rel="stylesheet" href="/further-assets/app.css">
+  <link rel="stylesheet" href="/further-assets/gateway-theme.css">
+  <link rel="stylesheet" href="/further-assets/material.css">
+  <link rel="stylesheet" href="/further-assets/auth-material.css">
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/material-icons.js"></script>
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/app.js"></script>
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/site.js"></script>
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/appearance.js"></script>
+<script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/lunar-schedule.js"></script>
+<script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/activities.js"></script>
+<link rel="stylesheet" href="/further-assets/activities.css">
+<link rel="stylesheet" href="/further-assets/workspace-colors.css">
+<link rel="stylesheet" href="/further-assets/public-pages.css">
+</head>
+<body data-page="auth" data-further-api-ui="workspace-v2" class="auth-page auth-material-page">
+  <div class="auth-shell">
+    <header class="auth-header">
+      <a class="auth-brand" href="/" aria-label="返回首页">
+        <span class="rail-logo"><img src="/further-api-logo.svg?v=handshake-20261004" width="40" height="40" alt=""></span>
+        <span><strong data-site-name>further-api</strong><small data-site-subtitle>AI API 网关</small></span>
+      </a>
+      <a class="md-btn md-btn-text auth-home-link" href="/"><span class="material-symbol" aria-hidden="true">arrow_outward</span>返回首页</a>
+    </header>
+    <main class="auth-workspace">
+      <aside class="auth-story" aria-labelledby="auth-story-title"><span class="further-kicker">further-api / 账户中心</span><h2 id="auth-story-title">继续你的模型工作。</h2><p>安全登录账户，在一个工作区管理模型、凭据与用量。</p><ol class="further-auth-steps"><li><b>独立凭据</b><span>为应用分别设置访问范围。</span></li><li><b>清晰用量</b><span>查看调用记录与实际消费。</span></li><li><b>安全访问</b><span>支持双重验证和通行密钥。</span></li></ol><a class="md-btn md-btn-outlined" href="/pricing">浏览公开模型目录</a></aside>
+      <section class="auth-entry" aria-labelledby="auth-title">
+        <div class="md-card auth-card">
+
+          <h1 id="auth-title">登录</h1>
+          <p id="auth-description">使用你的账户继续访问 further-api。</p>
+          <section class="site-announcement hidden" data-site-announcement aria-live="polite">
+      <span class="site-announcement-icon"><span class="material-symbol" aria-hidden="true">campaign</span></span>
+      <div><b data-site-announcement-title>站点公告</b><p data-site-announcement-content></p></div>
+          </section>
+      <div class="status-err hidden" id="auth-oauth-message" role="alert"></div>
+      <div class="auth-provider-area">
+        <button id="linuxdo-login" class="md-btn md-btn-outlined auth-submit auth-linuxdo-button" type="button" aria-describedby="linuxdo-login-hint"><img class="linuxdo-mark" src="/further-assets/linuxdo-login.png" width="24" height="24" alt="" aria-hidden="true"><span>使用 Linux DO 登录</span><span class="material-symbol auth-provider-arrow" aria-hidden="true">arrow_forward</span></button>
+        <p class="field-hint hidden" id="linuxdo-login-hint"></p>
+      </div>
+      <div class="auth-divider"><span>或使用账户登录</span></div>
+      <form id="auth-form" method="post" action="/api/user/login">
+        <div id="local-auth-fields">
+          <div class="md-textfield">
+            <input class="md-input" id="auth-username" name="username" autocomplete="username" placeholder=" " required>
+            <label class="md-input-label" for="auth-username">用户名</label>
+          </div>
+          <div class="md-textfield auth-password-field">
+            <input class="md-input" id="auth-password" name="password" type="password" autocomplete="current-password" placeholder=" " required>
+            <label class="md-input-label" for="auth-password">密码</label>
+            <button id="auth-password-toggle" class="md-icon-button" type="button" aria-label="显示密码" aria-pressed="false"><span class="material-symbol" aria-hidden="true">visibility</span></button>
+          </div>
+        </div>
+        <div class="md-textfield hidden" id="auth-registration-code-wrap">
+          <input class="md-input" id="auth-registration-code" name="registration_code" type="password" autocomplete="one-time-code" placeholder=" ">
+          <label class="md-input-label" for="auth-registration-code">注册码</label>
+        </div>
+        <p class="field-hint hidden" id="auth-registration-hint">需要注册码。</p>
+        <p class="card-hint hidden" id="auth-local-closed">本地注册已关闭。</p>
+        <button id="auth-submit" class="md-btn md-btn-filled auth-submit" type="submit">登录</button>
+      </form>
+      <div class="auth-links">
+        <span data-auth-switch-hint>还没有账户？</span>
+        <a id="auth-switch" class="md-btn md-btn-text" href="/auth/?mode=register">创建账户</a>
+      </div>
+
+        </div>
+      </section>
+    </main>
+    <footer class="auth-page-footer"><span>© <span data-site-name>further-api</span></span><a href="/">返回首页<span class="material-symbol" aria-hidden="true">arrow_forward</span></a></footer>
+  </div>
+<noscript>请启用 JavaScript 后使用 further-api。</noscript>
+</body>
+</html>

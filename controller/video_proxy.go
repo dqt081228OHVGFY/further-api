@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	relaychannel "github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	relaychannel "github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/http/httpguts"
 )
@@ -224,7 +224,7 @@ func proxyTaskMedia(c *gin.Context, task *model.Task, descriptor *relaychannel.T
 
 	client := service.GetSSRFProtectedHTTPClient()
 	if proxy != "" {
-		client, err = service.GetHttpClientWithProxy(proxy)
+		client, err = service.GetSSRFProtectedHTTPClientWithProxy(proxy)
 		if err != nil {
 			return &taskMediaProxyError{
 				status: http.StatusInternalServerError, code: "artifact_internal_error",

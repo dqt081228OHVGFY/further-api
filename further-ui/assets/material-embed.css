@@ -1,0 +1,13 @@
+/* Boxed surfaces for the gateway feature pages embedded in the workspace. */
+.further-extension { font-family:'Public Sans Variable','Segoe UI','Microsoft YaHei UI',sans-serif; --background:#fff; --card:#fff; --popover:#fff; --muted:#f0f4f9; --border:#e3e9f1; --input:#e3e9f1; --primary:#0b57d0; --primary-foreground:#fff; }
+.dark .further-extension { --background:#18212d; --card:#18212d; --popover:#233145; --muted:#233145; --border:#304056; --input:#304056; --primary:#adc6ff; --primary-foreground:#002e69; }
+.further-extension [data-slot='card'] { border-radius:20px; box-shadow:none; }
+.further-extension [data-slot='button'] { border-radius:12px; transition:transform 220ms cubic-bezier(.2,0,0,1),background-color 200ms,color 200ms,box-shadow 220ms; }
+.further-extension [data-slot='button']:active:not(:disabled) { transform:scale(.97); }
+.further-extension [data-slot='input'],.further-extension [data-slot='select-trigger'] { border-radius:12px; }
+.further-extension [data-slot='table'] { border-collapse:separate; border-spacing:0 6px; }
+.further-extension [data-slot='table-row'] { border:0; }
+.further-extension [data-slot='table-body'] [data-slot='table-cell'] { background:var(--muted); }
+.further-extension [data-slot='table-body'] [data-slot='table-cell']:first-child { border-radius:11px 0 0 11px; }
+.further-extension [data-slot='table-body'] [data-slot='table-cell']:last-child { border-radius:0 11px 11px 0; }
+.further-extension [data-slot='dialog-content'] { border-radius:24px; }

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ func ConfigureTrustedProxies(engine *gin.Engine) error {
 		return err
 	}
 	if usedDefaults {
-		log.Print("WARNING: TRUSTED_PROXIES is unset or blank; trusting loopback, RFC 1918, and IPv6 ULA proxy addresses for compatibility. Set TRUSTED_PROXIES=none to trust no proxies, or configure explicit proxy IPs/CIDRs to replace these defaults.")
+		log.Print("TRUSTED_PROXIES is unset or blank; forwarded client IP headers are ignored. Configure the exact reverse proxy peer IP/CIDR when using a proxy.")
 	}
 	return common.ConfigureTrustedProxies(engine, trustedProxies)
 }

@@ -5,11 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // withSystemTaskRegistry swaps the package registry for the given handlers for
@@ -231,4 +233,65 @@ func TestEnqueueSystemTaskReportsCreatedAndExistingActive(t *testing.T) {
 	require.True(t, created)
 	require.NotNil(t, second)
 	assert.NotEqual(t, first.TaskID, second.TaskID)
+}
+
+func TestSystemTaskClaimPassLeavesPendingTasksAfterShutdown(t *testing.T) {
+	truncate(t)
+	handler := &stubScheduledHandler{taskType: "test_cancelled_claim", enabled: true, interval: time.Minute,
+		onRun: func(context.Context, *model.SystemTask, string) { t.Error("handler ran after shutdown") }}
+	withSystemTaskRegistry(t, handler)
+	task, err := model.CreateSystemTask(handler.taskType, nil, nil)
+	require.NoError(t, err)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	previous := common.BackgroundContext()
+	common.SetBackgroundContext(ctx)
+	defer common.SetBackgroundContext(previous)
+	runSystemTaskClaimPass("runner-cancelled")
+	reloaded, err := model.GetSystemTaskByTaskID(task.TaskID)
+	require.NoError(t, err)
+	require.Equal(t, model.SystemTaskStatusPending, reloaded.Status)
+}
+
+func TestSystemTaskClaimIsReleasedWhenShutdownInterruptsHydration(t *testing.T) {
+	truncate(t)
+	handler := &stubScheduledHandler{taskType: "test_cancelled_dispatch", enabled: true, interval: time.Minute,
+		onRun: func(context.Context, *model.SystemTask, string) { t.Error("handler ran after shutdown") }}
+	withSystemTaskRegistry(t, handler)
+	task, err := model.CreateSystemTask(handler.taskType, nil, nil)
+	require.NoError(t, err)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	previous := common.BackgroundContext()
+	common.SetBackgroundContext(ctx)
+	defer common.SetBackgroundContext(previous)
+	const callback = "test:cancel-task-hydration"
+	require.NoError(t, model.DB.Callback().Query().Before("gorm:query").Register(callback, func(tx *gorm.DB) {
+		if tx.Statement.Table != "system_tasks" {
+			return
+		}
+		where, ok := tx.Statement.Clauses["WHERE"].Expression.(clause.Where)
+		if !ok {
+			return
+		}
+		for _, expression := range where.Exprs {
+			if predicate, ok := expression.(clause.Expr); ok && predicate.SQL == "id = ?" {
+				// Only the final hydration query has this predicate. The earlier
+				// scan and claim-read include their own type and status filters.
+				cancel()
+				return
+			}
+		}
+	}))
+	t.Cleanup(func() { _ = model.DB.Callback().Query().Remove(callback) })
+	runSystemTaskClaimPass("shutdown-runner")
+	require.ErrorIs(t, ctx.Err(), context.Canceled)
+	require.NoError(t, model.DB.Callback().Query().Remove(callback))
+	finished, err := model.GetSystemTaskByTaskID(task.TaskID)
+	require.NoError(t, err)
+	require.Equal(t, model.SystemTaskStatusFailed, finished.Status)
+	require.Contains(t, finished.Error, context.Canceled.Error())
+	var locks int64
+	require.NoError(t, model.DB.Model(&model.SystemTaskLock{}).Where("task_id = ?", task.TaskID).Count(&locks).Error)
+	require.Zero(t, locks)
 }

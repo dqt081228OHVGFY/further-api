@@ -2,14 +2,15 @@ package jimeng
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,61 +31,49 @@ type ImageResponse struct {
 }
 
 func responseJimeng2OpenAIImage(_ *gin.Context, response *ImageResponse, info *relaycommon.RelayInfo) *dto.ImageResponse {
-	imageResponse := dto.ImageResponse{
-		Created: info.StartTime.Unix(),
+	output := &dto.ImageResponse{Created: info.StartTime.Unix(), Data: make([]dto.ImageData, 0, max(len(response.Data.BinaryDataBase64), len(response.Data.ImageUrls)))}
+	for index := 0; index < max(len(response.Data.BinaryDataBase64), len(response.Data.ImageUrls)); index++ {
+		image := dto.ImageData{}
+		if index < len(response.Data.BinaryDataBase64) {
+			image.B64Json = response.Data.BinaryDataBase64[index]
+		}
+		if index < len(response.Data.ImageUrls) {
+			image.Url = response.Data.ImageUrls[index]
+		}
+		if image.B64Json != "" || image.Url != "" {
+			output.Data = append(output.Data, image)
+		}
 	}
-
-	for _, base64Data := range response.Data.BinaryDataBase64 {
-		imageResponse.Data = append(imageResponse.Data, dto.ImageData{
-			B64Json: base64Data,
-		})
-	}
-	for _, imageUrl := range response.Data.ImageUrls {
-		imageResponse.Data = append(imageResponse.Data, dto.ImageData{
-			Url: imageUrl,
-		})
-	}
-
-	return &imageResponse
+	return output
 }
-
-// jimengImageHandler handles the Jimeng image generation response
-func jimengImageHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.NewAPIError) {
-	var jimengResponse ImageResponse
-	responseBody, err := io.ReadAll(resp.Body)
+func jimengImageHandler(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.GatewayError) {
+	if c == nil || info == nil || response == nil || response.Body == nil {
+		return nil, types.NewError(errors.New("Jimeng image response context is missing"), types.ErrorCodeBadResponseBody)
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, types.NewError(err, types.ErrorCodeReadResponseBodyFailed)
 	}
-	service.CloseResponseBodyGracefully(resp)
-
-	err = json.Unmarshal(responseBody, &jimengResponse)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *ImageResponse
+	if err = json.Unmarshal(data, &wire); err != nil {
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-
-	// Check if the response indicates an error
-	if jimengResponse.Code != 10000 {
-		return nil, types.WithOpenAIError(types.OpenAIError{
-			Message: jimengResponse.Message,
-			Type:    "jimeng_error",
-			Param:   "",
-			Code:    fmt.Sprintf("%d", jimengResponse.Code),
-		}, resp.StatusCode)
+	if wire == nil {
+		return nil, types.NewError(errors.New("Jimeng image response must be an object"), types.ErrorCodeBadResponseBody)
 	}
-
-	// Convert Jimeng response to OpenAI format
-	fullTextResponse := responseJimeng2OpenAIImage(c, &jimengResponse, info)
-	jsonResponse, err := json.Marshal(fullTextResponse)
+	if wire.Code != 10000 {
+		return nil, types.WithOpenAIError(types.OpenAIError{Message: wire.Message, Type: "jimeng_error", Code: fmt.Sprint(wire.Code)}, http.StatusBadGateway)
+	}
+	output := responseJimeng2OpenAIImage(c, wire, info)
+	if len(output.Data) == 0 {
+		return nil, types.NewError(errors.New("Jimeng returned no generated images"), types.ErrorCodeEmptyResponse)
+	}
+	body, err := json.Marshal(output)
 	if err != nil {
 		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = c.Writer.Write(jsonResponse)
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-
+	info.UpdateImageCount(int64(len(output.Data)))
+	service.IOCopyBytesGracefully(c, response, body)
 	return &dto.Usage{}, nil
 }

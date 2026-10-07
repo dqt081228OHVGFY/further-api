@@ -13,17 +13,17 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/billingexpr"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/billing_setting"
-	"github.com/QuantumNous/new-api/setting/config"
-	"github.com/QuantumNous/new-api/setting/ratio_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/billingexpr"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/billing_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/config"
+	"github.com/dqt081228OHVGFY/further-api/setting/ratio_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -956,7 +956,7 @@ export function parseTaskResult() { return {}; }
 				var revision atomic.Int32
 				var failVendors atomic.Bool
 				upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					assert.Contains(t, r.URL.Path, "/api/i18n/zh/newapi/")
+					assert.Contains(t, r.URL.Path, "/zh/")
 					var payload any
 					if strings.HasSuffix(r.URL.Path, "vendors.json") {
 						if failVendors.Load() {
@@ -977,7 +977,7 @@ export function parseTaskResult() { return {}; }
 					_, _ = w.Write(encoded)
 				}))
 				defer upstream.Close()
-				t.Setenv("SYNC_UPSTREAM_BASE", upstream.URL)
+				t.Setenv("FURTHER_METADATA_BASE", upstream.URL)
 				t.Setenv("SYNC_HTTP_RETRY", "1")
 				var preview struct {
 					Success bool

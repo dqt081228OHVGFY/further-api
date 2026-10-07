@@ -11,15 +11,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/model"
-	pluginruntime "github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/relay"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	pluginruntime "github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/relay"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/types"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
@@ -86,7 +86,7 @@ export function buildSubmitRequest(){return {}} export function parseSubmitRespo
 		"data":{"task_id":"task_public"},
 		"upstream":{"task_id":"upstream_private"}
 	}`, recorder.Body.String())
-	assert.JSONEq(t, `{"seconds":5}`, recorder.Header().Get("X-New-Api-Other-Ratios"))
+	assert.JSONEq(t, `{"seconds":5}`, recorder.Header().Get("X-Further-Api-Other-Ratios"))
 }
 
 func TestPresentTaskSubmissionFallbackUsesPersistedPublicID(t *testing.T) {

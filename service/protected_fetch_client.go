@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 )
 
 type ssrfResolver interface {
@@ -101,7 +102,11 @@ func (t *ssrfProtectedRoundTripper) RoundTrip(req *http.Request) (*http.Response
 	if req == nil || req.URL == nil {
 		return nil, fmt.Errorf("invalid request")
 	}
-	if err := ValidateSSRFProtectedFetchURL(req.URL.String()); err != nil {
+	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
+		return nil, fmt.Errorf("unsupported fetch protocol")
+	}
+	_, err := t.resolveTarget(req.Context(), req.URL)
+	if err != nil {
 		return nil, err
 	}
 
@@ -109,7 +114,83 @@ func (t *ssrfProtectedRoundTripper) RoundTrip(req *http.Request) (*http.Response
 	if err != nil {
 		return nil, err
 	}
-	return t.transportFor(proxyURL).RoundTrip(req)
+	if proxyURL == nil {
+		return t.transportFor(nil).RoundTrip(req)
+	}
+	// Tunnel both HTTP and HTTPS to the validated IP. Forward proxies must
+	// replace Host with the absolute-form authority, so forwarding to a pinned
+	// IP would break virtual hosts; tunneling preserves the origin-form Host.
+	return t.tunnelTransportFor(proxyURL).RoundTrip(req)
+}
+
+func fetchURLPort(target *url.URL) string {
+	if port := target.Port(); port != "" {
+		return port
+	}
+	if target.Scheme == "https" {
+		return "443"
+	}
+	return "80"
+}
+
+func (t *ssrfProtectedRoundTripper) resolveTarget(ctx context.Context, target *url.URL) ([]net.IP, error) {
+	protection, enabled, err := t.getProtection()
+	if err != nil || !enabled {
+		return nil, err
+	}
+	port, err := strconv.Atoi(fetchURLPort(target))
+	if err != nil {
+		return nil, fmt.Errorf("invalid fetch port")
+	}
+	host := target.Hostname()
+	if err := protection.ValidateNetworkTarget(host, port); err != nil {
+		return nil, err
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		return []net.IP{ip}, nil
+	}
+	if !protection.ApplyIPFilterForDomain {
+		return nil, nil
+	}
+	resolved, err := t.resolver.LookupIPAddr(ctx, host)
+	if err != nil {
+		return nil, fmt.Errorf("DNS resolution failed for %s: %w", host, err)
+	}
+	ips := make([]net.IP, 0, len(resolved))
+	for _, candidate := range resolved {
+		if candidate.IP == nil {
+			continue
+		}
+		if err := protection.ValidateResolvedIP(host, candidate.IP); err != nil {
+			return nil, err
+		}
+		ips = append(ips, candidate.IP)
+	}
+	if len(ips) == 0 {
+		return nil, fmt.Errorf("DNS resolution returned no usable addresses")
+	}
+	return ips, nil
+}
+
+func (t *ssrfProtectedRoundTripper) tunnelTransportFor(proxyURL *url.URL) *http.Transport {
+	var proxyTLSConfig *tls.Config
+	if proxyURL.Scheme == "https" {
+		if config := t.transportFor(proxyURL).TLSClientConfig; config != nil {
+			proxyTLSConfig = config.Clone()
+		}
+	}
+	key := "tunnel\x00" + proxyURL.String()
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+	if transport, exists := t.transports[key]; exists {
+		return transport
+	}
+	proxyDialer := &protectedProxyTunnelDialer{proxyURL: proxyURL, dialContext: t.dialContext, tlsConfig: proxyTLSConfig}
+	protectedDialer := &protectedFetchDialer{resolver: t.resolver, dialContext: proxyDialer.DialContext, getProtection: t.getProtection}
+	transport := t.newTransport(nil)
+	transport.DialContext = protectedDialer.DialContext
+	t.transports[key] = transport
+	return transport
 }
 
 func (t *ssrfProtectedRoundTripper) CloseIdleConnections() {
@@ -154,12 +235,15 @@ func (t *ssrfProtectedRoundTripper) newTransport(proxyURL *url.URL) *http.Transp
 	}
 
 	transport := &http.Transport{
-		MaxIdleConns:        common.RelayMaxIdleConns,
-		MaxIdleConnsPerHost: common.RelayMaxIdleConnsPerHost,
-		IdleConnTimeout:     time.Duration(common.RelayIdleConnTimeout) * time.Second,
-		ForceAttemptHTTP2:   true,
-		Proxy:               proxyFunc,
-		DialContext:         dialContext,
+		MaxIdleConns:           common.RelayMaxIdleConns,
+		MaxIdleConnsPerHost:    common.RelayMaxIdleConnsPerHost,
+		IdleConnTimeout:        time.Duration(common.RelayIdleConnTimeout) * time.Second,
+		ForceAttemptHTTP2:      true,
+		Proxy:                  proxyFunc,
+		DialContext:            dialContext,
+		TLSHandshakeTimeout:    10 * time.Second,
+		ResponseHeaderTimeout:  60 * time.Second,
+		MaxResponseHeaderBytes: 64 << 10,
 	}
 	if common.TLSInsecureSkipVerify {
 		transport.TLSClientConfig = common.InsecureTLSConfig

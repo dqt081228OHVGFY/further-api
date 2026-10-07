@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"unsafe"
 )
 
 // Codec is the JSON engine used by every kitutil JSON helper. The host may
@@ -115,9 +114,7 @@ func JsonRawMessageToString(data json.RawMessage) string {
 }
 
 func StringToByteSlice(s string) []byte {
-	tmp1 := (*[2]uintptr)(unsafe.Pointer(&s))
-	tmp2 := [3]uintptr{tmp1[0], tmp1[1], tmp1[1]}
-	return *(*[]byte)(unsafe.Pointer(&tmp2))
+	return []byte(s)
 }
 
 func Any2Type[T any](data any) (T, error) {

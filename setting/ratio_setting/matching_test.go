@@ -3,7 +3,7 @@ package ratio_setting
 import (
 	"testing"
 
-	"github.com/QuantumNous/new-api/setting/model_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/model_setting"
 	"github.com/stretchr/testify/assert"
 )
 

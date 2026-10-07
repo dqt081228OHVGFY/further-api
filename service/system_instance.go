@@ -9,11 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-
-	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 const systemInstanceReportInterval = 30 * time.Second
@@ -64,19 +62,20 @@ type SystemInstanceStorageMetrics struct {
 
 func StartSystemInstanceReporter() {
 	systemInstanceReporterOnce.Do(func() {
-		gopool.Go(func() {
-			reportSystemInstanceWithLog()
-
-			ticker := time.NewTicker(systemInstanceReportInterval)
-			defer ticker.Stop()
-			for range ticker.C {
-				reportSystemInstanceWithLog()
-			}
+		startPeriodicTask("system instance reporter", systemInstanceReportInterval, true, func(ctx context.Context) {
+			reportSystemInstanceContextWithLog(ctx)
 		})
 	})
 }
 
 func ReportCurrentSystemInstance() error {
+	return reportCurrentSystemInstanceContext(context.Background())
+}
+
+func reportCurrentSystemInstanceContext(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	identity := common.GetNodeIdentity()
 	hostname, hostnameErr := os.Hostname()
 	if strings.TrimSpace(identity.Name) == "" {
@@ -120,11 +119,15 @@ func ReportCurrentSystemInstance() error {
 			},
 		},
 	}
-	return model.UpsertSystemInstance(identity.Name, info, common.StartTime, common.GetTimestamp())
+	return model.UpsertSystemInstanceContext(ctx, identity.Name, info, common.StartTime, common.GetTimestamp())
 }
 
 func reportSystemInstanceWithLog() {
-	if err := ReportCurrentSystemInstance(); err != nil {
-		logger.LogWarn(context.Background(), fmt.Sprintf("system instance report failed: %v", err))
+	reportSystemInstanceContextWithLog(context.Background())
+}
+
+func reportSystemInstanceContextWithLog(ctx context.Context) {
+	if err := reportCurrentSystemInstanceContext(ctx); err != nil && ctx.Err() == nil {
+		logger.LogWarn(ctx, fmt.Sprintf("system instance report failed: %v", err))
 	}
 }

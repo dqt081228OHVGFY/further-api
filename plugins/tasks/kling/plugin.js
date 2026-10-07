@@ -12,7 +12,7 @@ export const meta = {
   channelTypes: [50],
   models: ["kling-v1", "kling-v1-6", "kling-v2-master"],
   fetchMode: "per_task",
-  upstreams: ["vendor", "new_api"],
+  upstreams: ["vendor", "gateway"],
   usageSchema: {
     // Kling final unit deduction (estimated at submit, actual on completion).
     units: {
@@ -99,10 +99,10 @@ function isRelay(apiKey) {
   return apiKey.startsWith("sk-");
 }
 
-// The host signal is authoritative on New API channels; the sk- key prefix
+// The host signal is authoritative on compatible gateway channels; the sk- key prefix
 // stays as the heuristic for legacy type-50 channels pointed at a gateway.
 function viaGateway(ctx) {
-  return !!(ctx.upstream && ctx.upstream.kind === "new_api") || isRelay(ctx.apiKey);
+  return !!(ctx.upstream && ctx.upstream.kind === "gateway") || isRelay(ctx.apiKey);
 }
 
 function tokenFor(ctx) {

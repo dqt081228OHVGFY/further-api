@@ -1,45 +1,41 @@
 package openai
 
 import (
+	"encoding/json"
+	"errors"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
-	"github.com/gin-gonic/gin"
 )
 
-func OaiResponsesCompactionHandler(c *gin.Context, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	defer service.CloseResponseBodyGracefully(resp)
-
-	responseBody, err := io.ReadAll(resp.Body)
+func OaiResponsesCompactionHandler(c *gin.Context, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if c == nil || response == nil || response.Body == nil {
+		return nil, chatResponseError(errors.New("Responses compaction context or body is missing"))
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusBadGateway)
 	}
-
-	var compactResp dto.OpenAIResponsesCompactionResponse
-	if err := common.Unmarshal(responseBody, &compactResp); err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *dto.OpenAIResponsesCompactionResponse
+	if err = json.Unmarshal(body, &wire); err != nil {
+		return nil, chatResponseError(err)
 	}
-	if oaiError := compactResp.GetOpenAIError(); oaiError != nil && oaiError.Type != "" {
-		return nil, types.WithOpenAIError(*oaiError, resp.StatusCode)
+	if wire == nil {
+		return nil, chatResponseError(errors.New("Responses compaction response must be an object"))
 	}
-
-	service.IOCopyBytesGracefully(c, resp, responseBody)
-
-	usage := dto.Usage{}
-	if compactResp.Usage != nil {
-		usage.PromptTokens = compactResp.Usage.InputTokens
-		usage.CompletionTokens = compactResp.Usage.OutputTokens
-		usage.TotalTokens = compactResp.Usage.TotalTokens
-		if compactResp.Usage.InputTokensDetails != nil {
-			usage.PromptTokensDetails.CachedTokens = compactResp.Usage.InputTokensDetails.CachedTokens
-			usage.PromptTokensDetails.CacheWriteTokens = compactResp.Usage.InputTokensDetails.CacheWriteTokens
+	if failure := wire.GetOpenAIError(); failure != nil && failure.Type != "" {
+		status := response.StatusCode
+		if status < 400 {
+			status = http.StatusBadGateway
 		}
+		return nil, types.WithOpenAIError(*failure, status)
 	}
-
-	return &usage, nil
+	usage := &dto.Usage{}
+	service.ApplyResponsesUsage(usage, wire.Usage)
+	service.IOCopyBytesGracefully(c, response, body)
+	return usage, nil
 }

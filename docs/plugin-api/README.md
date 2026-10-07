@@ -1,8 +1,9 @@
 # Task plugin API v1
 
-Task plugins are single-file synchronous ECMAScript modules. The plugin contract
-is currently unreleased; [`v1.schema.json`](./v1.schema.json) and
-[`v1.d.ts`](./v1.d.ts) are the authoritative v1 contract.
+Task plugins run in further-api as single-file synchronous ECMAScript modules.
+[`v1.schema.json`](./v1.schema.json) and [`v1.d.ts`](./v1.d.ts) define the v1
+contract. Go owns request execution, caller cancellation, persistence, polling,
+and settlement; plugins declare routes and transform protocol data.
 
 ## Contract and lifecycle
 
@@ -51,8 +52,8 @@ generation and verification are stateless and have no expiry; after
 verification the host still loads the task, owner, and plugin needed to serve
 the artifact. Rotating `CRYPTO_SECRET` invalidates issued URLs. The `access`
 query is redacted before request logging.
-Deployment boundaries and concurrency environment variables are documented in
-[v1.md](./v1.md#generic-task-management-api).
+Polling behavior and its environment variables are documented in
+[v1.md](./v1.md#polling-contract).
 
 The host requires `protocols.openai_video.render` to return a JSON object and
 preserves provider extensions, including output URLs and metadata. Plugins may
@@ -99,8 +100,8 @@ Keep deterministic cases for every exported hook, its main error branch, batch
 behavior, renderers, usage, and content requests. Run a fixture locally with:
 
 ```sh
-new-api plugin lint plugin.js
-new-api plugin test plugin.js --fixture golden.json
+further-api plugin lint plugin.js
+further-api plugin test plugin.js --fixture golden.json
 ```
 
 Root administrators can open the plugin detail Sandbox tab, choose a hook, and

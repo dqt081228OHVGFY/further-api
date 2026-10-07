@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 type ChannelSettings struct {
@@ -20,11 +20,11 @@ type ChannelSettings struct {
 	ResponsesWebSocketEnabled bool   `json:"responses_websocket_enabled,omitempty"`
 	SystemPrompt              string `json:"system_prompt,omitempty"`
 	SystemPromptOverride      bool   `json:"system_prompt_override,omitempty"`
-	// TaskExtendPluginKeys lists the task plugins a New API channel (type 60)
+	// TaskExtendPluginKeys lists the task plugins a further-api channel (type 60)
 	// is extended with. The upstream gateway may host many plugins, so the
 	// channel serves every listed plugin's models while the request still pins
 	// the executing plugin. TaskPluginKey remains the single type-61 binding
-	// and stays valid on a New API channel as well.
+	// and stays valid on a further-api channel as well.
 	TaskExtendPluginKeys []string `json:"task_extend_plugin_keys,omitempty"`
 	// HTTPProtocol controls outbound HTTP version negotiation for this channel.
 	// Accepted values: "", "auto" (default), "http1".
@@ -35,7 +35,7 @@ type ChannelSettings struct {
 }
 
 // BindsTaskPlugin reports whether the channel is bound to the task plugin,
-// either through the single binding or the New API extension list.
+// either through the single binding or the further-api extension list.
 func (s ChannelSettings) BindsTaskPlugin(key string) bool {
 	if key == "" {
 		return false

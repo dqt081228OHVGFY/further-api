@@ -1,7 +1,9 @@
 package model
 
 import (
-	"github.com/QuantumNous/new-api/common"
+	"context"
+
+	"github.com/dqt081228OHVGFY/further-api/common"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -44,6 +46,10 @@ func (instance *SystemInstance) BeforeCreate(_ *gorm.DB) error {
 }
 
 func UpsertSystemInstance(nodeName string, info any, startedAt int64, lastSeenAt int64) error {
+	return UpsertSystemInstanceContext(context.Background(), nodeName, info, startedAt, lastSeenAt)
+}
+
+func UpsertSystemInstanceContext(ctx context.Context, nodeName string, info any, startedAt int64, lastSeenAt int64) error {
 	infoText, err := marshalSystemInstanceInfo(info)
 	if err != nil {
 		return err
@@ -58,7 +64,7 @@ func UpsertSystemInstance(nodeName string, info any, startedAt int64, lastSeenAt
 		LastSeenAt: lastSeenAt,
 		UpdatedAt:  lastSeenAt,
 	}
-	return DB.Clauses(clause.OnConflict{
+	return DB.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns: []clause.Column{{Name: "node_name"}},
 		DoUpdates: clause.AssignmentColumns([]string{
 			"info",
@@ -70,19 +76,15 @@ func UpsertSystemInstance(nodeName string, info any, startedAt int64, lastSeenAt
 }
 
 func ListSystemInstances() ([]*SystemInstance, error) {
-	var instances []*SystemInstance
-	err := DB.Order("last_seen_at desc").Find(&instances).Error
-	return instances, err
+	return ListSystemInstancesContext(context.Background())
 }
 
 func DeleteStaleSystemInstances(now int64) (int64, error) {
-	result := DB.Where("last_seen_at < ?", now-SystemInstanceStaleAfterSeconds).Delete(&SystemInstance{})
-	return result.RowsAffected, result.Error
+	return DeleteStaleSystemInstancesContext(context.Background(), now)
 }
 
 func DeleteStaleSystemInstance(nodeName string, now int64) (bool, error) {
-	result := DB.Where("node_name = ? AND last_seen_at < ?", nodeName, now-SystemInstanceStaleAfterSeconds).Delete(&SystemInstance{})
-	return result.RowsAffected > 0, result.Error
+	return DeleteStaleSystemInstanceContext(context.Background(), nodeName, now)
 }
 
 func (instance *SystemInstance) ToResponse(now int64) SystemInstanceResponse {

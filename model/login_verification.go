@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -67,19 +67,8 @@ func CreateUserSessionFromLoginFlow(token string, session *UserSession, validate
 		if err := validate(tx, flow, state); err != nil {
 			return err
 		}
-		now := time.Now().Unix()
-		var activeCount, issuanceCount int64
-		if err := tx.Model(&UserSession{}).Where("user_id = ? AND status = ? AND expires_at > ?", session.UserID, UserSessionStatusActive, now).Count(&activeCount).Error; err != nil {
+		if err := checkUserSessionLimitsWithTx(tx, session.UserID, time.Now().Unix()); err != nil {
 			return err
-		}
-		if activeCount >= int64(common.UserSessionActiveLimit) {
-			return ErrUserSessionLimit
-		}
-		if err := tx.Model(&UserSession{}).Where("user_id = ? AND created_at > ?", session.UserID, now-common.UserSessionIssuanceWindowSeconds).Count(&issuanceCount).Error; err != nil {
-			return err
-		}
-		if issuanceCount >= int64(common.UserSessionIssuanceLimit) {
-			return ErrUserSessionIssuanceLimit
 		}
 		return createUserSessionWithTx(tx, session)
 	})

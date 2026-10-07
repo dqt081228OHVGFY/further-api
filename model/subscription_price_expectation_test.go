@@ -3,14 +3,14 @@ package model
 import (
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/stretchr/testify/require"
 )
 
 func seedBalancePurchaseExpectation(t *testing.T) (int, int, int) {
 	t.Helper()
-	setupRelayForSubscriptionTest(t)
-	require.NoError(t, DB.AutoMigrate(&SubscriptionOrder{}, &RelayForPrepaidCard{}))
+	setupFurtherSubscriptionTest(t)
+	require.NoError(t, DB.AutoMigrate(&SubscriptionOrder{}, &FurtherPrepaidCard{}))
 	const initialQuota = 10_000_000
 	require.NoError(t, DB.Model(&User{}).Where("id = ?", 21).Update("quota", initialQuota).Error)
 	plan := SubscriptionPlan{
@@ -97,14 +97,14 @@ func TestBalancePurchaseExpectedUSDAllowsLegacyBlankCurrency(t *testing.T) {
 func TestBalancePurchaseRejectsInternalAndHistoricalPrepaidPlans(t *testing.T) {
 	t.Run("internal policy", func(t *testing.T) {
 		userID, planID, initialQuota := seedBalancePurchaseExpectation(t)
-		require.NoError(t, DB.Create(&RelayForSubscriptionPolicy{PlanID: planID, Code: "internal-price-test", Internal: true}).Error)
+		require.NoError(t, DB.Create(&FurtherSubscriptionPolicy{PlanID: planID, Code: "internal-price-test", Internal: true}).Error)
 		err := PurchaseSubscriptionWithBalance(userID, planID)
 		require.ErrorContains(t, err, "仅用于内部发放")
 		requireNoBalancePurchase(t, userID, initialQuota)
 	})
 	t.Run("soft deleted prepaid card", func(t *testing.T) {
 		userID, planID, initialQuota := seedBalancePurchaseExpectation(t)
-		card := RelayForPrepaidCard{PlanID: planID, Code: "rfp_price_test", CodeHash: "price-test-hash", BatchID: "price-test", Quota: int(common.QuotaPerUnit)}
+		card := FurtherPrepaidCard{PlanID: planID, Code: "rfp_price_test", CodeHash: "price-test-hash", BatchID: "price-test", Quota: int(common.QuotaPerUnit)}
 		require.NoError(t, DB.Create(&card).Error)
 		require.NoError(t, DB.Delete(&card).Error)
 		err := PurchaseSubscriptionWithBalance(userID, planID)
@@ -117,7 +117,7 @@ func TestPendingThirdPartySubscriptionOrdersRejectProtectedPlanIDs(t *testing.T)
 	for _, provider := range []string{PaymentProviderStripe, PaymentProviderCreem, PaymentProviderEpay, PaymentProviderWaffoPancake} {
 		t.Run(provider, func(t *testing.T) {
 			userID, planID, _ := seedBalancePurchaseExpectation(t)
-			require.NoError(t, DB.Create(&RelayForSubscriptionPolicy{PlanID: planID, Code: "internal-order-test", Internal: true}).Error)
+			require.NoError(t, DB.Create(&FurtherSubscriptionPolicy{PlanID: planID, Code: "internal-order-test", Internal: true}).Error)
 			order := &SubscriptionOrder{UserId: userID, PlanId: planID, Money: 2.5, TradeNo: "protected-" + provider, PaymentProvider: provider, Status: common.TopUpStatusPending}
 			require.ErrorContains(t, order.Insert(), "仅用于内部发放")
 			var count int64
@@ -127,7 +127,7 @@ func TestPendingThirdPartySubscriptionOrdersRejectProtectedPlanIDs(t *testing.T)
 	}
 	t.Run("soft-deleted prepaid plan", func(t *testing.T) {
 		userID, planID, _ := seedBalancePurchaseExpectation(t)
-		card := RelayForPrepaidCard{PlanID: planID, Code: "rfp_order_test", CodeHash: "order-test-hash"}
+		card := FurtherPrepaidCard{PlanID: planID, Code: "rfp_order_test", CodeHash: "order-test-hash"}
 		require.NoError(t, DB.Create(&card).Error)
 		require.NoError(t, DB.Delete(&card).Error)
 		order := &SubscriptionOrder{UserId: userID, PlanId: planID, Money: 2.5, TradeNo: "protected-prepaid", PaymentProvider: PaymentProviderStripe, Status: common.TopUpStatusPending}

@@ -8,12 +8,11 @@ import (
 
 	"context"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	relaymedia "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/media"
-	sharedgemini "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/gemini"
-	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	sharedgemini "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/shared/gemini"
+	kitutil "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/reasoning"
 )
 
 func OpenAIChatRequestToGeminiGenerateContent(c context.Context, textRequest dto.GeneralOpenAIRequest, info convmeta.Meta) (*dto.GeminiChatRequest, error) {
@@ -279,76 +278,26 @@ func OpenAIChatRequestToGeminiGenerateContent(c context.Context, textRequest dto
 				if part.Text == "" {
 					continue
 				}
-				text := part.Text
-				hasMarkdownImage := false
-				for {
-					startIdx := strings.Index(text, "![")
-					if startIdx == -1 {
-						break
-					}
-					bracketIdx := strings.Index(text[startIdx:], "](data:")
-					if bracketIdx == -1 {
-						break
-					}
-					bracketIdx += startIdx
-					closeIdx := strings.Index(text[bracketIdx+2:], ")")
-					if closeIdx == -1 {
-						break
-					}
-					closeIdx += bracketIdx + 2
-
-					hasMarkdownImage = true
-					if startIdx > 0 {
-						textBefore := text[:startIdx]
-						if textBefore != "" {
-							parts = append(parts, dto.GeminiPart{
-								Text: textBefore,
-							})
-						}
-					}
-
-					dataURL := text[bracketIdx+2 : closeIdx]
-					format, base64String, err := relaymedia.DecodeBase64FileData(dataURL)
-					if err != nil {
-						return nil, fmt.Errorf("decode markdown base64 image data failed: %s", err.Error())
-					}
-					imgPart := dto.GeminiPart{
-						InlineData: &dto.GeminiInlineData{
-							MimeType: format,
-							Data:     base64String,
-						},
-					}
-					if shouldAttachThoughtSignature {
-						sharedgemini.AttachThoughtSignatureBypass(opts, &imgPart)
-					}
-					parts = append(parts, imgPart)
-					text = text[closeIdx+1:]
+				textParts, err := sharedgemini.TextAndDataImageParts(part.Text)
+				if err != nil {
+					return nil, err
 				}
-				if !hasMarkdownImage {
-					parts = append(parts, dto.GeminiPart{
-						Text: part.Text,
-					})
+				for _, textPart := range textParts {
+					if textPart.InlineData != nil && shouldAttachThoughtSignature {
+						sharedgemini.AttachThoughtSignatureBypass(opts, &textPart)
+					}
+					parts = append(parts, textPart)
 				}
 			} else {
 				source := part.ToFileSource()
 				if source == nil {
 					continue
 				}
-				base64Data, mimeType, err := relaymedia.ResolveBase64Data(c, source, "formatting image for Gemini")
+				mediaPart, err := sharedgemini.ResolveMediaPart(c, source, "formatting image for Gemini")
 				if err != nil {
-					return nil, fmt.Errorf("get file data from '%s' failed: %w", source.GetIdentifier(), err)
+					return nil, err
 				}
-
-				if _, ok := sharedgemini.SupportedMimeTypes[strings.ToLower(mimeType)]; !ok {
-					return nil, fmt.Errorf("mime type is not supported by Gemini: '%s', url: '%s', supported types are: %v", mimeType, source.GetIdentifier(), sharedgemini.SupportedMimeTypesList())
-				}
-
-				parts = append(parts, dto.GeminiPart{
-					InlineData: &dto.GeminiInlineData{
-						MimeType: mimeType,
-						Data:     base64Data,
-					},
-				})
+				parts = append(parts, mediaPart)
 			}
 		}
 

@@ -8,12 +8,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-
-	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 const (
@@ -38,16 +36,9 @@ func StartCodexCredentialAutoRefreshTask() {
 			return
 		}
 
-		gopool.Go(func() {
-			logger.LogInfo(context.Background(), fmt.Sprintf("codex credential auto-refresh task started: tick=%s threshold=%s", codexCredentialRefreshTickInterval, codexCredentialRefreshThreshold))
-
-			ticker := time.NewTicker(codexCredentialRefreshTickInterval)
-			defer ticker.Stop()
-
+		logger.LogInfo(common.BackgroundContext(), fmt.Sprintf("codex credential auto-refresh task started: tick=%s threshold=%s", codexCredentialRefreshTickInterval, codexCredentialRefreshThreshold))
+		startPeriodicTask("codex credential refresh", codexCredentialRefreshTickInterval, true, func(context.Context) {
 			runCodexCredentialAutoRefreshOnce()
-			for range ticker.C {
-				runCodexCredentialAutoRefreshOnce()
-			}
 		})
 	})
 }
@@ -58,7 +49,7 @@ func runCodexCredentialAutoRefreshOnce() {
 	}
 	defer codexCredentialRefreshRunning.Store(false)
 
-	ctx := context.Background()
+	ctx := common.BackgroundContext()
 	now := time.Now()
 
 	var refreshed int
@@ -66,8 +57,11 @@ func runCodexCredentialAutoRefreshOnce() {
 
 	offset := 0
 	for {
+		if ctx.Err() != nil {
+			return
+		}
 		var channels []*model.Channel
-		err := model.DB.
+		err := model.DB.WithContext(ctx).
 			Select("id", "name", "key", "status", "channel_info").
 			Where("type = ? AND (status = ? OR status = ?)",
 				constant.ChannelTypeCodex,
@@ -88,6 +82,9 @@ func runCodexCredentialAutoRefreshOnce() {
 		offset += codexCredentialRefreshBatchSize
 
 		for _, ch := range channels {
+			if ctx.Err() != nil {
+				return
+			}
 			if ch == nil {
 				continue
 			}

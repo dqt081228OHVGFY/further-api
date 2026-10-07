@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -121,8 +121,19 @@ func CompleteEmailBinding(identity AuthSessionIdentity, token, email, newCode, o
 		}
 		newCode, newCodeError := common.ValidateNumericCode(newCode)
 		oldCode, oldCodeError := common.ValidateNumericCode(oldCode)
-		newValid := newCodeError == nil && common.ValidatePasswordAndHash(newCode, state.NewCodeHash)
-		oldValid := state.OldCodeHash == "" || oldCodeError == nil && common.ValidatePasswordAndHash(oldCode, state.OldCodeHash)
+		newValid, oldValid := false, state.OldCodeHash == ""
+		if newCodeError == nil {
+			newValid, err = common.ValidatePasswordAndHashContext(tx.Statement.Context, newCode, state.NewCodeHash)
+			if err != nil {
+				return err
+			}
+		}
+		if !oldValid && oldCodeError == nil {
+			oldValid, err = common.ValidatePasswordAndHashContext(tx.Statement.Context, oldCode, state.OldCodeHash)
+			if err != nil {
+				return err
+			}
+		}
 		if !newValid || !oldValid {
 			state.FailedAttempts++
 			verificationError = ErrEmailBindingCodeInvalid

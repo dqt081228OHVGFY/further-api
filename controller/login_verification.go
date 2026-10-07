@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
-	passkeysvc "github.com/QuantumNous/new-api/service/passkey"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	passkeysvc "github.com/dqt081228OHVGFY/further-api/service/passkey"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	webauthnlib "github.com/go-webauthn/webauthn/webauthn"
@@ -52,7 +52,7 @@ func LoginPasskeyBegin(c *gin.Context) {
 		writeSecurityOperationError(c, err)
 		return
 	}
-	credential, err := model.GetPasskeyByUserID(verification.State.UserID)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), verification.State.UserID)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return
@@ -72,7 +72,7 @@ func LoginPasskeyBegin(c *gin.Context) {
 		writeSecurityOperationError(c, err)
 		return
 	}
-	token, expiresAt, err := passkeysvc.CreateSessionDataFlow(model.AuthFlowPurposeLoginPasskey, passkeysvc.FlowSecurity{
+	token, expiresAt, err := passkeysvc.CreateSessionDataFlowContext(c.Request.Context(), model.AuthFlowPurposeLoginPasskey, passkeysvc.FlowSecurity{
 		AuthSessionIdentity: model.AuthSessionIdentity{UserID: user.Id, UserAuthVersion: verification.State.AuthVersion},
 		LoginFlowID:         verification.Flow.Id, LoginExpiresAt: verification.Flow.ExpiresAt.Unix(),
 	}, sessionData)
@@ -104,7 +104,7 @@ func LoginPasskeyFinish(c *gin.Context) {
 		return
 	}
 	identity := model.AuthSessionIdentity{UserID: verification.State.UserID, UserAuthVersion: verification.State.AuthVersion}
-	sessionData, security, err := passkeysvc.PopSessionDataFlow(request.PasskeyFlowToken, model.AuthFlowPurposeLoginPasskey, identity)
+	sessionData, security, err := passkeysvc.PopSessionDataFlowContext(c.Request.Context(), request.PasskeyFlowToken, model.AuthFlowPurposeLoginPasskey, identity)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return
@@ -114,7 +114,7 @@ func LoginPasskeyFinish(c *gin.Context) {
 		writeSecurityOperationError(c, model.ErrAuthFlowInvalid)
 		return
 	}
-	credential, err := model.GetPasskeyByUserID(identity.UserID)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), identity.UserID)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return
@@ -133,7 +133,7 @@ func LoginPasskeyFinish(c *gin.Context) {
 		writeSecurityOperationError(c, err)
 		return
 	}
-	if err := model.UpdatePasskeyAssertionState(identity.UserID, validated, time.Now(), sessionData.RelyingPartyID); err != nil {
+	if err := model.UpdatePasskeyAssertionStateContext(c.Request.Context(), identity.UserID, validated, time.Now(), sessionData.RelyingPartyID); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}

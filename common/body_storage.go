@@ -2,6 +2,7 @@ package common
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -82,6 +83,8 @@ func (m *memoryStorage) Close() error {
 	defer m.mu.Unlock()
 	if atomic.CompareAndSwapInt32(&m.closed, 0, 1) {
 		DecrementMemoryBuffers(m.size)
+		m.data = nil
+		m.reader = nil
 	}
 	return nil
 }
@@ -284,6 +287,10 @@ func (d *diskStorage) IsDisk() bool {
 
 // CreateBodyStorage 根据数据大小创建合适的存储
 func CreateBodyStorage(data []byte) (BodyStorage, error) {
+	return createBudgetedBodyStorage(data)
+}
+
+func createBodyStorageUnbudgeted(data []byte) (BodyStorage, error) {
 	size := int64(len(data))
 	threshold := GetDiskCacheThresholdBytes()
 
@@ -305,6 +312,10 @@ func CreateBodyStorage(data []byte) (BodyStorage, error) {
 
 // CreateBodyStorageFromReader 从 Reader 创建存储（用于大请求的流式处理）
 func CreateBodyStorageFromReader(reader io.Reader, contentLength int64, maxBytes int64) (BodyStorage, error) {
+	return CreateBodyStorageFromReaderContext(context.Background(), reader, contentLength, maxBytes)
+}
+
+func createBodyStorageFromReaderUnbudgeted(reader io.Reader, contentLength int64, maxBytes int64) (BodyStorage, error) {
 	threshold := GetDiskCacheThresholdBytes()
 
 	// 如果启用了磁盘缓存且内容长度超过阈值，直接使用磁盘存储
@@ -334,7 +345,7 @@ func CreateBodyStorageFromReader(reader io.Reader, contentLength int64, maxBytes
 		return nil, ErrRequestBodyTooLarge
 	}
 
-	storage, err := CreateBodyStorage(data)
+	storage, err := createBodyStorageUnbudgeted(data)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -20,16 +19,16 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	pluginruntime "github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/relay/channel"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	kitdto "github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	pluginruntime "github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	kitdto "github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -580,93 +579,152 @@ func (a *TaskAdaptor) GetChannelName() string { return a.plugin.Meta.Name }
 func (a *TaskAdaptor) FetchMode() string      { return a.plugin.Meta.FetchMode }
 
 func (a *TaskAdaptor) FetchBatchTasks(baseURL, key string, tasks []*model.Task, proxy string) (*http.Response, error) {
-	taskContexts := make([]map[string]any, 0, len(tasks))
+	return a.FetchTaskBatchContext(common.BackgroundContext(), baseURL, key, tasks, proxy)
+}
+func (a *TaskAdaptor) FetchBatchTasksContext(ctx context.Context, baseURL, key string, tasks []*model.Task, proxy string) (*http.Response, error) {
+	return a.FetchTaskBatchContext(ctx, baseURL, key, tasks, proxy)
+}
+func (a *TaskAdaptor) FetchTaskBatchContext(ctx context.Context, baseURL, key string, tasks []*model.Task, proxy string) (*http.Response, error) {
+	if ctx == nil {
+		ctx = common.BackgroundContext()
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if a == nil || a.plugin == nil || a.plugin.Engine == nil {
+		return nil, fmt.Errorf("task query plugin is unavailable")
+	}
+	views := make([]map[string]any, 0, len(tasks))
 	for _, task := range tasks {
-		taskCtx, err := a.queryContext(task, key, baseURL, proxy)
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		view, err := a.queryContext(task, key, baseURL, proxy)
 		if err != nil {
 			return nil, err
 		}
-		taskContexts = append(taskContexts, taskCtx)
+		views = append(views, view)
 	}
-	ctx, err := a.batchQueryContext(key, baseURL, proxy, taskContexts)
+	view, err := a.batchQueryContext(key, baseURL, proxy, views)
 	if err != nil {
 		return nil, err
 	}
-	value, err := a.plugin.Engine.Call(context.Background(), "buildBatchQueryRequest", ctx, taskContexts)
+	descriptor, err := a.plugin.Engine.Call(ctx, "buildBatchQueryRequest", view, views)
 	if err != nil {
 		return nil, err
 	}
-	return a.doFetchDescriptor(baseURL, proxy, value)
+	return a.doFetchDescriptorContext(ctx, baseURL, proxy, descriptor)
 }
-
 func (a *TaskAdaptor) FetchTask(baseURL, key string, task *model.Task, proxy string) (*http.Response, error) {
-	ctx, err := a.queryContext(task, key, baseURL, proxy)
-	if err != nil {
-		return nil, err
-	}
-	value, err := a.plugin.Engine.Call(context.Background(), "buildQueryRequest", ctx)
-	if err != nil {
-		return nil, err
-	}
-	return a.doFetchDescriptor(baseURL, proxy, value)
+	return a.FetchTaskContext(common.BackgroundContext(), baseURL, key, task, proxy)
 }
-
+func (a *TaskAdaptor) FetchTaskContext(ctx context.Context, baseURL, key string, task *model.Task, proxy string) (*http.Response, error) {
+	if ctx == nil {
+		ctx = common.BackgroundContext()
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if a == nil || a.plugin == nil || a.plugin.Engine == nil {
+		return nil, fmt.Errorf("task query plugin is unavailable")
+	}
+	view, err := a.queryContext(task, key, baseURL, proxy)
+	if err != nil {
+		return nil, err
+	}
+	descriptor, err := a.plugin.Engine.Call(ctx, "buildQueryRequest", view)
+	if err != nil {
+		return nil, err
+	}
+	return a.doFetchDescriptorContext(ctx, baseURL, proxy, descriptor)
+}
 func (a *TaskAdaptor) doFetchDescriptor(baseURL, proxy string, value any) (*http.Response, error) {
+	return a.doFetchDescriptorContext(common.BackgroundContext(), baseURL, proxy, value)
+}
+func (a *TaskAdaptor) doFetchDescriptorContext(ctx context.Context, baseURL, proxy string, value any) (*http.Response, error) {
+	if ctx == nil {
+		ctx = common.BackgroundContext()
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if a == nil || a.plugin == nil {
+		return nil, fmt.Errorf("task query plugin is unavailable")
+	}
 	var descriptor requestDescriptor
 	if err := convert(value, &descriptor); err != nil {
 		return nil, err
 	}
-	if err := pluginruntime.ValidateRequestURL(descriptor.URL, baseURL, a.plugin.Meta.AllowedHosts); err != nil {
-		return nil, err
+	validate := func(request *http.Request) error {
+		if request == nil || request.URL == nil {
+			return fmt.Errorf("task query request URL is missing")
+		}
+		return pluginruntime.ValidateRequestURL(request.URL.String(), baseURL, a.plugin.Meta.AllowedHosts)
 	}
-	var requestBody io.Reader
+	var payload io.Reader
 	if descriptor.Body != nil {
-		if bodyText, ok := descriptor.Body.(string); ok {
-			requestBody = strings.NewReader(bodyText)
+		if body, ok := descriptor.Body.(string); ok {
+			payload = strings.NewReader(body)
 		} else {
-			encoded, marshalErr := common.Marshal(descriptor.Body)
-			if marshalErr != nil {
-				return nil, marshalErr
+			body, err := common.Marshal(descriptor.Body)
+			if err != nil {
+				return nil, err
 			}
-			requestBody = bytes.NewReader(encoded)
+			payload = bytes.NewReader(body)
 		}
 	}
 	method := strings.ToUpper(strings.TrimSpace(descriptor.Method))
 	if method == "" {
 		method = http.MethodGet
 	}
-	req, err := http.NewRequest(method, descriptor.URL, requestBody)
+	request, err := http.NewRequestWithContext(ctx, method, descriptor.URL, payload)
 	if err != nil {
+		return nil, err
+	}
+	if err = validate(request); err != nil {
 		return nil, err
 	}
 	for name, value := range descriptor.Headers {
-		req.Header.Set(name, value)
+		request.Header.Set(name, value)
 	}
-	client, err := service.GetHttpClientWithProxy(proxy)
+	shared, err := service.GetHttpClientWithProxy(proxy)
 	if err != nil {
 		return nil, err
+	}
+	client := *shared
+	client.CheckRedirect = func(next *http.Request, via []*http.Request) error {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if err := validate(next); err != nil {
+			return err
+		}
+		if shared.CheckRedirect != nil {
+			if err := shared.CheckRedirect(next, via); err != nil {
+				return err
+			}
+		} else if len(via) >= 10 {
+			return fmt.Errorf("stopped after 10 redirects")
+		}
+		// A custom redirect callback can rewrite a URL or context. Recheck the
+		// resulting destination and keep cancellation attached before sending it.
+		if err := validate(next); err != nil {
+			return err
+		}
+		*next = *next.WithContext(ctx)
+		return ctx.Err()
 	}
 	started := time.Now()
-	resp, err := client.Do(req)
+	response, err := client.Do(request)
 	if err != nil {
-		logger.LogDebug(
-			context.Background(),
-			"task_plugin subsystem=adaptor event=query_request_failed plugin=%q method=%q reason=transport_error elapsed_ms=%d",
-			a.plugin.Meta.Key,
-			method,
-			time.Since(started).Milliseconds(),
-		)
+		if response != nil && response.Body != nil {
+			response.Body.Close()
+		}
+		logger.LogDebug(ctx, "task_plugin subsystem=adaptor event=query_request_failed plugin=%q method=%q reason=transport_error elapsed_ms=%d", a.plugin.Meta.Key, method, time.Since(started).Milliseconds())
 		return nil, err
 	}
-	logger.LogDebug(
-		context.Background(),
-		"task_plugin subsystem=adaptor event=query_response_received plugin=%q method=%q status=%d elapsed_ms=%d",
-		a.plugin.Meta.Key,
-		method,
-		resp.StatusCode,
-		time.Since(started).Milliseconds(),
-	)
-	return resp, nil
+	logger.LogDebug(ctx, "task_plugin subsystem=adaptor event=query_response_received plugin=%q method=%q status=%d elapsed_ms=%d", a.plugin.Meta.Key, method, response.StatusCode, time.Since(started).Milliseconds())
+	return response, nil
 }
 
 func (a *TaskAdaptor) ParseBatchResult(tasks []*model.Task, resp *http.Response, body []byte) (map[string]*service.BatchTaskResult, error) {
@@ -953,9 +1011,8 @@ func (a *TaskAdaptor) BuildContentRequest(task *model.Task, artifactKey string, 
 		if len(descriptor.Headers) != 0 || descriptor.Body != nil {
 			return nil, fmt.Errorf("credentialless artifact requests cannot contain headers or a body")
 		}
-		parsedURL, parseErr := url.Parse(descriptor.URL)
-		if parseErr != nil || parsedURL.Host == "" || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
-			return nil, fmt.Errorf("credentialless artifact request URL must be absolute HTTP(S)")
+		if err = pluginruntime.ValidateCredentiallessURL(descriptor.URL); err != nil {
+			return nil, err
 		}
 	} else if err = pluginruntime.ValidateRequestURL(descriptor.URL, a.info.ChannelBaseUrl, a.plugin.Meta.AllowedHosts); err != nil {
 		return nil, err
@@ -1081,13 +1138,13 @@ func (a *TaskAdaptor) channelType() int {
 }
 
 // applyUpstreamCredentials sets ctx.upstream together with the credentials
-// every driver hook reads. A New API channel (type 60) is another gateway:
+// every driver hook reads. A further-api channel (type 60) is another gateway:
 // the plugin must address its own prefixed native routes there, and the
 // channel key is that gateway's token, so it is sent as a Bearer header for
 // every auth type instead of running the plugin's vendor auth scheme.
 func (a *TaskAdaptor) applyUpstreamCredentials(ctx map[string]any, channelType int, key, proxy string) error {
-	if channelType == constant.ChannelTypeNewAPI {
-		ctx["upstream"] = map[string]any{"kind": pluginruntime.UpstreamKindNewAPI}
+	if channelType == constant.ChannelTypeGateway {
+		ctx["upstream"] = map[string]any{"kind": pluginruntime.UpstreamKindGateway}
 		ctx["auth"] = map[string]any{"authHeader": "Bearer " + key}
 		ctx["authHeader"] = "Bearer " + key
 		ctx["apiKey"] = key

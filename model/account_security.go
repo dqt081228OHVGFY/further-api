@@ -1,9 +1,10 @@
 package model
 
 import (
+	"context"
 	"errors"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -19,11 +20,18 @@ var (
 // password under the same user lock as the credential update. Only self-profile
 // fields are accepted; a stale snapshot cannot restore roles or account status.
 func ChangeUserPassword(identity AuthSessionIdentity, update *User, firstPassword bool) error {
-	hash, err := common.HashAccountPassword(update.Password)
+	return ChangeUserPasswordContext(context.Background(), identity, update, firstPassword)
+}
+
+func ChangeUserPasswordContext(ctx context.Context, identity AuthSessionIdentity, update *User, firstPassword bool) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	hash, err := common.HashAccountPasswordContext(ctx, update.Password)
 	if err != nil {
 		return err
 	}
-	return DB.Transaction(func(tx *gorm.DB) error {
+	return DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := ValidateAuthSessionWithTx(tx, identity); err != nil {
 			return err
 		}
@@ -34,11 +42,23 @@ func ChangeUserPassword(identity AuthSessionIdentity, update *User, firstPasswor
 		if firstPassword != (current.Password == "") {
 			return ErrAccountPasswordState
 		}
-		if !firstPassword && !common.ValidatePasswordAndHash(update.OriginalPassword, current.Password) {
-			return ErrCurrentPasswordInvalid
+		if !firstPassword {
+			valid, err := common.ValidatePasswordAndHashContext(ctx, update.OriginalPassword, current.Password)
+			if err != nil {
+				return err
+			}
+			if !valid {
+				return ErrCurrentPasswordInvalid
+			}
 		}
-		if current.Password != "" && common.ValidatePasswordAndHash(update.Password, current.Password) {
-			return common.ErrAccountPasswordSame
+		if current.Password != "" {
+			valid, err := common.ValidatePasswordAndHashContext(ctx, update.Password, current.Password)
+			if err != nil {
+				return err
+			}
+			if valid {
+				return common.ErrAccountPasswordSame
+			}
 		}
 		changes := map[string]any{"password": hash}
 		if update.Username != "" {

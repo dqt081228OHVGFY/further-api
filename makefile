@@ -3,10 +3,10 @@ API_DIR = .
 DEV_WEB_PORT ?= 5173
 DEV_COMPOSE_FILE = docker-compose.dev.yml
 DEV_POSTGRES_SERVICE = postgres
-DEV_API_SERVICE = new-api
-DEV_POSTGRES_DB = newapi
-DEV_POSTGRES_USER = newapi
-DEV_SQLITE_PATH ?= one-api.db
+DEV_API_SERVICE = further-api
+DEV_POSTGRES_DB = further_api
+DEV_POSTGRES_USER = further_api
+DEV_SQLITE_PATH ?= further-api.db
 
 .PHONY: all build-web build-all-web start-api dev dev-api dev-api-rebuild dev-web reset-setup test
 

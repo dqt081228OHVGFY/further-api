@@ -1,0 +1,34 @@
+/* Canonical palette and local Material states. Scroll movement has one JS owner. */
+.home-page { background:var(--md-sys-color-surface,#fffefb); color:var(--md-sys-color-on-surface,#263952); }
+.home-page .home-brand strong,.home-page .home-hero h1,.home-page .home-section-head h2,.home-page .home-card-surface h3,.home-page .home-start h2 { color:var(--md-sys-color-on-surface,#263952); }
+.home-page .home-brand small,.home-hero-intro,.home-hero-note,.home-section-head>p,.home-card-surface p,.home-card-number,.home-code-format,.home-code-foot,.home-start-copy>p,.home-start-steps p,.home-page .home-footer p,.home-page .home-footer>small { color:var(--md-sys-color-on-surface-variant,#65758a); }
+.home-page .home-button { color:var(--md-sys-color-on-primary,#fff); background:var(--md-sys-color-primary,#3e6e91); transition:transform 180ms var(--further-motion-standard,cubic-bezier(.2,0,0,1)); }
+.home-page .home-button:hover { transform:translateY(-2px); }
+.home-page .home-button:active { transform:scale(.96); transition-duration:120ms; }
+.home-page .home-button>.material-symbol,.home-card-link>.material-symbol { transition:transform 220ms var(--further-motion-standard,cubic-bezier(.2,0,0,1)); }
+.home-page .home-button:hover>.material-symbol,.home-card-link:hover>.material-symbol { transform:translateX(4px); }
+.home-page .home-signout,.home-eyebrow,.home-page .home-hero h1 em,.home-link,.home-section-kicker,.home-card-kicker,.home-card-link,.home-code-foot>a,.home-canvas-star { color:var(--md-sys-color-primary,#3e6e91); }
+.home-link>.material-symbol { transition:transform 220ms var(--further-motion-standard,cubic-bezier(.2,0,0,1)); }
+.home-link:hover>.material-symbol { transform:translateY(3px); }
+.home-canvas-orbit-inner { background:var(--md-sys-color-surface-container-low,#f1f5f9); }
+.home-canvas-glow { background:var(--md-sys-color-primary-container,#d4e9fa); opacity:.7; }
+.home-canvas-core img { box-shadow:0 16px 29px color-mix(in srgb,var(--md-sys-color-primary,#3e6e91) 12%,transparent); }
+.home-canvas-core strong,.home-canvas-app,.home-canvas-model,.home-canvas-chip { color:var(--md-sys-color-primary,#3e6e91); }
+.home-canvas-app,.home-canvas-model { background:var(--md-sys-color-primary-container,#d4e9fa); }
+.home-canvas-chip { background:var(--md-sys-color-surface,#fffefb); }
+.home-canvas-path { color:var(--md-sys-color-primary,#3e6e91); background:var(--md-sys-color-outline-variant,#dfe8f4); }
+.home-canvas-caption { color:var(--md-sys-color-on-surface-variant,#65758a); }
+.home-card-surface { background:var(--md-sys-color-surface-container-low,#f1f5f9); }
+.home-card-icon { background:var(--md-sys-color-surface,#fffefb); color:var(--md-sys-color-primary,#3e6e91); }
+.home-card-art { color:var(--md-sys-color-primary,#3e6e91); opacity:.55; }
+.home-protocol-panel { background:var(--md-sys-color-surface-container-low,#f1f5f9); }
+.home-protocol-tabs { background:var(--md-sys-color-surface,#fffefb); }
+.home-protocol-tabs button { color:var(--md-sys-color-on-surface-variant,#65758a); background:transparent; transition:transform 120ms var(--further-motion-standard,cubic-bezier(.2,0,0,1)),background-color 180ms ease,color 180ms ease; }
+.home-protocol-tabs button:hover { background:var(--md-sys-color-surface-container-low,#f1f5f9); }
+.home-protocol-tabs button:active { transform:scale(.97); }
+.home-protocol-tabs button[aria-selected='true'],.home-code-method { background:var(--md-sys-color-primary-container,#d4e9fa); color:var(--md-sys-color-on-primary-container,#274963); }
+.home-code-stage pre,.home-code-top code { color:var(--md-sys-color-on-surface,#263952); }
+.home-start-surface { background:var(--md-sys-color-primary-container,#d4e9fa); }
+.home-page .home-start h2,.home-start-steps h3,.home-start-steps .material-symbol { color:var(--md-sys-color-on-primary-container,#274963); }
+.home-start-steps li>span:first-child { color:var(--md-sys-color-primary,#3e6e91); }
+.home-page .home-footer nav { color:var(--md-sys-color-on-surface-variant,#65758a); }

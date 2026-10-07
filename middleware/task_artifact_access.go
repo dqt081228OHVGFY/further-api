@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 )
 
@@ -116,7 +116,8 @@ func redactTaskArtifactAccessQuery() gin.HandlerFunc {
 			strings.HasSuffix(path, "/content")
 		isLegacyVideoContent := strings.HasPrefix(path, "/v1/videos/") &&
 			strings.HasSuffix(path, "/content")
-		if !isArtifactContent && !isLegacyVideoContent {
+		isMidjourneyImage := strings.HasPrefix(path, "/mj/image/") || strings.Contains(path, "/mj/image/")
+		if !isArtifactContent && !isLegacyVideoContent && !isMidjourneyImage {
 			c.Next()
 			return
 		}
@@ -172,6 +173,20 @@ func popTaskArtifactAccessQuery(request *http.Request) (string, bool, bool) {
 // TokenOrTaskArtifactAccessAuth accepts the normal relay API Bearer token or a
 // route-bound capability. Capabilities are verified before any database read.
 func TokenOrTaskArtifactAccessAuth(taskParam, artifactParam string) gin.HandlerFunc {
+	return tokenOrArtifactAccessAuth(func(c *gin.Context) (string, string) {
+		return c.Param(taskParam), c.Param(artifactParam)
+	})
+}
+
+// TokenOrMidjourneyImageAccessAuth keeps browser image previews available while
+// requiring an unforgeable row-bound capability or an ordinary owner API token.
+func TokenOrMidjourneyImageAccessAuth() gin.HandlerFunc {
+	return tokenOrArtifactAccessAuth(func(c *gin.Context) (string, string) {
+		return service.MidjourneyImageAccessTaskID(c.Param("id")), service.MidjourneyImageArtifactKey
+	})
+}
+
+func tokenOrArtifactAccessAuth(resolve func(*gin.Context) (string, string)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Cache-Control", "private, no-store")
 
@@ -190,8 +205,7 @@ func TokenOrTaskArtifactAccessAuth(taskParam, artifactParam string) gin.HandlerF
 			return
 		}
 
-		taskID := c.Param(taskParam)
-		artifactKey := c.Param(artifactParam)
+		taskID, artifactKey := resolve(c)
 		ip := c.ClientIP()
 		if ip == "" {
 			ip = "unknown"

@@ -1,16 +1,15 @@
 package model
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/clickhouse"
@@ -66,29 +65,6 @@ func initCol() {
 var DB *gorm.DB
 
 var LOG_DB *gorm.DB
-
-func createRootAccountIfNeed() error {
-	var user User
-	//if user.Status != common.UserStatusEnabled {
-	if err := DB.First(&user).Error; err != nil {
-		common.SysLog("no user exists, create a root user for you: username is root, password is 123456")
-		hashedPassword, err := common.Password2Hash("123456")
-		if err != nil {
-			return err
-		}
-		rootUser := User{
-			Username:    "root",
-			Password:    hashedPassword,
-			Role:        common.RoleRootUser,
-			Status:      common.UserStatusEnabled,
-			DisplayName: "Root User",
-			AccessToken: nil,
-			Quota:       100000000,
-		}
-		DB.Create(&rootUser)
-	}
-	return nil
-}
 
 func CheckSetup() {
 	setup := GetSetup()
@@ -318,6 +294,9 @@ func is64BitIntegerType(dbType common.DatabaseType, dataType string) bool {
 }
 
 func migrateDB() error {
+	if err := migrateBusinessNamespace(DB); err != nil {
+		return err
+	}
 	if err := migrateTokenKeyUniqueness(DB); err != nil {
 		return err
 	}
@@ -373,37 +352,39 @@ func migrateDB() error {
 		&RiskEvent{},
 		&RiskSnapshot{},
 		&RiskReview{},
-		&RelayForUIPreferences{},
-		&RelayForLoanSettings{},
-		&RelayForLoanAccount{},
-		&RelayForTokenLoan{},
-		&RelayForLoanCheckin{},
-		&RelayForLoanCut{},
-		&RelayForRegistrationSettings{},
-		&RelayForRegistrationCode{},
-		&RelayForPrepaidCard{},
-		&RelayForSubscriptionPolicy{},
-		&RelayForUserSubscriptionPolicy{},
-		&RelayForSubscriptionPreference{},
-		&RelayForSubscriptionHidden{},
-		&RelayForBenefitCampaign{},
-		&RelayForBenefitGrant{},
-		&RelayForHolidayCampaign{},
-		&RelayForHolidayClaim{},
-		&RelayForHolidaySubscription{},
-		&RelayForLDCCredential{},
-		&RelayForLDCSettings{},
-		&RelayForLDCOrder{},
-		&RelayForDiscountReservation{},
-		&RelayForModelAccess{},
-		&RelayForChannelPolicy{},
-		&RelayForChannelKeyPolicy{},
-		&RelayForChannelQuotaReservation{},
+		&FurtherUIPreferences{},
+		&FurtherLoanSettings{},
+		&FurtherLoanAccount{},
+		&FurtherTokenLoan{},
+		&FurtherLoanCheckin{},
+		&FurtherLoanCut{},
+		&FurtherRegistrationSettings{},
+		&FurtherRegistrationCode{},
+		&FurtherPrepaidCard{},
+		&FurtherSubscriptionPolicy{},
+		&FurtherUserSubscriptionPolicy{},
+		&FurtherSubscriptionPreference{},
+		&FurtherSubscriptionHidden{},
+		&FurtherBenefitCampaign{},
+		&FurtherBenefitGrant{},
+		&FurtherHolidayCampaign{},
+		&FurtherHolidayClaim{},
+		&FurtherLDCCredential{},
+		&FurtherLDCSettings{},
+		&FurtherLDCOrder{},
+		&FurtherDiscountReservation{},
+		&FurtherModelAccess{},
+		&FurtherChannelPolicy{},
+		&FurtherChannelKeyPolicy{},
+		&FurtherChannelQuotaReservation{},
 	)
 	if err != nil {
 		return err
 	}
 	if err := InitializeUserAuthVersions(); err != nil {
+		return err
+	}
+	if err := migrateBusinessValues(DB); err != nil {
 		return err
 	}
 	if err := InitializeExternalIdentityClaims(); err != nil {
@@ -718,6 +699,9 @@ func migrateSubscriptionPlanPriceAmount() {
 }
 
 func closeDB(db *gorm.DB) error {
+	if db == nil {
+		return nil
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		return err
@@ -727,13 +711,11 @@ func closeDB(db *gorm.DB) error {
 }
 
 func CloseDB() error {
+	var logErr error
 	if LOG_DB != DB {
-		err := closeDB(LOG_DB)
-		if err != nil {
-			return err
-		}
+		logErr = closeDB(LOG_DB)
 	}
-	return closeDB(DB)
+	return errors.Join(logErr, closeDB(DB))
 }
 
 // checkMySQLChineseSupport ensures the MySQL connection and current schema
@@ -825,35 +807,5 @@ func checkMySQLChineseSupport(db *gorm.DB) error {
 			maxShow, shown, maxShow, shown,
 		)
 	}
-	return nil
-}
-
-var (
-	lastPingTime time.Time
-	pingMutex    sync.Mutex
-)
-
-func PingDB() error {
-	pingMutex.Lock()
-	defer pingMutex.Unlock()
-
-	if time.Since(lastPingTime) < time.Second*10 {
-		return nil
-	}
-
-	sqlDB, err := DB.DB()
-	if err != nil {
-		log.Printf("Error getting sql.DB from GORM: %v", err)
-		return err
-	}
-
-	err = sqlDB.Ping()
-	if err != nil {
-		log.Printf("Error pinging DB: %v", err)
-		return err
-	}
-
-	lastPingTime = time.Now()
-	common.SysLog("Database pinged successfully")
 	return nil
 }

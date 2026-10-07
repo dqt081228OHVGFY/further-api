@@ -1,19 +1,19 @@
 package aws
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/gin-gonic/gin"
 )
 
 type AwsClaudeRequest struct {
-	// AnthropicVersion should be "bedrock-2023-05-31"
 	AnthropicVersion  string              `json:"anthropic_version"`
 	AnthropicBeta     json.RawMessage     `json:"anthropic_beta,omitempty"`
 	System            any                 `json:"system,omitempty"`
@@ -28,119 +28,178 @@ type AwsClaudeRequest struct {
 	ContextManagement json.RawMessage     `json:"context_management,omitempty"`
 	Thinking          *dto.Thinking       `json:"thinking,omitempty"`
 	OutputConfig      json.RawMessage     `json:"output_config,omitempty"`
-	//Metadata         json.RawMessage     `json:"metadata,omitempty"`
 }
 
-func formatRequest(requestBody io.Reader, requestHeader http.Header) (*AwsClaudeRequest, error) {
-	var awsClaudeRequest AwsClaudeRequest
-	err := common.DecodeJson(requestBody, &awsClaudeRequest)
-	if err != nil {
+func formatRequest(body io.Reader, headers http.Header) (*AwsClaudeRequest, error) {
+	if body == nil {
+		return nil, errors.New("Bedrock messages body is missing")
+	}
+	var request *AwsClaudeRequest
+	if err := json.NewDecoder(body).Decode(&request); err != nil {
 		return nil, err
 	}
-	awsClaudeRequest.AnthropicVersion = "bedrock-2023-05-31"
-
-	// check header anthropic-beta
-	anthropicBetaValues := requestHeader.Get("anthropic-beta")
-	if len(anthropicBetaValues) > 0 {
-		var tempArray []string
-		tempArray = strings.Split(anthropicBetaValues, ",")
-		if len(tempArray) > 0 {
-			betaJson, err := json.Marshal(tempArray)
-			if err != nil {
-				return nil, err
-			}
-			awsClaudeRequest.AnthropicBeta = betaJson
+	if request == nil {
+		return nil, errors.New("Bedrock messages body must be an object")
+	}
+	request.AnthropicVersion = "bedrock-2023-05-31"
+	var flags []string
+	seen := make(map[string]bool)
+	for _, flag := range strings.Split(headers.Get("Anthropic-Beta"), ",") {
+		flag = strings.TrimSpace(flag)
+		if flag != "" && !seen[flag] {
+			seen[flag] = true
+			flags = append(flags, flag)
 		}
 	}
-	logger.LogJson(context.Background(), "json", awsClaudeRequest)
-	return &awsClaudeRequest, nil
+	if len(flags) != 0 {
+		encoded, err := json.Marshal(flags)
+		if err != nil {
+			return nil, err
+		}
+		request.AnthropicBeta = encoded
+	}
+	return request, nil
 }
 
-// NovaMessage Nova模型使用messages-v1格式
 type NovaMessage struct {
 	Role    string        `json:"role"`
 	Content []NovaContent `json:"content"`
 }
-
 type NovaContent struct {
-	Text string `json:"text"`
+	Text       string         `json:"text,omitempty"`
+	Image      map[string]any `json:"image,omitempty"`
+	ToolUse    map[string]any `json:"toolUse,omitempty"`
+	ToolResult map[string]any `json:"toolResult,omitempty"`
 }
-
 type NovaRequest struct {
-	SchemaVersion   string               `json:"schemaVersion"`             // 请求版本，例如 "1.0"
-	Messages        []NovaMessage        `json:"messages"`                  // 对话消息列表
-	InferenceConfig *NovaInferenceConfig `json:"inferenceConfig,omitempty"` // 推理配置，可选
+	SchemaVersion   string               `json:"schemaVersion"`
+	System          []NovaContent        `json:"system,omitempty"`
+	Messages        []NovaMessage        `json:"messages"`
+	InferenceConfig *NovaInferenceConfig `json:"inferenceConfig,omitempty"`
+	ToolConfig      map[string]any       `json:"toolConfig,omitempty"`
 }
-
 type NovaInferenceConfig struct {
-	MaxTokens     int      `json:"maxTokens,omitempty"`     // 最大生成的 token 数
-	Temperature   float64  `json:"temperature,omitempty"`   // 随机性 (默认 0.7, 范围 0-1)
-	TopP          float64  `json:"topP,omitempty"`          // nucleus sampling (默认 0.9, 范围 0-1)
-	TopK          int      `json:"topK,omitempty"`          // 限制候选 token 数 (默认 50, 范围 0-128)
-	StopSequences []string `json:"stopSequences,omitempty"` // 停止生成的序列
+	MaxTokens     *uint    `json:"maxTokens,omitempty"`
+	Temperature   *float64 `json:"temperature,omitempty"`
+	TopP          *float64 `json:"topP,omitempty"`
+	TopK          *int     `json:"topK,omitempty"`
+	StopSequences []string `json:"stopSequences,omitempty"`
 }
 
-// 转换OpenAI请求为Nova格式
-func convertToNovaRequest(req *dto.GeneralOpenAIRequest) *NovaRequest {
-	novaMessages := make([]NovaMessage, len(req.Messages))
-	for i, msg := range req.Messages {
-		novaMessages[i] = NovaMessage{
-			Role:    msg.Role,
-			Content: []NovaContent{{Text: msg.StringContent()}},
+func novaRequest(c *gin.Context, request *dto.GeneralOpenAIRequest) (*NovaRequest, error) {
+	if request == nil {
+		return nil, errors.New("Nova chat request is missing")
+	}
+	result := &NovaRequest{SchemaVersion: "messages-v1", Messages: make([]NovaMessage, 0, len(request.Messages))}
+	for _, message := range request.Messages {
+		blocks := make([]NovaContent, 0)
+		if message.Role == "tool" {
+			if message.ToolCallId == "" {
+				return nil, errors.New("Nova tool result requires a tool_call_id")
+			}
+			blocks = append(blocks, NovaContent{ToolResult: map[string]any{"toolUseId": message.ToolCallId, "content": []map[string]string{{"text": message.StringContent()}}}})
+		} else {
+			for _, part := range message.ParseContent() {
+				switch part.Type {
+				case dto.ContentTypeText:
+					blocks = append(blocks, NovaContent{Text: part.Text})
+				case dto.ContentTypeImageURL:
+					if c == nil {
+						return nil, errors.New("Nova image conversion requires a request context")
+					}
+					source := part.ToFileSource()
+					if source == nil {
+						return nil, errors.New("Nova image source is missing")
+					}
+					data, mediaType, err := service.GetBase64Data(c, source, "Nova image conversion")
+					if err != nil {
+						return nil, err
+					}
+					format := strings.TrimPrefix(mediaType, "image/")
+					if format == "jpg" {
+						format = "jpeg"
+					}
+					blocks = append(blocks, NovaContent{Image: map[string]any{"format": format, "source": map[string]string{"bytes": data}}})
+				default:
+					return nil, fmt.Errorf("Nova messages do not support content type %q", part.Type)
+				}
+			}
+			if len(message.ToolCalls) != 0 {
+				var calls []dto.ToolCallRequest
+				if err := json.Unmarshal(message.ToolCalls, &calls); err != nil {
+					return nil, fmt.Errorf("decode Nova tool calls: %w", err)
+				}
+				for _, call := range calls {
+					var arguments any
+					if err := json.Unmarshal([]byte(call.Function.Arguments), &arguments); err != nil {
+						return nil, fmt.Errorf("decode Nova tool arguments: %w", err)
+					}
+					blocks = append(blocks, NovaContent{ToolUse: map[string]any{"toolUseId": call.ID, "name": call.Function.Name, "input": arguments}})
+				}
+			}
+		}
+		if message.Role == "system" || message.Role == "developer" {
+			result.System = append(result.System, blocks...)
+			continue
+		}
+		role := message.Role
+		if role == "tool" {
+			role = "user"
+		}
+		if role != "user" && role != "assistant" {
+			return nil, fmt.Errorf("Nova messages do not support role %q", message.Role)
+		}
+		if len(blocks) == 0 {
+			continue
+		}
+		if n := len(result.Messages); n > 0 && result.Messages[n-1].Role == role {
+			result.Messages[n-1].Content = append(result.Messages[n-1].Content, blocks...)
+		} else {
+			result.Messages = append(result.Messages, NovaMessage{Role: role, Content: blocks})
 		}
 	}
-
-	novaReq := &NovaRequest{
-		SchemaVersion: "messages-v1",
-		Messages:      novaMessages,
+	limit := request.MaxCompletionTokens
+	if limit == nil || *limit == 0 {
+		limit = request.MaxTokens
 	}
-
-	// 设置推理配置
-	if (req.MaxTokens != nil && *req.MaxTokens != 0) || (req.Temperature != nil && *req.Temperature != 0) || (req.TopP != nil && *req.TopP != 0) || (req.TopK != nil && *req.TopK != 0) || req.Stop != nil {
-		novaReq.InferenceConfig = &NovaInferenceConfig{}
-		if req.MaxTokens != nil && *req.MaxTokens != 0 {
-			novaReq.InferenceConfig.MaxTokens = int(*req.MaxTokens)
+	if limit != nil || request.Temperature != nil || request.TopP != nil || request.TopK != nil || request.Stop != nil {
+		result.InferenceConfig = &NovaInferenceConfig{MaxTokens: limit, Temperature: request.Temperature, TopP: request.TopP, TopK: request.TopK, StopSequences: parseStopSequences(request.Stop)}
+	}
+	if len(request.Tools) != 0 {
+		tools := make([]any, 0, len(request.Tools))
+		for _, tool := range request.Tools {
+			if tool.Type != "function" {
+				return nil, errors.New("Nova supports function tools only")
+			}
+			tools = append(tools, map[string]any{"toolSpec": map[string]any{"name": tool.Function.Name, "description": tool.Function.Description, "inputSchema": map[string]any{"json": tool.Function.Parameters}}})
 		}
-		if req.Temperature != nil && *req.Temperature != 0 {
-			novaReq.InferenceConfig.Temperature = *req.Temperature
+		result.ToolConfig = map[string]any{"tools": tools}
+	}
+	return result, nil
+}
+func parseStopSequences(value any) []string {
+	result := make([]string, 0)
+	add := func(text string) {
+		if text != "" {
+			result = append(result, text)
 		}
-		if req.TopP != nil && *req.TopP != 0 {
-			novaReq.InferenceConfig.TopP = *req.TopP
+	}
+	switch values := value.(type) {
+	case string:
+		add(values)
+	case []string:
+		for _, text := range values {
+			add(text)
 		}
-		if req.TopK != nil && *req.TopK != 0 {
-			novaReq.InferenceConfig.TopK = *req.TopK
-		}
-		if req.Stop != nil {
-			if stopSequences := parseStopSequences(req.Stop); len(stopSequences) > 0 {
-				novaReq.InferenceConfig.StopSequences = stopSequences
+	case []any:
+		for _, item := range values {
+			if text, ok := item.(string); ok {
+				add(text)
 			}
 		}
 	}
-
-	return novaReq
-}
-
-// parseStopSequences 解析停止序列，支持字符串或字符串数组
-func parseStopSequences(stop any) []string {
-	if stop == nil {
+	if len(result) == 0 {
 		return nil
 	}
-
-	switch v := stop.(type) {
-	case string:
-		if v != "" {
-			return []string{v}
-		}
-	case []string:
-		return v
-	case []any:
-		var sequences []string
-		for _, item := range v {
-			if str, ok := item.(string); ok && str != "" {
-				sequences = append(sequences, str)
-			}
-		}
-		return sequences
-	}
-	return nil
+	return result
 }

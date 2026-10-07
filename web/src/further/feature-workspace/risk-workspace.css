@@ -1,0 +1,86 @@
+.frisk-workspace { display:block;width:100%;height:auto;min-height:0;max-width:1440px;margin:auto;overflow:visible;container:frisk / inline-size; }
+.frisk-content[hidden] { display:none!important; }
+.frisk-content { position:relative;min-width:0;height:auto;overflow:visible; }
+.frisk-content > .rfw-refresh-indicator { margin-bottom:16px; }
+.frisk-account button:disabled { opacity:.5;cursor:wait; }
+.frisk-hero { padding:30px 34px;border-radius:24px;background:var(--md-sys-color-surface);border:1px solid var(--md-sys-color-outline-variant);overflow:visible;flex-wrap:wrap; }
+.frisk-hero-main { flex:1 1 330px; }
+.frisk-hero h1 { letter-spacing:-.04em;font-size:clamp(27px,3vw,38px); }
+.frisk-workflow { display:grid;grid-template-columns:auto 12px auto 12px auto;align-items:center;gap:10px;padding:23px;background:var(--md-sys-color-surface-container-low);border-radius:18px; }
+.frisk-workflow > span { display:grid;gap:7px;justify-items:center;font-size:12px;white-space:nowrap; }
+.frisk-workflow b { font-size:10px;font-weight:500;color:var(--md-sys-color-on-surface-variant); }
+.frisk-workflow > i { height:1px;background:var(--md-sys-color-outline-variant); }
+.frisk-workflow > small { display:flex;align-items:center;justify-content:center;gap:6px;grid-column:1/-1;margin-top:8px;color:var(--md-sys-color-on-surface-variant);font-size:10px; }
+.frisk-tabs { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:fit-content;max-width:100%;margin:20px 0;padding:5px;border-radius:15px;background:var(--md-sys-color-surface-container-high); }
+.frisk-tabs button { min-width:0;border-radius:11px;padding:11px 18px; }
+.frisk-tabs button>span { white-space:nowrap; }
+.frisk-tabs button[aria-selected='true'] { background:var(--md-sys-color-surface);box-shadow:0 3px 8px #0000000a; }
+.frisk-metrics article { border-radius:18px;border:1px solid var(--md-sys-color-outline-variant);background:var(--md-sys-color-surface); }
+.frisk-overview { border-radius:20px;background:var(--workspace-blue,var(--md-sys-color-primary-container)); }
+.frisk-account { border-radius:18px;box-shadow:none;border:1px solid var(--md-sys-color-outline-variant); }
+.frisk-account:hover { border-color:var(--md-sys-color-primary);transform:translateY(-2px); }
+.frisk-account-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.frisk-queue { min-width:0;border-radius:22px;padding:26px;border:1px solid var(--md-sys-color-outline-variant);background:var(--md-sys-color-surface); }
+.frisk-filters { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end; }
+.frisk-workspace[data-risk-view='overview'] .frisk-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.frisk-filters>.frisk-search { grid-column:1/-1; }
+.frisk-filters>label { min-width:0; }
+.frisk-filters select { min-width:0;max-width:100%; }
+.frisk-policy-aside { border-radius:18px;background:var(--workspace-yellow,var(--md-sys-color-secondary-container)); }
+.frisk-policy-main,.frisk-policy-grid,.frisk-word-editor { min-width:0; }
+.frisk-word-editor textarea { display:block;box-sizing:border-box;min-width:0;max-width:100%; }
+.frisk-workspace .frisk-empty { min-height:0;padding:28px 20px; }
+.frisk-footnote { min-width:0;overflow-wrap:anywhere; }
+/* The native surface owns its first reveal. Later risk views and inserted cards
+   retain their own entrance once that outer animation has finished. */
+[data-native-feature-root][data-native-motion-engine='web'] .frisk-workspace[data-risk-entry='initial'] :is(.frisk-enter,.frisk-account) { animation:none!important; }
+@container frisk (max-width:960px) {
+  .frisk-hero { align-items:flex-start;flex-direction:column;gap:20px;padding:24px; }
+  .frisk-hero-main { flex:0 1 auto; }
+  .frisk-workflow { width:100%;grid-template-columns:1fr 12px 1fr 12px 1fr; }
+  .frisk-metrics { grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+  .frisk-overview { grid-template-columns:minmax(0,1fr);gap:22px;padding:24px; }
+  .frisk-policy-grid { grid-template-columns:minmax(0,1fr);gap:20px; }
+}
+@container frisk (max-width:680px) {
+  .frisk-account-grid,.frisk-skeleton-grid { grid-template-columns:minmax(0,1fr); }
+  .frisk-tabs { width:100%; }
+  .frisk-tabs button { padding:10px 7px;gap:5px;font-size:12px; }
+  .frisk-queue { padding:20px; }
+  .frisk-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .frisk-filters>label:last-child:nth-child(4) { grid-column:1/-1; }
+  .frisk-policy { padding:23px 20px; }
+  .frisk-savebar { align-items:flex-start; }
+}
+@container frisk (max-width:420px) {
+  .frisk-hero { gap:17px;padding:22px 18px; }
+  .frisk-hero h1 { font-size:27px; }
+  .frisk-workflow { gap:7px;padding:18px 10px; }
+  .frisk-workflow>span { font-size:10px; }
+  .frisk-workflow>small { font-size:9px;line-height:1.7; }
+  .frisk-tabs button { padding:10px 5px;gap:4px;font-size:11px; }
+  .frisk-tabs button>svg { width:14px;height:14px;flex-shrink:0; }
+  .frisk-metrics article { padding:17px 14px; }
+  .frisk-metrics article>div { font-size:10px; }
+  .frisk-metrics article>small { font-size:9px; }
+  .frisk-queue { padding:18px 14px; }
+  .frisk-filters { gap:12px 9px;padding:12px; }
+  .frisk-filters>label>span { font-size:10px; }
+  .frisk-search>input,.frisk-filters select,.frisk-word-editor textarea { font-size:16px; }
+  .frisk-filters select { padding-inline:9px; }
+  .frisk-account-body { gap:15px; }
+  .frisk-account>footer>div { flex-wrap:wrap; }
+  .frisk-policy { padding:22px 16px; }
+  .frisk-policy-aside { padding:21px 17px; }
+  .frisk-section-heading { flex-wrap:wrap; }
+  .frisk-savebar { flex-direction:column;align-items:stretch; }
+  .frisk-savebar>div { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%; }
+  .frisk-savebar .frisk-button { min-width:0;padding-inline:9px; }
+  .frisk-pagination { flex-wrap:wrap;gap:12px; }
+  .frisk-pagination>span { flex-basis:100%; }
+  .frisk-pagination>div { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;margin:0; }
+  .frisk-pagination .frisk-button { min-width:0; }
+}
+@container frisk (max-width:360px) {
+  .frisk-workspace[data-risk-view] .frisk-filters { grid-template-columns:minmax(0,1fr); }
+}

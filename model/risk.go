@@ -1,13 +1,14 @@
 package model
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -101,6 +102,10 @@ func validRiskRequestID(value string) bool {
 }
 
 func CreateRiskEvent(event *RiskEvent) error {
+	return CreateRiskEventContext(context.Background(), event)
+}
+
+func CreateRiskEventContext(ctx context.Context, event *RiskEvent) error {
 	if event == nil || event.UserID <= 0 || event.OccurredAt <= 0 {
 		return errors.New("invalid risk event identity or timestamp")
 	}
@@ -115,19 +120,27 @@ func CreateRiskEvent(event *RiskEvent) error {
 	if event.PromptTokens < 0 {
 		event.PromptTokens = 0
 	}
-	return DB.Create(event).Error
+	return DB.WithContext(ctx).Create(event).Error
 }
 
 func ListRiskEvents(userID int, since int64, limit int) ([]RiskEvent, error) {
+	return ListRiskEventsContext(context.Background(), userID, since, limit)
+}
+
+func ListRiskEventsContext(ctx context.Context, userID int, since int64, limit int) ([]RiskEvent, error) {
 	events := make([]RiskEvent, 0)
-	err := DB.Where("user_id = ? AND occurred_at >= ?", userID, since).
+	err := DB.WithContext(ctx).Where("user_id = ? AND occurred_at >= ?", userID, since).
 		Order("occurred_at DESC").Order("id DESC").Limit(limit).
 		Find(&events).Error
 	return events, err
 }
 
 func UpsertRiskSnapshot(snapshot *RiskSnapshot) error {
-	return DB.Clauses(clause.OnConflict{
+	return UpsertRiskSnapshotContext(context.Background(), snapshot)
+}
+
+func UpsertRiskSnapshotContext(ctx context.Context, snapshot *RiskSnapshot) error {
+	return DB.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "user_id"}, {Name: "window_days"}},
 		UpdateAll: true,
 	}).Create(snapshot).Error
@@ -212,25 +225,33 @@ func UpsertRiskReview(review *RiskReview) error {
 }
 
 func PruneRiskEvents(before int64, limit int) (int, error) {
+	return PruneRiskEventsContext(context.Background(), before, limit)
+}
+
+func PruneRiskEventsContext(ctx context.Context, before int64, limit int) (int, error) {
 	if limit <= 0 || limit > 1000 {
 		limit = 1000
 	}
 	var ids []int64
-	if err := DB.Model(&RiskEvent{}).Where("occurred_at < ?", before).
+	if err := DB.WithContext(ctx).Model(&RiskEvent{}).Where("occurred_at < ?", before).
 		Order("occurred_at ASC").Limit(limit).Pluck("id", &ids).Error; err != nil {
 		return 0, err
 	}
 	if len(ids) == 0 {
 		return 0, nil
 	}
-	result := DB.Where("id IN ?", ids).Delete(&RiskEvent{})
+	result := DB.WithContext(ctx).Where("id IN ?", ids).Delete(&RiskEvent{})
 	return int(result.RowsAffected), result.Error
 }
 
 // PruneRiskSnapshots removes expired aggregate evidence as its window closes.
 // Review decisions are kept separately for administrators' audit history.
 func PruneRiskSnapshots(now int64) error {
-	return DB.Where("(window_days = ? AND last_request_at < ?) OR (window_days = ? AND last_request_at < ?)",
+	return PruneRiskSnapshotsContext(context.Background(), now)
+}
+
+func PruneRiskSnapshotsContext(ctx context.Context, now int64) error {
+	return DB.WithContext(ctx).Where("(window_days = ? AND last_request_at < ?) OR (window_days = ? AND last_request_at < ?)",
 		3, now-3*24*3600, 7, now-7*24*3600).Delete(&RiskSnapshot{}).Error
 }
 

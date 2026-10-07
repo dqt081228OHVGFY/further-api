@@ -9,29 +9,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	taskdto "github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	pluginruntime "github.com/QuantumNous/new-api/pkg/jsplugin"
-	perfmetrics "github.com/QuantumNous/new-api/pkg/perf_metrics"
-	"github.com/QuantumNous/new-api/relay"
-	"github.com/QuantumNous/new-api/relay/channel/task/taskcommon"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	taskdto "github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	pluginruntime "github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	perfmetrics "github.com/dqt081228OHVGFY/further-api/pkg/perf_metrics"
+	"github.com/dqt081228OHVGFY/further-api/relay"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/task/taskcommon"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
-func relayHandler(c *gin.Context, info *relaycommon.RelayInfo) *types.NewAPIError {
-	var err *types.NewAPIError
+func relayHandler(c *gin.Context, info *relaycommon.RelayInfo) *types.GatewayError {
+	var err *types.GatewayError
 	switch info.RelayMode {
 	case relayconstant.RelayModeImagesGenerations, relayconstant.RelayModeImagesEdits:
 		err = relay.ImageHelper(c, info)
@@ -55,8 +55,8 @@ func relayHandler(c *gin.Context, info *relaycommon.RelayInfo) *types.NewAPIErro
 	return err
 }
 
-func geminiRelayHandler(c *gin.Context, info *relaycommon.RelayInfo) *types.NewAPIError {
-	var err *types.NewAPIError
+func geminiRelayHandler(c *gin.Context, info *relaycommon.RelayInfo) *types.GatewayError {
+	var err *types.GatewayError
 	if strings.Contains(c.Request.URL.Path, "embed") {
 		err = relay.GeminiEmbeddingHandler(c, info)
 	} else {
@@ -72,8 +72,8 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 	//originalModel := common.GetContextKeyString(c, constant.ContextKeyOriginalModel)
 
 	var (
-		newAPIError *types.NewAPIError
-		ws          *websocket.Conn
+		gatewayError *types.GatewayError
+		ws           *websocket.Conn
 	)
 
 	if relayFormat == types.RelayFormatOpenAIRealtime {
@@ -87,21 +87,21 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 	}
 
 	defer func() {
-		if newAPIError != nil {
-			service.RecordRequestPolicyTermination(c, newAPIError)
-			logger.LogError(c, fmt.Sprintf("relay error: %s", common.LocalLogPreview(newAPIError.Error())))
-			newAPIError.SetMessage(common.MessageWithRequestId(newAPIError.Error(), requestId))
+		if gatewayError != nil {
+			service.RecordRequestPolicyTermination(c, gatewayError)
+			logger.LogError(c, fmt.Sprintf("relay error: %s", common.LocalLogPreview(gatewayError.Error())))
+			gatewayError.SetMessage(common.MessageWithRequestId(gatewayError.Error(), requestId))
 			switch relayFormat {
 			case types.RelayFormatOpenAIRealtime:
-				helper.WssError(c, ws, newAPIError.ToOpenAIError())
+				helper.WssError(c, ws, gatewayError.ToOpenAIError())
 			case types.RelayFormatClaude:
-				c.JSON(newAPIError.StatusCode, gin.H{
+				c.JSON(gatewayError.StatusCode, gin.H{
 					"type":  "error",
-					"error": newAPIError.ToClaudeError(),
+					"error": gatewayError.ToClaudeError(),
 				})
 			default:
-				c.JSON(newAPIError.StatusCode, gin.H{
-					"error": newAPIError.ToOpenAIError(),
+				c.JSON(gatewayError.StatusCode, gin.H{
+					"error": gatewayError.ToOpenAIError(),
 				})
 			}
 		}
@@ -111,22 +111,22 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 	if err != nil {
 		// Map "request body too large" to 413 so clients can handle it correctly
 		if common.IsRequestBodyTooLargeError(err) || errors.Is(err, common.ErrRequestBodyTooLarge) {
-			newAPIError = types.NewErrorWithStatusCode(err, types.ErrorCodeReadRequestBodyFailed, http.StatusRequestEntityTooLarge, types.ErrOptionWithSkipRetry())
+			gatewayError = types.NewErrorWithStatusCode(err, types.ErrorCodeReadRequestBodyFailed, http.StatusRequestEntityTooLarge, types.ErrOptionWithSkipRetry())
 		} else {
-			newAPIError = types.NewError(err, types.ErrorCodeInvalidRequest, types.ErrOptionWithStatusCode(http.StatusBadRequest), types.ErrOptionWithSkipRetry())
+			gatewayError = types.NewError(err, types.ErrorCodeInvalidRequest, types.ErrOptionWithStatusCode(http.StatusBadRequest), types.ErrOptionWithSkipRetry())
 		}
 		return
 	}
 
 	relayInfo, err := relaycommon.GenRelayInfo(c, relayFormat, request, ws)
 	if err != nil {
-		newAPIError = types.NewError(err, types.ErrorCodeGenRelayInfoFailed)
+		gatewayError = types.NewError(err, types.ErrorCodeGenRelayInfoFailed)
 		return
 	}
 
 	defer func() {
 		recovered := recover()
-		resultErr := newAPIError
+		resultErr := gatewayError
 		if recovered != nil {
 			resultErr = types.NewError(fmt.Errorf("relay panic: %v", recovered), types.ErrorCodeBadResponse)
 		}
@@ -138,11 +138,11 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		}
 	}()
 
-	if newAPIError = relay.PrepareRequestBilling(c, relayInfo); newAPIError != nil {
+	if gatewayError = relay.PrepareRequestBilling(c, relayInfo); gatewayError != nil {
 		return
 	}
 	defer func() {
-		newAPIError = relay.RefundFailedRequestBilling(c, relayInfo, newAPIError)
+		gatewayError = relay.RefundFailedRequestBilling(c, relayInfo, gatewayError)
 	}()
 
 	retryParam := &service.RetryParam{
@@ -163,12 +163,12 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		channel, channelErr := getChannel(c, relayInfo, retryParam)
 		if channelErr != nil {
 			logger.LogError(c, channelErr.Error())
-			newAPIError = channelErr
+			gatewayError = channelErr
 			break
 		}
 		service.AppendUsedChannel(c, channel.Id)
 		if billingErr := service.PrepareTieredBillingForSelectedGroup(c, relayInfo); billingErr != nil {
-			newAPIError = billingErr
+			gatewayError = billingErr
 			break
 		}
 
@@ -176,9 +176,9 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		if bodyErr != nil {
 			// Ensure consistent 413 for oversized bodies even when error occurs later (e.g., retry path)
 			if common.IsRequestBodyTooLargeError(bodyErr) || errors.Is(bodyErr, common.ErrRequestBodyTooLarge) {
-				newAPIError = types.NewErrorWithStatusCode(bodyErr, types.ErrorCodeReadRequestBodyFailed, http.StatusRequestEntityTooLarge, types.ErrOptionWithSkipRetry())
+				gatewayError = types.NewErrorWithStatusCode(bodyErr, types.ErrorCodeReadRequestBodyFailed, http.StatusRequestEntityTooLarge, types.ErrOptionWithSkipRetry())
 			} else {
-				newAPIError = types.NewErrorWithStatusCode(bodyErr, types.ErrorCodeReadRequestBodyFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
+				gatewayError = types.NewErrorWithStatusCode(bodyErr, types.ErrorCodeReadRequestBodyFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 			}
 			break
 		}
@@ -186,27 +186,27 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 
 		switch relayFormat {
 		case types.RelayFormatOpenAIRealtime:
-			newAPIError = relay.WssHelper(c, relayInfo)
+			gatewayError = relay.WssHelper(c, relayInfo)
 		case types.RelayFormatClaude:
-			newAPIError = relay.ClaudeHelper(c, relayInfo)
+			gatewayError = relay.ClaudeHelper(c, relayInfo)
 		case types.RelayFormatGemini:
-			newAPIError = geminiRelayHandler(c, relayInfo)
+			gatewayError = geminiRelayHandler(c, relayInfo)
 		default:
-			newAPIError = relayHandler(c, relayInfo)
+			gatewayError = relayHandler(c, relayInfo)
 		}
 
-		if newAPIError == nil {
+		if gatewayError == nil {
 			service.MarkRequestPolicySuccess(c, relayInfo.StreamStatus)
 			relayInfo.LastError = nil
 			return
 		}
 
-		newAPIError = service.NormalizeViolationFeeError(newAPIError)
-		relayInfo.LastError = newAPIError
+		gatewayError = service.NormalizeViolationFeeError(gatewayError)
+		relayInfo.LastError = gatewayError
 
-		decision := service.DecideRelayRetry(c, newAPIError, common.RetryTimes-retryParam.GetRetry())
-		service.RecordPolicyFailure(c, channel.Id, newAPIError, decision)
-		processChannelError(c, *types.NewChannelError(channel.Id, channel.Type, channel.Name, channel.ChannelInfo.IsMultiKey, common.GetContextKeyString(c, constant.ContextKeyChannelKey), channel.GetAutoBan()), newAPIError, relayInfo)
+		decision := service.DecideRelayRetry(c, gatewayError, common.RetryTimes-retryParam.GetRetry())
+		service.RecordPolicyFailure(c, channel.Id, gatewayError, decision)
+		processChannelError(c, *types.NewChannelError(channel.Id, channel.Type, channel.Name, channel.ChannelInfo.IsMultiKey, common.GetContextKeyString(c, constant.ContextKeyChannelKey), channel.GetAutoBan()), gatewayError, relayInfo)
 
 		if decision.Action != "retry" {
 			break
@@ -259,7 +259,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func getChannel(c *gin.Context, info *relaycommon.RelayInfo, retryParam *service.RetryParam) (*model.Channel, *types.NewAPIError) {
+func getChannel(c *gin.Context, info *relaycommon.RelayInfo, retryParam *service.RetryParam) (*model.Channel, *types.GatewayError) {
 	if info.ChannelMeta == nil {
 		autoBan := c.GetBool("auto_ban")
 		autoBanInt := 1
@@ -286,14 +286,14 @@ func getChannel(c *gin.Context, info *relaycommon.RelayInfo, retryParam *service
 	info.PriceData.GroupRatioInfo = helper.HandleGroupRatio(c, info)
 
 	service.RequestPolicy(c).BeginAttempt(channel, selectGroup)
-	newAPIError := middleware.SetupContextForSelectedChannel(c, channel, info.OriginModelName)
-	if newAPIError != nil {
-		return nil, newAPIError
+	gatewayError := middleware.SetupContextForSelectedChannel(c, channel, info.OriginModelName)
+	if gatewayError != nil {
+		return nil, gatewayError
 	}
 	return channel, nil
 }
 
-func processChannelError(c *gin.Context, channelError types.ChannelError, err *types.NewAPIError, relayInfo *relaycommon.RelayInfo) {
+func processChannelError(c *gin.Context, channelError types.ChannelError, err *types.GatewayError, relayInfo *relaycommon.RelayInfo) {
 	service.ProcessChannelError(c, channelError, err, relayInfo)
 }
 
@@ -350,7 +350,7 @@ func RelayMidjourney(c *gin.Context) {
 func RelayNotImplemented(c *gin.Context) {
 	err := types.OpenAIError{
 		Message: "API not implemented",
-		Type:    "new_api_error",
+		Type:    "gateway_error",
 		Param:   "",
 		Code:    "api_not_implemented",
 	}
@@ -390,7 +390,7 @@ func RelayTaskPluginEndpoint(c *gin.Context, fallback gin.HandlerFunc) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": gin.H{
 				"message": "Task protocol request failed",
-				"type":    "new_api_error",
+				"type":    "gateway_error",
 				"code":    "task_protocol_error",
 			},
 		})
@@ -520,7 +520,7 @@ func executeTaskSubmissionWith(
 				}
 			}
 		} else {
-			var channelErr *types.NewAPIError
+			var channelErr *types.GatewayError
 			channel, channelErr = getChannel(c, relayInfo, retryParam)
 			if channelErr != nil {
 				logger.LogError(c, channelErr.Error())
@@ -597,7 +597,7 @@ func executeTaskSubmissionWith(
 	// Reserve any submit-time upward billing adjustment before persistence.
 	// This keeps insertion failures fully refundable while ensuring settlement
 	// after the barrier normally has a zero positive delta.
-	if relayInfo.Billing != nil {
+	if relayInfo.Billing != nil && (result.Quota == 0 || !service.BillingReservationCovers(relayInfo, result.Quota)) {
 		stage = "reserve"
 		diagnostics.reserve("reserve_start", result.Quota)
 		if reserveErr := relayInfo.Billing.Reserve(result.Quota); reserveErr != nil {
@@ -714,7 +714,7 @@ func presentTaskSubmission(c *gin.Context, outcome *taskSubmissionOutcome) {
 		otherRatios = map[string]float64{}
 	}
 	if ratiosJSON, err := common.Marshal(otherRatios); err == nil {
-		c.Header("X-New-Api-Other-Ratios", string(ratiosJSON))
+		c.Header("X-Further-Api-Other-Ratios", string(ratiosJSON))
 	}
 	if pinnedValue, exists := c.Get(pluginruntime.ContextKeyPinnedRoute); exists {
 		if pinned, ok := pinnedValue.(pluginruntime.PinnedRoute); ok && pinned.Plugin != nil && pinned.Route.Render != "" {
@@ -779,7 +779,7 @@ func respondTaskError(c *gin.Context, taskErr *taskdto.TaskError) {
 
 // taskSubmissionAPIError adapts a task error for the shared relay error paths.
 // TaskError.Error is nil for many local rejections, so fall back to the message.
-func taskSubmissionAPIError(taskErr *taskdto.TaskError) *types.NewAPIError {
+func taskSubmissionAPIError(taskErr *taskdto.TaskError) *types.GatewayError {
 	err := taskErr.Error
 	if err == nil {
 		err = errors.New(taskErr.Message)

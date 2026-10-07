@@ -9,8 +9,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,18 +40,18 @@ func webResourceRateLimitRouter(t *testing.T) *gin.Engine {
 		"web/dist/index.html":                     {Data: []byte("<html>home</html>")},
 		"web/dist/console/index.html":             {Data: []byte("<html>console</html>")},
 		"web/dist/static/js/app.js":               {Data: []byte("window.applicationLoaded = true;")},
-		"web/dist/relayfor-assets/app.css":        {Data: []byte("body { color: blue; }")},
-		"web/dist/relayfor-assets/icons.woff2":    {Data: []byte("test-font")},
-		"web/dist/relayfor-logo.svg":              {Data: []byte(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`)},
+		"web/dist/further-assets/app.css":        {Data: []byte("body { color: blue; }")},
+		"web/dist/further-assets/icons.woff2":    {Data: []byte("test-font")},
+		"web/dist/further-logo.svg":              {Data: []byte(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`)},
 		"web/dist/api/private.js":                 {Data: []byte("must not shadow a backend URL")},
 		"web/dist/v1/private.js":                  {Data: []byte("must not shadow a relay URL")},
-		"web/dist/relayfor-assets/folder.js/file": {Data: []byte("directory must not bypass the limiter")},
+		"web/dist/further-assets/folder.js/file": {Data: []byte("directory must not bypass the limiter")},
 	}
 	router := gin.New()
 	require.NoError(t, router.SetTrustedProxies(nil))
 	api := router.Group("/api", middleware.GlobalAPIRateLimit())
 	api.GET("/probe.js", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"backend": true}) })
-	SetWebRouter(router, WebAssets{BuildFS: assets, IndexPage: []byte("dashboard")}, func(c *gin.Context) { c.Next() })
+	SetWebRouter(router, WebAssets{BuildFS: assets}, func(c *gin.Context) { c.Next() })
 	return router
 }
 
@@ -67,7 +67,7 @@ func TestExistingWebResourcesDoNotExhaustDocumentRateLimit(t *testing.T) {
 	router := webResourceRateLimitRouter(t)
 	clientIP := freshWebResourceTestIP()
 	for i := 0; i < 8; i++ {
-		for _, path := range []string{"/static/js/app.js?v=1", "/relayfor-assets/app.css", "/relayfor-assets/icons.woff2", "/relayfor-logo.svg"} {
+		for _, path := range []string{"/static/js/app.js?v=1", "/further-assets/app.css", "/further-assets/icons.woff2", "/further-logo.svg"} {
 			response := webResourceRequest(router, http.MethodGet, path, clientIP)
 			require.Equal(t, http.StatusOK, response.Code, path)
 			assert.Equal(t, "max-age=604800", response.Header().Get("Cache-Control"))
@@ -88,7 +88,7 @@ func TestExistingWebResourcesDoNotExhaustDocumentRateLimit(t *testing.T) {
 	asset := webResourceRequest(router, http.MethodGet, "/static/js/app.js", clientIP)
 	assert.Equal(t, http.StatusOK, asset.Code)
 	assert.Equal(t, "window.applicationLoaded = true;", asset.Body.String())
-	head := webResourceRequest(router, http.MethodHead, "/relayfor-assets/app.css", clientIP)
+	head := webResourceRequest(router, http.MethodHead, "/further-assets/app.css", clientIP)
 	assert.Equal(t, http.StatusOK, head.Code)
 	assert.Empty(t, head.Body.String())
 }
@@ -105,7 +105,7 @@ func TestWebResourceFastPathKeepsAPIAndMissingPathLimits(t *testing.T) {
 		// API requests did not spend the separate HTML allowance.
 		assert.Equal(t, http.StatusOK, webResourceRequest(router, http.MethodGet, "/", clientIP).Code)
 	})
-	for _, path := range []string{"/api/private.js", "/v1/private.js", "/assets/missing.js", "/relayfor-assets/folder.js", "/%61pi/private.js"} {
+	for _, path := range []string{"/api/private.js", "/v1/private.js", "/assets/missing.js", "/further-assets/folder.js", "/%61pi/private.js"} {
 		t.Run(path, func(t *testing.T) {
 			clientIP := freshWebResourceTestIP()
 			first := webResourceRequest(router, http.MethodGet, path, clientIP)

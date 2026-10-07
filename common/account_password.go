@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
@@ -28,6 +29,8 @@ var (
 	ErrPasswordLegacyLimit   = errors.New("Long passwords are unavailable until the password storage upgrade is complete.")
 )
 
+var deriveAccountPasswordKey = argon2.IDKey
+
 // ValidateNewAccountPassword applies only when a user chooses a new password.
 // Authentication must continue to accept historical passwords without applying
 // the new policy. Do not normalize passwords, including surrounding whitespace.
@@ -42,6 +45,13 @@ func ValidateNewAccountPassword(password string) error {
 // temporary bcrypt mode permits rolling out dual-format readers to all nodes
 // before enabling Argon2id writes. Existing hashes are never rewritten in bulk.
 func HashAccountPassword(password string) (string, error) {
+	return HashAccountPasswordContext(context.Background(), password)
+}
+
+func HashAccountPasswordContext(ctx context.Context, password string) (string, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
 	if err := ValidateNewAccountPassword(password); err != nil {
 		return "", err
 	}
@@ -50,7 +60,7 @@ func HashAccountPassword(password string) (string, error) {
 		if len(password) > 72 {
 			return "", ErrPasswordLegacyLimit
 		}
-		return Password2Hash(password)
+		return Password2HashContext(ctx, password)
 	case "", "argon2id":
 	default:
 		return "", errors.New("Unsupported account password hashing configuration.")
@@ -59,28 +69,49 @@ func HashAccountPassword(password string) (string, error) {
 	if _, err := rand.Read(salt); err != nil {
 		return "", fmt.Errorf("generate account password salt: %w", err)
 	}
-	key := argon2.IDKey([]byte(password), salt, accountPasswordTime, accountPasswordMemory, 1, accountPasswordKeyBytes)
+	release, err := acquirePasswordKDF(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer release()
+	key := deriveAccountPasswordKey([]byte(password), salt, accountPasswordTime, accountPasswordMemory, 1, accountPasswordKeyBytes)
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
 	return fmt.Sprintf("$argon2id$v=19$m=19456,t=2,p=1$%s$%s", base64.RawStdEncoding.EncodeToString(salt), base64.RawStdEncoding.EncodeToString(key)), nil
 }
 
 func validateArgon2AccountPassword(password, encoded string) bool {
+	valid, _ := validateArgon2AccountPasswordContext(context.Background(), password, encoded)
+	return valid
+}
+
+func validateArgon2AccountPasswordContext(ctx context.Context, password, encoded string) (bool, error) {
 	// Bound both plaintext and parameters before invoking a memory-hard KDF.
 	// Only the version/parameters emitted by this application are accepted.
 	if len(password) > MaxAccountPasswordLength*utf8.UTFMax || len(encoded) > 256 {
-		return false
+		return false, nil
 	}
 	parts := strings.Split(encoded, "$")
 	if len(parts) != 6 || parts[0] != "" || parts[1] != "argon2id" || parts[2] != "v=19" || parts[3] != "m=19456,t=2,p=1" {
-		return false
+		return false, nil
 	}
 	salt, err := base64.RawStdEncoding.Strict().DecodeString(parts[4])
 	if err != nil || len(salt) != accountPasswordSaltBytes {
-		return false
+		return false, nil
 	}
 	expected, err := base64.RawStdEncoding.Strict().DecodeString(parts[5])
 	if err != nil || len(expected) != accountPasswordKeyBytes {
-		return false
+		return false, nil
 	}
-	actual := argon2.IDKey([]byte(password), salt, accountPasswordTime, accountPasswordMemory, 1, accountPasswordKeyBytes)
-	return subtle.ConstantTimeCompare(actual, expected) == 1
+	release, err := acquirePasswordKDF(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+	actual := deriveAccountPasswordKey([]byte(password), salt, accountPasswordTime, accountPasswordMemory, 1, accountPasswordKeyBytes)
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	return subtle.ConstantTimeCompare(actual, expected) == 1, nil
 }

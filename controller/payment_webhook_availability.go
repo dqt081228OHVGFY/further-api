@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/QuantumNous/new-api/setting"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 	"strings"
 )
 

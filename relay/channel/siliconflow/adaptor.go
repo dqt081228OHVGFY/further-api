@@ -2,38 +2,46 @@ package siliconflow
 
 import (
 	"errors"
-	"fmt"
+
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 )
 
-type Adaptor struct {
-}
+type Adaptor struct{ ResponseFormat string }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	converted, err := openai.ChatFrom(c, info, request)
+	if err != nil {
+		return nil, err
+	}
+	return a.ConvertOpenAIRequest(c, info, converted)
 }
 
 func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.ConvertClaudeRequest(c, info, req)
+	converted, err := openai.ChatFrom(c, info, req)
+	if err != nil {
+		return nil, err
+	}
+	return a.ConvertOpenAIRequest(c, info, converted)
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.ConvertAudioRequest(c, info, request)
+	body, err := openai.AudioPayload(c, info, request)
+	if err == nil {
+		a.ResponseFormat = request.ResponseFormat
+	}
+	return body, err
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
@@ -63,22 +71,28 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
+	a.ResponseFormat = ""
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.RelayMode == constant.RelayModeRerank {
-		return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("SiliconFlow provider configuration is missing")
 	}
-	return relaycommon.GetFullRequestURL(info.ChannelBaseUrl, info.RequestURLPath, info.ChannelType), nil
+	if info.RelayMode == constant.RelayModeRerank {
+		return openai.ProviderEndpoint(info.ChannelBaseUrl, "/v1/rerank")
+	}
+	return openai.RequestEndpoint(info)
 }
 
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
-	channel.SetupApiRequestHeader(info, c, req)
-	req.Set("Authorization", fmt.Sprintf("Bearer %s", info.ApiKey))
-	return nil
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	return openai.SetupProviderHeaders(c, headers, info)
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
+	if request == nil {
+		return nil, errors.New("SiliconFlow chat request is missing")
+	}
 	// SiliconFlow requires messages array for FIM requests, even if client doesn't send it
 	if (request.Prefix != nil || request.Suffix != nil) && len(request.Messages) == 0 {
 		// Add an empty user message to satisfy SiliconFlow's requirement
@@ -93,13 +107,21 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	// TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("siliconflow", "Responses input")
 }
 
-func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.DoRequest(c, info, requestBody)
+func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, body io.Reader) (any, error) {
+	if info == nil {
+		return nil, errors.New("SiliconFlow request context is missing")
+	}
+	switch info.RelayMode {
+	case constant.RelayModeAudioTranscription, constant.RelayModeAudioTranslation:
+		return channel.DoFormRequest(a, c, info, body)
+	case constant.RelayModeRealtime:
+		return channel.DoWssRequest(a, c, info, body)
+	default:
+		return channel.DoApiRequest(a, c, info, body)
+	}
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
@@ -110,19 +132,18 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 	return request, nil
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	switch info.RelayMode {
 	case constant.RelayModeRerank:
 		usage, err = siliconflowRerankHandler(c, info, resp)
 	default:
-		adaptor := openai.Adaptor{}
-		usage, err = adaptor.DoResponse(c, resp, info)
+		usage, err = openai.ProtocolResponse(c, resp, info, a.ResponseFormat)
 	}
 	return
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

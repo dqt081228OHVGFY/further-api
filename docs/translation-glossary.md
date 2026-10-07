@@ -70,6 +70,8 @@ This document provides standard translation references for key terminology in th
 
 ## 翻译注意事项 (Translation Guidelines)
 
+- 产品名称在所有语言中均使用 **further-api**，不翻译或改变大小写。翻译时保留现有 key、`{{变量}}` 占位符、HTML 标签和协议字段；只更改用户可见的值。法律署名、原作者姓名和许可链接按 `NOTICE` 保留。品牌资源与仓库链接见 [品牌与资源](./branding.md)。
+- Use **further-api** unchanged in every language. Preserve translation keys, `{{variables}}`, HTML tags, and protocol fields. Keep the legal attribution, original authors, and license links required by `NOTICE`; see [branding and assets](./branding.md).
 - **提示 (Prompt)** = 模型输入内容 / Model input content
 - **补全 (Completion)** = 模型输出内容 / Model output content
 - **倍率 (Ratio)** = 价格计算的乘数因子 / Multiplier factor for price calculation

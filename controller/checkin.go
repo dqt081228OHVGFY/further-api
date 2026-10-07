@@ -5,22 +5,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
 )
 
 // GetCheckinStatus 获取用户签到状态和历史记录
 func GetCheckinStatus(c *gin.Context) {
-	setting := model.RelayForCheckinSettingsSnapshot()
+	setting := model.FurtherCheckinSettingsSnapshot()
 	if !setting.Enabled {
 		common.ApiErrorMsg(c, "签到功能未启用")
 		return
 	}
 	userId := c.GetInt("id")
 	// 获取月份参数，默认为当前月份
-	month := c.DefaultQuery("month", time.Now().In(model.RelayForActivityLocation).Format("2006-01"))
+	month := c.DefaultQuery("month", time.Now().In(model.FurtherActivityLocation).Format("2006-01"))
 
 	stats, err := model.GetUserCheckinStats(userId, month)
 	if err != nil {
@@ -44,7 +44,7 @@ func GetCheckinStatus(c *gin.Context) {
 
 // DoCheckin 执行用户签到
 func DoCheckin(c *gin.Context) {
-	setting := model.RelayForCheckinSettingsSnapshot()
+	setting := model.FurtherCheckinSettingsSnapshot()
 	if !setting.Enabled {
 		common.ApiErrorMsg(c, "签到功能未启用")
 		return

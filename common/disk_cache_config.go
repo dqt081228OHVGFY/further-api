@@ -175,3 +175,28 @@ func IsDiskCacheAvailable(requestSize int64) bool {
 	currentUsage := atomic.LoadInt64(&diskCacheStats.CurrentDiskUsageBytes)
 	return currentUsage+requestSize <= maxBytes
 }
+
+// Reserve before streaming so concurrent files cannot all observe the same
+// available disk quota and publish their accounting only after writing.
+func TryReserveDiskCacheFile(size int64) bool {
+	if !IsDiskCacheEnabled() || size < 0 {
+		return false
+	}
+	maximum := GetDiskCacheMaxSizeBytes()
+	for {
+		used := atomic.LoadInt64(&diskCacheStats.CurrentDiskUsageBytes)
+		if size > maximum || used > maximum-size {
+			return false
+		}
+		if atomic.CompareAndSwapInt64(&diskCacheStats.CurrentDiskUsageBytes, used, used+size) {
+			atomic.AddInt64(&diskCacheStats.ActiveDiskFiles, 1)
+			return true
+		}
+	}
+}
+
+func ReduceDiskCacheReservation(bytes int64) {
+	if bytes > 0 {
+		atomic.AddInt64(&diskCacheStats.CurrentDiskUsageBytes, -bytes)
+	}
+}

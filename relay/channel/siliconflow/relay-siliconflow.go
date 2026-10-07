@@ -2,44 +2,37 @@ package siliconflow
 
 import (
 	"encoding/json"
+	"errors"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
-	"github.com/gin-gonic/gin"
 )
 
-func siliconflowRerankHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	responseBody, err := io.ReadAll(resp.Body)
+func siliconflowRerankHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if c == nil || info == nil || response == nil || response.Body == nil {
+		return nil, types.NewError(errors.New("SiliconFlow rerank context is missing"), types.ErrorCodeBadResponseBody)
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, types.NewError(err, types.ErrorCodeReadResponseBodyFailed)
 	}
-	service.CloseResponseBodyGracefully(resp)
-	var siliconflowResp SFRerankResponse
-	err = json.Unmarshal(responseBody, &siliconflowResp)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *SFRerankResponse
+	if err = json.Unmarshal(data, &wire); err != nil {
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-	usage := &dto.Usage{
-		PromptTokens:     siliconflowResp.Meta.Tokens.InputTokens,
-		CompletionTokens: siliconflowResp.Meta.Tokens.OutputTokens,
-		TotalTokens:      siliconflowResp.Meta.Tokens.InputTokens + siliconflowResp.Meta.Tokens.OutputTokens,
+	if wire == nil {
+		return nil, types.NewError(errors.New("SiliconFlow rerank response must be an object"), types.ErrorCodeBadResponseBody)
 	}
-	rerankResp := &dto.RerankResponse{
-		Results: siliconflowResp.Results,
-		Usage:   *usage,
-	}
-
-	jsonResponse, err := json.Marshal(rerankResp)
+	usage := dto.Usage{PromptTokens: wire.Meta.Tokens.InputTokens, CompletionTokens: wire.Meta.Tokens.OutputTokens, TotalTokens: wire.Meta.Tokens.InputTokens + wire.Meta.Tokens.OutputTokens}
+	body, err := json.Marshal(dto.RerankResponse{Results: wire.Results, Usage: usage})
 	if err != nil {
 		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	service.IOCopyBytesGracefully(c, resp, jsonResponse)
-	return usage, nil
+	service.IOCopyBytesGracefully(c, response, body)
+	return &usage, nil
 }

@@ -230,8 +230,9 @@ type LogEntry struct {
 
 // UpdateDeploymentRequest represents request to update deployment configuration
 type UpdateDeploymentRequest struct {
-	EnvVariables       map[string]string `json:"env_variables,omitempty"`
-	SecretEnvVariables map[string]string `json:"secret_env_variables,omitempty"`
+	// nil leaves upstream values unchanged; an explicit empty map clears them.
+	EnvVariables       map[string]string `json:"env_variables,omitzero"`
+	SecretEnvVariables map[string]string `json:"secret_env_variables,omitzero"`
 	Entrypoint         []string          `json:"entrypoint,omitempty"`
 	TrafficPort        *int              `json:"traffic_port,omitempty"`
 	ImageURL           string            `json:"image_url,omitempty"`

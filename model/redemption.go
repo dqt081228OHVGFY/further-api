@@ -2,12 +2,10 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/common"
 
 	"gorm.io/gorm"
 )
@@ -136,58 +134,6 @@ func GetRedemptionById(id int) (*Redemption, error) {
 	return &redemption, err
 }
 
-func Redeem(key string, userId int) (quota int, err error) {
-	if key == "" {
-		return 0, errors.New("未提供兑换码")
-	}
-	if userId == 0 {
-		return 0, errors.New("无效的 user id")
-	}
-	redemption := &Redemption{}
-
-	keyCol := "`key`"
-	if common.UsingMainDatabase(common.DatabaseTypePostgreSQL) {
-		keyCol = `"key"`
-	}
-	common.RandomSleep()
-	err = DB.Transaction(func(tx *gorm.DB) error {
-		err := lockForUpdate(tx).Where(keyCol+" = ?", key).First(redemption).Error
-		if err != nil {
-			return errors.New("无效的兑换码")
-		}
-		if redemption.Status != common.RedemptionCodeStatusEnabled {
-			return errors.New("该兑换码已被使用")
-		}
-		if redemption.ExpiredTime != 0 && redemption.ExpiredTime < common.GetTimestamp() {
-			return errors.New("该兑换码已过期")
-		}
-		// Compare-and-swap on status: only the transaction that flips
-		// enabled -> used may credit quota, so a concurrent redeem of the
-		// same code loses here even without a row lock (e.g. on SQLite).
-		result := tx.Model(&Redemption{}).
-			Where("id = ? AND status = ?", redemption.Id, common.RedemptionCodeStatusEnabled).
-			Updates(map[string]any{
-				"redeemed_time": common.GetTimestamp(),
-				"status":        common.RedemptionCodeStatusUsed,
-				"used_user_id":  userId,
-			})
-		if result.Error != nil {
-			return result.Error
-		}
-		if result.RowsAffected == 0 {
-			return errors.New("该兑换码已被使用")
-		}
-		return creditTopUpQuota(tx, userId, redemption.Quota, nil)
-	})
-	if err != nil {
-		common.SysError("redemption failed: " + err.Error())
-		return 0, ErrRedeemFailed
-	}
-	syncCreditUserQuotaCache(userId, redemption.Quota, "redemption")
-	RecordLog(userId, LogTypeTopup, fmt.Sprintf("通过兑换码充值 %s，兑换码ID %d", logger.LogQuota(redemption.Quota), redemption.Id))
-	return redemption.Quota, nil
-}
-
 func (redemption *Redemption) Insert() error {
 	if redemption.Quota <= 0 {
 		return errors.New("redemption quota must be positive")
@@ -307,7 +253,7 @@ func GetRedemptionBatches(keyword, status string, startIdx, pageSize int) ([]Red
 		for index, row := range selected {
 			key := row.BatchID
 			if key == "" {
-				key = "newapi-" + strconv.Itoa(row.LegacyID)
+				key = "legacy-" + strconv.Itoa(row.LegacyID)
 				legacyIDs = append(legacyIDs, row.LegacyID)
 			} else {
 				batchIDs = append(batchIDs, key)
@@ -322,7 +268,7 @@ func GetRedemptionBatches(keyword, status string, startIdx, pageSize int) ([]Red
 		for _, code := range codes {
 			key := code.BatchID
 			if key == "" {
-				key = "newapi-" + strconv.Itoa(code.Id)
+				key = "legacy-" + strconv.Itoa(code.Id)
 			}
 			batches[indexes[key]].Items = append(batches[indexes[key]].Items, code)
 		}
@@ -333,7 +279,11 @@ func GetRedemptionBatches(keyword, status string, startIdx, pageSize int) ([]Red
 
 func DeleteUnusedRedemptionBatch(batchID string) (int64, error) {
 	query := DB.Model(&Redemption{}).Where("status <> ?", common.RedemptionCodeStatusUsed)
-	if suffix, legacy := strings.CutPrefix(batchID, "newapi-"); legacy {
+	suffix, legacy := strings.CutPrefix(batchID, "legacy-")
+	if !legacy {
+		suffix, legacy = strings.CutPrefix(batchID, "further-")
+	}
+	if legacy {
 		id, err := strconv.Atoi(suffix)
 		if err != nil || id <= 0 {
 			return 0, errors.New("invalid batch ID")

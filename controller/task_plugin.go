@@ -14,14 +14,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/plugins"
-	"github.com/QuantumNous/new-api/setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/plugins"
+	"github.com/dqt081228OHVGFY/further-api/setting"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -525,7 +525,7 @@ func SetTaskPluginStatus(c *gin.Context) {
 		}
 		if cascade {
 			for _, channel := range channels {
-				if channel.Type == constant.ChannelTypeNewAPI {
+				if channel.Type == constant.ChannelTypeGateway {
 					// A gateway channel also carries ordinary traffic, so the
 					// cascade only drops this plugin from its bindings.
 					unbound, unbindErr := model.UnbindTaskPlugin(channel.Id, key)
@@ -718,7 +718,10 @@ func syncTaskPluginsOnceContext(ctx context.Context) error {
 	started := time.Now()
 	taskPluginSyncState.Lock()
 	defer taskPluginSyncState.Unlock()
-	databaseSnapshot, err := model.GetTaskPluginSyncSnapshot()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	databaseSnapshot, err := model.GetTaskPluginSyncSnapshotContext(ctx)
 	if err != nil {
 		syncErr := fmt.Errorf("sync task plugins: %w", err)
 		taskPluginSyncState.lastRebuild = taskPluginRebuildOutcome{
@@ -752,6 +755,9 @@ func syncTaskPluginsOnceContext(ctx context.Context) error {
 	nextHashes := make(map[string]string, len(databasePlugins))
 	seen := make(map[string]bool, len(databasePlugins))
 	for _, plugin := range databasePlugins {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		seen[plugin.Key] = true
 		if current := currentOverrides[plugin.Key]; current != nil && taskPluginSyncState.hashes[plugin.Key] == plugin.SourceHash {
 			nextOverrides = append(nextOverrides, current)
@@ -771,7 +777,7 @@ func syncTaskPluginsOnceContext(ctx context.Context) error {
 			plugin.Version,
 		)
 		var compiled *jsplugin.LoadedPlugin
-		source, compileErr := model.GetTaskPluginSource(plugin.Id)
+		source, compileErr := model.GetTaskPluginSourceContext(ctx, plugin.Id)
 		if compileErr != nil {
 			compileErr = fmt.Errorf("load source: %w", compileErr)
 		} else {
@@ -806,6 +812,9 @@ func syncTaskPluginsOnceContext(ctx context.Context) error {
 			plugin.Key,
 			plugin.Version,
 		)
+	}
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 	if err = jsplugin.DefaultRegistry.ReplaceOverrides(nextOverrides); err != nil {
 		syncErr := fmt.Errorf("publish task plugin generation: %w", err)
@@ -866,8 +875,20 @@ func SyncTaskPluginsOnce() {
 }
 
 func SyncTaskPlugins() {
-	SyncTaskPluginsOnce()
-	for range time.NewTicker(30 * time.Second).C {
-		SyncTaskPluginsOnce()
+	ctx := common.BackgroundContext()
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	for {
+		if ctx.Err() != nil {
+			return
+		}
+		if err := syncTaskPluginsOnceContext(ctx); err != nil && ctx.Err() == nil {
+			common.SysError(err.Error())
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
 	}
 }

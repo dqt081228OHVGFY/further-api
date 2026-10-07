@@ -1,32 +1,29 @@
 package minimax
 
 import (
-	"fmt"
-
-	channelconstant "github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"errors"
+	channelconstant "github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 func GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	baseUrl := info.ChannelBaseUrl
-	if baseUrl == "" {
-		baseUrl = channelconstant.GetChannelBaseURL(channelconstant.ChannelTypeMiniMax)
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("MiniMax provider configuration is missing")
 	}
-	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
-	default:
-		switch info.RelayMode {
-		case constant.RelayModeChatCompletions:
-			return fmt.Sprintf("%s/v1/text/chatcompletion_v2", baseUrl), nil
-		case constant.RelayModeImagesGenerations:
-			return fmt.Sprintf("%s/v1/image_generation", baseUrl), nil
-		case constant.RelayModeAudioSpeech:
-			return fmt.Sprintf("%s/v1/t2a_v2", baseUrl), nil
-		default:
-			return "", fmt.Errorf("unsupported relay mode: %d", info.RelayMode)
-		}
+	base := info.ChannelBaseUrl
+	if base == "" {
+		base = channelconstant.GetChannelBaseURL(channelconstant.ChannelTypeMiniMax)
 	}
+	if info.RelayFormat == types.RelayFormatClaude {
+		return openai.ProviderEndpoint(base, "/anthropic/v1/messages")
+	}
+	routes := map[int]string{constant.RelayModeChatCompletions: "/v1/text/chatcompletion_v2", constant.RelayModeImagesGenerations: "/v1/image_generation", constant.RelayModeAudioSpeech: "/v1/t2a_v2"}
+	route, ok := routes[info.RelayMode]
+	if !ok {
+		return "", openai.UnsupportedOperation("MiniMax", "this operation")
+	}
+	return openai.ProviderEndpoint(base, route)
 }

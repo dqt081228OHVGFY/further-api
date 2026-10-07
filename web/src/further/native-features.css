@@ -1,0 +1,309 @@
+/* Loaded only inside the Further native feature ShadowRoot. */
+:host([data-account-security-host]) {
+  display: block;
+  height: auto;
+  min-height: 0;
+}
+
+:host([data-account-security-host]) [data-native-feature-root],
+:host([data-account-security-host].dark) [data-native-feature-root] {
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  animation: none;
+}
+
+:host([data-account-security-host]) [data-native-feature-root] > .further-native-content {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.further-account-security {
+  width: 100%;
+  min-width: 0;
+}
+
+:host([data-account-security-host]) [data-slot='card'] {
+  border-radius: 14px;
+  box-shadow: none;
+  background: var(--rf-feature-surface-soft);
+}
+
+:host {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  min-height: 0;
+  height: auto;
+  --rf-feature-surface: var(--md-sys-color-surface, #fff);
+  --rf-feature-surface-soft: var(--md-sys-color-surface-container-low, #f8fafd);
+  --rf-feature-surface-raised: var(--md-sys-color-surface-container, #f0f4f9);
+  --rf-feature-ink: var(--md-sys-color-on-surface, #202b3a);
+  --rf-feature-ink-muted: var(--md-sys-color-on-surface-variant, #617087);
+  --rf-feature-line: var(--md-sys-color-outline-variant, #e0e7f0);
+  --rf-feature-primary: var(--md-sys-color-primary, #0b57d0);
+  --rf-feature-on-primary: var(--md-sys-color-on-primary, #fff);
+  --rf-feature-primary-soft: var(--md-sys-color-primary-container, #d3e3fd);
+  --background: var(--rf-feature-surface);
+  --foreground: var(--rf-feature-ink);
+  --card: var(--rf-feature-surface);
+  --card-foreground: var(--rf-feature-ink);
+  --popover: var(--rf-feature-surface);
+  --popover-foreground: var(--rf-feature-ink);
+  --primary: var(--rf-feature-primary);
+  --primary-foreground: var(--rf-feature-on-primary);
+  --secondary: var(--rf-feature-surface-raised);
+  --secondary-foreground: var(--rf-feature-ink);
+  --muted: var(--rf-feature-surface-soft);
+  --muted-foreground: var(--rf-feature-ink-muted);
+  --border: var(--rf-feature-line);
+  --input: var(--rf-feature-line);
+  --ring: var(--rf-feature-primary);
+  color-scheme: light;
+}
+
+:host(.dark) {
+  --rf-feature-surface: var(--md-sys-color-surface, #18212d);
+  --rf-feature-surface-soft: var(--md-sys-color-surface-container-low, #1b2636);
+  --rf-feature-surface-raised: var(--md-sys-color-surface-container-high, #233145);
+  --rf-feature-ink: var(--md-sys-color-on-surface, #eef3fb);
+  --rf-feature-ink-muted: var(--md-sys-color-on-surface-variant, #a9b6c8);
+  --rf-feature-line: var(--md-sys-color-outline-variant, #304056);
+  --rf-feature-primary: var(--md-sys-color-primary, #a8c7fa);
+  --rf-feature-on-primary: var(--md-sys-color-on-primary, #092044);
+  --rf-feature-primary-soft: var(--md-sys-color-primary-container, #25456b);
+  color-scheme: dark;
+}
+
+:host([data-native-feature-notifications]) {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  height: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+:host([data-native-feature-notifications]) [data-sonner-toaster] {
+  position: fixed;
+  z-index: 2200;
+  pointer-events: auto;
+}
+
+/* Portals only host fixed overlays/toasts. They must not inherit the compiled
+ * document body's viewport-sized box beneath an embedded feature. */
+[data-native-feature-portal] {
+  display: contents;
+  min-height: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) {
+  color: var(--rf-feature-ink);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased;
+  min-width: 0;
+}
+
+[data-native-feature-root] {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  container: further-native / inline-size;
+  min-height: 0;
+  height: auto;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  animation:rf-native-enter var(--further-motion-enter-duration,220ms) var(--further-motion-enter,cubic-bezier(.2,.8,.2,1)) backwards;
+}
+
+/* The host's Web Animation owns initial and route entry. Keep that ownership
+   marker after completion so the CSS fallback cannot start a second arrival. */
+[data-native-feature-root][data-native-motion-engine='web'],
+:host([data-native-motion-engine='web']) [data-native-feature-root] { animation:none!important; }
+
+[data-native-feature-root] > .further-native-content {
+  flex: 0 0 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+:host(.dark) [data-native-feature-root] {
+  box-shadow: none;
+}
+
+[data-native-feature-root] [data-slot='card'],
+[data-native-feature-portal] [data-slot='card'] {
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 20px;
+  background: var(--rf-feature-surface);
+  box-shadow: 0 4px 16px rgb(29 51 84 / 5%);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='card-header'] {
+  padding-inline: clamp(16px, 2vw, 24px);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='card-title'] {
+  color: var(--rf-feature-ink);
+  font-weight: 650;
+  letter-spacing: -.025em;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) :is([data-slot='input'], [data-slot='textarea'], [data-slot='select-trigger']) {
+  min-height: 42px;
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 12px;
+  background: var(--rf-feature-surface-soft);
+  color: var(--rf-feature-ink);
+  transition:border-color var(--further-motion-state-duration,180ms) var(--further-motion-standard,cubic-bezier(.2,.8,.2,1)), background-color var(--further-motion-state-duration,180ms) var(--further-motion-standard,cubic-bezier(.2,.8,.2,1));
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) :is([data-slot='input'], [data-slot='textarea'], [data-slot='select-trigger']):focus-visible {
+  border-color: var(--rf-feature-primary);
+  background: var(--rf-feature-surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rf-feature-primary) 17%, transparent);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button'] {
+  border-radius: 12px;
+  font-weight: 600;
+  transition:transform var(--further-motion-press-duration,120ms) var(--further-motion-standard,cubic-bezier(.2,.8,.2,1)), background-color var(--further-motion-state-duration,180ms) var(--further-motion-standard,cubic-bezier(.2,.8,.2,1));
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button'][class~='bg-primary'] {
+  background: var(--rf-feature-primary);
+  color: var(--rf-feature-on-primary);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--rf-feature-primary) 18%, transparent);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='button']:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'], [data-slot='popover-content'], [data-slot='select-content']) {
+  border: 1px solid var(--rf-feature-line);
+  border-radius: 20px;
+  background: var(--rf-feature-surface);
+  color: var(--rf-feature-ink);
+  box-shadow: 0 20px 56px rgb(15 35 68 / 17%);
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) [data-slot='tabs-list'] {
+  border-radius: 14px;
+  background: var(--rf-feature-surface-raised);
+}
+
+@keyframes rf-native-enter {
+  from { opacity:0; }
+  to { opacity:1; transform:none; }
+}
+
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'], [data-slot='sheet-overlay']) { z-index: 1100; }
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content'], [data-slot='sheet-content']) { z-index: 1101; }
+
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay']):is([data-open], [data-starting-style]) {
+  animation:rf-native-backdrop-in var(--further-motion-section-duration,220ms) linear backwards;
+}
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']):is([data-open], [data-starting-style]) {
+  animation:rf-native-dialog-in var(--further-motion-enter-duration,220ms) var(--further-motion-enter,cubic-bezier(.2,.8,.2,1)) backwards;
+}
+[data-native-feature-portal] :is([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay']):is([data-ending-style], [data-closed]) {
+  animation:rf-native-backdrop-out var(--further-motion-exit-duration,140ms) linear both;
+}
+[data-native-feature-portal] :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']):is([data-ending-style], [data-closed]) {
+  animation:rf-native-dialog-out var(--further-motion-exit-duration,140ms) var(--further-motion-exit,cubic-bezier(.4,0,1,1)) both;
+}
+@keyframes rf-native-dialog-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rf-native-dialog-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes rf-native-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rf-native-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+
+:is([data-native-feature-root],[data-native-feature-portal]) [data-slot='button']:active:not(:disabled) { transform:scale(.97); }
+
+/* Native <dialog> owns its viewport position. Reset styles must not replace
+   the browser's default margin with zero or stretch it to the feature root. */
+:host dialog.rfw-dialog { position:fixed; inset:0; margin:auto; height:fit-content; min-height:0; transform:none; transform-origin:center; }
+:host dialog.rfw-dialog[data-rfw-motion-engine='web'] { animation:none !important; }
+:host dialog.rfw-dialog::backdrop { animation-duration:var(--further-motion-section-duration,220ms) !important; }
+:host dialog.rfw-dialog.rfw-dialog-closing::backdrop { animation-duration:var(--further-motion-exit-duration,140ms) !important; }
+
+
+/* The Further shell owns page width and gutters. Auto inline margins on a
+   column-flex child shrink its page to the contents instead of stretching. */
+[data-native-feature-root] > .rfw-page,
+[data-native-feature-root] > .further-native-content > .rfw-page {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is([data-native-feature-root], [data-native-feature-portal]) *,
+:is([data-native-feature-root], [data-native-feature-portal]) *::before,
+:is([data-native-feature-root], [data-native-feature-portal]) *::after {
+  box-sizing: border-box;
+}
+
+[data-native-feature-root] .rfw-header .rfw-eyebrow { display: none; }
+[data-native-feature-root] .rfw-header p { font-size: 13px; line-height: 1.7; }
+[data-native-feature-root] .rfw-header > .rfw-toolbar { flex: 0 0 auto; width: auto; }
+[data-native-feature-root] :is(.rfw-card, .rfw-record-card, .rfw-oauth-service) {
+  min-width: 0;
+  border-radius: 17px;
+  padding: 22px;
+  box-shadow: none;
+}
+[data-native-feature-root] .rfw-settings-page .rfw-settings-overview { padding: 16px 18px; margin-bottom: 20px; }
+[data-native-feature-root] .rfw-settings-page .rfw-setting-row { padding: 18px; }
+[data-native-feature-root] .rfw-settings-page .rfw-settings-sections { gap: 24px; }
+[data-native-feature-root] .rfw-settings-page .rfw-settings-savebar { margin-top: 24px; padding: 16px 18px; }
+[data-native-feature-root] :is(.rfw-toolbar, .rfw-actions, .rfw-settings-search) { min-width: 0; }
+[data-native-feature-root] .rfw-toolbar > :is(input,select) { min-width: 0; max-width: 100%; }
+
+/* Use the embedded width, including when a desktop sidebar leaves a narrow
+   content pane, instead of relying only on viewport media queries. */
+@container further-native (max-width: 720px) {
+  [data-native-feature-root] :is(.rfw-settings-grid, .rfw-record-grid, .rfw-security-grid, .rfw-oauth-services) { grid-template-columns: minmax(0,1fr); }
+  [data-native-feature-root] .rfw-settings-page .rfw-settings-section-fields { grid-template-columns: minmax(0,1fr); }
+  [data-native-feature-root] .rfw-settings-page .rfw-settings-overview { flex-direction: column; align-items: stretch; }
+  [data-native-feature-root] .rfw-settings-search input { width: 100%; min-width: 0; }
+  [data-native-feature-root] .rfw-header { align-items: flex-start; gap: 12px; }
+  [data-native-feature-root] .rfw-header h1 { font-size: 24px; }
+}
+@container further-native (max-width: 480px) {
+  [data-native-feature-root] :is(.rfw-card, .rfw-record-card, .rfw-oauth-service) { padding: 18px; }
+  [data-native-feature-root] .rfw-settings-page .rfw-setting-row { padding: 16px; }
+  [data-native-feature-root] .rfw-settings-page .rfw-settings-savebar { flex-direction: column; align-items: stretch; }
+  [data-native-feature-root] .rfw-settings-page .rfw-settings-savebar > div { flex-wrap: wrap; }
+  [data-native-feature-root] .rfw-settings-page .rfw-settings-savebar button { flex: 1 1 auto; }
+}

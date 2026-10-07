@@ -21,7 +21,8 @@ import { useEffect, useRef } from 'react'
 declare global {
   interface Window {
     turnstile?: {
-      render: (element: HTMLElement, options: Record<string, unknown>) => void
+      render: (element: HTMLElement, options: Record<string, unknown>) => string
+      remove?: (widgetId: string) => void
     }
   }
 }
@@ -40,16 +41,25 @@ export function Turnstile({
   className,
 }: TurnstileProps) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const callbacks = useRef({ onVerify, onExpire })
 
   useEffect(() => {
+    callbacks.current = { onVerify, onExpire }
+  }, [onVerify, onExpire])
+
+  useEffect(() => {
+    const container = ref.current
+    let active = true
+    let widgetId: string | undefined
+    let script: HTMLScriptElement | null = null
     const render = () => {
-      if (!ref.current || !window.turnstile) return
+      if (!active || !container || !window.turnstile || widgetId !== undefined) return
       try {
-        window.turnstile.render(ref.current, {
+        widgetId = window.turnstile.render(container, {
           sitekey: siteKey,
-          callback: (token: string) => onVerify(token),
-          'error-callback': () => onExpire?.(),
-          'expired-callback': () => onExpire?.(),
+          callback: (token: string) => { if (active) callbacks.current.onVerify(token) },
+          'error-callback': () => { if (active) callbacks.current.onExpire?.() },
+          'expired-callback': () => { if (active) callbacks.current.onExpire?.() },
         })
       } catch {
         /* empty */
@@ -58,19 +68,25 @@ export function Turnstile({
 
     if (window.turnstile) {
       render()
-      return
+    } else {
+      script = document.querySelector<HTMLScriptElement>('#cf-turnstile')
+      if (!script) {
+        script = document.createElement('script')
+        script.id = 'cf-turnstile'
+        script.src =
+          'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+        script.async = true
+        script.defer = true
+      }
+      script.addEventListener('load', render, { once: true })
+      if (!script.isConnected) document.head.append(script)
     }
-    const scriptId = 'cf-turnstile'
-    if (document.getElementById(scriptId)) return
-    const s = document.createElement('script')
-    s.id = scriptId
-    s.src =
-      'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
-    s.async = true
-    s.defer = true
-    s.onload = () => render()
-    document.head.appendChild(s)
-  }, [siteKey, onVerify, onExpire])
+    return () => {
+      active = false
+      script?.removeEventListener('load', render)
+      if (widgetId !== undefined) window.turnstile?.remove?.(widgetId)
+    }
+  }, [siteKey])
 
   return <div ref={ref} className={className} />
 }

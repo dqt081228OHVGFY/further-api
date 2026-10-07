@@ -74,7 +74,9 @@ func getMP3Duration(r io.Reader) (float64, error) {
 // getWAVDuration 解析 WAV 文件头以获取时长。
 func getWAVDuration(r io.ReadSeeker) (float64, error) {
 	// 1. 强制复位指针
-	r.Seek(0, io.SeekStart)
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
+		return 0, errors.Wrap(err, "failed to seek wav file")
+	}
 
 	dec := wav.NewDecoder(r)
 
@@ -93,12 +95,20 @@ func getWAVDuration(r io.ReadSeeker) (float64, error) {
 	// 如果读出来的 Size 是 0，尝试用文件大小反推
 	if pcmSize == 0 {
 		// 获取文件总大小
-		currentPos, _ := r.Seek(0, io.SeekCurrent) // 当前通常在 data chunk header 之后
-		endPos, _ := r.Seek(0, io.SeekEnd)
+		currentPos, seekErr := r.Seek(0, io.SeekCurrent) // 当前通常在 data chunk header 之后
+		if seekErr != nil {
+			return 0, errors.Wrap(seekErr, "failed to inspect wav position")
+		}
+		endPos, seekErr := r.Seek(0, io.SeekEnd)
+		if seekErr != nil {
+			return 0, errors.Wrap(seekErr, "failed to inspect wav length")
+		}
 		fileSize := endPos
 
 		// 恢复位置（虽然如果不继续读也没关系）
-		r.Seek(currentPos, io.SeekStart)
+		if _, err := r.Seek(currentPos, io.SeekStart); err != nil {
+			return 0, errors.Wrap(err, "failed to restore wav position")
+		}
 
 		// 数据区大小 ≈ 文件总大小 - 当前指针位置(即Header大小)
 		// 注意：FwdToPCM 成功后，CurrentPos 应该刚好指向 Data 区数据的开始
@@ -228,9 +238,16 @@ func getOpusDuration(r io.ReadSeeker) (float64, error) {
 		}
 
 		// 读取 granule position (字节 6-13, 小端序)
-		granulePos := int64(binary.LittleEndian.Uint64(buf[6:14]))
-		if granulePos > totalGranulePos {
-			totalGranulePos = granulePos
+		granule := binary.LittleEndian.Uint64(buf[6:14])
+		// Ogg reserves all-one bits for an unknown granule. Other negative
+		// signed values are invalid and must not become a zero billing estimate.
+		if granule != ^uint64(0) {
+			if granule > uint64(1<<63-1) {
+				return 0, errors.New("invalid opus granule position")
+			}
+			if int64(granule) > totalGranulePos {
+				totalGranulePos = int64(granule)
+			}
 		}
 
 		// 读取段表大小

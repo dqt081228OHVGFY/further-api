@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -26,7 +26,7 @@ func Setup2FA(c *gin.Context) {
 		return
 	}
 	identity, _ := middleware.GetSessionAuthIdentity(c)
-	setup, err := service.StartTwoFASetup(identity, authorization)
+	setup, err := service.StartTwoFASetupContext(c.Request.Context(), identity, authorization)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return
@@ -46,7 +46,7 @@ func Enable2FA(c *gin.Context) {
 		common.ApiErrorMsg(c, "参数错误")
 		return
 	}
-	if err := service.FinishTwoFASetup(identity, req.FlowToken, req.Code); err != nil {
+	if err := service.FinishTwoFASetupContext(c.Request.Context(), identity, req.FlowToken, req.Code); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -66,7 +66,7 @@ func Disable2FA(c *gin.Context) {
 	}
 	identity, _ := middleware.GetSessionAuthIdentity(c)
 	userId := identity.UserID
-	if err := model.DisableTwoFAForSession(identity); err != nil {
+	if err := model.DisableTwoFAForSessionContext(c.Request.Context(), identity); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -141,7 +141,7 @@ func RegenerateBackupCodes(c *gin.Context) {
 	}
 
 	// 保存新的备用码并原子推进用户鉴权版本
-	if err := model.ReplaceBackupCodesForSession(identity, backupCodes); err != nil {
+	if err := model.ReplaceBackupCodesForSessionContext(c.Request.Context(), identity, backupCodes); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": "保存备用码失败",
@@ -220,7 +220,7 @@ func AdminDisable2FA(c *gin.Context) {
 	}
 
 	// 禁用2FA
-	if err := model.DisableTwoFAWithAuthVersion(userId); err != nil {
+	if _, err := model.MutateManagedAccountSecurityContext(c.Request.Context(), managedSecurityOperator(c), model.ManagedSecurityMutation{TargetID: userId, Action: "twofa-disable"}); err != nil {
 		if errors.Is(err, model.ErrTwoFANotEnabled) {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
@@ -228,10 +228,6 @@ func AdminDisable2FA(c *gin.Context) {
 			})
 			return
 		}
-		writeSecurityOperationError(c, err)
-		return
-	}
-	if _, err := model.RevokeAllUserSessions(userId, "admin_twofa_disabled"); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}

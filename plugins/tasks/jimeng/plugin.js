@@ -12,7 +12,7 @@ export const meta = {
   channelTypes: [51],
   models: ["jimeng_vgfm_t2v_l20"],
   fetchMode: "per_task",
-  upstreams: ["vendor", "new_api"],
+  upstreams: ["vendor", "gateway"],
   usageSchema: {
     // Requested video duration in seconds. S2.0 Pro is fixed at 5; 3.0 req_keys allow 5 or 10.
     seconds: {
@@ -91,10 +91,10 @@ function isRelay(apiKey) {
   return apiKey.startsWith("sk-");
 }
 
-// The host signal is authoritative on New API channels; the sk- key prefix
+// The host signal is authoritative on compatible gateway channels; the sk- key prefix
 // stays as the heuristic for legacy type-51 channels pointed at a gateway.
 function viaGateway(ctx) {
-  return !!(ctx.upstream && ctx.upstream.kind === "new_api") || isRelay(ctx.apiKey);
+  return !!(ctx.upstream && ctx.upstream.kind === "gateway") || isRelay(ctx.apiKey);
 }
 
 function imageValues(body) {

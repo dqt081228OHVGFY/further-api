@@ -9,7 +9,8 @@ function getDataDirPath() {
   }
 }
 
-contextBridge.exposeInMainWorld('electron', {
+const localApplication = ['127.0.0.1', 'localhost', '[::1]'].includes(globalThis.location?.hostname);
+if (localApplication) contextBridge.exposeInMainWorld('electron', {
   isElectron: true,
   version: process.versions.electron,
   platform: process.platform,

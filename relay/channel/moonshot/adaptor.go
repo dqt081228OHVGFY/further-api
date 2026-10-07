@@ -2,20 +2,20 @@ package moonshot
 
 import (
 	"errors"
-	"fmt"
+
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	channelconstant "github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	channelconstant "github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,64 +23,66 @@ import (
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	converted, err := openai.ChatFrom(c, info, request)
+	if err != nil {
+		return nil, err
+	}
+	return a.ConvertOpenAIRequest(c, info, converted)
 }
 
 func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	adaptor := claude.Adaptor{}
-	return adaptor.ConvertClaudeRequest(c, info, req)
+	return claude.NativeMessages(c, info, req)
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	//TODO implement me
-	return nil, errors.New("not supported")
+	return nil, openai.UnsupportedOperation("moonshot", "audio operations")
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	adaptor := openai.Adaptor{}
-	return adaptor.ConvertImageRequest(c, info, request)
+	return openai.ImagePayload(c, info, request)
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	baseURL := info.ChannelBaseUrl
-	if specialPlan, ok := channelconstant.ChannelSpecialBases[baseURL]; ok {
-		if info.RelayFormat == types.RelayFormatClaude {
-			return fmt.Sprintf("%s/v1/messages", specialPlan.ClaudeBaseURL), nil
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("Moonshot provider configuration is missing")
+	}
+	base, route := info.ChannelBaseUrl, "/v1/chat/completions"
+	if plan, ok := channelconstant.ChannelSpecialBases[base]; ok {
+		if info.RelayFormat == types.RelayFormatClaude && plan.ClaudeBaseURL != "" {
+			return openai.ProviderEndpoint(plan.ClaudeBaseURL, "/v1/messages")
 		}
-		if info.RelayFormat == types.RelayFormatOpenAI {
-			return fmt.Sprintf("%s/chat/completions", specialPlan.OpenAIBaseURL), nil
+		if info.RelayFormat == types.RelayFormatOpenAI && plan.OpenAIBaseURL != "" {
+			return openai.ProviderEndpoint(plan.OpenAIBaseURL, "/chat/completions")
 		}
 	}
-
-	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
-	default:
-		if info.RelayMode == constant.RelayModeRerank {
-			return fmt.Sprintf("%s/v1/rerank", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeEmbeddings {
-			return fmt.Sprintf("%s/v1/embeddings", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeChatCompletions {
-			return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
-		} else if info.RelayMode == constant.RelayModeCompletions {
-			return fmt.Sprintf("%s/v1/completions", info.ChannelBaseUrl), nil
+	if info.RelayFormat == types.RelayFormatClaude {
+		route = "/anthropic/v1/messages"
+	} else {
+		switch info.RelayMode {
+		case constant.RelayModeRerank:
+			route = "/v1/rerank"
+		case constant.RelayModeEmbeddings:
+			route = "/v1/embeddings"
+		case constant.RelayModeCompletions:
+			route = "/v1/completions"
 		}
-		return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
 	}
+	return openai.ProviderEndpoint(base, route)
 }
 
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
-	channel.SetupApiRequestHeader(info, c, req)
-	req.Set("Authorization", fmt.Sprintf("Bearer %s", info.ApiKey))
-	return nil
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	return openai.SetupProviderHeaders(c, headers, info)
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
+	if request == nil {
+		return nil, errors.New("Moonshot chat request is missing")
+	}
 	if request.Temperature != nil && isTemperatureOneOnlyModel(getUpstreamModelName(info, request.Model)) && *request.Temperature != 1.0 {
 		request.Temperature = common.GetPointer[float64](1.0)
 	}
@@ -99,8 +101,7 @@ func isTemperatureOneOnlyModel(model string) bool {
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	// TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("moonshot", "Responses input")
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
@@ -115,19 +116,17 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 	return request, nil
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
-		adaptor := claude.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return claude.MessagesResponse(c, resp, info)
 	default:
-		adaptor := openai.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return openai.ProtocolResponse(c, resp, info, "")
 	}
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

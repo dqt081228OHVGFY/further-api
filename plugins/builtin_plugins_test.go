@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -165,13 +165,13 @@ func TestBuiltInResponsesDecodersEchoChannelMappedAlias(t *testing.T) {
 	}
 }
 
-func TestBuiltInPluginsAddressNewAPIUpstreamOnNativeRoutes(t *testing.T) {
+func TestBuiltInPluginsAddressCompatibleGatewayOnNativeRoutes(t *testing.T) {
 	generation := jsplugin.DefaultRegistry.Generation()
 	require.NotNil(t, generation)
 	for _, key := range []string{"hailuo", "google", "vidu", "vertex-ai"} {
 		plugin, found := generation.Get(key)
 		require.True(t, found, key)
-		assert.False(t, plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindNewAPI), "%s has no native routes and must not be bindable to a New API channel", key)
+		assert.False(t, plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindGateway), "%s has no native routes and must not be bindable to a compatible gateway channel", key)
 	}
 
 	const base = "https://upstream.example"
@@ -259,14 +259,14 @@ func TestBuiltInPluginsAddressNewAPIUpstreamOnNativeRoutes(t *testing.T) {
 	}{
 		{"vendor signal", map[string]any{"kind": "vendor"}, false, false},
 		{"no signal from an older host", nil, false, false},
-		{"new_api signal", map[string]any{"kind": "new_api"}, true, false},
+		{"new_api signal", map[string]any{"kind": "gateway"}, true, false},
 		{"legacy sk- key without a signal", nil, true, true},
 	}
 	for _, tc := range cases {
 		t.Run(tc.key, func(t *testing.T) {
 			plugin, found := generation.Get(tc.key)
 			require.True(t, found)
-			require.True(t, plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindNewAPI), "%s must declare new_api to be bindable to a New API channel", tc.key)
+			require.True(t, plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindGateway), "%s must declare new_api to be bindable to a compatible gateway channel", tc.key)
 			call := func(hook string, args ...any) map[string]any {
 				value, err := plugin.Engine.Call(t.Context(), hook, args...)
 				require.NoError(t, err, hook)
@@ -348,7 +348,7 @@ func TestBuiltInPluginsAddressNewAPIUpstreamOnNativeRoutes(t *testing.T) {
 			wantSSEHeader    bool
 		}{
 			{"vendor", map[string]any{"kind": "vendor"}, "sse", true},
-			{"new_api", map[string]any{"kind": "new_api"}, "json", false},
+			{"gateway", map[string]any{"kind": "gateway"}, "json", false},
 		} {
 			t.Run(variant.name, func(t *testing.T) {
 				value, err := plugin.Engine.Call(t.Context(), "buildSubmitRequest", map[string]any{

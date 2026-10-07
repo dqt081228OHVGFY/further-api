@@ -7,13 +7,13 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/setting/billing_setting"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
-	"github.com/QuantumNous/new-api/setting/ratio_setting"
-	hostreasoning "github.com/QuantumNous/new-api/setting/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/setting/billing_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/ratio_setting"
+	hostreasoning "github.com/dqt081228OHVGFY/further-api/setting/reasoning"
 	"github.com/shopspring/decimal"
 )
 

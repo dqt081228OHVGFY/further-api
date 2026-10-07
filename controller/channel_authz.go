@@ -1,6 +1,31 @@
 package controller
 
-import "github.com/QuantumNous/new-api/model"
+import (
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service/authz"
+	"github.com/gin-gonic/gin"
+)
+
+// Header/parameter overrides, proxy settings and base URLs can contain literal
+// credentials even when Key is omitted. Readers who cannot manage sensitive
+// channel configuration receive a routing/accounting projection. Omit hidden
+// fields entirely so edit clients cannot write mask/null placeholders back.
+func channelReadResponse(c *gin.Context, channel *model.Channel) any {
+	if channel == nil || authz.Can(c.GetInt("id"), c.GetInt("role"), authz.ChannelSensitiveWrite) {
+		return channel
+	}
+	return gin.H{
+		"id": channel.Id, "type": channel.Type, "name": channel.Name, "status": channel.Status,
+		"models": channel.Models, "group": channel.Group, "model_mapping": channel.ModelMapping,
+		"weight": channel.Weight, "priority": channel.Priority, "auto_ban": channel.AutoBan,
+		"tag": channel.Tag, "remark": channel.Remark, "test_model": channel.TestModel,
+		"status_code_mapping": channel.StatusCodeMapping, "other_info": channel.OtherInfo,
+		"channel_info": channel.ChannelInfo, "created_time": channel.CreatedTime,
+		"test_time": channel.TestTime, "response_time": channel.ResponseTime,
+		"balance": channel.Balance, "balance_updated_time": channel.BalanceUpdatedTime,
+		"used_quota": channel.UsedQuota,
+	}
+}
 
 func channelHasSensitiveChanges(channel *PatchChannel, origin *model.Channel, requestData map[string]any) bool {
 	if _, ok := requestData["type"]; ok && channel.Type != origin.Type {

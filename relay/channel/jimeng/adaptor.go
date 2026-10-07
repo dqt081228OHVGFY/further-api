@@ -7,12 +7,12 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,23 +21,32 @@ type Adaptor struct {
 }
 
 func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "Gemini content input")
 }
 
 func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "Anthropic Messages input")
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	return fmt.Sprintf("%s/?Action=CVProcess&Version=2022-08-31", info.ChannelBaseUrl), nil
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("Jimeng provider configuration is missing")
+	}
+	return openai.ProviderEndpoint(info.ChannelBaseUrl, "/?Action=CVProcess&Version=2022-08-31")
 }
 
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, header *http.Header, info *relaycommon.RelayInfo) error {
-	return errors.New("not implemented")
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	if c == nil || c.Request == nil || headers == nil || info == nil || !info.HasChannelMeta() {
+		return errors.New("Jimeng request headers are missing")
+	}
+	if *headers == nil {
+		*headers = make(http.Header)
+	}
+	channel.SetupApiRequestHeader(info, c, headers)
+	return nil
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
@@ -88,43 +97,51 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "reranking")
 }
 
 func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "embeddings")
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "audio operations")
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("jimeng", "Responses input")
 }
 
-func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	fullRequestURL, err := a.GetRequestURL(info)
-	if err != nil {
-		return nil, fmt.Errorf("get request url failed: %w", err)
+func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, body io.Reader) (any, error) {
+	if c == nil || c.Request == nil || info == nil || !info.HasChannelMeta() {
+		return nil, errors.New("Jimeng request context is missing")
 	}
-	req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
+	endpoint, err := a.GetRequestURL(info)
 	if err != nil {
-		return nil, fmt.Errorf("new request failed: %w", err)
+		return nil, err
 	}
-	channel.ApplyUpstreamBodyMetadata(req, requestBody)
-	err = Sign(c, req, info.ApiKey)
+	request, err := http.NewRequestWithContext(c.Request.Context(), c.Request.Method, endpoint, body)
 	if err != nil {
-		return nil, fmt.Errorf("setup request header failed: %w", err)
+		return nil, err
 	}
-	resp, err := channel.DoRequest(c, req, info)
+	channel.ApplyUpstreamBodyMetadata(request, body)
+	if err = a.SetupRequestHeader(c, &request.Header, info); err != nil {
+		return nil, err
+	}
+	overrides, err := channel.ResolveHeaderOverride(info, c)
 	if err != nil {
-		return nil, fmt.Errorf("do request failed: %w", err)
+		return nil, err
 	}
-	return resp, nil
+	for name, value := range overrides {
+		request.Header.Set(name, value)
+	}
+	if err = Sign(c, request, info.ApiKey); err != nil {
+		return nil, err
+	}
+	return channel.DoRequest(c, request, info)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	if info.RelayMode == relayconstant.RelayModeImagesGenerations {
 		usage, err = jimengImageHandler(c, resp, info)
 	} else if info.IsStream {
@@ -136,7 +153,7 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

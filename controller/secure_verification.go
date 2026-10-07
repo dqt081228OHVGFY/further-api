@@ -6,15 +6,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/service"
-	passkeysvc "github.com/QuantumNous/new-api/service/passkey"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/oauth"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	passkeysvc "github.com/dqt081228OHVGFY/further-api/service/passkey"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 )
@@ -40,6 +40,10 @@ func writeSecurityOperationError(c *gin.Context, err error) {
 	var code, message string
 	var protocolError *protocol.Error
 	switch {
+	case errors.Is(err, common.ErrPasswordKDFBusy):
+		status = http.StatusServiceUnavailable
+		c.Header("Retry-After", "1")
+		code, message = "AUTH_BUSY", common.ErrPasswordKDFBusy.Error()
 	case errors.Is(err, passkeysvc.ErrRPIDUnavailable):
 		code, message = "PASSKEY_RP_ID_UNAVAILABLE", i18n.T(c, i18n.MsgPasskeyRPIDUnavailable)
 	case errors.Is(err, system_setting.ErrPasskeyRPIDInvalid):
@@ -85,10 +89,15 @@ func writeSecurityOperationError(c *gin.Context, err error) {
 	case errors.Is(err, service.ErrVerificationForbidden):
 		status = http.StatusForbidden
 		code, message = "SECURITY_ACTION_FORBIDDEN", service.ErrVerificationForbidden.Error()
+	case errors.Is(err, model.ErrAccountSecurityPermission):
+		status = http.StatusForbidden
+		code, message = "ACCOUNT_SECURITY_FORBIDDEN", model.ErrAccountSecurityPermission.Error()
 	case errors.Is(err, service.ErrVerificationFailed), errors.As(err, &protocolError):
 		code, message = "SECURITY_VERIFICATION_FAILED", service.ErrVerificationFailed.Error()
 	case errors.Is(err, service.ErrVerificationLocked):
 		code, message = "SECURITY_VERIFICATION_LOCKED", service.ErrVerificationLocked.Error()
+	case errors.Is(err, model.ErrTwoFACodeReplayed):
+		code, message = "SECURITY_CODE_ALREADY_USED", model.ErrTwoFACodeReplayed.Error()
 	case errors.Is(err, service.ErrVerificationUnavailable):
 		code, message = "SECURITY_METHOD_UNAVAILABLE", service.ErrVerificationUnavailable.Error()
 	case errors.Is(err, service.ErrVerificationFlowRequired):
@@ -145,7 +154,7 @@ func UniversalVerify(c *gin.Context) {
 		common.ApiErrorMsg(c, "参数错误")
 		return
 	}
-	proof, err := service.VerifySecurityInput(identity, request)
+	proof, err := service.VerifySecurityInputContext(c.Request.Context(), identity, request)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return

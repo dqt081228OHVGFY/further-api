@@ -1,15 +1,16 @@
 package channel
 
 import (
+	"context"
 	"io"
 	"net/http"
 
-	taskdto "github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/model"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	hosttypes "github.com/QuantumNous/new-api/types"
+	taskdto "github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	hosttypes "github.com/dqt081228OHVGFY/further-api/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +27,7 @@ type Adaptor interface {
 	ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error)
 	ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error)
 	DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error)
-	DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError)
+	DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError)
 	GetModelList() []string
 	GetChannelName() string
 	ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error)
@@ -119,6 +120,10 @@ type TaskContentRequestProvider interface {
 
 type TaskUsageFactsProvider interface {
 	ExtractUsageFacts(c *gin.Context, info *relaycommon.RelayInfo) map[string]any
+}
+
+type TaskContextFetcher interface {
+	FetchTaskContext(context.Context, string, string, *model.Task, string) (*http.Response, error)
 }
 
 // TaskValidatedBillingProvider lets an adaptor reject invalid usage facts at

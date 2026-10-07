@@ -1,16 +1,17 @@
 package service
 
 import (
+	"context"
 	"crypto/hmac"
 	"encoding/json"
 	"errors"
 	"sort"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/oauth"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"gorm.io/gorm"
 )
 
@@ -137,7 +138,7 @@ func BindVerificationOperation(operation VerificationOperation) (VerificationBin
 	}
 	return VerificationBinding{
 		Scope:       operation.Scope,
-		ContextHash: common.GenerateHMACWithKey(authSigningKey("verification-context"), string(payload)),
+		ContextHash: common.GenerateHMACWithKey(legacyAuthSigningKey("verification-context"), string(payload)),
 	}, nil
 }
 
@@ -330,13 +331,20 @@ func RequireVerificationMethod(identity AuthIdentity, scope, method string) (*Ve
 // CompleteSecurityVerification runs after the concrete authentication ceremony.
 // Recheck the session and policy after potentially slow external authentication.
 func CompleteSecurityVerification(identity AuthIdentity, binding VerificationBinding, method string) (*SecurityProof, error) {
+	return CompleteSecurityVerificationContext(context.Background(), identity, binding, method)
+}
+
+func CompleteSecurityVerificationContext(ctx context.Context, identity AuthIdentity, binding VerificationBinding, method string) (*SecurityProof, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if _, _, err := ValidateLoginSession(identity); err != nil {
 		return nil, err
 	}
 	if _, err := RequireVerificationMethod(identity, binding.Scope, method); err != nil {
 		return nil, err
 	}
-	token, expiresAt, err := IssueSecurityProof(identity, method, binding)
+	token, expiresAt, err := IssueSecurityProofContext(ctx, identity, method, binding)
 	if err != nil {
 		return nil, err
 	}
@@ -346,6 +354,13 @@ func CompleteSecurityVerification(identity AuthIdentity, binding VerificationBin
 // ConsumeOperationProof accepts a proof at most once. The consumption commits
 // before the caller performs its action; an action failure must not restore it.
 func ConsumeOperationProof(raw string, identity AuthIdentity, operation VerificationOperation) (*model.AuthFlowAuthorization, error) {
+	return ConsumeOperationProofContext(context.Background(), raw, identity, operation)
+}
+
+func ConsumeOperationProofContext(ctx context.Context, raw string, identity AuthIdentity, operation VerificationOperation) (*model.AuthFlowAuthorization, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	binding, err := BindVerificationOperation(operation)
 	if err != nil {
 		return nil, err
@@ -360,7 +375,7 @@ func ConsumeOperationProof(raw string, identity AuthIdentity, operation Verifica
 	if _, err := RequireVerificationMethod(identity, binding.Scope, claims.Method); err != nil {
 		return nil, err
 	}
-	flow, err := model.ConsumeAuthFlowWithAction(claims.ID, model.AuthFlowMatch{
+	flow, err := model.ConsumeAuthFlowWithActionContext(ctx, claims.ID, model.AuthFlowMatch{
 		Purpose: model.AuthFlowPurposeSecurityProof, UserId: identity.UserID, SessionId: identity.SessionID,
 	}, func(tx *gorm.DB, _ *model.AuthFlow) error {
 		return model.ValidateAuthSessionWithTx(tx, identity)
@@ -412,6 +427,13 @@ type VerificationInput struct {
 }
 
 func VerifySecurityInput(identity AuthIdentity, input VerificationInput) (*SecurityProof, error) {
+	return VerifySecurityInputContext(context.Background(), identity, input)
+}
+
+func VerifySecurityInputContext(ctx context.Context, identity AuthIdentity, input VerificationInput) (*SecurityProof, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	binding, err := BindVerificationOperation(VerificationOperation{Scope: input.Scope, Context: input.Context})
 	if err != nil {
 		return nil, err
@@ -429,11 +451,18 @@ func VerifySecurityInput(identity AuthIdentity, input VerificationInput) (*Secur
 				return nil, ErrVerificationFailed
 			}
 		}
-		user, err := model.GetUserById(identity.UserID, true)
+		user, err := model.GetUserByIdContext(ctx, identity.UserID, true)
 		if err != nil {
 			return nil, err
 		}
-		if password == "" || user.Password == "" || !common.ValidatePasswordAndHash(password, user.Password) {
+		if password == "" || user.Password == "" {
+			return nil, ErrVerificationFailed
+		}
+		valid, err := common.ValidatePasswordAndHashContext(ctx, password, user.Password)
+		if err != nil {
+			return nil, err
+		}
+		if !valid {
 			return nil, ErrVerificationFailed
 		}
 	case VerificationMethodTwoFA:
@@ -442,11 +471,11 @@ func VerifySecurityInput(identity AuthIdentity, input VerificationInput) (*Secur
 				return nil, ErrVerificationFailed
 			}
 		}
-		twoFA, err := model.GetTwoFAByUserId(identity.UserID)
+		twoFA, err := model.GetTwoFAByUserIdContext(ctx, identity.UserID)
 		if err != nil {
 			return nil, err
 		}
-		if err := VerifyTwoFactorCode(twoFA, input.Code); err != nil {
+		if err := VerifyTwoFactorCodeContext(ctx, twoFA, input.Code); err != nil {
 			return nil, err
 		}
 	case VerificationMethodPasskey, VerificationMethodOAuth:
@@ -454,12 +483,19 @@ func VerifySecurityInput(identity AuthIdentity, input VerificationInput) (*Secur
 	default:
 		return nil, ErrProofMethod
 	}
-	return CompleteSecurityVerification(identity, binding, input.Method)
+	return CompleteSecurityVerificationContext(ctx, identity, binding, input.Method)
 }
 
 // VerifyTwoFactorCode classifies the input before verification so one failed
 // submission cannot increment the failure counter for both TOTP and backup codes.
 func VerifyTwoFactorCode(twoFA *model.TwoFA, code string) error {
+	return VerifyTwoFactorCodeContext(context.Background(), twoFA, code)
+}
+
+func VerifyTwoFactorCodeContext(ctx context.Context, twoFA *model.TwoFA, code string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if twoFA == nil || !twoFA.IsEnabled {
 		return model.ErrTwoFANotEnabled
 	}
@@ -470,13 +506,16 @@ func VerifyTwoFactorCode(twoFA *model.TwoFA, code string) error {
 	var valid bool
 	var err error
 	if numeric, numericErr := common.ValidateNumericCode(code); numericErr == nil {
-		valid, err = twoFA.ValidateTOTPAndUpdateUsage(numeric)
+		valid, err = twoFA.ValidateTOTPAndUpdateUsageContext(ctx, numeric)
 	} else if common.ValidateBackupCode(code) {
-		valid, err = twoFA.ValidateBackupCodeAndUpdateUsage(code)
+		valid, err = twoFA.ValidateBackupCodeAndUpdateUsageContext(ctx, code)
 	} else {
-		err = twoFA.IncrementFailedAttempts()
+		err = twoFA.IncrementFailedAttemptsContext(ctx)
 	}
 	if err != nil {
+		if errors.Is(err, model.ErrTwoFAVerificationLocked) {
+			return ErrVerificationLocked
+		}
 		return err
 	}
 	if !valid {

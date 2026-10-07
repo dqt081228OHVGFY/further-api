@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 
 	"gorm.io/gorm"
 )
@@ -138,6 +138,63 @@ func CreateUserSession(session *UserSession) error {
 	return publishCreatedUserSession(session, cacheDeadline)
 }
 
+// Ordinary primary-authentication logins use the same user lock and limits as
+// the factor-completion path. HTTP/cache snapshots cannot authorize issuance
+// after an account change or let parallel requests overrun the per-user cap.
+func CreateUserSessionForLoginContext(ctx context.Context, session *UserSession) error {
+	if session == nil || session.UserID <= 0 {
+		return ErrUserSessionInvalid
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	cacheDeadline := userSessionCacheDeadline()
+	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if common.UsingMainDatabase(common.DatabaseTypeSQLite) {
+			// A first-statement write serializes SQLite even when a caller's
+			// fixture/DSN starts deferred transactions instead of IMMEDIATE.
+			if err := tx.Model(&User{}).Where("id = ?", session.UserID).UpdateColumn("auth_version", gorm.Expr("auth_version")).Error; err != nil {
+				return err
+			}
+		}
+		var user User
+		if err := lockForUpdate(tx).Select("id", "status", "auth_version").First(&user, session.UserID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return ErrUserSessionInactive
+			}
+			return err
+		}
+		if user.Status != common.UserStatusEnabled || user.AuthVersion != session.UserAuthVersion {
+			return ErrUserSessionInactive
+		}
+		if err := checkUserSessionLimitsWithTx(tx, session.UserID, time.Now().Unix()); err != nil {
+			return err
+		}
+		return createUserSessionWithTx(tx, session)
+	})
+	if err != nil {
+		return err
+	}
+	return publishCreatedUserSession(session, cacheDeadline)
+}
+
+func checkUserSessionLimitsWithTx(tx *gorm.DB, userID int, now int64) error {
+	var activeCount, issuanceCount int64
+	if err := tx.Model(&UserSession{}).Where("user_id = ? AND status = ? AND expires_at > ?", userID, UserSessionStatusActive, now).Count(&activeCount).Error; err != nil {
+		return err
+	}
+	if activeCount >= int64(common.UserSessionActiveLimit) {
+		return ErrUserSessionLimit
+	}
+	if err := tx.Model(&UserSession{}).Where("user_id = ? AND created_at > ?", userID, now-common.UserSessionIssuanceWindowSeconds).Count(&issuanceCount).Error; err != nil {
+		return err
+	}
+	if issuanceCount >= int64(common.UserSessionIssuanceLimit) {
+		return ErrUserSessionIssuanceLimit
+	}
+	return nil
+}
+
 func createUserSessionWithTx(tx *gorm.DB, session *UserSession) error {
 	now := time.Now().Unix()
 	if session == nil || session.SID == "" || session.UserID <= 0 || session.UserAuthVersion <= 0 || session.RefreshHash == "" || session.ExpiresAt <= now {
@@ -191,10 +248,14 @@ func CountActiveUserSessions(userID int, now int64) (int64, error) {
 // CountUserSessionsCreatedSince counts every issued row, regardless of its
 // current status or expiry. userID zero selects the global count.
 func CountUserSessionsCreatedSince(userID int, createdAfter int64) (int64, error) {
+	return CountUserSessionsCreatedSinceContext(context.Background(), userID, createdAfter)
+}
+
+func CountUserSessionsCreatedSinceContext(ctx context.Context, userID int, createdAfter int64) (int64, error) {
 	if userID < 0 || createdAfter <= 0 {
 		return 0, ErrUserSessionInvalid
 	}
-	query := DB.Model(&UserSession{}).Where("created_at > ?", createdAfter)
+	query := DB.WithContext(ctx).Model(&UserSession{}).Where("created_at > ?", createdAfter)
 	if userID > 0 {
 		query = query.Where("user_id = ?", userID)
 	}
@@ -782,6 +843,10 @@ func revokeUserSessions(userID int, excludedSID, reason string) (int64, error) {
 }
 
 func DeleteExpiredUserSessions(now int64) error {
+	return DeleteExpiredUserSessionsContext(context.Background(), now)
+}
+
+func DeleteExpiredUserSessionsContext(ctx context.Context, now int64) error {
 	if now <= 0 {
 		now = time.Now().Unix()
 	}
@@ -790,10 +855,14 @@ func DeleteExpiredUserSessions(now int64) error {
 	}
 	issuanceCutoff := now - common.UserSessionIssuanceWindowSeconds
 	revokedBefore := now - int64(common.UserSessionRevokedRetentionDays)*24*60*60
-	return deleteExpiredUserSessionsBefore(now, issuanceCutoff, revokedBefore)
+	return deleteExpiredUserSessionsBeforeContext(ctx, now, issuanceCutoff, revokedBefore)
 }
 
 func DeleteOldRevokedUserSessions(now int64) error {
+	return DeleteOldRevokedUserSessionsContext(context.Background(), now)
+}
+
+func DeleteOldRevokedUserSessionsContext(ctx context.Context, now int64) error {
 	if now <= 0 {
 		now = time.Now().Unix()
 	}
@@ -802,13 +871,20 @@ func DeleteOldRevokedUserSessions(now int64) error {
 	}
 	issuanceCutoff := now - common.UserSessionIssuanceWindowSeconds
 	revokedBefore := now - int64(common.UserSessionRevokedRetentionDays)*24*60*60
-	return deleteRevokedUserSessionsBefore(revokedBefore, issuanceCutoff)
+	return deleteRevokedUserSessionsBeforeContext(ctx, revokedBefore, issuanceCutoff)
 }
 
 func deleteExpiredUserSessionsBefore(expiredBefore, issuanceCutoff, revokedBefore int64) error {
+	return deleteExpiredUserSessionsBeforeContext(context.Background(), expiredBefore, issuanceCutoff, revokedBefore)
+}
+
+func deleteExpiredUserSessionsBeforeContext(ctx context.Context, expiredBefore, issuanceCutoff, revokedBefore int64) error {
 	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		var sids []string
-		if err := DB.Model(&UserSession{}).
+		if err := DB.WithContext(ctx).Model(&UserSession{}).
 			Where(
 				"expires_at < ? AND created_at <= ? AND (status <> ? OR revoked_at <= 0 OR revoked_at < ?)",
 				expiredBefore,
@@ -824,7 +900,7 @@ func deleteExpiredUserSessionsBefore(expiredBefore, issuanceCutoff, revokedBefor
 		}
 		for start := 0; start < len(sids); start += userSessionCleanupBatchSize {
 			end := min(start+userSessionCleanupBatchSize, len(sids))
-			if err := DB.Where("sid IN ?", sids[start:end]).
+			if err := DB.WithContext(ctx).Where("sid IN ?", sids[start:end]).
 				Where(
 					"expires_at < ? AND created_at <= ? AND (status <> ? OR revoked_at <= 0 OR revoked_at < ?)",
 					expiredBefore,
@@ -840,9 +916,16 @@ func deleteExpiredUserSessionsBefore(expiredBefore, issuanceCutoff, revokedBefor
 }
 
 func deleteRevokedUserSessionsBefore(revokedBefore, issuanceCutoff int64) error {
+	return deleteRevokedUserSessionsBeforeContext(context.Background(), revokedBefore, issuanceCutoff)
+}
+
+func deleteRevokedUserSessionsBeforeContext(ctx context.Context, revokedBefore, issuanceCutoff int64) error {
 	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		var sids []string
-		if err := DB.Model(&UserSession{}).
+		if err := DB.WithContext(ctx).Model(&UserSession{}).
 			Where(
 				"status = ? AND revoked_at > 0 AND revoked_at < ? AND created_at <= ?",
 				UserSessionStatusRevoked,
@@ -857,7 +940,7 @@ func deleteRevokedUserSessionsBefore(revokedBefore, issuanceCutoff int64) error 
 		}
 		for start := 0; start < len(sids); start += userSessionCleanupBatchSize {
 			end := min(start+userSessionCleanupBatchSize, len(sids))
-			if err := DB.Where("sid IN ?", sids[start:end]).
+			if err := DB.WithContext(ctx).Where("sid IN ?", sids[start:end]).
 				Where(
 					"status = ? AND revoked_at > 0 AND revoked_at < ? AND created_at <= ?",
 					UserSessionStatusRevoked,

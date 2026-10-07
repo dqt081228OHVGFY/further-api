@@ -1,0 +1,14 @@
+# Install as /etc/systemd/system/further-api.service after adjusting the paths and user.
+[Unit]
+Description=further-api gateway
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/opt/further-api
+ExecStart=/opt/further-api/further-api --port 3000 --log-dir /opt/further-api/logs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

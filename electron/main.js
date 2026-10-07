@@ -3,6 +3,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
+const { browserDestination } = require('./navigation-policy.cjs');
 
 let mainWindow;
 let serverProcess;
@@ -15,7 +16,7 @@ const DEV_FRONTEND_PORT = 5173; // Rsbuild dev server port
 function saveAndOpenErrorLog() {
   try {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const logFileName = `new-api-crash-${timestamp}.log`;
+    const logFileName = `further-api-crash-${timestamp}.log`;
     const logDir = app.getPath('logs');
     const logFilePath = path.join(logDir, logFileName);
     
@@ -25,7 +26,7 @@ function saveAndOpenErrorLog() {
     }
     
     // 写入日志
-    const logContent = `New API 崩溃日志
+    const logContent = `further-api 崩溃日志
 生成时间: ${new Date().toLocaleString('zh-CN')}
 平台: ${process.platform}
 架构: ${process.arch}
@@ -72,7 +73,7 @@ function analyzeError(errorLogs) {
       type: '端口被占用',
       title: '端口 ' + PORT + ' 被占用',
       message: '无法启动服务器，端口已被其他程序占用',
-      solution: `可能的解决方案：\n\n1. 关闭占用端口 ${PORT} 的其他程序\n2. 检查是否已经运行了另一个 New API 实例\n3. 使用以下命令查找占用端口的进程：\n   Mac/Linux: lsof -i :${PORT}\n   Windows: netstat -ano | findstr :${PORT}\n4. 重启电脑以释放端口`
+      solution: `可能的解决方案：\n\n1. 关闭占用端口 ${PORT} 的其他程序\n2. 检查是否已经运行了另一个 further-api 实例\n3. 使用以下命令查找占用端口的进程：\n   Mac/Linux: lsof -i :${PORT}\n   Windows: netstat -ano | findstr :${PORT}\n4. 重启电脑以释放端口`
     };
   }
   
@@ -83,7 +84,7 @@ function analyzeError(errorLogs) {
       type: '数据文件被占用',
       title: '无法访问数据文件',
       message: '应用的数据文件正被其他程序占用',
-      solution: '可能的解决方案：\n\n1. 检查是否已经打开了另一个 New API 窗口\n   - 查看任务栏/Dock 中是否有其他 New API 图标\n   - 查看系统托盘（Windows）或菜单栏（Mac）中是否有 New API 图标\n\n2. 如果刚刚关闭过应用，请等待 10 秒后再试\n\n3. 重启电脑以释放被占用的文件\n\n4. 如果问题持续，可以尝试：\n   - 退出所有 New API 实例\n   - 删除数据目录中的临时文件（.db-shm 和 .db-wal）\n   - 重新启动应用'
+      solution: '可能的解决方案：\n\n1. 检查是否已经打开了另一个 further-api 窗口\n   - 查看任务栏/Dock 中是否有其他 further-api 图标\n   - 查看系统托盘（Windows）或菜单栏（Mac）中是否有 further-api 图标\n\n2. 如果刚刚关闭过应用，请等待 10 秒后再试\n\n3. 重启电脑以释放被占用的文件\n\n4. 如果问题持续，可以尝试：\n   - 退出所有 further-api 实例\n   - 删除数据目录中的临时文件（.db-shm 和 .db-wal）\n   - 重新启动应用'
     };
   }
   
@@ -152,23 +153,23 @@ function getBinaryPath() {
   const platform = process.platform;
 
   if (isDev) {
-    const binaryName = platform === 'win32' ? 'new-api.exe' : 'new-api';
+    const binaryName = platform === 'win32' ? 'further-api.exe' : 'further-api';
     return path.join(__dirname, '..', binaryName);
   }
 
   let binaryName;
   switch (platform) {
     case 'win32':
-      binaryName = 'new-api.exe';
+      binaryName = 'further-api.exe';
       break;
     case 'darwin':
-      binaryName = 'new-api';
+      binaryName = 'further-api';
       break;
     case 'linux':
-      binaryName = 'new-api';
+      binaryName = 'further-api';
       break;
     default:
-      binaryName = 'new-api';
+      binaryName = 'further-api';
   }
 
   return path.join(process.resourcesPath, 'bin', binaryName);
@@ -255,13 +256,13 @@ function startServer() {
     }
 
     // 生产模式：启动二进制服务器
-    const env = { ...process.env, PORT: PORT.toString() };
+    const env = { ...process.env, PORT: PORT.toString(), BIND_HOST: '127.0.0.1' };
 
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    env.SQLITE_PATH = path.join(dataDir, 'new-api.db');
+    env.SQLITE_PATH = path.join(dataDir, 'further-api.db');
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📁 您的数据存储位置：');
@@ -395,11 +396,35 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true
     },
-    title: 'New API',
+    title: 'further-api',
     icon: path.join(__dirname, 'icon.png')
   });
+
+  // OAuth can navigate to an HTTPS provider and back to the local gateway.
+  // Other protocols and unrelated loopback services remain outside this app.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!browserDestination(url, loadPort)) event.preventDefault();
+  });
+  mainWindow.webContents.on('will-redirect', (event, url) => {
+    if (!browserDestination(url, loadPort)) event.preventDefault();
+  });
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (browserDestination(url, loadPort)) {
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true }
+        }
+      };
+    }
+    return { action: 'deny' };
+  });
+  mainWindow.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+  mainWindow.webContents.session.setPermissionCheckHandler(() => false);
 
   mainWindow.loadURL(`http://127.0.0.1:${loadPort}`);
   
@@ -436,7 +461,7 @@ function createTray() {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show New API',
+      label: 'Show further-api',
       click: () => {
         if (mainWindow === null) {
           createWindow();
@@ -458,7 +483,7 @@ function createTray() {
     }
   ]);
 
-  tray.setToolTip('New API');
+  tray.setToolTip('further-api');
   tray.setContextMenu(contextMenu);
 
   // On macOS, clicking the tray icon shows the window

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -11,12 +12,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/pkg/billingexpr"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/setting/billing_setting"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
-	"github.com/QuantumNous/new-api/setting/ratio_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/pkg/billingexpr"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/setting/billing_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/ratio_setting"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -34,11 +35,12 @@ type ModelPricingChange struct {
 
 type ModelPricingEntry struct {
 	ModelPricingDescription
-	PluginVariants []ModelPricingPluginVariant          `json:"plugin_variants,omitempty"`
-	ModelName      string                               `json:"model_name"`
-	Version        string                               `json:"version"`
-	Configured     PricingValues                        `json:"configured"`
-	UsageSchema    map[string]jsplugin.UsageFieldSchema `json:"usage_schema,omitempty"`
+	PluginVariants      []ModelPricingPluginVariant          `json:"plugin_variants,omitempty"`
+	ModelName           string                               `json:"model_name"`
+	Version             string                               `json:"version"`
+	Configured          PricingValues                        `json:"configured"`
+	UsageSchema         map[string]jsplugin.UsageFieldSchema `json:"usage_schema,omitempty"`
+	CompletionRatioInfo ratio_setting.CompletionRatioInfo    `json:"completion_ratio_info"`
 }
 
 type ModelPricingPluginVariant struct {
@@ -54,6 +56,7 @@ type ModelPricingPluginVariant struct {
 }
 
 type ModelPricingSnapshot struct {
+	QuotaPerUnit float64             `json:"quota_per_unit"`
 	Entries      []ModelPricingEntry `json:"entries"`
 	Options      map[string]string   `json:"options"`
 	EmptyVersion string              `json:"empty_version"`
@@ -263,12 +266,17 @@ func GetModelPricingSnapshot(names []string) (*ModelPricingSnapshot, error) {
 		}
 	}
 	sort.Strings(names)
-	result := &ModelPricingSnapshot{Entries: make([]ModelPricingEntry, 0, len(names)), Options: make(map[string]string), EmptyVersion: ModelPricingVersion(PricingValues{})}
+	result := &ModelPricingSnapshot{QuotaPerUnit: common.QuotaPerUnit, Entries: make([]ModelPricingEntry, 0, len(names)), Options: make(map[string]string), EmptyVersion: ModelPricingVersion(PricingValues{})}
 	generation := jsplugin.DefaultRegistry.Generation()
 	for _, name := range names {
 		configured := modelPricingValues(values, name)
 		entry := ModelPricingEntry{ModelName: name, Version: ModelPricingVersion(configured), Configured: configured,
 			ModelPricingDescription: ModelPricingDescription{Effective: effectiveModelPricing(values, name)}}
+		var completion *float64
+		if ratio, ok := entry.Effective["CompletionRatio"].(float64); ok {
+			completion = &ratio
+		}
+		entry.CompletionRatioInfo = ratio_setting.ResolveCompletionRatio(name, completion)
 		entry.CacheWriteMode = ResolveCacheWriteMode(name, configured)
 		entry.BillingDetails = ResolveLegacyBillingDetails(name, entry.Effective, configured)
 		if plugin, ok := generation.GetByModel(name); ok {
@@ -459,6 +467,10 @@ func validateModelPricing(name string, values, previous PricingValues) error {
 }
 
 func UpdateModelPricing(changes []ModelPricingChange) error {
+	return UpdateModelPricingContext(context.Background(), changes)
+}
+
+func UpdateModelPricingContext(ctx context.Context, changes []ModelPricingChange) error {
 	if len(changes) == 0 {
 		return errors.New("select model pricing changes before saving")
 	}
@@ -472,7 +484,7 @@ func UpdateModelPricing(changes []ModelPricingChange) error {
 			return ErrModelPricingConflict
 		}
 	}
-	return mutateModelPricingOptions(func(_ *gorm.DB, values map[string]map[string]any) error {
+	return mutateModelPricingOptionsContext(ctx, func(_ *gorm.DB, values map[string]map[string]any) error {
 		defaults := defaultPricingMaps()
 		for _, change := range changes {
 			previous := modelPricingValues(values, change.ModelName)
@@ -495,7 +507,11 @@ func UpdateModelPricing(changes []ModelPricingChange) error {
 // UpdateModelPricingOptions keeps legacy single-option callers on the same
 // locking, validation and transaction path as the model-level API.
 func UpdateModelPricingOptions(updates map[string]string) error {
-	return mutateModelPricingOptions(func(_ *gorm.DB, values map[string]map[string]any) error {
+	return UpdateModelPricingOptionsContext(context.Background(), updates)
+}
+
+func UpdateModelPricingOptionsContext(ctx context.Context, updates map[string]string) error {
+	return mutateModelPricingOptionsContext(ctx, func(_ *gorm.DB, values map[string]map[string]any) error {
 		previous := maps.Clone(values)
 		names := make(map[string]bool)
 		for key, raw := range updates {
@@ -533,10 +549,20 @@ func UpdateModelPricingOptions(updates map[string]string) error {
 }
 
 func mutateModelPricingOptions(mutate func(*gorm.DB, map[string]map[string]any) error) error {
+	return mutateModelPricingOptionsContext(context.Background(), mutate)
+}
+
+func mutateModelPricingOptionsContext(ctx context.Context, mutate func(*gorm.DB, map[string]map[string]any) error) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if DB == nil {
+		return gorm.ErrInvalidDB
+	}
 	modelPricingMutationMu.Lock()
 	defer modelPricingMutationMu.Unlock()
 	var committed map[string]map[string]any
-	err := DB.Transaction(func(tx *gorm.DB) error {
+	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		values, existing, duplicated, err := readModelPricingMaps(lockForUpdate(tx))
 		if err != nil {
 			return err

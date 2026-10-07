@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,6 +30,11 @@ func TestAccessTokenRoundTripAndPurposeIsolation(t *testing.T) {
 	parsed, err := ParseAccessToken(token)
 	require.NoError(t, err)
 	assert.Equal(t, identity, parsed)
+	claims := &authClaims{}
+	_, _, err = jwt.NewParser().ParseUnverified(token, claims)
+	require.NoError(t, err)
+	assert.Equal(t, "further-api", claims.Issuer)
+	assert.Contains(t, claims.Audience, "further-api-dashboard")
 
 	binding, err := BindVerificationOperation(VerificationOperation{Scope: "channel.key.read", Context: []byte(`{"channel_id":123}`)})
 	require.NoError(t, err)
@@ -37,6 +42,48 @@ func TestAccessTokenRoundTripAndPurposeIsolation(t *testing.T) {
 	require.NoError(t, err)
 	_, err = ParseAccessToken(proof)
 	assert.ErrorIs(t, err, ErrAuthTokenInvalid)
+}
+
+func TestLegacyDashboardTokenMigration(t *testing.T) {
+	useTestSessionSecret(t)
+	identity := AuthIdentity{UserID: 42, SessionID: "legacy-session", UserAuthVersion: 1, SessionVersion: 1}
+	now := time.Now()
+	claims := authClaims{
+		TokenUse: accessTokenUse, SessionID: identity.SessionID,
+		UserAuthVersion: identity.UserAuthVersion, SessionVersion: identity.SessionVersion,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer: legacyAuthTokenIssuer, Subject: "42",
+			Audience:  jwt.ClaimStrings{legacyAuthTokenAudience},
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Minute)),
+			NotBefore: jwt.NewNumericDate(now.Add(-time.Second)),
+			IssuedAt:  jwt.NewNumericDate(now), ID: "legacy-token",
+		},
+	}
+	legacy, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(legacyAuthSigningKey(accessTokenUse))
+	require.NoError(t, err)
+	parsed, err := ParseAccessToken(legacy)
+	require.NoError(t, err)
+	assert.Equal(t, identity, parsed)
+	_, internal, err := ParseDashboardAccessToken(legacy)
+	require.NoError(t, err)
+	assert.True(t, internal)
+
+	tamperAt := len(legacy) - 2
+	replacement := "x"
+	if legacy[tamperAt] == 'x' {
+		replacement = "y"
+	}
+	tampered := legacy[:tamperAt] + replacement + legacy[tamperAt+1:]
+	_, internal, err = ParseDashboardAccessToken(tampered)
+	assert.True(t, internal)
+	assert.ErrorIs(t, err, ErrAuthTokenInvalid)
+
+	claims.ExpiresAt = jwt.NewNumericDate(now.Add(-time.Minute))
+	expired, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(legacyAuthSigningKey(accessTokenUse))
+	require.NoError(t, err)
+	_, internal, err = ParseDashboardAccessToken(expired)
+	assert.True(t, internal)
+	assert.ErrorIs(t, err, ErrAuthTokenExpired)
 }
 
 func TestAccessTokenRejectsTampering(t *testing.T) {

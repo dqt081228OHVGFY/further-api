@@ -1,30 +1,53 @@
-# Build this repository so the image includes the RelayFor interface and the
-# complete New API gateway. Copy compose.env.example to .env and set secrets.
+# Build the further-api gateway from this repository.
+# Copy compose.env.example to .env and set secrets.
 services:
-  new-api:
+  gateway-data-init:
+    image: further-api:local
     build:
       context: .
       dockerfile: Dockerfile
-    image: relayfor-gateway:local
+    user: "0:0"
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - install -d -o 10001 -g 10001 -m 0700 /data /app/logs && chown -R --no-dereference 10001:10001 /data /app/logs
+    volumes:
+      - ./data:/data
+      - ./logs:/app/logs
+    network_mode: none
+    cap_drop: ["ALL"]
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "FOWNER"]
+    security_opt: ["no-new-privileges:true"]
+  further-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: further-api:local
     restart: unless-stopped
     command: --log-dir /app/logs
     ports:
-      - "3000:3000"
+      - "${GATEWAY_BIND_ADDRESS:-127.0.0.1}:${GATEWAY_PORT:-3000}:3000"
+    user: "10001:10001"
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
     volumes:
       - ./data:/data
       - ./logs:/app/logs
     environment:
-      SQL_DSN: postgresql://newapi:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/newapi
+      SQL_DSN: postgresql://${POSTGRES_USER:-further_api}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-further_api}
       REDIS_CONN_STRING: redis://:${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}@redis:6379
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      CRYPTO_SECRET: ${CRYPTO_SECRET:?Set CRYPTO_SECRET in .env}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       SESSION_COOKIE_TRUSTED_URL: ${SESSION_COOKIE_TRUSTED_URL:-}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-none}
       TZ: Asia/Shanghai
       ERROR_LOG_ENABLED: "true"
       BATCH_UPDATE_ENABLED: "true"
-      NODE_NAME: relayfor-gateway-1
+      NODE_NAME: further-api-1
     depends_on:
+      gateway-data-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -55,15 +78,15 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: newapi
+      POSTGRES_USER: ${POSTGRES_USER:-further_api}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB: newapi
+      POSTGRES_DB: ${POSTGRES_DB:-further_api}
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
       - gateway-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U newapi -d newapi"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 3s
       retries: 5

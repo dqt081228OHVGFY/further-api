@@ -10,13 +10,14 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"testing/fstest"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
@@ -888,7 +889,10 @@ func performPluginRequest(handler http.Handler, method, path string) *httptest.R
 
 func TestWebFallbackDoesNotCacheMissingAPIOrAssets(t *testing.T) {
 	outer := gin.New()
-	SetWebRouter(outer, WebAssets{IndexPage: []byte("dashboard")}, func(c *gin.Context) { c.Next() })
+	SetWebRouter(outer, WebAssets{BuildFS: fstest.MapFS{
+		"web/dist/index.html":         {Data: []byte("home")},
+		"web/dist/console/index.html": {Data: []byte("account workspace")},
+	}}, func(c *gin.Context) { c.Next() })
 	for _, path := range []string{"/api/user/token/status", "/api/audit/self?p=1", "/v1/missing", "/assets/missing.js"} {
 		t.Run(path, func(t *testing.T) {
 			response := performPluginRequest(outer, http.MethodGet, path)
@@ -900,7 +904,7 @@ func TestWebFallbackDoesNotCacheMissingAPIOrAssets(t *testing.T) {
 	}
 	page := performPluginRequest(outer, http.MethodGet, "/security")
 	assert.Equal(t, http.StatusOK, page.Code)
-	assert.Equal(t, "dashboard", page.Body.String())
+	assert.Equal(t, "account workspace", page.Body.String())
 	assert.Equal(t, "no-cache", page.Header().Get("Cache-Control"))
 }
 

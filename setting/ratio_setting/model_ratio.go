@@ -4,10 +4,10 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
-	hostreasoning "github.com/QuantumNous/new-api/setting/reasoning"
-	"github.com/QuantumNous/new-api/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
+	hostreasoning "github.com/dqt081228OHVGFY/further-api/setting/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/types"
 )
 
 // from songquanpeng/one-api
@@ -21,7 +21,7 @@ const (
 // https://platform.openai.com/docs/models/model-endpoint-compatibility
 // https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Blfmc9dlf
 // https://openai.com/pricing
-// TODO: when a new api is enabled, check the pricing here
+// 新增模型时核对默认价格；实际计费使用站点保存的配置。
 // 1 === $0.002 / 1K tokens
 // 1 === ￥0.014 / 1k tokens
 

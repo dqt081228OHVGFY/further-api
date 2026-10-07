@@ -13,20 +13,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	appconstant "github.com/QuantumNous/new-api/constant"
-	appdto "github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/middleware"
-	appmodel "github.com/QuantumNous/new-api/model"
-	perfmetrics "github.com/QuantumNous/new-api/pkg/perf_metrics"
-	"github.com/QuantumNous/new-api/pkg/wsmanager"
-	relaychannel "github.com/QuantumNous/new-api/relay/channel"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	appconstant "github.com/dqt081228OHVGFY/further-api/constant"
+	appdto "github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	appmodel "github.com/dqt081228OHVGFY/further-api/model"
+	perfmetrics "github.com/dqt081228OHVGFY/further-api/pkg/perf_metrics"
+	"github.com/dqt081228OHVGFY/further-api/pkg/wsmanager"
+	relaychannel "github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -37,7 +37,7 @@ const responsesWSWriteTimeout = 30 * time.Second
 
 // ResponsesWSRequestRunner executes the existing authentication and rate-limit
 // middleware around one complete request, without a second HTTP connection.
-type ResponsesWSRequestRunner func(*http.Request, string, func(*gin.Context) *types.NewAPIError) *types.NewAPIError
+type ResponsesWSRequestRunner func(*http.Request, string, func(*gin.Context) *types.GatewayError) *types.GatewayError
 
 type responsesWSCreateEvent struct {
 	Type     string            `json:"type"`
@@ -116,7 +116,7 @@ type responsesWSSession struct {
 	lockedRoute     dto.AdvancedCustomRoute
 }
 
-func ResponsesWebSocketHelper(c *gin.Context, client *websocket.Conn, runner ResponsesWSRequestRunner) *types.NewAPIError {
+func ResponsesWebSocketHelper(c *gin.Context, client *websocket.Conn, runner ResponsesWSRequestRunner) *types.GatewayError {
 	ctx, cancel := context.WithCancel(c.Request.Context())
 	s := &responsesWSSession{ctx: ctx, cancel: cancel, client: client, runner: runner,
 		request: c.Request.Clone(ctx), requestID: c.GetString(common.RequestIdKey)}
@@ -175,7 +175,7 @@ func ResponsesWebSocketHelper(c *gin.Context, client *websocket.Conn, runner Res
 
 func (s *responsesWSSession) runRequest(state *responsesWSCallState, message []byte, envelope responsesWSCreateEvent, streamID string, requestID string) {
 	create, parseErr := normalizeResponsesWSCreateEvent(message, envelope, streamID)
-	var apiErr *types.NewAPIError
+	var apiErr *types.GatewayError
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			apiErr = types.NewError(fmt.Errorf("responses websocket request panic: %v", recovered), types.ErrorCodeBadResponse, types.ErrOptionWithSkipRetry())
@@ -211,7 +211,7 @@ func (s *responsesWSSession) runRequest(state *responsesWSCallState, message []b
 	request.Body = io.NopCloser(bytes.NewReader(message))
 	request.ContentLength = int64(len(message))
 	request.Header.Set("Content-Type", "application/json")
-	apiErr = s.runner(request, requestID, func(c *gin.Context) *types.NewAPIError {
+	apiErr = s.runner(request, requestID, func(c *gin.Context) *types.GatewayError {
 		if parseErr != nil {
 			return newResponsesWSInvalidRequestError(parseErr)
 		}
@@ -224,7 +224,7 @@ func (s *responsesWSSession) runRequest(state *responsesWSCallState, message []b
 	}
 }
 
-func (s *responsesWSSession) runCall(c *gin.Context, state *responsesWSCallState, create responsesWSCreateRequest) (apiErr *types.NewAPIError) {
+func (s *responsesWSSession) runCall(c *gin.Context, state *responsesWSCallState, create responsesWSCreateRequest) (apiErr *types.GatewayError) {
 	policy := service.RequestPolicy(c)
 	modelName := create.Request.Model
 	started := time.Now()
@@ -530,7 +530,7 @@ func responsesWSErrorEndsRequest(event responsesWSErrorEvent, streamID, response
 	return true, len(control) > 0 && event.ResponseID == "", false
 }
 
-func (s *responsesWSSession) restoreConnectionContext(c *gin.Context, model string) *types.NewAPIError {
+func (s *responsesWSSession) restoreConnectionContext(c *gin.Context, model string) *types.GatewayError {
 	// The channel type is not rechecked: a locked channel keeps its type, and
 	// the FilterResponsesWebSocket rules were applied when it was selected.
 	channel, err := appmodel.CacheGetChannel(s.lockedChannelID)
@@ -596,7 +596,7 @@ func (s *responsesWSSession) restoreConnectionContext(c *gin.Context, model stri
 	return nil
 }
 
-func buildResponsesWSCreatePayload(c *gin.Context, info *relaycommon.RelayInfo, req dto.OpenAIResponsesRequest, generate common.RawMessage, streamID string) ([]byte, *types.NewAPIError) {
+func buildResponsesWSCreatePayload(c *gin.Context, info *relaycommon.RelayInfo, req dto.OpenAIResponsesRequest, generate common.RawMessage, streamID string) ([]byte, *types.GatewayError) {
 	_, body, closer, apiErr := PrepareResponsesRequest(c, info, &req)
 	if apiErr != nil {
 		return nil, apiErr
@@ -708,7 +708,7 @@ func (s *responsesWSSession) writeClient(kind int, message []byte) error {
 	return s.client.WriteMessage(kind, message)
 }
 
-func (s *responsesWSSession) sendError(eventID, streamID string, apiErr *types.NewAPIError) {
+func (s *responsesWSSession) sendError(eventID, streamID string, apiErr *types.GatewayError) {
 	if apiErr == nil {
 		return
 	}
@@ -794,7 +794,7 @@ func parseResponsesWSEnvelope(message []byte) (responsesWSCreateEvent, string, e
 	return event, streamID, nil
 }
 
-func newResponsesWSInvalidRequestError(err error) *types.NewAPIError {
+func newResponsesWSInvalidRequestError(err error) *types.GatewayError {
 	return types.NewErrorWithStatusCode(err, types.ErrorCodeInvalidRequest, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 }
 
@@ -870,7 +870,7 @@ func buildResponsesWSCreateEvent(jsonData []byte, generate common.RawMessage, st
 	return common.Marshal(event)
 }
 
-func buildResponsesWSErrorPayload(eventID, streamID string, apiErr *types.NewAPIError) ([]byte, error) {
+func buildResponsesWSErrorPayload(eventID, streamID string, apiErr *types.GatewayError) ([]byte, error) {
 	if apiErr == nil {
 		return nil, errors.New("api error is nil")
 	}
@@ -892,7 +892,7 @@ func buildResponsesWSErrorPayload(eventID, streamID string, apiErr *types.NewAPI
 // matching as the HTTP distributor. Unlike HTTP, it also runs for requests
 // pinned to a channel: the check is stricter there on purpose, because a
 // persistent connection keeps serving the model after the pin was resolved.
-func checkResponsesWSModelAccess(c *gin.Context, modelName string) *types.NewAPIError {
+func checkResponsesWSModelAccess(c *gin.Context, modelName string) *types.GatewayError {
 	if !common.GetContextKeyBool(c, appconstant.ContextKeyTokenModelLimitEnabled) {
 		return nil
 	}
@@ -912,8 +912,8 @@ func checkResponsesWSModelAccess(c *gin.Context, modelName string) *types.NewAPI
 
 // selectResponsesWSChannel narrows the shared HTTP selection to channels that
 // speak the Responses WebSocket protocol and renders its outcome as a
-// non-retryable NewAPIError.
-func selectResponsesWSChannel(c *gin.Context, modelName string, retryParam *service.RetryParam) (*appmodel.Channel, *types.NewAPIError) {
+// non-retryable GatewayError.
+func selectResponsesWSChannel(c *gin.Context, modelName string, retryParam *service.RetryParam) (*appmodel.Channel, *types.GatewayError) {
 	constraints := service.GetChannelConstraints(c)
 	if !slices.ContainsFunc(constraints.Filters, func(filter appdto.ChannelFilter) bool {
 		return filter.Kind == appdto.FilterResponsesWebSocket

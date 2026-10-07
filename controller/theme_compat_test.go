@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +24,7 @@ func TestUpdateOptionRejectsRetiredFrontendTheme(t *testing.T) {
 	UpdateOption(context)
 
 	assert.Equal(t, http.StatusOK, response.Code)
-	assert.JSONEq(t, `{"success":false,"message":"Classic 前端已移除，主题只能设置为 default"}`, response.Body.String())
+	assert.JSONEq(t, `{"success":false,"message":"站点主题请通过外观设置管理"}`, response.Body.String())
 }
 
 func TestGetStatusAdvertisesDefaultDashboard(t *testing.T) {

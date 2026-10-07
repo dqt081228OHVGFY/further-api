@@ -2,27 +2,30 @@ package middleware
 
 import (
 	"crypto/subtle"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/gin-gonic/gin"
 )
 
-// SessionCookieOriginGuard protects cookie-authenticated refresh/logout
-// endpoints when secure cookie mode is enabled. In insecure local development
-// mode it preserves the legacy behavior and intentionally performs no Origin
-// validation. It never adds CORS response headers and must not be installed on
-// relay routes.
+// SessionCookieOriginGuard protects browser session issuance, refresh and
+// logout regardless of the cookie's Secure setting. Local HTTP development
+// permits loopback origins on another port and originless non-browser clients.
+// It never adds CORS response headers and must not be installed on relay routes.
 func SessionCookieOriginGuard() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !common.SessionCookieSecure {
+		if !common.SessionCookieSecure && len(c.Request.Header.Values("Origin")) == 0 &&
+			len(c.Request.Header.Values("Referer")) == 0 && c.GetHeader("Sec-Fetch-Site") != "cross-site" {
 			c.Next()
 			return
 		}
 		origin, ok := requestBrowserOrigin(c.Request)
-		if !ok || !isAllowedSessionOrigin(c.Request, origin) {
+		allowed := ok && (isAllowedSessionOrigin(c.Request, origin) ||
+			(!common.SessionCookieSecure && isAllowedDevelopmentSessionOrigin(c.Request, origin)))
+		if !allowed {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"success": false,
 				"code":    "AUTH_ORIGIN_FORBIDDEN",
@@ -32,6 +35,36 @@ func SessionCookieOriginGuard() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func isAllowedDevelopmentSessionOrigin(request *http.Request, origin string) bool {
+	parsed, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	// Support an HTTPS frontend behind a TLS-terminating proxy while Secure
+	// cookies are being configured, without trusting forwarded request headers.
+	if request.TLS == nil && parsed.Scheme == "https" {
+		target, err := common.NormalizeOrigin("https://" + request.Host)
+		if err == nil && target == origin {
+			return true
+		}
+	}
+	if request.TLS != nil || parsed.Scheme != "http" {
+		return false
+	}
+	target, err := url.Parse("http://" + request.Host)
+	if err != nil {
+		return false
+	}
+	isLoopback := func(host string) bool {
+		if strings.EqualFold(host, "localhost") {
+			return true
+		}
+		ip := net.ParseIP(host)
+		return ip != nil && ip.IsLoopback()
+	}
+	return isLoopback(target.Hostname()) && isLoopback(parsed.Hostname())
 }
 
 func requestBrowserOrigin(request *http.Request) (string, bool) {

@@ -1,197 +1,129 @@
 package openai
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/gin-gonic/gin"
 )
 
-func OaiChatToResponsesHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	if resp == nil || resp.Body == nil {
-		return nil, types.NewOpenAIError(fmt.Errorf("invalid response"), types.ErrorCodeBadResponse, http.StatusInternalServerError)
+func OaiChatToResponsesHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if err := responsesContext(c, info, response); err != nil {
+		return nil, chatResponseError(err)
 	}
-	defer service.CloseResponseBodyGracefully(resp)
-
-	body, err := io.ReadAll(resp.Body)
+	defer service.CloseResponseBodyGracefully(response)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, chatResponseError(err)
 	}
-
-	var chatResp dto.OpenAITextResponse
-	if err := common.Unmarshal(body, &chatResp); err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var chat *dto.OpenAITextResponse
+	if err = json.Unmarshal(body, &chat); err != nil {
+		return nil, chatResponseError(err)
 	}
-	if oaiError := chatResp.GetOpenAIError(); oaiError != nil && oaiError.Type != "" {
-		return nil, types.WithOpenAIError(*oaiError, resp.StatusCode)
+	if chat == nil {
+		return nil, chatResponseError(errors.New("chat response must be an object"))
 	}
-
-	info.ObserveResponseModel(chatResp.Model)
-	if responseID := helper.GetResponseID(c); responseID != "" {
-		chatResp.Id = responseID
+	if failure := chat.GetOpenAIError(); failure != nil && failure.Type != "" {
+		return nil, types.WithOpenAIError(*failure, http.StatusBadGateway)
 	}
-	convertResult, err := service.ConvertResponse(c, info, types.RelayFormatOpenAIResponses, &chatResp)
+	info.ObserveResponseModel(chat.Model)
+	if id := helper.GetResponseID(c); id != "" {
+		chat.Id = id
+	}
+	converted, err := service.ConvertResponse(c, info, types.RelayFormatOpenAIResponses, chat)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+		return nil, chatResponseError(err)
 	}
-	responsesResp, ok := convertResult.Value.(*dto.OpenAIResponsesResponse)
-	if !ok {
-		return nil, types.NewOpenAIError(fmt.Errorf("expected OpenAI responses response, got %T", convertResult.Value), types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	wire, ok := converted.Value.(*dto.OpenAIResponsesResponse)
+	if !ok || wire == nil {
+		return nil, chatResponseError(errors.New("Responses codec returned no response"))
 	}
-	usage := convertResult.Usage
+	usage := converted.Usage
 	if usage == nil || usage.TotalTokens == 0 {
-		text := service.ExtractOutputTextFromResponses(responsesResp)
-		usage = service.ResponseText2Usage(c, text, info.UpstreamModelName, info.GetEstimatePromptTokens())
-		responsesResp.Usage = relayconvert.UsageFromChatUsage(usage)
+		usage = service.ResponseText2Usage(c, service.ExtractOutputTextFromResponses(wire), info.UpstreamModelName, info.GetEstimatePromptTokens())
+		wire.Usage = relayconvert.UsageFromChatUsage(usage)
 	}
-
-	responseBody, err := common.Marshal(responsesResp)
+	body, err = json.Marshal(wire)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeJsonMarshalFailed, http.StatusInternalServerError)
+		return usage, chatResponseError(err)
 	}
-
-	service.IOCopyBytesGracefully(c, resp, responseBody)
+	service.IOCopyBytesGracefully(c, response, body)
 	return usage, nil
 }
-
-func OaiChatToResponsesStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	if resp == nil || resp.Body == nil {
-		return nil, types.NewOpenAIError(fmt.Errorf("invalid response"), types.ErrorCodeBadResponse, http.StatusInternalServerError)
+func OaiChatToResponsesStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if err := responsesContext(c, info, response); err != nil {
+		return nil, chatResponseError(err)
 	}
-	defer service.CloseResponseBodyGracefully(resp)
-
-	responseID := helper.GetResponseID(c)
-	state, err := relayconvert.NewResponseStreamState(types.RelayFormatOpenAI, types.RelayFormatOpenAIResponses, relayconvert.ResponseStreamOptions{
-		ID:                 responseID,
-		Model:              info.UpstreamModelName,
-		EmitSequenceNumber: true,
-	})
+	defer service.CloseResponseBodyGracefully(response)
+	codec, err := relayconvert.NewResponseStreamState(types.RelayFormatOpenAI, types.RelayFormatOpenAIResponses, relayconvert.ResponseStreamOptions{ID: helper.GetResponseID(c), Model: info.UpstreamModelName, EmitSequenceNumber: true})
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
+		return nil, chatResponseError(err)
 	}
-	streamErr := (*types.NewAPIError)(nil)
-
-	sendEvent := func(event relayconvert.ChatToResponsesStreamEvent) bool {
-		data, err := common.Marshal(event.Payload)
+	writer := &ResponsesEventWriter{Context: c, Info: info, State: codec}
+	helper.StreamScannerHandler(c, response, info, func(data string, result *helper.StreamResult) {
+		stop := func(err error) {
+			if !writer.Fail(err) {
+				writer.Failure = chatResponseError(err)
+			}
+			result.Stop(writer.Failure)
+		}
+		var envelope dto.OpenAITextResponse
+		if json.Unmarshal([]byte(data), &envelope) == nil {
+			if failure := envelope.GetOpenAIError(); failure != nil && failure.Type != "" {
+				stop(errors.New(failure.Message))
+				return
+			}
+		}
+		var frame *dto.ChatCompletionsStreamResponse
+		if err := json.Unmarshal([]byte(data), &frame); err != nil {
+			stop(err)
+			return
+		}
+		if frame == nil {
+			stop(errors.New("chat stream frame must be an object"))
+			return
+		}
+		info.ObserveResponseModel(frame.Model)
+		results, err := service.ConvertStreamResponseChunk(c, info, codec, frame)
 		if err != nil {
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeJsonMarshalFailed, http.StatusInternalServerError)
-			return false
-		}
-		if err := helper.ResponseChunkData(c, dto.ResponsesStreamResponse{Type: event.Type}, string(data)); err != nil {
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
-			return false
-		}
-		return true
-	}
-	failResponsesStream := func(err error) bool {
-		failureResults, handled := state.FailResponsesStream("server_error", err.Error(), "")
-		if !handled {
-			return false
-		}
-		for _, result := range failureResults {
-			event, ok := result.Value.(relayconvert.ChatToResponsesStreamEvent)
-			if !ok {
-				streamErr = types.NewOpenAIError(fmt.Errorf("expected OAI responses stream event, got %T", result.Value), types.ErrorCodeBadResponse, http.StatusInternalServerError)
-				return true
-			}
-			if !sendEvent(event) {
-				return true
-			}
-		}
-		return true
-	}
-
-	helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-		if streamErr != nil {
-			sr.Stop(streamErr)
+			stop(err)
 			return
 		}
-
-		var errorResp dto.OpenAITextResponse
-		if err := common.UnmarshalJsonStr(data, &errorResp); err == nil {
-			if oaiError := errorResp.GetOpenAIError(); oaiError != nil && oaiError.Type != "" {
-				if failResponsesStream(fmt.Errorf("%s", oaiError.Message)) {
-					sr.Stop(streamErr)
-					return
-				}
-				streamErr = types.WithOpenAIError(*oaiError, resp.StatusCode)
-				sr.Stop(streamErr)
-				return
-			}
-		}
-
-		var chunk dto.ChatCompletionsStreamResponse
-		if err := common.UnmarshalJsonStr(data, &chunk); err != nil {
-			logger.LogError(c, "failed to unmarshal chat stream response: "+err.Error())
-			if failResponsesStream(err) {
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-			sr.Stop(streamErr)
-			return
-		}
-
-		info.ObserveResponseModel(chunk.Model)
-		results, err := service.ConvertStreamResponseChunk(c, info, state, &chunk)
-		if err != nil {
-			if failResponsesStream(err) {
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
-			sr.Stop(streamErr)
-			return
-		}
-		for _, result := range results {
-			event, ok := result.Value.(relayconvert.ChatToResponsesStreamEvent)
-			if !ok {
-				streamErr = types.NewOpenAIError(fmt.Errorf("expected OAI responses stream event, got %T", result.Value), types.ErrorCodeBadResponse, http.StatusInternalServerError)
-				sr.Stop(streamErr)
-				return
-			}
-			if !sendEvent(event) {
-				sr.Stop(streamErr)
-				return
-			}
+		if !writer.Results(results) {
+			result.Stop(writer.Failure)
 		}
 	})
-
-	if streamErr != nil {
-		return nil, streamErr
-	}
-
-	usage := state.Usage()
+	usage := codec.Usage()
 	if usage == nil || usage.TotalTokens == 0 {
-		usage = service.ResponseText2Usage(c, state.UsageText(), info.UpstreamModelName, info.GetEstimatePromptTokens())
-		state.SetUsage(usage)
+		usage = service.ResponseText2Usage(c, codec.UsageText(), info.UpstreamModelName, info.GetEstimatePromptTokens())
+		codec.SetUsage(usage)
 	}
-
-	finalResults, err := service.FinalizeStreamResponse(c, info, state)
+	if writer.Failure != nil {
+		return usage, writer.Failure
+	}
+	if writer.NativeFailureDelivered {
+		return usage, nil
+	}
+	if c.Request != nil && c.Request.Context().Err() != nil {
+		return usage, nil
+	}
+	if info.StreamStatus != nil && !info.StreamStatus.IsNormalEnd() {
+		return usage, nil
+	}
+	results, err := service.FinalizeStreamResponse(c, info, codec)
 	if err != nil {
-		if failResponsesStream(err) {
-			return usage, streamErr
+		if !writer.Fail(err) {
+			writer.Failure = chatResponseError(err)
 		}
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
+		return usage, writer.Failure
 	}
-	for _, result := range finalResults {
-		event, ok := result.Value.(relayconvert.ChatToResponsesStreamEvent)
-		if !ok {
-			return nil, types.NewOpenAIError(fmt.Errorf("expected OAI responses stream event, got %T", result.Value), types.ErrorCodeBadResponse, http.StatusInternalServerError)
-		}
-		if !sendEvent(event) {
-			return nil, streamErr
-		}
-	}
-
-	return usage, nil
+	writer.Results(results)
+	return usage, writer.Failure
 }

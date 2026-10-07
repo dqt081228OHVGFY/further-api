@@ -1,6 +1,8 @@
 package common
 
 import (
+	"context"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -28,6 +30,9 @@ type SystemStatus struct {
 }
 
 var latestSystemStatus atomic.Value
+var systemMonitorMu sync.Mutex
+var systemMonitorCancel context.CancelFunc
+var systemMonitorDone <-chan struct{}
 
 func init() {
 	latestSystemStatus.Store(SystemStatus{})
@@ -35,18 +40,46 @@ func init() {
 
 // StartSystemMonitor 启动系统监控
 func StartSystemMonitor() {
+	systemMonitorMu.Lock()
+	defer systemMonitorMu.Unlock()
+	if systemMonitorCancel != nil {
+		return
+	}
+	ctx, cancel := context.WithCancel(BackgroundContext())
+	done := make(chan struct{})
+	systemMonitorCancel, systemMonitorDone = cancel, done
 	go func() {
+		defer close(done)
 		for {
-			config := GetPerformanceMonitorConfig()
-			if !config.Enabled {
-				time.Sleep(30 * time.Second)
-				continue
+			if ctx.Err() != nil {
+				return
 			}
-
-			updateSystemStatus()
-			time.Sleep(5 * time.Second)
+			config := GetPerformanceMonitorConfig()
+			delay := 30 * time.Second
+			if config.Enabled {
+				updateSystemStatus()
+				delay = 5 * time.Second
+			}
+			timer := time.NewTimer(delay)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return
+			case <-timer.C:
+			}
 		}
 	}()
+}
+
+func StopSystemMonitor() {
+	systemMonitorMu.Lock()
+	defer systemMonitorMu.Unlock()
+	if systemMonitorCancel == nil {
+		return
+	}
+	systemMonitorCancel()
+	<-systemMonitorDone
+	systemMonitorCancel, systemMonitorDone = nil, nil
 }
 
 func updateSystemStatus() {

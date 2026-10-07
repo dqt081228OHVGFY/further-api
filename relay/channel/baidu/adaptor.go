@@ -1,119 +1,89 @@
 package baidu
 
 import (
+	"context"
 	"errors"
-	"fmt"
+
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
-	"github.com/QuantumNous/new-api/relay/channel"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
+	requestContext context.Context
 }
 
 func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("baidu", "Gemini content input")
 }
 
 func (a *Adaptor) ConvertClaudeRequest(*gin.Context, *relaycommon.RelayInfo, *dto.ClaudeRequest) (any, error) {
-	//TODO implement me
-	panic("implement me")
+	return nil, openai.UnsupportedOperation("baidu", "Anthropic Messages input")
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("baidu", "audio operations")
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("baidu", "image generation")
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
-
+	a.requestContext = nil
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	// https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
-	suffix := "chat/"
-	if strings.HasPrefix(info.UpstreamModelName, "Embedding") {
-		suffix = "embeddings/"
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("Baidu provider configuration is missing")
 	}
-	if strings.HasPrefix(info.UpstreamModelName, "bge-large") {
-		suffix = "embeddings/"
+	model := info.UpstreamModelName
+	routes := map[string]string{"ERNIE-4.0": "completions_pro", "ERNIE-Bot-4": "completions_pro", "ERNIE-Bot": "completions", "ERNIE-Bot-turbo": "eb-instant", "ERNIE-Speed": "ernie_speed", "ERNIE-4.0-8K": "completions_pro", "ERNIE-3.5-8K": "completions", "ERNIE-3.5-8K-0205": "ernie-3.5-8k-0205", "ERNIE-3.5-8K-1222": "ernie-3.5-8k-1222", "ERNIE-Bot-8K": "ernie_bot_8k", "ERNIE-3.5-4K-0205": "ernie-3.5-4k-0205", "ERNIE-Speed-8K": "ernie_speed", "ERNIE-Speed-128K": "ernie-speed-128k", "ERNIE-Lite-8K-0922": "eb-instant", "ERNIE-Lite-8K-0308": "ernie-lite-8k", "ERNIE-Tiny-8K": "ernie-tiny-8k", "BLOOMZ-7B": "bloomz_7b1", "Embedding-V1": "embedding-v1", "bge-large-zh": "bge_large_zh", "bge-large-en": "bge_large_en", "tao-8k": "tao_8k"}
+	task := "chat/"
+	if strings.HasPrefix(model, "Embedding") || strings.HasPrefix(model, "bge-large") || strings.HasPrefix(model, "tao-8k") {
+		task = "embeddings/"
 	}
-	if strings.HasPrefix(info.UpstreamModelName, "tao-8k") {
-		suffix = "embeddings/"
+	deployment := routes[model]
+	if deployment == "" {
+		deployment = strings.ToLower(model)
 	}
-	switch info.UpstreamModelName {
-	case "ERNIE-4.0":
-		suffix += "completions_pro"
-	case "ERNIE-Bot-4":
-		suffix += "completions_pro"
-	case "ERNIE-Bot":
-		suffix += "completions"
-	case "ERNIE-Bot-turbo":
-		suffix += "eb-instant"
-	case "ERNIE-Speed":
-		suffix += "ernie_speed"
-	case "ERNIE-4.0-8K":
-		suffix += "completions_pro"
-	case "ERNIE-3.5-8K":
-		suffix += "completions"
-	case "ERNIE-3.5-8K-0205":
-		suffix += "ernie-3.5-8k-0205"
-	case "ERNIE-3.5-8K-1222":
-		suffix += "ernie-3.5-8k-1222"
-	case "ERNIE-Bot-8K":
-		suffix += "ernie_bot_8k"
-	case "ERNIE-3.5-4K-0205":
-		suffix += "ernie-3.5-4k-0205"
-	case "ERNIE-Speed-8K":
-		suffix += "ernie_speed"
-	case "ERNIE-Speed-128K":
-		suffix += "ernie-speed-128k"
-	case "ERNIE-Lite-8K-0922":
-		suffix += "eb-instant"
-	case "ERNIE-Lite-8K-0308":
-		suffix += "ernie-lite-8k"
-	case "ERNIE-Tiny-8K":
-		suffix += "ernie-tiny-8k"
-	case "BLOOMZ-7B":
-		suffix += "bloomz_7b1"
-	case "Embedding-V1":
-		suffix += "embedding-v1"
-	case "bge-large-zh":
-		suffix += "bge_large_zh"
-	case "bge-large-en":
-		suffix += "bge_large_en"
-	case "tao-8k":
-		suffix += "tao_8k"
-	default:
-		suffix += strings.ToLower(info.UpstreamModelName)
-	}
-	fullRequestURL := fmt.Sprintf("%s/rpc/2.0/ai_custom/v1/wenxinworkshop/%s", info.ChannelBaseUrl, suffix)
-	var accessToken string
-	var err error
-	if accessToken, err = getBaiduAccessToken(info.ApiKey); err != nil {
+	target, err := openai.ProviderEndpoint(info.ChannelBaseUrl, "/rpc/2.0/ai_custom/v1/wenxinworkshop/"+task+url.PathEscape(deployment))
+	if err != nil {
 		return "", err
 	}
-	fullRequestURL += "?access_token=" + accessToken
-	return fullRequestURL, nil
+	token, err := getBaiduAccessTokenContext(a.requestContext, info.ApiKey)
+	if err != nil {
+		return "", err
+	}
+	endpoint, err := url.Parse(target)
+	if err != nil {
+		return "", err
+	}
+	query := endpoint.Query()
+	query.Set("access_token", token)
+	endpoint.RawQuery = query.Encode()
+	return endpoint.String(), nil
 }
 
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
-	channel.SetupApiRequestHeader(info, c, req)
-	req.Set("Authorization", "Bearer "+info.ApiKey)
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	if c == nil || c.Request == nil || headers == nil || info == nil || !info.HasChannelMeta() {
+		return errors.New("Baidu request configuration is missing")
+	}
+	if *headers == nil {
+		*headers = make(http.Header)
+	}
+	channel.SetupApiRequestHeader(info, c, headers)
 	return nil
 }
 
@@ -129,7 +99,7 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
+	return nil, openai.UnsupportedOperation("baidu", "reranking")
 }
 
 func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
@@ -138,15 +108,18 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	// TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("baidu", "Responses input")
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
+	if c == nil || c.Request == nil {
+		return nil, errors.New("Baidu request context is missing")
+	}
+	a.requestContext = c.Request.Context()
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	if info.IsStream {
 		err, usage = baiduStreamHandler(c, info, resp)
 	} else {

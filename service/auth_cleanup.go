@@ -1,11 +1,12 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 const authArtifactCleanupInterval = time.Hour
@@ -16,20 +17,25 @@ func StartAuthArtifactCleanup() {
 	if !common.IsMasterNode {
 		return
 	}
-	go func() {
-		cleanupAuthArtifacts()
-		ticker := time.NewTicker(authArtifactCleanupInterval)
-		defer ticker.Stop()
-		for range ticker.C {
-			cleanupAuthArtifacts()
-		}
-	}()
+	startPeriodicTask("authentication artifact cleanup", authArtifactCleanupInterval, true, func(ctx context.Context) {
+		cleanupAuthArtifactsContext(ctx)
+	})
 }
 
 func cleanupAuthArtifacts() {
+	cleanupAuthArtifactsContext(context.Background())
+}
+
+func cleanupAuthArtifactsContext(ctx context.Context) {
+	if ctx.Err() != nil {
+		return
+	}
 	now := time.Now()
-	count, err := model.CountUserSessionsCreatedSince(0, now.Add(-time.Hour).Unix())
+	count, err := model.CountUserSessionsCreatedSinceContext(ctx, 0, now.Add(-time.Hour).Unix())
 	if err != nil {
+		if ctx.Err() != nil {
+			return
+		}
 		common.SysError("failed to count hourly user session issuance: " + err.Error())
 	} else if count > int64(common.UserSessionHourlyAlertThreshold) {
 		common.SysError(fmt.Sprintf(
@@ -39,13 +45,13 @@ func cleanupAuthArtifacts() {
 			int64(time.Hour/time.Second),
 		))
 	}
-	if err := model.DeleteExpiredUserSessions(now.Unix()); err != nil {
+	if err := model.DeleteExpiredUserSessionsContext(ctx, now.Unix()); err != nil && ctx.Err() == nil {
 		common.SysError("failed to delete expired user sessions: " + err.Error())
 	}
-	if err := model.DeleteOldRevokedUserSessions(now.Unix()); err != nil {
+	if err := model.DeleteOldRevokedUserSessionsContext(ctx, now.Unix()); err != nil && ctx.Err() == nil {
 		common.SysError("failed to delete old revoked user sessions: " + err.Error())
 	}
-	if err := model.DeleteExpiredAuthFlows(now); err != nil {
+	if err := model.DeleteExpiredAuthFlowsContext(ctx, now); err != nil && ctx.Err() == nil {
 		common.SysError("failed to delete expired authentication flows: " + err.Error())
 	}
 }

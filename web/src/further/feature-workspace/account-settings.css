@@ -1,0 +1,135 @@
+/* further-api account and configuration workspaces. */
+:host([data-account-security-host]) { min-height:0; height:auto; }
+:host([data-account-security-host]) .rfw-account-security { margin:0; padding:0; }
+.rfw-account-security { --rfw-accent:var(--md-sys-color-primary,#285c63); }
+.rfw-security-hero { display:flex; align-items:center; gap:24px; padding:28px; margin-bottom:18px; border:1px solid color-mix(in srgb,var(--rfw-accent) 22%,transparent); border-radius:24px; background:linear-gradient(115deg,color-mix(in srgb,var(--rfw-accent) 9%,var(--md-sys-color-surface,#fff)),var(--md-sys-color-surface-container-low,#f7f9fc)); }
+.rfw-security-hero h2 { font-size:22px; letter-spacing:-.025em; line-height:1.45; margin:8px 0; }
+.rfw-security-hero p { color:var(--md-sys-color-on-surface-variant,#596879); font-size:13px; line-height:1.8; margin:0; }
+.rfw-security-emblem { display:grid; place-items:center; width:78px; height:78px; flex:none; border-radius:25px; background:var(--md-sys-color-primary-container,#d7e9eb); color:var(--md-sys-color-on-primary-container,#174046); box-shadow:0 0 0 7px color-mix(in srgb,var(--rfw-accent) 5%,transparent); }
+.rfw-account-security .rfw-security-overview { gap:10px; margin:0 0 18px; }
+.rfw-account-security .rfw-security-overview > div { border:0; background:var(--md-sys-color-surface-container-low,#f7f9fc); border-radius:14px; padding:15px 18px; }
+.rfw-security-navigation { display:flex; gap:7px; flex-wrap:wrap; padding:5px; margin:0 0 25px; border-bottom:1px solid var(--md-sys-color-outline-variant,#cdd5df); }
+.rfw-security-navigation a { display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--md-sys-color-on-surface-variant,#596879); font-size:13px; padding:12px 16px; border-radius:12px; transition:background .18s,color .18s; }
+.rfw-security-navigation a:hover { background:var(--md-sys-color-primary-container,#d7e9eb); color:var(--md-sys-color-on-primary-container,#174046); }
+.rfw-security-block { scroll-margin-top:24px; margin-bottom:28px; }
+.rfw-security-block-heading { display:flex; gap:14px; align-items:flex-start; margin:0 0 15px; }
+.rfw-security-block-heading > span { font-size:12px; line-height:28px; color:var(--rfw-accent); font-weight:600; }
+.rfw-security-block-heading h2 { margin:0; line-height:1.5; font-size:19px; letter-spacing:-.015em; }
+.rfw-security-block-heading p { margin:5px 0 0; font-size:12px; line-height:1.7; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-account-security .rfw-card p { font-size:13px; line-height:1.8; }
+.rfw-account-security .rfw-security-grid button { font-size:12px; min-height:40px; padding:9px 13px; }
+.rfw-account-security .rfw-security-detail { border-bottom:0; padding:12px; border-radius:11px; background:var(--md-sys-color-surface-container-low,#f7f9fc); }
+.rfw-account-security .rfw-security-sessions { scroll-margin-top:24px; margin-top:0; background:var(--md-sys-color-surface,#fff); border-radius:20px; }
+.rfw-account-security .rfw-security-danger-zone { margin-top:20px; padding:20px; border:1px solid var(--md-sys-color-outline-variant,#cdd5df); border-radius:16px; background:var(--md-sys-color-surface-container-low,#f7f9fc); }
+.rfw-account-security .rfw-security-danger-zone strong { font-size:14px; }
+.rfw-account-security .rfw-page > .rfw-message { position:sticky; top:12px; z-index:8; box-shadow:0 6px 24px #0000000d; }
+.rfw-modal-completed { display:flex; align-items:center; gap:8px; padding:12px 14px; border-radius:12px; color:var(--md-sys-color-on-primary-container,#174046) !important; background:var(--md-sys-color-primary-container,#d7e9eb); }
+.rfw-page { position:relative; }
+.rfw-page .rfw-refresh-indicator { position:absolute; top:0; left:0; right:0; height:3px; margin:0; overflow:hidden; border-radius:9px; background:var(--md-sys-color-surface-container-high,#e0e7f0); pointer-events:none; }
+.rfw-refresh-indicator::after { content:''; display:block; height:100%; width:35%; border-radius:inherit; background:var(--md-sys-color-primary,#285c63); animation:rfw-refresh 1s ease-in-out infinite; }
+@keyframes rfw-refresh { from { transform:translateX(-110%); } to { transform:translateX(390%); } }
+.rfw-settings-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:8px; text-decoration:none; font-size:12px; color:var(--md-sys-color-primary,#285c63); }
+.rfw-settings-back svg { rotate:180deg; }
+:host([data-admin-settings-host]) .rfw-settings-back { display:none; }
+.rfw-secret-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11px; color:var(--md-sys-color-on-surface-variant); }
+.rfw-secret-actions button { font-size:11px; min-height:34px; padding:7px 11px; }
+.rfw-domain-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:24px 0; }
+.rfw-domain-summary>div { min-width:0; padding:15px; border:1px solid var(--md-sys-color-outline-variant); border-radius:13px; }
+.rfw-domain-summary dt { color:var(--md-sys-color-on-surface-variant); font-size:11px; margin-bottom:7px; }
+.rfw-domain-summary dd { margin:0; font-size:13px; line-height:1.7; overflow-wrap:anywhere; white-space:pre-wrap; }
+.rfw-domain-impact { padding:17px; margin:20px 0; border-radius:13px; background:var(--md-sys-color-error-container); color:var(--md-sys-color-on-error-container); font-size:13px; line-height:1.8; }
+.rfw-domain-impact p { color:inherit; margin:7px 0 0; }
+.rfw-domain-confirm { display:flex; align-items:flex-start; gap:11px; font-size:13px; line-height:1.8; margin:20px 0; }
+.rfw-domain-confirm input { flex:none; width:18px; height:18px; margin-top:3px; accent-color:var(--md-sys-color-primary); }
+@media(max-width:520px) { .rfw-domain-summary { grid-template-columns:1fr; } .rfw-secret-actions { align-items:flex-start; flex-direction:column; gap:9px; } }
+.rfw-settings-page .rfw-settings-section { display:block; padding:0; border:0; }
+.rfw-settings-page .rfw-settings-section-title { display:grid; grid-template-columns:34px minmax(0,1fr); column-gap:8px; margin-bottom:16px; align-items:center; }
+.rfw-settings-page .rfw-settings-section-title > span { display:grid; place-items:center; height:34px; font-size:11px; border-radius:10px; background:var(--md-sys-color-primary-container,#d7e9eb); color:var(--md-sys-color-on-primary-container,#174046); grid-row:1 / 3; }
+.rfw-settings-page .rfw-settings-section-title h2 { margin:0; font-size:17px; line-height:1.5; }
+.rfw-settings-page .rfw-settings-section-title p { grid-column:2; margin:4px 0 0; }
+.rfw-settings-page .rfw-settings-section-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.rfw-settings-page .rfw-setting-row { padding:22px; border:1px solid var(--md-sys-color-outline-variant,#cdd5df); border-radius:17px !important; align-content:start; }
+.rfw-settings-page .rfw-setting-toggle { align-content:center; }
+.rfw-settings-page .rfw-settings-section:last-child:has(textarea) .rfw-settings-section-fields { grid-template-columns:minmax(0,1fr); }
+.rfw-settings-page .rfw-setting-changed { border-color:color-mix(in srgb,var(--md-sys-color-primary,#285c63) 55%,var(--md-sys-color-outline-variant,#cdd5df)); box-shadow:inset 3px 0 var(--md-sys-color-primary,#285c63); }
+.rfw-settings-page .rfw-settings-savebar { margin-top:28px; bottom:12px; border-radius:18px; backdrop-filter:blur(12px); background:color-mix(in srgb,var(--md-sys-color-surface,#fff) 94%,transparent); }
+.rfw-settings-page .rfw-setting-toggle .rfw-switch { min-height:36px; margin:0; gap:7px; position:relative; }
+.rfw-settings-page .rfw-setting-toggle .rfw-switch input { appearance:none; width:38px; height:22px; margin:0; border:1px solid var(--md-sys-color-outline-variant,#cdd5df); border-radius:20px; background:var(--md-sys-color-surface-container-high,#e0e7f0); cursor:pointer; transition:background .2s,border-color .2s; }
+.rfw-settings-page .rfw-setting-toggle .rfw-switch input:checked { background:var(--md-sys-color-primary,#285c63); border-color:var(--md-sys-color-primary,#285c63); }
+.rfw-settings-page .rfw-setting-toggle .rfw-switch > span { position:absolute; inset-inline-start:4px; top:11px; width:14px; height:14px; border-radius:50%; pointer-events:none; background:var(--md-sys-color-on-surface-variant,#596879); transition:transform .2s,background .2s; }
+.rfw-settings-page .rfw-setting-toggle .rfw-switch input:checked + span { transform:translateX(16px); background:var(--md-sys-color-on-primary,#fff); }
+.rfw-oauth-intro { display:flex; gap:14px; padding:20px; margin-bottom:24px; border-radius:17px; background:var(--md-sys-color-primary-container,#d7e9eb); color:var(--md-sys-color-on-primary-container,#174046); }
+.rfw-oauth-intro svg { flex:none; }
+.rfw-oauth-intro strong { font-size:15px; }
+.rfw-oauth-intro p { font-size:12px; line-height:1.8; margin:6px 0 0; }
+.rfw-oauth-services { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.rfw-oauth-service { min-width:0; padding:24px; border:1px solid var(--md-sys-color-outline-variant,#cdd5df); border-radius:19px; background:var(--md-sys-color-surface,#fff); }
+.rfw-oauth-service header { display:flex; gap:10px; align-items:center; justify-content:space-between; }
+.rfw-oauth-service h2 { font-size:18px; line-height:1.5; margin:0; overflow-wrap:anywhere; }
+.rfw-oauth-service > p { font-size:12px; color:var(--md-sys-color-on-surface-variant,#596879); margin:12px 0 20px; }
+.rfw-oauth-callback { display:grid; gap:9px; padding:13px; border-radius:11px; background:var(--md-sys-color-surface-container-low,#f7f9fc); }
+.rfw-oauth-callback span { font-size:11px; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-oauth-callback code { font-size:12px; line-height:1.7; overflow-wrap:anywhere; }
+.rfw-oauth-service footer { display:flex; gap:10px; justify-content:space-between; margin-top:20px; }
+.rfw-oauth-service footer button { font-size:12px; }
+.rfw-oauth-discovery { display:grid; gap:8px; margin-bottom:22px; padding:16px; background:var(--md-sys-color-surface-container-low,#f7f9fc); border-radius:14px; }
+.rfw-oauth-discovery .rfw-field { margin-bottom:0; }
+.rfw-oauth-discovery > button { justify-self:end; font-size:12px; }
+.rfw-oauth-advanced { margin:20px 0; padding:17px; border:1px solid var(--md-sys-color-outline-variant,#cdd5df); border-radius:13px; }
+.rfw-oauth-advanced summary { cursor:pointer; font-size:13px; font-weight:600; }
+.rfw-oauth-advanced[open] summary { margin-bottom:20px; }
+.rfw-oauth-advanced .rfw-field:last-child { margin-bottom:0; }
+@media(max-width:760px) { .rfw-security-hero { padding:22px; gap:18px; border-radius:20px; } .rfw-security-hero h2 { font-size:19px; } .rfw-security-emblem { width:60px; height:60px; border-radius:20px; } .rfw-account-security .rfw-security-overview { grid-template-columns:1fr; } }
+@media(max-width:640px) { .rfw-settings-page .rfw-settings-section-fields { grid-template-columns:minmax(0,1fr); } .rfw-security-hero { padding:18px; gap:15px; align-items:flex-start; } .rfw-security-emblem { width:44px; height:44px; border-radius:15px; } .rfw-security-emblem svg { width:25px; height:25px; } .rfw-security-hero h2 { font-size:18px; margin-top:6px; } .rfw-security-hero .rfw-eyebrow { font-size:10px; } .rfw-security-hero p { font-size:12px; } .rfw-security-navigation { gap:0; padding:0 0 6px; } .rfw-security-navigation a { flex:1; justify-content:center; padding:11px 5px; font-size:12px; gap:5px; } .rfw-security-block { margin-bottom:24px; } .rfw-settings-page .rfw-setting-row { padding:18px; } .rfw-settings-page .rfw-settings-savebar { position:sticky; bottom:8px; } .rfw-settings-page .rfw-field :is(input,textarea,select),.rfw-account-security .rfw-field input { font-size:16px; } }
+@media(max-width:640px) { .rfw-oauth-services { grid-template-columns:minmax(0,1fr); } .rfw-oauth-service { padding:20px; } }
+
+/* Only the account security cards share these dimensions and action rows. */
+.rfw-account-security { container-type:inline-size; container-name:rfw-account-security; min-width:0; }
+.rfw-account-security .rfw-security-grid { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; gap:16px; }
+.rfw-account-security .rfw-security-grid > .rfw-security-card { display:flex; flex-direction:column; min-width:0; min-height:0; height:auto; padding:22px; border-radius:20px; background:var(--md-sys-color-surface,#fff); border-color:color-mix(in srgb,var(--md-sys-color-outline-variant,#cdd5df) 75%,transparent); }
+.rfw-account-security .rfw-security-card-title { display:grid; grid-template-columns:44px minmax(0,1fr); column-gap:12px; row-gap:4px; min-height:50px; margin:0; align-content:start; }
+.rfw-account-security .rfw-security-card-title > svg { grid-row:1 / 3; align-self:center; width:44px; height:44px; padding:10px; box-sizing:border-box; border-radius:14px; color:var(--md-sys-color-on-primary-container,#174046); background:var(--md-sys-color-primary-container,#d7e9eb); }
+.rfw-account-security .rfw-security-card-title h3 { grid-column:2; min-width:0; margin:0; font-size:16px; font-weight:600; line-height:1.45; overflow-wrap:anywhere; }
+.rfw-account-security .rfw-security-card-title .rfw-security-badge { grid-column:2; justify-self:start; margin:0; padding:3px 8px; min-height:20px; box-sizing:border-box; font-size:10px; line-height:1.4; }
+.rfw-account-security .rfw-security-card > .rfw-security-card-description { margin:14px 0 18px; min-height:3.5em; font-size:13px; line-height:1.75; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-account-security .rfw-security-card-form,.rfw-account-security .rfw-security-card-body { display:flex; flex-direction:column; min-width:0; gap:14px; flex:1; margin:0; }
+.rfw-account-security .rfw-security-card .rfw-field { display:grid; min-width:0; gap:8px; margin:0; }
+.rfw-account-security .rfw-security-card .rfw-field label { font-size:13px; font-weight:600; line-height:1.5; }
+.rfw-account-security .rfw-security-card .rfw-field input { box-sizing:border-box; width:100%; min-width:0; height:48px; min-height:48px; margin:0; padding:0 14px; border-radius:12px; font:inherit; font-size:14px; line-height:1.5; }
+.rfw-account-security .rfw-security-card .rfw-security-detail { display:grid; min-width:0; gap:7px; margin:0; padding:13px 14px; }
+.rfw-account-security .rfw-security-card .rfw-security-detail span { font-size:11px; line-height:1.5; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-account-security .rfw-security-card .rfw-security-detail strong { min-width:0; font-size:13px; font-weight:500; line-height:1.7; overflow-wrap:anywhere; }
+.rfw-account-security .rfw-security-card .rfw-security-note { margin:0; font-size:12px; line-height:1.8; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-account-security .rfw-security-card-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(106px,1fr)); align-items:stretch; gap:8px; width:100%; margin-top:auto; padding-top:18px; }
+.rfw-account-security .rfw-security-card .rfw-security-card-actions > button { display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; min-width:0; width:100%; height:48px; min-height:48px; margin:0; padding:0 12px; border-radius:12px; font:inherit; font-size:13px; font-weight:500; line-height:1.5; }
+.rfw-account-security .rfw-security-bindings-list { display:grid; min-width:0; gap:10px; max-height:220px; overflow:auto; overscroll-behavior:contain; }
+.rfw-account-security .rfw-security-bindings-list .rfw-security-binding { min-width:0; margin:0; gap:10px; }
+.rfw-account-security .rfw-security-bindings-list .rfw-security-binding > div { min-width:0; }
+.rfw-account-security .rfw-security-bindings-list .rfw-security-binding :is(strong,p) { overflow-wrap:anywhere; }
+.rfw-account-security .rfw-security-bindings-list .rfw-security-binding button { flex:none; }
+.rfw-account-security .rfw-security-empty-state { display:grid; justify-items:start; align-content:start; gap:10px; padding:18px; border-radius:12px; color:var(--md-sys-color-on-surface-variant,#596879); background:var(--md-sys-color-surface-container-low,#f7f9fc); }
+.rfw-account-security .rfw-security-empty-state > svg { color:var(--md-sys-color-primary,#285c63); }
+.rfw-account-security .rfw-security-empty-state > p { margin:0; font-size:12px; line-height:1.7; }
+.rfw-account-security .rfw-security-card .rfw-security-card-footnote { display:flex; align-items:center; gap:8px; min-width:0; min-height:48px; margin:0; font-size:11px; line-height:1.7; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-account-security .rfw-security-card-footnote svg { flex:none; }
+@media(max-width:860px) {
+  .rfw-account-security .rfw-security-grid { grid-template-columns:minmax(0,1fr); }
+  .rfw-account-security .rfw-security-card > .rfw-security-card-description { min-height:0; }
+  .rfw-account-security .rfw-security-card-form,.rfw-account-security .rfw-security-card-body { flex:initial; }
+  .rfw-account-security .rfw-security-bindings-list { max-height:none; overflow:visible; }
+  .rfw-account-security .rfw-security-card .rfw-field input { font-size:16px; }
+}
+@container rfw-account-security (max-width:860px) {
+  .rfw-account-security .rfw-security-grid { grid-template-columns:minmax(0,1fr); }
+  .rfw-account-security .rfw-security-card > .rfw-security-card-description { min-height:0; }
+  .rfw-account-security .rfw-security-card-form,.rfw-account-security .rfw-security-card-body { flex:initial; }
+  .rfw-account-security .rfw-security-bindings-list { max-height:none; overflow:visible; }
+  .rfw-account-security .rfw-security-card .rfw-field input { font-size:16px; }
+}
+.rfw-setting-presets { margin:20px 0; padding:18px; border:1px solid var(--md-sys-color-outline-variant,#d5dce6); border-radius:16px; background:var(--md-sys-color-surface-container-low,#f7f9fc); }
+.rfw-setting-presets h2 { margin:0 0 6px; font-size:16px; }
+.rfw-setting-presets p { margin:0; font-size:12px; line-height:1.7; color:var(--md-sys-color-on-surface-variant,#596879); }
+.rfw-setting-preset-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:14px; margin-top:14px; }
+.rfw-setting-preset-grid article { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+.rfw-setting-preset-grid small { font-size:12px; line-height:1.6; color:var(--md-sys-color-error,#ba1a1a); }
+.rfw-setting-presets .rfw-preset-notice { margin-top:14px; color:var(--md-sys-color-primary,#005ac1); }

@@ -21,8 +21,8 @@ For commercial licensing, please contact support@quantumnous.com
  */
 
 // System Configuration Defaults
-export const DEFAULT_SYSTEM_NAME = 'RelayFor'
-export const DEFAULT_LOGO = '/relayfor-logo.svg'
+export const DEFAULT_SYSTEM_NAME = 'further-api'
+export const DEFAULT_LOGO = '/further-api-logo.svg?v=handshake-20261004'
 
 // LocalStorage Keys
 export const STORAGE_KEYS = {

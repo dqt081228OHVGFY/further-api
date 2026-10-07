@@ -1,0 +1,169 @@
+.further-welcome {
+  --further-primary:var(--md-sys-color-primary,#3e6e91);
+  --further-ink:var(--md-sys-color-on-surface,#263952);
+  --further-muted:var(--md-sys-color-on-surface-variant,#65758a);
+  --further-line:var(--md-sys-color-outline-variant,#dfe8f4);
+  --fwelcome-surface:var(--md-sys-color-surface,#fffefb);
+  --fwelcome-soft:var(--md-sys-color-surface-container-low,#f1f5f9);
+  --fwelcome-wash:var(--md-sys-color-primary-container,#d4e9fa);
+  --fwelcome-on-wash:var(--md-sys-color-on-primary-container,#274963);
+  --fwelcome-ease:cubic-bezier(.25,.1,.25,1);
+  min-height:100svh;
+  color:var(--further-ink);
+  background:var(--fwelcome-surface);
+  font-family:inherit;
+  overflow-x:clip;
+}
+.further-welcome * { box-sizing:border-box; }
+.further-welcome button,.further-welcome a { -webkit-tap-highlight-color:transparent; }
+.further-welcome button { font:inherit; }
+.further-welcome button:disabled { cursor:wait; }
+.further-welcome :focus-visible { outline:3px solid var(--further-primary); outline-offset:5px; }
+.fwelcome-header { display:flex; justify-content:space-between; align-items:center; gap:20px; max-width:1184px; margin:auto; padding:22px 32px; }
+.fwelcome-brand { display:inline-flex; align-items:center; gap:10px; color:inherit; text-decoration:none; font-size:19px; font-weight:760; letter-spacing:-.03em; }
+.fwelcome-brand img { border-radius:11px; }
+.fwelcome-header-end { display:flex; align-items:center; gap:18px; }
+.fwelcome-new { display:inline-flex; align-items:center; gap:6px; color:var(--further-muted); font-size:12px; }
+.fwelcome-new svg { color:var(--further-primary); }
+.fwelcome-main { max-width:1120px; padding:12px 32px 0; margin:auto; }
+.fwelcome-hero { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); align-items:center; gap:36px; padding:24px 0 32px; }
+.fwelcome-eyebrow { display:flex; align-items:center; gap:9px; font-size:12px; font-weight:600; letter-spacing:.04em; color:var(--further-primary); margin:0 0 17px; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-eyebrow>span { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.fwelcome-hero h1 { margin:0; font-size:clamp(36px,4.4vw,58px); font-weight:700; line-height:1.16; letter-spacing:-.05em; overflow-wrap:anywhere; }
+.fwelcome-title-line { display:block; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-title-brand { color:var(--further-primary); animation-delay:220ms; }
+.fwelcome-wave { display:inline-block; margin-left:15px; color:var(--further-primary); font-size:.55em; vertical-align:middle; animation:fwelcome-star-turn 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-intro { margin:22px 0 0; color:var(--further-muted); font-size:15px; line-height:1.85; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-hero-caption { display:flex; align-items:center; gap:11px; margin-top:25px; color:var(--further-muted); font-size:12px; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-caption-rule { width:26px; height:1px; background:var(--further-line); }
+.fwelcome-art { position:relative; height:290px; width:100%; max-width:390px; justify-self:end; isolation:isolate; }
+.fwelcome-orbit { position:absolute; border:1px solid var(--further-line); border-radius:50%; inset:25px 30px; transform:rotate(-28deg); animation:fwelcome-orbit-arrive 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-orbit-inner { inset:68px 53px; transform:rotate(22deg); background:var(--fwelcome-soft); border-color:transparent; animation-name:fwelcome-inner-arrive; animation-delay:180ms; }
+.fwelcome-connection { position:absolute; inset:0; width:100%; height:100%; color:var(--further-primary); }
+.fwelcome-connection path { stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0; opacity:.42; animation:fwelcome-path 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-hero-logo { position:absolute; inset:0; display:grid; place-items:center; animation:fwelcome-logo-arrive 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-hero-logo img { border-radius:31px; width:108px; height:108px; box-shadow:0 14px 28px color-mix(in srgb,var(--further-primary) 13%,transparent); transform:rotate(-7deg); }
+.fwelcome-art-label { position:absolute; display:flex; align-items:center; gap:7px; padding:10px 14px; border:1px solid var(--further-line); border-radius:50px; background:var(--fwelcome-surface); color:var(--further-primary); font-size:12px; font-weight:600; animation:fwelcome-label-arrive 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-art-label-key { left:8px; top:65px; transform:rotate(-8deg); }
+.fwelcome-art-label-spark { bottom:44px; right:4px; transform:rotate(7deg); animation-delay:650ms; }
+.fwelcome-orbit-dot { position:absolute; width:12px; height:12px; border-radius:50%; background:var(--fwelcome-wash); border:3px solid var(--further-primary); animation:fwelcome-pop 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-orbit-dot-one { top:24px; right:91px; }
+.fwelcome-orbit-dot-two { bottom:28px; left:94px; width:8px; height:8px; border-width:0; background:var(--further-primary); animation-delay:820ms; }
+.fwelcome-art-star { position:absolute; color:var(--further-primary); font-size:30px; animation:fwelcome-star-turn 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-art-star-one { top:41px; right:20px; }
+.fwelcome-art-star-two { left:22px; bottom:28px; font-size:23px; animation-delay:570ms; }
+.fwelcome-section-title { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:15px; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-section-title h2 { margin:0; font-size:16px; font-weight:650; letter-spacing:-.02em; }
+.fwelcome-section-title>span { color:var(--further-muted); font-size:11px; }
+.fwelcome-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.fwelcome-card { display:flex; flex-direction:column; align-items:stretch; text-align:left; position:relative; padding:22px; border:1px solid var(--further-line); border-radius:24px; color:var(--further-ink); background:var(--fwelcome-soft); min-width:0; cursor:pointer; animation:fwelcome-card-arrive 360ms var(--fwelcome-ease) 0ms backwards; transition:transform 220ms cubic-bezier(.25,.1,.25,1),background-color 180ms ease,border-color 180ms ease; }
+.fwelcome-card:nth-child(2) { animation-delay:530ms; }
+.fwelcome-card:nth-child(3) { animation-delay:610ms; }
+.fwelcome-card:hover,.fwelcome-card:focus-visible { transform:translateY(-5px); background:var(--fwelcome-wash); border-color:color-mix(in srgb,var(--further-primary) 32%,var(--further-line)); }
+.fwelcome-card:active { transform:translateY(-1px) scale(.982); transition-duration:120ms; }
+.fwelcome-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.fwelcome-card-icon { display:grid; place-items:center; width:43px; height:43px; border-radius:16px; color:var(--further-primary); background:var(--fwelcome-surface); }
+.fwelcome-card-number { font-size:11px; letter-spacing:.08em; color:var(--further-muted); }
+.fwelcome-card-kicker { color:var(--further-primary); font-size:11px; font-weight:600; margin-bottom:7px; }
+.fwelcome-card strong { font-size:17px; line-height:1.5; letter-spacing:-.025em; font-weight:650; }
+.fwelcome-card-description { color:var(--further-muted); font-size:12px; line-height:1.8; margin-top:9px; }
+.fwelcome-card-action { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:21px; color:var(--further-primary); font-size:12px; font-weight:600; }
+.fwelcome-card-action svg { transition:transform 220ms cubic-bezier(.25,.1,.25,1); }
+.fwelcome-card:hover .fwelcome-card-action svg,.fwelcome-card:focus-visible .fwelcome-card-action svg { transform:translateX(4px); }
+.fwelcome-next { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:24px; padding:22px 0; animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-next-copy { display:flex; flex-direction:column; gap:7px; }
+.fwelcome-next-copy strong { font-size:14px; font-weight:600; }
+.fwelcome-next-copy>span { font-size:12px; color:var(--further-muted); }
+.fwelcome-primary { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:22px; min-height:52px; min-width:185px; padding:14px 24px; border:0; border-radius:28px; color:var(--md-sys-color-on-primary,#fff); background:var(--further-primary); font-size:14px; font-weight:600; cursor:pointer; overflow:hidden; transition:transform 180ms cubic-bezier(.25,.1,.25,1); }
+.fwelcome-primary::before { content:''; position:absolute; inset:0; background:currentColor; opacity:0; transition:opacity 180ms; pointer-events:none; }
+.fwelcome-primary:hover { transform:translateY(-2px); }
+.fwelcome-primary:hover::before { opacity:.08; }
+.fwelcome-primary:active { transform:scale(.96); transition-duration:120ms; }
+.fwelcome-primary:active::before { opacity:.16; }
+.fwelcome-primary>svg { transition:transform 220ms cubic-bezier(.25,.1,.25,1); }
+.fwelcome-primary:hover>svg { transform:translateX(4px); }
+.fwelcome-save-error { margin:0 0 16px; padding:12px 16px; border-radius:14px; color:var(--md-sys-color-on-error-container,#6d2721); background:var(--md-sys-color-error-container,#ffdad4); font-size:12px; line-height:1.7; animation:fwelcome-rise 360ms var(--fwelcome-ease) backwards; }
+.fwelcome-guide { border-top:1px solid var(--further-line); animation:fwelcome-rise 360ms var(--fwelcome-ease) 0ms backwards; }
+.fwelcome-guide-toggle { display:flex; justify-content:space-between; align-items:center; width:100%; padding:17px 0; border:0; color:var(--further-muted); background:transparent; text-align:left; cursor:pointer; font-size:12px; }
+.fwelcome-guide-toggle>svg { transition:transform 280ms cubic-bezier(.25,.1,.25,1); }
+.fwelcome-guide-toggle[aria-expanded='true']>svg { transform:rotate(180deg); }
+.fwelcome-guide-body { overflow:hidden; }
+.fwelcome-guide-body[hidden] { display:none; }
+.fwelcome-guide-body ol { list-style:none; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; padding:4px 0 22px; margin:0; }
+.fwelcome-guide-body li { display:flex; align-items:flex-start; gap:12px; min-width:0; }
+.fwelcome-step-number { display:grid; place-items:center; width:27px; height:27px; border-radius:50%; flex:none; background:var(--fwelcome-soft); color:var(--further-muted); font-size:12px; transition:background-color 180ms,color 180ms; }
+.fwelcome-guide-body li[data-active='true'] .fwelcome-step-number { background:var(--fwelcome-wash); color:var(--fwelcome-on-wash); }
+.fwelcome-guide-body h3 { font-size:12px; font-weight:650; margin:5px 0 8px; }
+.fwelcome-guide-body p { font-size:11px; color:var(--further-muted); line-height:1.9; margin:0; }
+.fwelcome-footer { max-width:1120px; margin:auto; padding:18px 32px 25px; color:var(--further-muted); font-size:10px; }
+.further-welcome[data-welcome-state='leaving'] { pointer-events:none; }
+@keyframes fwelcome-rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes fwelcome-card-arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes fwelcome-logo-arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes fwelcome-orbit-arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes fwelcome-inner-arrive { from { opacity:0; transform:rotate(-32deg) scale(.72); } to { opacity:1; transform:rotate(22deg) scale(1); } }
+@keyframes fwelcome-label-arrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes fwelcome-star-turn { from { opacity:0; rotate:-100deg; scale:.2; } to { opacity:1; rotate:0deg; scale:1; } }
+@keyframes fwelcome-pop { from { opacity:0; scale:0; } to { opacity:1; scale:1; } }
+@keyframes fwelcome-path { from { stroke-dashoffset:1; opacity:0; } to { stroke-dashoffset:0; opacity:.42; } }
+@media(min-width:1440px) { .fwelcome-main { padding-top:20px; } .fwelcome-hero { padding-bottom:40px; } }
+@media(max-width:760px) {
+  .fwelcome-header { padding:18px 24px; }
+  .fwelcome-main { padding:0 24px; }
+  .fwelcome-header-end { gap:8px; }
+  .fwelcome-new { display:none; }
+  .fwelcome-hero { gap:10px; padding:22px 0 26px; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); }
+  .fwelcome-hero h1 { font-size:38px; }
+  .fwelcome-art { height:230px; }
+  .fwelcome-art-label { padding:8px 10px; }
+  .fwelcome-art-label-key { left:-8px; top:35px; }
+  .fwelcome-art-label-spark { right:-6px; bottom:26px; }
+  .fwelcome-hero-logo img { width:84px; height:84px; border-radius:25px; }
+  .fwelcome-hero-caption { display:none; }
+  .fwelcome-card { padding:18px; border-radius:20px; }
+  .fwelcome-cards { gap:10px; }
+  .fwelcome-card strong { font-size:15px; }
+  .fwelcome-guide-body ol { grid-template-columns:minmax(0,1fr); gap:16px; }
+  .fwelcome-footer { padding:18px 24px 22px; }
+}
+@media(max-width:540px) {
+  .fwelcome-header { padding:16px 20px; }
+  .fwelcome-brand { font-size:17px; }
+  .fwelcome-brand img { width:32px; height:32px; border-radius:10px; }
+  .fwelcome-main { padding:0 20px; }
+  .fwelcome-hero { grid-template-columns:minmax(0,1fr); padding:12px 0 25px; gap:4px; }
+  .fwelcome-art { grid-row:1; justify-self:center; width:235px; height:167px; }
+  .fwelcome-hero-logo img { width:68px; height:68px; border-radius:21px; }
+  .fwelcome-orbit { inset:12px 17px; }
+  .fwelcome-orbit-inner { inset:36px 30px; }
+  .fwelcome-art-label { font-size:10px; padding:7px 10px; gap:5px; }
+  .fwelcome-art-label>svg { width:13px; height:13px; }
+  .fwelcome-art-label-key { left:0; top:30px; }
+  .fwelcome-art-label-spark { right:-1px; bottom:24px; }
+  .fwelcome-orbit-dot-one { top:8px; right:64px; }
+  .fwelcome-orbit-dot-two { bottom:11px; left:58px; }
+  .fwelcome-art-star-one { top:15px; right:6px; font-size:23px; }
+  .fwelcome-art-star-two { left:5px; bottom:13px; font-size:19px; }
+  .fwelcome-eyebrow { margin-top:14px; margin-bottom:12px; font-size:11px; }
+  .fwelcome-hero h1 { font-size:clamp(32px,9.8vw,44px); }
+  .fwelcome-intro { font-size:13px; line-height:1.8; margin-top:15px; }
+  .fwelcome-section-title { gap:8px; margin-bottom:12px; }
+  .fwelcome-section-title h2 { font-size:14px; }
+  .fwelcome-section-title>span { font-size:10px; }
+  .fwelcome-cards { grid-template-columns:minmax(0,1fr); gap:10px; }
+  .fwelcome-card { display:grid; grid-template-columns:41px minmax(0,1fr); column-gap:14px; padding:16px; border-radius:20px; }
+  .fwelcome-card-top { grid-column:1; grid-row:1 / 5; display:block; margin:0; }
+  .fwelcome-card-icon { width:39px; height:39px; border-radius:14px; }
+  .fwelcome-card-icon svg { width:21px; height:21px; }
+  .fwelcome-card-number { display:block; text-align:center; margin-top:9px; font-size:9px; }
+  .fwelcome-card-kicker { grid-column:2; font-size:10px; margin-bottom:4px; }
+  .fwelcome-card strong { grid-column:2; font-size:15px; }
+  .fwelcome-card-description { grid-column:2; font-size:11px; margin-top:5px; }
+  .fwelcome-card-action { grid-column:2; padding-top:10px; font-size:11px; }
+  .fwelcome-next { flex-direction:column; align-items:stretch; gap:15px; padding:18px 0; margin-top:15px; }
+  .fwelcome-next-copy { gap:5px; }
+  .fwelcome-next-copy strong { font-size:13px; }
+  .fwelcome-next-copy>span { font-size:11px; }
+  .fwelcome-primary { width:100%; min-height:50px; justify-content:space-between; padding-inline:22px; }
+  .fwelcome-footer { padding:17px 20px 20px; }
+}

@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/setting/perf_metrics_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/setting/perf_metrics_setting"
 
 	"github.com/bytedance/gopkg/util/gopool"
 )
@@ -30,7 +30,7 @@ func Init() {
 
 // RecordRelayResult samples one finished relay exactly once, at the request
 // boundary, regardless of how many channel attempts it took.
-func RecordRelayResult(ctx context.Context, info *relaycommon.RelayInfo, apiErr *types.NewAPIError) {
+func RecordRelayResult(ctx context.Context, info *relaycommon.RelayInfo, apiErr *types.GatewayError) {
 	if info == nil {
 		return
 	}

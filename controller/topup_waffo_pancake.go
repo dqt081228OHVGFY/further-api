@@ -1,119 +1,98 @@
 package controller
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
-
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 )
+
+var errPancakeEnvironment = errors.New("支付回调环境不匹配")
+var errPancakeReference = errors.New("支付回调账户或订单不匹配")
+
+func pancakePaymentEvidence(event *service.WaffoPancakeWebhookEvent) *model.PaymentEvidence {
+	amount := strings.TrimSpace(event.Data.Subtotal)
+	if amount == "" {
+		amount = strings.TrimSpace(event.Data.Amount)
+	}
+	if amount == "" && event.Data.Total != "" {
+		paid, paidErr := decimal.NewFromString(event.Data.Total)
+		tax, taxErr := decimal.NewFromString(event.Data.TaxAmount)
+		if paidErr == nil && taxErr == nil && tax.Sign() >= 0 {
+			amount = paid.Sub(tax).String()
+		}
+	}
+	return &model.PaymentEvidence{Amount: amount, Currency: event.Data.Currency}
+}
+
+func processWaffoPancakePayment(ctx context.Context, event *service.WaffoPancakeWebhookEvent, expectedEnvironment, receipt, callerIP string) error {
+	if event == nil {
+		return errPancakeReference
+	}
+	if !strings.EqualFold(strings.TrimSpace(event.Mode), expectedEnvironment) {
+		return errPancakeEnvironment
+	}
+	if event.NormalizedEventType() != "order.completed" {
+		return nil
+	}
+	tradeNo := strings.TrimSpace(event.Data.OrderMerchantExternalID)
+	// Stored order type determines dispatch, including historical trade numbers.
+	reference, err := model.FindGatewayPaymentReferenceContext(ctx, tradeNo, model.PaymentProviderWaffoPancake)
+	if err != nil {
+		if errors.Is(err, model.ErrTopUpNotFound) || errors.Is(err, model.ErrPaymentMethodMismatch) {
+			return errPancakeReference
+		}
+		return err
+	}
+	if reference.Subscription {
+		_, err = service.ResolveWaffoPancakeSubscriptionTradeNoContext(ctx, event)
+	} else {
+		_, err = service.ResolveWaffoPancakeTradeNoContext(ctx, event)
+	}
+	if err != nil {
+		return errPancakeReference
+	}
+	LockOrder(tradeNo)
+	defer UnlockOrder(tradeNo)
+	return model.CompleteGatewayPaymentContext(ctx, model.GatewayPaymentConfirmation{TradeNo: tradeNo, Provider: model.PaymentProviderWaffoPancake, Receipt: receipt, CallerIP: callerIP, Evidence: pancakePaymentEvidence(event)})
+}
 
 func WaffoPancakeWebhook(c *gin.Context) {
 	if !isWaffoPancakeWebhookEnabled() {
-		logger.LogWarn(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 被拒绝 reason=webhook_disabled path=%q client_ip=%s", c.Request.RequestURI, c.ClientIP()))
 		c.String(http.StatusForbidden, "webhook disabled")
 		return
 	}
-
-	// :env splits test vs prod traffic at the routing layer — operator
-	// registers each URL in the matching webhook slot in Pancake's dashboard.
-	// We then enforce event.mode == expectedEnv to catch mis-registrations.
-	expectedEnv := strings.TrimSpace(c.Param("env"))
-	if expectedEnv != "test" && expectedEnv != "prod" {
-		logger.LogWarn(c.Request.Context(), fmt.Sprintf(
-			"Waffo Pancake webhook 路径环境段无效 env=%q path=%q client_ip=%s",
-			expectedEnv, c.Request.RequestURI, c.ClientIP(),
-		))
+	expectedEnvironment := strings.TrimSpace(c.Param("env"))
+	if expectedEnvironment != "test" && expectedEnvironment != "prod" {
 		c.String(http.StatusNotFound, "unknown env")
 		return
 	}
-
-	bodyBytes, err := io.ReadAll(c.Request.Body)
+	payload, err := readPaymentWebhook(c)
 	if err != nil {
-		logger.LogError(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 读取请求体失败 path=%q client_ip=%s error=%q", c.Request.RequestURI, c.ClientIP(), err.Error()))
 		c.String(http.StatusBadRequest, "bad request")
 		return
 	}
-
-	signature := c.GetHeader("X-Waffo-Signature")
-	logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 收到请求 path=%q client_ip=%s signature=%q body=%q", c.Request.RequestURI, c.ClientIP(), signature, string(bodyBytes)))
-
-	event, err := service.VerifyConfiguredWaffoPancakeWebhook(string(bodyBytes), signature)
+	event, err := service.VerifyConfiguredWaffoPancakeWebhook(string(payload), c.GetHeader("X-Waffo-Signature"))
 	if err != nil {
-		logger.LogWarn(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 验签失败 path=%q client_ip=%s signature=%q body=%q error=%q", c.Request.RequestURI, c.ClientIP(), signature, string(bodyBytes), err.Error()))
+		logger.LogWarn(c.Request.Context(), "Waffo Pancake 回调签名验证未通过")
 		c.String(http.StatusUnauthorized, "invalid signature")
 		return
 	}
-
-	if !strings.EqualFold(strings.TrimSpace(event.Mode), expectedEnv) {
-		logger.LogError(c.Request.Context(), fmt.Sprintf(
-			"Waffo Pancake webhook 环境不匹配 expected=%q actual_mode=%q event_id=%s order_id=%s client_ip=%s",
-			expectedEnv, event.Mode, event.ID, event.Data.OrderID, c.ClientIP(),
-		))
-		c.String(http.StatusOK, "OK")
-		return
-	}
-
-	logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 验签成功 event_type=%s event_id=%s order_id=%s client_ip=%s", event.NormalizedEventType(), event.ID, event.Data.OrderID, c.ClientIP()))
-	if event.NormalizedEventType() != "order.completed" {
-		c.String(http.StatusOK, "OK")
-		return
-	}
-
-	// Dispatch by trade_no prefix. OrderMerchantExternalID = our trade_no;
-	// OrderID is Pancake's internal ORD_* (logs only).
-	rawTradeNo := strings.TrimSpace(event.Data.OrderMerchantExternalID)
-	isSubscription := strings.HasPrefix(rawTradeNo, "WAFFO_PANCAKE_SUB-")
-
-	if isSubscription {
-		tradeNo, err := service.ResolveWaffoPancakeSubscriptionTradeNo(event)
-		if err != nil {
-			logger.LogError(c.Request.Context(), fmt.Sprintf(
-				"Waffo Pancake webhook 订阅订单解析失败 event_id=%s order_id=%s buyer_identity=%q client_ip=%s error=%q",
-				event.ID, event.Data.OrderID, event.Data.MerchantProvidedBuyerIdentity, c.ClientIP(), err.Error(),
-			))
+	if err := processWaffoPancakePayment(c.Request.Context(), event, expectedEnvironment, string(payload), c.ClientIP()); err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("Waffo Pancake 回调结算失败 event_id=%s error=%q", event.ID, err.Error()))
+		if errors.Is(err, errPancakeEnvironment) || errors.Is(err, errPancakeReference) {
 			c.String(http.StatusOK, "OK")
 			return
 		}
-		LockOrder(tradeNo)
-		defer UnlockOrder(tradeNo)
-		if err := model.CompleteSubscriptionOrder(tradeNo, string(bodyBytes), model.PaymentProviderWaffoPancake, ""); err != nil {
-			logger.LogError(c.Request.Context(), fmt.Sprintf("Waffo Pancake 订阅完成失败 trade_no=%s event_id=%s order_id=%s client_ip=%s error=%q", tradeNo, event.ID, event.Data.OrderID, c.ClientIP(), err.Error()))
-			c.String(http.StatusInternalServerError, "retry")
-			return
-		}
-		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo Pancake 订阅完成 trade_no=%s event_id=%s order_id=%s client_ip=%s", tradeNo, event.ID, event.Data.OrderID, c.ClientIP()))
-		c.String(http.StatusOK, "OK")
-		return
-	}
-
-	tradeNo, err := service.ResolveWaffoPancakeTradeNo(event)
-	if err != nil {
-		// LogError (not LogWarn): covers order-not-found and buyer-identity
-		// mismatch — both warrant human attention. 200 OK so Waffo doesn't
-		// retry a permanently-unresolvable webhook.
-		logger.LogError(c.Request.Context(), fmt.Sprintf(
-			"Waffo Pancake webhook 订单解析失败 event_id=%s order_id=%s buyer_identity=%q client_ip=%s error=%q",
-			event.ID, event.Data.OrderID, event.Data.MerchantProvidedBuyerIdentity, c.ClientIP(), err.Error(),
-		))
-		c.String(http.StatusOK, "OK")
-		return
-	}
-
-	LockOrder(tradeNo)
-	defer UnlockOrder(tradeNo)
-
-	if err := model.RechargeWaffoPancake(tradeNo); err != nil {
-		logger.LogError(c.Request.Context(), fmt.Sprintf("Waffo Pancake 充值处理失败 trade_no=%s event_id=%s order_id=%s client_ip=%s error=%q", tradeNo, event.ID, event.Data.OrderID, c.ClientIP(), err.Error()))
 		c.String(http.StatusInternalServerError, "retry")
 		return
 	}
-
-	logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo Pancake 充值成功 trade_no=%s event_id=%s order_id=%s client_ip=%s", tradeNo, event.ID, event.Data.OrderID, c.ClientIP()))
 	c.String(http.StatusOK, "OK")
 }

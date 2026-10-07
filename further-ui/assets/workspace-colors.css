@@ -1,0 +1,104 @@
+/* Shared pastel blue / yellow identity, applied after each page's layout CSS. */
+:root { --workspace-blue:#eaf4ff; --workspace-yellow:#fff5d6; --workspace-yellow-ink:#78602b; --workspace-action:#cce6fb; --workspace-action-ink:#244963; --workspace-easing:cubic-bezier(.2,.8,.2,1); }
+:root { --further-motion-standard:cubic-bezier(.2,.8,.2,1); --further-motion-enter:cubic-bezier(.2,.8,.2,1); --further-motion-exit:cubic-bezier(.4,0,1,1); }
+:root:not([data-theme='dark']),:root[data-further-palette]:not([data-theme='dark']) {
+  --md-sys-color-primary:#3e6e91; --md-sys-color-on-primary:#fff;
+  --md-sys-color-primary-container:#e5f1fd; --md-sys-color-on-primary-container:#345a78;
+  --md-sys-color-secondary:#78602b; --md-sys-color-secondary-container:#fff3ce; --md-sys-color-on-secondary-container:#685321;
+  --md-sys-color-surface:#fffefb; --md-sys-color-surface-bright:#fffefb;
+  --md-sys-color-surface-container-low:#f6faff; --md-sys-color-surface-container:#f0f6fc;
+  --md-sys-color-surface-container-high:#eaf2fa; --md-sys-color-surface-container-highest:#e1edf7;
+  --md-sys-color-on-surface:#263952; --md-sys-color-on-surface-variant:#65758a;
+  --md-sys-color-outline:#8b9bb1; --md-sys-color-outline-variant:#dfe8f4;
+}
+:root[data-further-palette='yellow']:not([data-theme='dark']) { --workspace-action:#f8e8b8; --workspace-action-ink:#685321; --md-sys-color-primary:#7b652b; --md-sys-color-on-primary-container:#685321; --md-sys-color-primary-container:#fff3ce; --md-sys-color-surface-container:#faf7ed; }
+:root[data-further-palette='white']:not([data-theme='dark']) { --md-sys-color-surface-container:#f5f7f8; }
+:root[data-theme='dark'],:root[data-further-palette][data-theme='dark'] { --workspace-blue:#243e5c; --workspace-yellow:#453b25; --workspace-yellow-ink:#ebd49a; --workspace-action:#bddaf1; --workspace-action-ink:#243f56; --md-sys-color-primary:#accbfa; --md-sys-color-on-primary:#173756; --md-sys-color-primary-container:#25486d; --md-sys-color-on-primary-container:#d5e6ff; --md-sys-color-secondary:#dfc88f; --md-sys-color-secondary-container:#514226; --md-sys-color-on-secondary-container:#f9e7b8; --md-sys-color-surface:#172333; --md-sys-color-surface-container-low:#1b2b40; --md-sys-color-surface-container:#142134; --md-sys-color-surface-container-high:#263950; --md-sys-color-surface-container-highest:#30455f; --md-sys-color-on-surface:#e0e9f5; --md-sys-color-on-surface-variant:#a5b5ca; --md-sys-color-outline-variant:#31455e; }
+:root[data-further-palette='yellow'][data-theme='dark'] { --workspace-action:#ead9a7; --workspace-action-ink:#554524; --md-sys-color-primary:#e6d39b; --md-sys-color-primary-container:#51452b; --md-sys-color-on-primary-container:#faecca; }
+body[data-page='console'],body[data-page='admin'] { background:var(--md-sys-color-surface-container); }
+.workspace-welcome,.settings-directory-item,.console-start-card { background:var(--workspace-blue); }
+.workspace-orbit-dot:last-child,.workspace-footer::before { background:color-mix(in srgb,var(--workspace-yellow) 75%,var(--workspace-yellow-ink)); }
+.stat-card:nth-child(even),.ranking-card-warning,.console-directory-foot { background:var(--workspace-yellow); }
+.more-plans-banner,.console-benefit-intro,.auth-story { background:var(--workspace-blue); }
+.auth-story::after { border-color:color-mix(in srgb,var(--md-sys-color-primary-container) 75%,var(--md-sys-color-surface)); }
+.auth-material-page .auth-card { background:var(--md-sys-color-surface); }
+.auth-material-page #local-auth-fields { background:var(--md-sys-color-surface-container-low); }
+.auth-material-page .auth-provider-area,.auth-material-page #linuxdo-login { background:var(--workspace-yellow); }
+:root[data-theme='dark'] .auth-material-page .auth-provider-area { background:var(--workspace-yellow); }
+.md-btn-filled:not(.md-btn-danger):not(.danger),.auth-material-page #auth-submit.md-btn-filled { background:var(--workspace-action); color:var(--workspace-action-ink); box-shadow:0 4px 12px color-mix(in srgb,var(--workspace-action-ink) 7%,transparent); }
+.md-btn-filled:not(.md-btn-danger):not(.danger):hover,.auth-material-page #auth-submit.md-btn-filled:hover { background:color-mix(in srgb,var(--workspace-action) 85%,var(--md-sys-color-surface)); }
+.md-btn-filled:not(.md-btn-danger):not(.danger):disabled { opacity:.62; }
+.workspace-page .md-btn-outlined:hover { background:color-mix(in srgb,var(--workspace-yellow) 65%,transparent); }
+.workspace-page .nav-item.active { background:var(--md-sys-color-primary-container); }
+.workspace-page .nav-item:hover { background:color-mix(in srgb,var(--workspace-blue) 70%,transparent); }
+:root:is([data-further-palette='mid_autumn'],[data-further-palette='auto'][data-holiday='mid_autumn']):not([data-theme='dark']) { --workspace-blue:#f5ecd7; --workspace-yellow:#fff0bc; --workspace-yellow-ink:#906923; --workspace-action:#f1d595; --workspace-action-ink:#765018; --md-sys-color-primary:#8d6727; --md-sys-color-primary-container:#faeac2; --md-sys-color-on-primary-container:#72521b; --md-sys-color-secondary:#92691f; --md-sys-color-secondary-container:#ffe9a9; --md-sys-color-surface-container:#f7f0df; --md-sys-color-surface-container-low:#fff9ea; --md-sys-color-outline-variant:#ece0c8; }
+:root:is([data-further-palette='duanwu'],[data-further-palette='auto'][data-holiday='duanwu']):not([data-theme='dark']) { --workspace-blue:#e4f1df; --workspace-yellow:#fff0bf; --workspace-action:#c9dfb3; --workspace-action-ink:#31553b; --md-sys-color-primary:#3f7055; --md-sys-color-primary-container:#e0eddc; --md-sys-color-on-primary-container:#2f573e; }
+:root:is([data-further-palette='qixi'],[data-further-palette='auto'][data-holiday='qixi']):not([data-theme='dark']) { --workspace-blue:#e9edff; --workspace-yellow:#f0e9fc; --workspace-yellow-ink:#695891; --workspace-action:#d6d9f5; --workspace-action-ink:#4d4975; --md-sys-color-primary:#5e68a2; --md-sys-color-primary-container:#e6eaff; --md-sys-color-on-primary-container:#434d86; }
+:root:is([data-further-palette='chongyang'],[data-further-palette='auto'][data-holiday='chongyang']):not([data-theme='dark']) { --workspace-blue:#f5eddd; --workspace-yellow:#f9eac3; --workspace-yellow-ink:#896324; --workspace-action:#efd8a6; --workspace-action-ink:#745422; --md-sys-color-primary:#86652c; --md-sys-color-primary-container:#f5e6bf; --md-sys-color-on-primary-container:#715522; --md-sys-color-secondary:#96722b; --md-sys-color-surface-container-low:#faf6eb; }
+:root:is([data-further-palette='new_year_eve'],[data-further-palette='auto'][data-holiday='new_year_eve']):not([data-theme='dark']) { --workspace-blue:#ffede2; --workspace-yellow:#ffe8b4; --workspace-yellow-ink:#9c601c; --workspace-action:#f2c4b4; --workspace-action-ink:#853d32; --md-sys-color-primary:#b55344; --md-sys-color-primary-container:#fbe1d6; --md-sys-color-on-primary-container:#873a30; }
+:root:is([data-further-palette='mid_autumn'],[data-further-palette='auto'][data-holiday='mid_autumn'])[data-theme='dark'],:root:is([data-further-palette='chongyang'],[data-further-palette='auto'][data-holiday='chongyang'])[data-theme='dark'] { --workspace-blue:#403a2e; --workspace-yellow:#4b3d25; --workspace-yellow-ink:#ebcd8b; --workspace-action:#e7c57e; --workspace-action-ink:#58401b; --md-sys-color-primary:#e8c881; --md-sys-color-primary-container:#584827; --md-sys-color-on-primary-container:#f7e5b9; }
+:root:is([data-further-palette='duanwu'],[data-further-palette='auto'][data-holiday='duanwu'])[data-theme='dark'] { --workspace-blue:#253f31; --workspace-action:#bed8ac; --workspace-action-ink:#304d31; --md-sys-color-primary:#b6d7bc; --md-sys-color-primary-container:#31513d; }
+:root:is([data-further-palette='qixi'],[data-further-palette='auto'][data-holiday='qixi'])[data-theme='dark'] { --workspace-blue:#30364e; --workspace-yellow:#3d344c; --workspace-yellow-ink:#d4c1ef; --workspace-action:#c9c6ea; --workspace-action-ink:#454066; --md-sys-color-primary:#c2c7ef; }
+:root:is([data-further-palette='new_year_eve'],[data-further-palette='auto'][data-holiday='new_year_eve'])[data-theme='dark'] { --workspace-blue:#4b3029; --workspace-yellow:#4d3b22; --workspace-action:#efb9a5; --workspace-action-ink:#65392f; --md-sys-color-primary:#f2b4a2; --md-sys-color-primary-container:#673f35; }
+/* National Day shares one red-and-gold palette across original and React pages. */
+:root:is([data-further-palette='national_day'],[data-further-palette='auto'][data-holiday='national_day']):not([data-theme='dark']) { --workspace-blue:#f8e5dd; --workspace-yellow:#ffedbf; --workspace-yellow-ink:#8b6228; --workspace-action:#edc294; --workspace-action-ink:#733c29; --md-sys-color-primary:#ad4d3c; --md-sys-color-primary-container:#f8ddd2; --md-sys-color-on-primary-container:#7d392e; --md-sys-color-secondary:#946b30; --md-sys-color-secondary-container:#ffebbc; --md-sys-color-on-secondary-container:#72521e; }
+:root:is([data-further-palette='national_day'],[data-further-palette='auto'][data-holiday='national_day'])[data-theme='dark'] { --workspace-blue:#472e31; --workspace-yellow:#4b3b25; --workspace-yellow-ink:#edcf94; --workspace-action:#edbd8d; --workspace-action-ink:#613d29; --md-sys-color-primary:#f0baa0; --md-sys-color-primary-container:#653b35; --md-sys-color-on-primary-container:#ffdecc; --md-sys-color-secondary:#e3c17e; --md-sys-color-secondary-container:#55432a; --md-sys-color-on-secondary-container:#f4deb0; }
+/* Keep every surface in the seasonal palette, including dialogs and the rail.
+   The explicit palette controls precedence; only automatic mode reads the live season. */
+:root:is([data-further-palette='auto'][data-holiday],[data-further-palette='duanwu'],[data-further-palette='qixi'],[data-further-palette='mid_autumn'],[data-further-palette='chongyang'],[data-further-palette='new_year_eve'],[data-further-palette='national_day']):not([data-theme='dark']) {
+  --md-sys-color-surface:color-mix(in srgb,var(--workspace-blue) 18%,#fff);
+  --md-sys-color-surface-bright:var(--md-sys-color-surface);
+  --md-sys-color-surface-dim:color-mix(in srgb,var(--workspace-blue) 82%,#fff);
+  --md-sys-color-surface-container-low:color-mix(in srgb,var(--workspace-blue) 30%,#fff);
+  --md-sys-color-surface-container:color-mix(in srgb,var(--workspace-blue) 65%,#fff);
+  --md-sys-color-surface-container-high:color-mix(in srgb,var(--workspace-blue) 82%,#fff);
+  --md-sys-color-surface-container-highest:var(--workspace-blue);
+  --md-sys-color-secondary:var(--workspace-yellow-ink);
+  --md-sys-color-secondary-container:var(--workspace-yellow);
+  --md-sys-color-on-secondary-container:var(--workspace-yellow-ink);
+  --md-sys-color-on-surface:color-mix(in srgb,var(--workspace-action-ink) 62%,#20242a);
+  --md-sys-color-on-surface-variant:color-mix(in srgb,var(--workspace-action-ink) 80%,#686b70);
+  --md-sys-color-outline-variant:color-mix(in srgb,var(--workspace-blue) 85%,var(--workspace-action-ink));
+}
+:root:is([data-further-palette='auto'][data-holiday],[data-further-palette='duanwu'],[data-further-palette='qixi'],[data-further-palette='mid_autumn'],[data-further-palette='chongyang'],[data-further-palette='new_year_eve'],[data-further-palette='national_day'])[data-theme='dark'] {
+  --md-sys-color-surface:color-mix(in srgb,var(--workspace-blue) 62%,#10151a);
+  --md-sys-color-surface-bright:var(--workspace-blue);
+  --md-sys-color-surface-dim:color-mix(in srgb,var(--workspace-blue) 32%,#10151a);
+  --md-sys-color-surface-container-low:color-mix(in srgb,var(--workspace-blue) 75%,#10151a);
+  --md-sys-color-surface-container:color-mix(in srgb,var(--workspace-blue) 48%,#10151a);
+  --md-sys-color-surface-container-high:var(--workspace-blue);
+  --md-sys-color-surface-container-highest:color-mix(in srgb,var(--workspace-blue) 84%,var(--workspace-action));
+  --md-sys-color-primary-container:var(--workspace-blue);
+  --md-sys-color-on-primary:var(--workspace-action-ink);
+  --md-sys-color-on-primary-container:color-mix(in srgb,var(--workspace-action) 80%,#fff);
+  --md-sys-color-secondary:var(--workspace-yellow-ink);
+  --md-sys-color-secondary-container:var(--workspace-yellow);
+  --md-sys-color-on-secondary-container:var(--workspace-yellow-ink);
+  --md-sys-color-on-surface:color-mix(in srgb,var(--workspace-action) 35%,#fff);
+  --md-sys-color-on-surface-variant:color-mix(in srgb,var(--workspace-action) 60%,#b4b4b4);
+  --md-sys-color-outline-variant:color-mix(in srgb,var(--workspace-blue) 76%,var(--workspace-action));
+}
+.gateway-palette-options [data-palette] { gap:9px; }
+.gateway-palette-options [data-palette]::before { content:''; width:14px; height:14px; border-radius:50%; border:1px solid #d7e1e8; background:#fff; }
+.gateway-palette-options [data-palette='blue']::before { background:#cce6fb; border-color:#aecfe8; }
+.gateway-palette-options [data-palette='yellow']::before { background:#fff0bd; border-color:#e4d29b; }
+html:is([data-further-palette='mid_autumn'],[data-further-palette='auto'][data-holiday='mid_autumn']) .workspace-orbit-core,html:is([data-further-palette='chongyang'],[data-further-palette='auto'][data-holiday='chongyang']) .workspace-orbit-core { background:var(--workspace-yellow); color:var(--workspace-yellow-ink); border-radius:50%; }
+html:is([data-further-palette='mid_autumn'],[data-further-palette='auto'][data-holiday='mid_autumn']) .workspace-orbit-core::after { content:''; width:46px; height:46px; border-radius:50%; background:var(--workspace-yellow); box-shadow:inset -10px -3px 0 color-mix(in srgb,var(--workspace-yellow-ink) 48%,transparent); }
+html:is([data-further-palette='mid_autumn'],[data-further-palette='auto'][data-holiday='mid_autumn']) .workspace-orbit-core > .material-symbol { display:none; }
+.md-btn,.md-icon-button,.nav-item,.activity-season-pill { transition:background .22s var(--workspace-easing),color .22s var(--workspace-easing),transform .3s var(--workspace-easing),box-shadow .22s var(--workspace-easing); }
+.activity-season-art { position:relative; display:inline-block; width:45px; height:27px; flex-shrink:0; }
+.activity-season-moon { position:absolute; top:-2px; right:0; width:23px; height:23px; border-radius:50%; background:#e7be68; }
+.activity-season-moon::after { content:''; position:absolute; width:18px; height:18px; right:-3px; top:-2px; border-radius:50%; background:var(--workspace-yellow); }
+.activity-season-mooncake { position:absolute; left:2px; bottom:0; width:24px; height:24px; border:3px dotted #cf9c41; border-radius:35%; background:#f3d28b; display:grid; place-items:center; box-shadow:inset 0 0 0 2px #f9e2a8; transform:rotate(-10deg); }
+.activity-season-mooncake b { font-size:9px; font-weight:600; line-height:1; color:#9a6a22; border:1px solid #c99d4e; border-radius:3px; padding:1px; }
+
+/* Shared Material acceleration preserves the current fade and axis movement. */
+.rf-entering,.view.entering{animation-timing-function:var(--further-motion-enter)!important}.rf-leaving{animation-timing-function:var(--further-motion-exit)!important}
+
+/* Fixed colour and automatic season are deliberate, independent choices. */
+.gateway-palette-mode,.further-palette-mode { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0 0 20px; }
+.gateway-palette-mode button,.further-palette-mode button { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; min-height:76px; padding:13px 15px; border:1px solid var(--md-sys-color-outline-variant); border-radius:14px; background:var(--md-sys-color-surface-container-low); color:var(--md-sys-color-on-surface); font:inherit; cursor:pointer; }
+.gateway-palette-mode button[aria-pressed='true'],.further-palette-mode button[aria-pressed='true'] { border-color:var(--md-sys-color-primary); background:var(--md-sys-color-primary-container); color:var(--md-sys-color-on-primary-container); box-shadow:inset 0 0 0 1px var(--md-sys-color-primary); }
+.gateway-palette-mode b,.further-palette-mode b { font-size:14px; font-weight:600; }
+.gateway-palette-mode small,.further-palette-mode small { font-size:11px; line-height:1.65; color:inherit; }
+@media(max-width:420px) { .gateway-palette-mode,.further-palette-mode { gap:8px; } .gateway-palette-mode button,.further-palette-mode button { padding:12px; } }

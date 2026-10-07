@@ -1,14 +1,15 @@
 package model
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -123,24 +124,38 @@ func NewPasskeyCredentialFromWebAuthn(userID int, credential *webauthn.Credentia
 }
 
 func GetPasskeyByUserID(userID int) (*PasskeyCredential, error) {
+	return GetPasskeyByUserIDContext(context.Background(), userID)
+}
+
+func GetPasskeyByUserIDContext(ctx context.Context, userID int) (*PasskeyCredential, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if userID == 0 {
 		common.SysLog("GetPasskeyByUserID: empty user ID")
 		return nil, ErrFriendlyPasskeyNotFound
 	}
 	var credential PasskeyCredential
-	if err := DB.Where("user_id = ?", userID).First(&credential).Error; err != nil {
+	if err := DB.WithContext(ctx).Where("user_id = ?", userID).First(&credential).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 未找到记录是正常情况（用户未绑定），返回 ErrPasskeyNotFound 而不记录日志
 			return nil, ErrPasskeyNotFound
 		}
 		// 只有真正的数据库错误才记录日志
 		common.SysLog(fmt.Sprintf("GetPasskeyByUserID: database error for user %d: %v", userID, err))
-		return nil, ErrFriendlyPasskeyNotFound
+		return nil, err
 	}
 	return &credential, nil
 }
 
 func GetPasskeyByCredentialID(credentialID []byte) (*PasskeyCredential, error) {
+	return GetPasskeyByCredentialIDContext(context.Background(), credentialID)
+}
+
+func GetPasskeyByCredentialIDContext(ctx context.Context, credentialID []byte) (*PasskeyCredential, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if len(credentialID) == 0 {
 		common.SysLog("GetPasskeyByCredentialID: empty credential ID")
 		return nil, ErrFriendlyPasskeyNotFound
@@ -148,13 +163,13 @@ func GetPasskeyByCredentialID(credentialID []byte) (*PasskeyCredential, error) {
 
 	credIDStr := base64.StdEncoding.EncodeToString(credentialID)
 	var credential PasskeyCredential
-	if err := DB.Where("credential_id = ?", credIDStr).First(&credential).Error; err != nil {
+	if err := DB.WithContext(ctx).Where("credential_id = ?", credIDStr).First(&credential).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			common.SysLog(fmt.Sprintf("GetPasskeyByCredentialID: passkey not found for credential ID length %d", len(credentialID)))
 			return nil, ErrFriendlyPasskeyNotFound
 		}
 		common.SysLog(fmt.Sprintf("GetPasskeyByCredentialID: database error for credential ID: %v", err))
-		return nil, ErrFriendlyPasskeyNotFound
+		return nil, err
 	}
 
 	return &credential, nil
@@ -164,13 +179,20 @@ func GetPasskeyByCredentialID(credentialID []byte) (*PasskeyCredential, error) {
 // assertion. Registration identity (credential ID, public key, AAGUID,
 // transports and attestation metadata) is immutable on this path.
 func UpdatePasskeyAssertionState(userID int, credential *webauthn.Credential, lastUsedAt time.Time, rpID string) error {
+	return UpdatePasskeyAssertionStateContext(context.Background(), userID, credential, lastUsedAt, rpID)
+}
+
+func UpdatePasskeyAssertionStateContext(ctx context.Context, userID int, credential *webauthn.Credential, lastUsedAt time.Time, rpID string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if userID <= 0 || credential == nil || len(credential.ID) == 0 || lastUsedAt.IsZero() || rpID == "" {
 		return fmt.Errorf("Passkey 保存失败，请重试")
 	}
 	credentialID := base64.StdEncoding.EncodeToString(credential.ID)
 	passkeyOptionMutex.Lock()
 	defer passkeyOptionMutex.Unlock()
-	return DB.Transaction(func(tx *gorm.DB) error {
+	return DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := validatePasskeyRPIDWithTx(tx, rpID); err != nil {
 			return err
 		}
@@ -230,13 +252,24 @@ func RegisterPasskeyForSession(identity AuthSessionIdentity, credential *Passkey
 	return upsertPasskeyCredentialWithAuthVersion(credential, &identity)
 }
 
+func RegisterPasskeyForSessionContext(ctx context.Context, identity AuthSessionIdentity, credential *PasskeyCredential) error {
+	return upsertPasskeyCredentialWithAuthVersionContext(ctx, credential, &identity)
+}
+
 func upsertPasskeyCredentialWithAuthVersion(credential *PasskeyCredential, identity *AuthSessionIdentity) error {
+	return upsertPasskeyCredentialWithAuthVersionContext(context.Background(), credential, identity)
+}
+
+func upsertPasskeyCredentialWithAuthVersionContext(ctx context.Context, credential *PasskeyCredential, identity *AuthSessionIdentity) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if credential == nil || credential.UserID <= 0 {
 		return fmt.Errorf("Passkey 保存失败，请重试")
 	}
 	passkeyOptionMutex.Lock()
 	defer passkeyOptionMutex.Unlock()
-	if err := DB.Transaction(func(tx *gorm.DB) error {
+	if err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if identity != nil && (credential.RPID == nil || *credential.RPID == "") {
 			return system_setting.ErrPasskeyRPIDUnavailable
 		}
@@ -271,11 +304,22 @@ func DeletePasskeyForSession(identity AuthSessionIdentity) error {
 	return deletePasskeyWithAuthVersion(identity.UserID, &identity)
 }
 
+func DeletePasskeyForSessionContext(ctx context.Context, identity AuthSessionIdentity) error {
+	return deletePasskeyWithAuthVersionContext(ctx, identity.UserID, &identity)
+}
+
 func deletePasskeyWithAuthVersion(userID int, identity *AuthSessionIdentity) error {
+	return deletePasskeyWithAuthVersionContext(context.Background(), userID, identity)
+}
+
+func deletePasskeyWithAuthVersionContext(ctx context.Context, userID int, identity *AuthSessionIdentity) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if userID == 0 {
 		return fmt.Errorf("删除失败，请重试")
 	}
-	if err := DB.Transaction(func(tx *gorm.DB) error {
+	if err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if identity != nil {
 			if err := ValidateAuthSessionWithTx(tx, *identity); err != nil {
 				return err

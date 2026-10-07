@@ -16,15 +16,15 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	pluginruntime "github.com/QuantumNous/new-api/pkg/jsplugin"
-	relayconstant "github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	pluginruntime "github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	relayconstant "github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 )
@@ -1376,7 +1376,7 @@ func logTaskPluginChannelDecision(c *gin.Context, channel *model.Channel, modelN
 	switch channel.Type {
 	case constant.ChannelTypeTaskPlugin:
 		identityMode = "type59_setting"
-	case constant.ChannelTypeNewAPI:
+	case constant.ChannelTypeGateway:
 		identityMode = "type60_setting"
 	}
 	logger.LogDebug(

@@ -1,156 +1,317 @@
 package service
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"strings"
+	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
-// ---------------------------------------------------------------------------
-// FundingSource — 资金来源接口（钱包 or 订阅）
-// ---------------------------------------------------------------------------
-
-// FundingSource 抽象了预扣费的资金来源。
 type FundingSource interface {
-	// Source 返回资金来源标识："wallet" 或 "subscription"
 	Source() string
-	// PreConsume 从该资金来源预扣 amount 额度
 	PreConsume(amount int) error
-	// Settle 根据差额调整资金来源（正数补扣，负数退还）
 	Settle(delta int) error
-	// Refund 退还所有预扣费
 	Refund() error
 }
 
-// ---------------------------------------------------------------------------
-// WalletFunding — 钱包资金来源实现
-// ---------------------------------------------------------------------------
-
-// ErrInsufficientWalletQuota 钱包原子预扣失败（余额不足），未发生任何扣减。
-// BillingSession 据此映射为 ErrorCodeInsufficientUserQuota，
-// 使 wallet_first 等计费偏好可以回退到订阅。
-var ErrInsufficientWalletQuota = errors.New("wallet quota insufficient")
+var (
+	ErrInsufficientWalletQuota = errors.New("wallet quota insufficient")
+	ErrFundingFinalized        = errors.New("计费预留已结束。")
+	ErrFundingAmountInvalid    = errors.New("计费额度超出有效范围。")
+)
 
 type WalletFunding struct {
-	userId   int
-	consumed int // 实际预扣的用户额度
+	userId         int
+	consumed       int
+	mu             sync.Mutex
+	settled        bool
+	refunded       bool
+	refundError    error
+	requestContext context.Context
 }
 
-func (w *WalletFunding) Source() string { return BillingSourceWallet }
+func (*WalletFunding) Source() string { return BillingSourceWallet }
 
-func (w *WalletFunding) PreConsume(amount int) error {
-	if amount <= 0 {
+func validFundingAmount(amount int) bool {
+	return amount >= 0 && amount <= common.MaxWalletQuota
+}
+
+// Wallet reservation keeps a cumulative total across provider retries and
+// quantity overrides. Each successful debit is part of the same refund.
+func (wallet *WalletFunding) reserve(amount int, strict bool) error {
+	wallet.mu.Lock()
+	defer wallet.mu.Unlock()
+	if wallet.settled || wallet.refunded {
+		return ErrFundingFinalized
+	}
+	if !validFundingAmount(amount) || amount > common.MaxWalletQuota-wallet.consumed {
+		return ErrFundingAmountInvalid
+	}
+	if amount == 0 {
 		return nil
 	}
-	reserved, err := model.TryReserveUserQuota(w.userId, amount)
-	if err != nil {
+	if strict {
+		reserved, err := model.TryReserveUserQuotaContext(fundingOperationContext(wallet.requestContext), wallet.userId, amount)
+		if err != nil {
+			return err
+		}
+		if !reserved {
+			return ErrInsufficientWalletQuota
+		}
+	} else if err := model.DecreaseUserQuotaContext(fundingOperationContext(wallet.requestContext), wallet.userId, amount, false); err != nil {
 		return err
 	}
-	if !reserved {
-		return ErrInsufficientWalletQuota
-	}
-	w.consumed = amount
+	wallet.consumed += amount
 	return nil
 }
 
-func (w *WalletFunding) Settle(delta int) error {
-	if delta == 0 {
+func (wallet *WalletFunding) PreConsume(amount int) error { return wallet.reserve(amount, true) }
+
+func (wallet *WalletFunding) rollbackReserve(amount int) error {
+	compensate, cancel := compensationContext()
+	defer cancel()
+	wallet.mu.Lock()
+	defer wallet.mu.Unlock()
+	if wallet.settled || wallet.refunded {
+		return ErrFundingFinalized
+	}
+	if amount < 0 || amount > wallet.consumed {
+		return ErrFundingAmountInvalid
+	}
+	if amount == 0 {
 		return nil
 	}
+	if err := model.IncreaseUserQuotaContext(compensate, wallet.userId, amount, false); err != nil {
+		return err
+	}
+	wallet.consumed -= amount
+	return nil
+}
+
+func (wallet *WalletFunding) Settle(delta int) error {
+	commit, cancel := compensationContext()
+	defer cancel()
+	wallet.mu.Lock()
+	defer wallet.mu.Unlock()
+	if wallet.refunded {
+		return ErrFundingFinalized
+	}
+	if wallet.settled {
+		return nil
+	}
+	if delta < -wallet.consumed || delta > common.MaxWalletQuota-wallet.consumed {
+		return ErrFundingAmountInvalid
+	}
+	var err error
 	if delta > 0 {
-		return model.DecreaseUserQuota(w.userId, delta, false)
+		err = model.DecreaseUserQuotaContext(commit, wallet.userId, delta, false)
 	}
-	return model.IncreaseUserQuota(w.userId, -delta, false)
+	if delta < 0 {
+		err = model.IncreaseUserQuotaContext(commit, wallet.userId, -delta, false)
+	}
+	if err != nil {
+		return err
+	}
+	wallet.consumed += delta
+	wallet.settled = true
+	return nil
 }
 
-func (w *WalletFunding) Refund() error {
-	if w.consumed <= 0 {
+// Wallet credits lack a persisted request-key idempotency record. Execute one
+// credit operation and retain its result; repeating Refund never credits twice.
+func (wallet *WalletFunding) Refund() error {
+	compensate, cancel := compensationContext()
+	defer cancel()
+	wallet.mu.Lock()
+	defer wallet.mu.Unlock()
+	if wallet.settled {
 		return nil
 	}
-	// IncreaseUserQuota 是 quota += N 的非幂等操作，不能重试，否则会多退额度。
-	// 订阅的 RefundSubscriptionPreConsume 有 requestId 幂等保护所以可以重试。
-	return model.IncreaseUserQuota(w.userId, w.consumed, false)
+	if wallet.refunded {
+		return wallet.refundError
+	}
+	wallet.refunded = true
+	if wallet.consumed > 0 {
+		wallet.refundError = model.IncreaseUserQuotaContext(compensate, wallet.userId, wallet.consumed, false)
+	}
+	return wallet.refundError
 }
-
-// ---------------------------------------------------------------------------
-// SubscriptionFunding — 订阅资金来源实现
-// ---------------------------------------------------------------------------
 
 type SubscriptionFunding struct {
-	requestId      string
-	userId         int
-	modelName      string
-	amount         int64 // 预扣的订阅额度（subConsume）
-	subscriptionId int
-	preConsumed    int64
-	// 以下字段在 PreConsume 成功后填充，供 RelayInfo 同步使用
-	AmountTotal      int64
-	AmountUsedAfter  int64
-	PlanId           int
-	PlanTitle        string
-	relayForDiscount bool
+	requestId       string
+	userId          int
+	modelName       string
+	amount          int64
+	subscriptionId  int
+	preConsumed     int64
+	AmountTotal     int64
+	AmountUsedAfter int64
+	PlanId          int
+	PlanTitle       string
+	furtherDiscount bool
+	reservedExtra   int64
+	requestContext  context.Context
+	mu              sync.Mutex
+	settled         bool
+	refunded        bool
 }
 
-func (s *SubscriptionFunding) Source() string { return BillingSourceSubscription }
+func (*SubscriptionFunding) Source() string { return BillingSourceSubscription }
 
-func (s *SubscriptionFunding) PreConsume(_ int) error {
-	// amount 参数被忽略，使用内部 s.amount（已在构造时根据 preConsumedQuota 计算）
-	res, err := model.PreConsumeUserSubscription(s.requestId, s.userId, s.modelName, 0, s.amount)
+func (subscription *SubscriptionFunding) PreConsume(_ int) error {
+	subscription.mu.Lock()
+	defer subscription.mu.Unlock()
+	if subscription.settled || subscription.refunded {
+		return ErrFundingFinalized
+	}
+	if subscription.subscriptionId > 0 {
+		return nil
+	}
+	if subscription.userId <= 0 || strings.TrimSpace(subscription.requestId) == "" ||
+		subscription.amount <= 0 || subscription.amount > int64(common.MaxWalletQuota) {
+		return ErrFundingAmountInvalid
+	}
+	reservation, err := model.PreConsumeUserSubscriptionContext(fundingOperationContext(subscription.requestContext), subscription.requestId, subscription.userId, subscription.modelName, 0, subscription.amount)
 	if err != nil {
 		return err
 	}
-	s.subscriptionId = res.UserSubscriptionId
-	s.preConsumed = res.PreConsumed
-	s.AmountTotal = res.AmountTotal
-	s.AmountUsedAfter = res.AmountUsedAfter
-	discount, err := model.GetRelayForDiscountReservation(s.requestId)
+	discount, err := model.GetFurtherDiscountReservationContext(fundingOperationContext(subscription.requestContext), subscription.requestId)
 	if err != nil {
-		_ = model.RefundSubscriptionPreConsume(s.requestId)
-		return err
+		compensate, cancel := compensationContext()
+		rollback := model.RefundSubscriptionPreConsumeContext(compensate, subscription.requestId)
+		cancel()
+		return errors.Join(err, rollback)
 	}
-	s.relayForDiscount = discount != nil
-	// 获取订阅计划信息
-	if planInfo, err := model.GetSubscriptionPlanInfoByUserSubscriptionId(res.UserSubscriptionId); err == nil && planInfo != nil {
-		s.PlanId = planInfo.PlanId
-		s.PlanTitle = planInfo.PlanTitle
+	subscription.subscriptionId = reservation.UserSubscriptionId
+	subscription.preConsumed = reservation.PreConsumed
+	subscription.AmountTotal = reservation.AmountTotal
+	subscription.AmountUsedAfter = reservation.AmountUsedAfter
+	subscription.furtherDiscount = discount != nil
+	if plan, err := model.GetSubscriptionPlanInfoByUserSubscriptionIdContext(fundingOperationContext(subscription.requestContext), reservation.UserSubscriptionId); err == nil && plan != nil {
+		subscription.PlanId, subscription.PlanTitle = plan.PlanId, plan.PlanTitle
 	}
 	return nil
 }
 
-func (s *SubscriptionFunding) Settle(delta int) error {
-	if delta == 0 {
+func (subscription *SubscriptionFunding) Settle(delta int) error {
+	commit, cancel := compensationContext()
+	defer cancel()
+	subscription.mu.Lock()
+	defer subscription.mu.Unlock()
+	if subscription.refunded {
+		return ErrFundingFinalized
+	}
+	if subscription.settled {
 		return nil
 	}
-	return model.PostConsumeUserSubscriptionDelta(s.subscriptionId, int64(delta))
+	reserved := subscription.preConsumed + subscription.reservedExtra
+	if int64(delta) < -reserved || int64(delta) > int64(common.MaxWalletQuota)-reserved {
+		return ErrFundingAmountInvalid
+	}
+	if delta != 0 {
+		if err := model.PostConsumeUserSubscriptionDeltaContext(commit, subscription.subscriptionId, int64(delta)); err != nil {
+			return err
+		}
+	}
+	subscription.settled = true
+	return nil
 }
 
-func (s *SubscriptionFunding) Refund() error {
-	if s.preConsumed <= 0 {
+func (subscription *SubscriptionFunding) reserveExtra(amount int) error {
+	subscription.mu.Lock()
+	defer subscription.mu.Unlock()
+	if subscription.refunded || subscription.settled {
+		return ErrFundingFinalized
+	}
+	reserved := subscription.preConsumed + subscription.reservedExtra
+	if amount < 0 || int64(amount) > int64(common.MaxWalletQuota)-reserved {
+		return ErrFundingAmountInvalid
+	}
+	if err := model.PostConsumeUserSubscriptionDeltaContext(fundingOperationContext(subscription.requestContext), subscription.subscriptionId, int64(amount)); err != nil {
+		return err
+	}
+	subscription.reservedExtra += int64(amount)
+	return nil
+}
+
+func (subscription *SubscriptionFunding) rollbackExtra(amount int) error {
+	compensate, cancel := compensationContext()
+	defer cancel()
+	subscription.mu.Lock()
+	defer subscription.mu.Unlock()
+	if subscription.refunded || subscription.settled {
+		return ErrFundingFinalized
+	}
+	if amount < 0 || int64(amount) > subscription.reservedExtra {
+		return ErrFundingAmountInvalid
+	}
+	if err := model.PostConsumeUserSubscriptionDeltaContext(compensate, subscription.subscriptionId, -int64(amount)); err != nil {
+		return err
+	}
+	subscription.reservedExtra -= int64(amount)
+	return nil
+}
+
+func (subscription *SubscriptionFunding) Refund() error {
+	compensate, cancel := compensationContext()
+	defer cancel()
+	subscription.mu.Lock()
+	defer subscription.mu.Unlock()
+	if subscription.settled || subscription.refunded || subscription.subscriptionId <= 0 {
 		return nil
 	}
-	return refundWithRetry(func() error {
-		return model.RefundSubscriptionPreConsume(s.requestId)
-	})
+	// The persisted request-key rollback releases both quota and savings
+	// reservation metadata, independently of the caller's token reservation.
+	if err := refundWithRetryContext(compensate, func() error { return model.RefundSubscriptionPreConsumeContext(compensate, subscription.requestId) }); err != nil {
+		return fmt.Errorf("refund subscription reservation: %w", err)
+	}
+	subscription.refunded = true
+	return nil
 }
 
-// refundWithRetry 尝试多次执行退款操作以提高成功率，只能用于基于事务的退款函数！！！！！！
-// try to refund with retries, only for refund functions based on transactions!!!
 func refundWithRetry(fn func() error) error {
+	return refundWithRetryContext(context.Background(), fn)
+}
+
+// Only request-key-idempotent subscription rollbacks may be retried.
+func refundWithRetryContext(ctx context.Context, fn func() error) error {
 	if fn == nil {
 		return nil
 	}
-	const maxAttempts = 3
-	var lastErr error
-	for i := range maxAttempts {
-		if err := fn(); err == nil {
-			return nil
-		} else {
-			lastErr = err
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	var last error
+	for attempt := range 3 {
+		if err := ctx.Err(); err != nil {
+			return errors.Join(last, err)
 		}
-		if i < maxAttempts-1 {
-			time.Sleep(time.Duration(200*(i+1)) * time.Millisecond)
+		last = fn()
+		if last == nil {
+			return nil
+		}
+		if attempt == 2 {
+			break
+		}
+		timer := time.NewTimer(time.Duration(attempt+1) * 200 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return errors.Join(last, ctx.Err())
+		case <-timer.C:
 		}
 	}
-	return lastErr
+	return last
+}
+
+func fundingOperationContext(ctx context.Context) context.Context {
+	if ctx == nil {
+		return context.Background()
+	}
+	return ctx
 }

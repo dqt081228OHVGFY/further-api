@@ -7,9 +7,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"unsafe"
 
-	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
+	kitutil "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
 
 	"github.com/samber/lo"
 )
@@ -86,11 +85,9 @@ func StringsContains(strs []string, str string) bool {
 	return slices.Contains(strs, str)
 }
 
-// StringToByteSlice []byte only read, panic on append
+// StringToByteSlice returns owned bytes; callers cannot mutate an immutable string.
 func StringToByteSlice(s string) []byte {
-	tmp1 := (*[2]uintptr)(unsafe.Pointer(&s))
-	tmp2 := [3]uintptr{tmp1[0], tmp1[1], tmp1[1]}
-	return *(*[]byte)(unsafe.Pointer(&tmp2))
+	return []byte(s)
 }
 
 func EncodeBase64(str string) string {

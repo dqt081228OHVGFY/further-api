@@ -2,7 +2,7 @@
 # 中文（繁體）翻譯檔案
 
 # Task plugin messages
-task_plugin.unknown_meta_field: '外掛中繼資料包含未知欄位「{{.Field}}」。如果外掛來自官方市集，可能需要較新版本的 new-api。請嘗試更新 new-api 後重新安裝外掛。'
+task_plugin.unknown_meta_field: '外掛中繼資料包含未知欄位「{{.Field}}」。如果外掛來自官方市集，可能需要較新版本的 further-api。請嘗試更新 further-api 後重新安裝外掛。'
 
 # Common messages
 common.invalid_params: "無效的參數"
@@ -31,9 +31,9 @@ common.batch_too_many: "批次請求數量過多，最多 {{.Max}} 條"
 auth.not_logged_in: "無權進行此操作，未登入且未提供 access token"
 auth.access_token_invalid: "無權進行此操作，access token 無效"
 auth.user_info_invalid: "無權進行此操作，使用者資訊無效"
-auth.user_id_not_provided: "無權進行此操作，未提供 New-Api-User"
-auth.user_id_format_error: "無權進行此操作，New-Api-User 格式錯誤"
-auth.user_id_mismatch: "無權進行此操作，New-Api-User 與登入使用者不匹配"
+auth.user_id_not_provided: "無權進行此操作，未提供使用者身分請求標頭"
+auth.user_id_format_error: "無權進行此操作，使用者身分請求標頭格式錯誤"
+auth.user_id_mismatch: "無權進行此操作，使用者身分與登入使用者不匹配"
 auth.user_banned: "使用者已被封禁"
 auth.insufficient_privilege: "無權進行此操作，權限不足"
 

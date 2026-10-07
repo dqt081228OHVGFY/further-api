@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +17,18 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	// Keep a separate connection alive so a cancelled transaction can discard
+	// its pool connection without deleting the shared in-memory database.
+	const testDSN = "file:further_api_model_tests?mode=memory&cache=shared"
+	anchor, err := gorm.Open(sqlite.Open(testDSN), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	anchorSQL, err := anchor.DB()
+	if err != nil {
+		panic(err)
+	}
+	db, err := gorm.Open(sqlite.Open(testDSN), &gorm.Config{})
 	if err != nil {
 		panic("failed to open test db: " + err.Error())
 	}
@@ -63,7 +74,10 @@ func TestMain(m *testing.M) {
 		panic("failed to migrate: " + err.Error())
 	}
 
-	os.Exit(m.Run())
+	code := m.Run()
+	_ = sqlDB.Close()
+	_ = anchorSQL.Close()
+	os.Exit(code)
 }
 
 func truncateTables(t *testing.T) {

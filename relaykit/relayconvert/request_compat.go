@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/convdiag"
-	sharedclaude "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/claude"
-	sharedgemini "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/gemini"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/convdiag"
+	sharedclaude "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/shared/claude"
+	sharedgemini "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/shared/gemini"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 func ClaudeMessagesRequestToOpenAIChat(claudeRequest dto.ClaudeRequest, info convmeta.Meta) (*dto.GeneralOpenAIRequest, error) {

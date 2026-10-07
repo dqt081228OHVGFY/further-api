@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -17,7 +17,7 @@ const (
 	KindResponses = "responses"
 
 	defaultCloseReason = "channel disabled or deleted"
-	redisChannel       = "new-api:wsmanager:channel-close"
+	redisChannel       = "further-api:wsmanager:channel-close"
 )
 
 type entry struct {

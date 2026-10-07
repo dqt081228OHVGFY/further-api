@@ -1,575 +1,268 @@
 package ollama
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
-	"github.com/samber/lo"
 )
 
-func toOllamaResponseFormat(responseFormat *dto.ResponseFormat) (any, error) {
-	if responseFormat == nil {
+func toOllamaResponseFormat(format *dto.ResponseFormat) (any, error) {
+	if format == nil {
 		return nil, nil
 	}
-	switch responseFormat.Type {
+	switch format.Type {
 	case "json", "json_object":
 		return "json", nil
 	case "json_schema":
-		if len(responseFormat.JsonSchema) == 0 {
+		if len(format.JsonSchema) == 0 {
 			return nil, nil
 		}
-		var jsonSchema dto.FormatJsonSchema
-		if err := common.Unmarshal(responseFormat.JsonSchema, &jsonSchema); err != nil {
-			return nil, fmt.Errorf("invalid ollama response format: %w", err)
+		var schema dto.FormatJsonSchema
+		if err := json.Unmarshal(format.JsonSchema, &schema); err != nil {
+			return nil, fmt.Errorf("invalid Ollama output schema: %w", err)
 		}
-		return jsonSchema.Schema, nil
+		return schema.Schema, nil
 	default:
 		return nil, nil
 	}
 }
-
-func openAIChatToOllamaChat(c *gin.Context, r *dto.GeneralOpenAIRequest) (*OllamaChatRequest, error) {
-	think := r.Think
-	if len(think) == 0 {
-		effort := r.ReasoningEffort
-		if len(r.Reasoning) > 0 {
-			var reasoning dto.Reasoning
-			if err := common.Unmarshal(r.Reasoning, &reasoning); err != nil {
-				return nil, fmt.Errorf("invalid ollama reasoning: %w", err)
-			}
-			effort = lo.CoalesceOrEmpty(reasoning.Effort, effort)
+func ollamaThinking(request *dto.GeneralOpenAIRequest) (json.RawMessage, error) {
+	if len(request.Think) > 0 {
+		return request.Think, nil
+	}
+	effort := request.ReasoningEffort
+	if len(request.Reasoning) > 0 {
+		var nested dto.Reasoning
+		if err := json.Unmarshal(request.Reasoning, &nested); err != nil {
+			return nil, err
 		}
-		if effort != "" {
-			var thinkValue any
-			switch effort {
-			case "none":
-				thinkValue = false
-			case "low", "medium", "high", "max":
-				thinkValue = effort
-			default:
-				return nil, fmt.Errorf("unsupported ollama reasoning effort %q", effort)
+		if nested.Effort != "" {
+			effort = nested.Effort
+		}
+	}
+	if effort == "" {
+		return nil, nil
+	}
+	var value any
+	switch effort {
+	case "none":
+		value = false
+	case "low", "medium", "high", "max":
+		value = effort
+	default:
+		return nil, fmt.Errorf("Ollama does not support reasoning effort %q", effort)
+	}
+	return json.Marshal(value)
+}
+func ollamaOptions(request *dto.GeneralOpenAIRequest) map[string]any {
+	options := make(map[string]any)
+	if request.Temperature != nil {
+		options["temperature"] = *request.Temperature
+	}
+	if request.TopP != nil {
+		options["top_p"] = *request.TopP
+	}
+	if request.TopK != nil {
+		options["top_k"] = *request.TopK
+	}
+	if request.FrequencyPenalty != nil {
+		options["frequency_penalty"] = *request.FrequencyPenalty
+	}
+	if request.PresencePenalty != nil {
+		options["presence_penalty"] = *request.PresencePenalty
+	}
+	if request.Seed != nil {
+		options["seed"] = int(*request.Seed)
+	}
+	if tokens := request.GetMaxTokens(); tokens > 0 {
+		options["num_predict"] = int(tokens)
+	}
+	switch stop := request.Stop.(type) {
+	case string:
+		options["stop"] = []string{stop}
+	case []string:
+		options["stop"] = append([]string(nil), stop...)
+	case []any:
+		values := make([]string, 0, len(stop))
+		for _, item := range stop {
+			if text, ok := item.(string); ok {
+				values = append(values, text)
 			}
-			var err error
-			think, err = common.Marshal(thinkValue)
+		}
+		options["stop"] = values
+	}
+	return options
+}
+func openAIChatToOllamaChat(c *gin.Context, request *dto.GeneralOpenAIRequest) (*OllamaChatRequest, error) {
+	if request == nil {
+		return nil, errors.New("Ollama chat request is missing")
+	}
+	thinking, err := ollamaThinking(request)
+	if err != nil {
+		return nil, err
+	}
+	format, err := toOllamaResponseFormat(request.ResponseFormat)
+	if err != nil {
+		return nil, err
+	}
+	output := &OllamaChatRequest{Model: request.Model, Stream: request.Stream != nil && *request.Stream, Options: ollamaOptions(request), Think: thinking, Format: format, Messages: make([]OllamaChatMessage, 0, len(request.Messages))}
+	tools := make([]OllamaTool, 0, len(request.Tools))
+	for _, tool := range request.Tools {
+		tools = append(tools, OllamaTool{Type: "function", Function: OllamaToolFunction{Name: tool.Function.Name, Description: tool.Function.Description, Parameters: tool.Function.Parameters}})
+	}
+	if len(tools) > 0 {
+		output.Tools = tools
+	}
+	names := make(map[string]string)
+	for _, message := range request.Messages {
+		converted := OllamaChatMessage{Role: message.Role}
+		var text strings.Builder
+		for _, part := range message.ParseContent() {
+			if part.Type == dto.ContentTypeText {
+				text.WriteString(part.Text)
+				continue
+			}
+			if part.Type != dto.ContentTypeImageURL {
+				return nil, fmt.Errorf("Ollama chat does not support content type %q", part.Type)
+			}
+			source := part.ToFileSource()
+			if source == nil {
+				return nil, errors.New("Ollama image source is missing")
+			}
+			image, _, err := service.GetBase64Data(c, source, "Ollama chat image")
 			if err != nil {
-				return nil, fmt.Errorf("marshal ollama think: %w", err)
+				return nil, err
+			}
+			if image != "" {
+				converted.Images = append(converted.Images, image)
 			}
 		}
+		converted.Content = text.String()
+		reason := message.GetReasoningContent()
+		if message.Role == "assistant" && reason != "" {
+			converted.Thinking, err = json.Marshal(reason)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if message.Role == "tool" {
+			converted.ToolCallID = message.ToolCallId
+			converted.ToolName = names[message.ToolCallId]
+			if message.Name != nil && *message.Name != "" {
+				converted.ToolName = *message.Name
+			}
+		}
+		if len(message.ToolCalls) > 0 {
+			var calls []dto.ToolCallRequest
+			if err = json.Unmarshal(message.ToolCalls, &calls); err != nil {
+				return nil, fmt.Errorf("invalid Ollama tool call list: %w", err)
+			}
+			for _, call := range calls {
+				var arguments any
+				if call.Function.Arguments != "" {
+					if err = json.Unmarshal([]byte(call.Function.Arguments), &arguments); err != nil {
+						return nil, fmt.Errorf("invalid Ollama tool arguments: %w", err)
+					}
+				}
+				if arguments == nil {
+					arguments = map[string]any{}
+				}
+				native := OllamaToolCall{ID: call.ID}
+				native.Function.Name, native.Function.Arguments = call.Function.Name, arguments
+				converted.ToolCalls = append(converted.ToolCalls, native)
+				if call.ID != "" {
+					names[call.ID] = call.Function.Name
+				}
+			}
+		}
+		output.Messages = append(output.Messages, converted)
 	}
-
-	chatReq := &OllamaChatRequest{
-		Model:   r.Model,
-		Stream:  lo.FromPtrOr(r.Stream, false),
-		Options: map[string]any{},
-		Think:   think,
+	return output, nil
+}
+func openAIToGenerate(_ *gin.Context, request *dto.GeneralOpenAIRequest) (*OllamaGenerateRequest, error) {
+	if request == nil {
+		return nil, errors.New("Ollama completion request is missing")
 	}
-	format, err := toOllamaResponseFormat(r.ResponseFormat)
+	format, err := toOllamaResponseFormat(request.ResponseFormat)
 	if err != nil {
 		return nil, err
 	}
-	chatReq.Format = format
-
-	// options mapping
-	if r.Temperature != nil {
-		chatReq.Options["temperature"] = r.Temperature
-	}
-	if r.TopP != nil {
-		chatReq.Options["top_p"] = lo.FromPtr(r.TopP)
-	}
-	if r.TopK != nil {
-		chatReq.Options["top_k"] = lo.FromPtr(r.TopK)
-	}
-	if r.FrequencyPenalty != nil {
-		chatReq.Options["frequency_penalty"] = lo.FromPtr(r.FrequencyPenalty)
-	}
-	if r.PresencePenalty != nil {
-		chatReq.Options["presence_penalty"] = lo.FromPtr(r.PresencePenalty)
-	}
-	if r.Seed != nil {
-		chatReq.Options["seed"] = int(lo.FromPtr(r.Seed))
-	}
-	if mt := r.GetMaxTokens(); mt != 0 {
-		chatReq.Options["num_predict"] = int(mt)
-	}
-
-	if r.Stop != nil {
-		switch v := r.Stop.(type) {
-		case string:
-			chatReq.Options["stop"] = []string{v}
-		case []string:
-			chatReq.Options["stop"] = v
-		case []any:
-			arr := lo.FilterMap(v, func(item any, _ int) (string, bool) {
-				value, ok := item.(string)
-				return value, ok
-			})
-			if len(arr) > 0 {
-				chatReq.Options["stop"] = arr
+	output := &OllamaGenerateRequest{Model: request.Model, Stream: request.Stream != nil && *request.Stream, Options: ollamaOptions(request), Format: format, Think: request.Think}
+	switch prompt := request.Prompt.(type) {
+	case string:
+		output.Prompt = prompt
+	case []string:
+		output.Prompt = strings.Join(prompt, "")
+	case []any:
+		var text strings.Builder
+		for _, item := range prompt {
+			if value, ok := item.(string); ok {
+				text.WriteString(value)
 			}
 		}
+		output.Prompt = text.String()
+	case nil:
+	default:
+		output.Prompt = fmt.Sprint(prompt)
 	}
-
-	if len(r.Tools) > 0 {
-		chatReq.Tools = lo.Map(r.Tools, func(tool dto.ToolCallRequest, _ int) OllamaTool {
-			return OllamaTool{
-				Type: "function",
-				Function: OllamaToolFunction{
-					Name:        tool.Function.Name,
-					Description: tool.Function.Description,
-					Parameters:  tool.Function.Parameters,
-				},
-			}
-		})
-	}
-
-	chatReq.Messages = make([]OllamaChatMessage, 0, len(r.Messages))
-	toolNamesByCallID := make(map[string]string)
-	for _, m := range r.Messages {
-		var textBuilder strings.Builder
-		var images []string
-		if m.IsStringContent() {
-			textBuilder.WriteString(m.StringContent())
-		} else {
-			parts := m.ParseContent()
-			for _, part := range parts {
-				if part.Type == dto.ContentTypeImageURL {
-					source := part.ToFileSource()
-					if source != nil {
-						base64Data, _, err := service.GetBase64Data(c, source, "fetch image for ollama chat")
-						if err != nil {
-							return nil, err
-						}
-						if base64Data != "" {
-							images = append(images, base64Data)
-						}
-					}
-				} else if part.Type == dto.ContentTypeText {
-					textBuilder.WriteString(part.Text)
-				}
-			}
-		}
-		cm := OllamaChatMessage{Role: m.Role, Content: textBuilder.String()}
-		if len(images) > 0 {
-			cm.Images = images
-		}
-		if m.Role == "assistant" {
-			if reasoning, ok := lo.Coalesce(m.ReasoningContent, m.Reasoning); ok {
-				thinking, err := common.Marshal(*reasoning)
-				if err != nil {
-					return nil, fmt.Errorf("marshal ollama thinking: %w", err)
-				}
-				cm.Thinking = thinking
-			}
-		}
-		if m.Role == "tool" {
-			cm.ToolCallID = m.ToolCallId
-			cm.ToolName = lo.CoalesceOrEmpty(lo.FromPtr(m.Name), toolNamesByCallID[m.ToolCallId])
-		}
-		if m.ToolCalls != nil && len(m.ToolCalls) > 0 {
-			parsed := m.ParseToolCalls()
-			if len(parsed) > 0 {
-				calls := make([]OllamaToolCall, 0, len(parsed))
-				for _, tc := range parsed {
-					var args any
-					if tc.Function.Arguments != "" {
-						_ = common.Unmarshal([]byte(tc.Function.Arguments), &args)
-					}
-					if args == nil {
-						args = map[string]any{}
-					}
-					oc := OllamaToolCall{ID: tc.ID}
-					oc.Function.Name = tc.Function.Name
-					oc.Function.Arguments = args
-					calls = append(calls, oc)
-					if tc.ID != "" {
-						toolNamesByCallID[tc.ID] = tc.Function.Name
-					}
-				}
-				cm.ToolCalls = calls
-			}
-		}
-		chatReq.Messages = append(chatReq.Messages, cm)
-	}
-	return chatReq, nil
+	output.Suffix, _ = request.Suffix.(string)
+	return output, nil
 }
-
-// openAIToGenerate converts OpenAI completions request to Ollama generate
-func openAIToGenerate(c *gin.Context, r *dto.GeneralOpenAIRequest) (*OllamaGenerateRequest, error) {
-	gen := &OllamaGenerateRequest{
-		Model:   r.Model,
-		Stream:  lo.FromPtrOr(r.Stream, false),
-		Options: map[string]any{},
-		Think:   r.Think,
+func requestOpenAI2Embeddings(request dto.EmbeddingRequest) *OllamaEmbeddingRequest {
+	base := &dto.GeneralOpenAIRequest{Temperature: request.Temperature, TopP: request.TopP, FrequencyPenalty: request.FrequencyPenalty, PresencePenalty: request.PresencePenalty, Seed: request.Seed}
+	options := ollamaOptions(base)
+	dimensions := 0
+	if request.Dimensions != nil {
+		dimensions = *request.Dimensions
+		options["dimensions"] = dimensions
 	}
-	// Prompt may be in r.Prompt (string or []any)
-	if r.Prompt != nil {
-		switch v := r.Prompt.(type) {
-		case string:
-			gen.Prompt = v
-		case []any:
-			var sb strings.Builder
-			for _, it := range v {
-				if s, ok := it.(string); ok {
-					sb.WriteString(s)
-				}
-			}
-			gen.Prompt = sb.String()
-		default:
-			gen.Prompt = fmt.Sprintf("%v", r.Prompt)
-		}
+	values := request.ParseInput()
+	if strings, ok := request.Input.([]string); ok {
+		values = append([]string(nil), strings...)
 	}
-	if r.Suffix != nil {
-		if s, ok := r.Suffix.(string); ok {
-			gen.Suffix = s
-		}
+	var input any = values
+	if len(values) == 1 {
+		input = values[0]
 	}
-	format, err := toOllamaResponseFormat(r.ResponseFormat)
-	if err != nil {
-		return nil, err
-	}
-	gen.Format = format
-	if r.Temperature != nil {
-		gen.Options["temperature"] = r.Temperature
-	}
-	if r.TopP != nil {
-		gen.Options["top_p"] = lo.FromPtr(r.TopP)
-	}
-	if r.TopK != nil {
-		gen.Options["top_k"] = lo.FromPtr(r.TopK)
-	}
-	if r.FrequencyPenalty != nil {
-		gen.Options["frequency_penalty"] = lo.FromPtr(r.FrequencyPenalty)
-	}
-	if r.PresencePenalty != nil {
-		gen.Options["presence_penalty"] = lo.FromPtr(r.PresencePenalty)
-	}
-	if r.Seed != nil {
-		gen.Options["seed"] = int(lo.FromPtr(r.Seed))
-	}
-	if mt := r.GetMaxTokens(); mt != 0 {
-		gen.Options["num_predict"] = int(mt)
-	}
-	if r.Stop != nil {
-		switch v := r.Stop.(type) {
-		case string:
-			gen.Options["stop"] = []string{v}
-		case []string:
-			gen.Options["stop"] = v
-		case []any:
-			arr := lo.FilterMap(v, func(item any, _ int) (string, bool) {
-				value, ok := item.(string)
-				return value, ok
-			})
-			if len(arr) > 0 {
-				gen.Options["stop"] = arr
-			}
-		}
-	}
-	return gen, nil
+	return &OllamaEmbeddingRequest{Model: request.Model, Input: input, Options: options, Dimensions: dimensions}
 }
-
-func requestOpenAI2Embeddings(r dto.EmbeddingRequest) *OllamaEmbeddingRequest {
-	opts := map[string]any{}
-	if r.Temperature != nil {
-		opts["temperature"] = r.Temperature
+func ollamaEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if c == nil || info == nil || !info.HasChannelMeta() || response == nil || response.Body == nil {
+		return nil, types.NewError(errors.New("Ollama embedding context is missing"), types.ErrorCodeBadResponseBody)
 	}
-	if r.TopP != nil {
-		opts["top_p"] = lo.FromPtr(r.TopP)
-	}
-	if r.FrequencyPenalty != nil {
-		opts["frequency_penalty"] = lo.FromPtr(r.FrequencyPenalty)
-	}
-	if r.PresencePenalty != nil {
-		opts["presence_penalty"] = lo.FromPtr(r.PresencePenalty)
-	}
-	if r.Seed != nil {
-		opts["seed"] = int(lo.FromPtr(r.Seed))
-	}
-	dimensions := lo.FromPtrOr(r.Dimensions, 0)
-	if r.Dimensions != nil {
-		opts["dimensions"] = dimensions
-	}
-	input := r.ParseInput()
-	if len(input) == 1 {
-		return &OllamaEmbeddingRequest{Model: r.Model, Input: input[0], Options: opts, Dimensions: dimensions}
-	}
-	return &OllamaEmbeddingRequest{Model: r.Model, Input: input, Options: opts, Dimensions: dimensions}
-}
-
-func ollamaEmbeddingHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var oResp OllamaEmbeddingResponse
-	body, err := io.ReadAll(resp.Body)
+	defer service.CloseResponseBodyGracefully(response)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-	service.CloseResponseBodyGracefully(resp)
-	if err = common.Unmarshal(body, &oResp); err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *OllamaEmbeddingResponse
+	if err = json.Unmarshal(data, &wire); err != nil {
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-	if oResp.Error != "" {
-		return nil, types.NewOpenAIError(fmt.Errorf("ollama error: %s", oResp.Error), types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	if wire == nil {
+		return nil, types.NewError(errors.New("Ollama embedding response must be an object"), types.ErrorCodeBadResponseBody)
 	}
-	data := make([]dto.OpenAIEmbeddingResponseItem, 0, len(oResp.Embeddings))
-	for i, emb := range oResp.Embeddings {
-		data = append(data, dto.OpenAIEmbeddingResponseItem{Index: i, Object: "embedding", Embedding: emb})
+	if wire.Error != "" {
+		return nil, types.NewError(errors.New(wire.Error), types.ErrorCodeBadResponseBody)
 	}
-	usage := &dto.Usage{PromptTokens: oResp.PromptEvalCount, CompletionTokens: 0, TotalTokens: oResp.PromptEvalCount}
-	embResp := &dto.OpenAIEmbeddingResponse{Object: "list", Data: data, Model: info.UpstreamModelName, Usage: *usage}
-	out, _ := common.Marshal(embResp)
-	service.IOCopyBytesGracefully(c, resp, out)
-	return usage, nil
-}
-
-func FetchOllamaModels(baseURL, apiKey string) ([]OllamaModel, error) {
-	url := fmt.Sprintf("%s/api/tags", baseURL)
-
-	client := &http.Client{}
-	request, err := http.NewRequest("GET", url, nil)
+	usage := dto.Usage{PromptTokens: wire.PromptEvalCount, TotalTokens: wire.PromptEvalCount}
+	output := dto.OpenAIEmbeddingResponse{Object: "list", Model: info.UpstreamModelName, Usage: usage, Data: make([]dto.OpenAIEmbeddingResponseItem, 0, len(wire.Embeddings))}
+	for index, embedding := range wire.Embeddings {
+		output.Data = append(output.Data, dto.OpenAIEmbeddingResponseItem{Object: "embedding", Index: index, Embedding: embedding})
+	}
+	body, err := json.Marshal(output)
 	if err != nil {
-		return nil, fmt.Errorf("创建请求失败: %v", err)
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-
-	// Ollama 通常不需要 Bearer token，但为了兼容性保留
-	if apiKey != "" {
-		request.Header.Set("Authorization", "Bearer "+apiKey)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, fmt.Errorf("请求失败: %v", err)
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(response.Body)
-		return nil, fmt.Errorf("服务器返回错误 %d: %s", response.StatusCode, string(body))
-	}
-
-	var tagsResponse OllamaTagsResponse
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("读取响应失败: %v", err)
-	}
-
-	err = common.Unmarshal(body, &tagsResponse)
-	if err != nil {
-		return nil, fmt.Errorf("解析响应失败: %v", err)
-	}
-
-	return tagsResponse.Models, nil
-}
-
-// 拉取 Ollama 模型 (非流式)
-func PullOllamaModel(baseURL, apiKey, modelName string) error {
-	url := fmt.Sprintf("%s/api/pull", baseURL)
-
-	pullRequest := OllamaPullRequest{
-		Name:   modelName,
-		Stream: false, // 非流式，简化处理
-	}
-
-	requestBody, err := common.Marshal(pullRequest)
-	if err != nil {
-		return fmt.Errorf("序列化请求失败: %v", err)
-	}
-
-	client := &http.Client{
-		Timeout: 30 * 60 * 1000 * time.Millisecond, // 30分钟超时，支持大模型
-	}
-	request, err := http.NewRequest("POST", url, strings.NewReader(string(requestBody)))
-	if err != nil {
-		return fmt.Errorf("创建请求失败: %v", err)
-	}
-
-	request.Header.Set("Content-Type", "application/json")
-	if apiKey != "" {
-		request.Header.Set("Authorization", "Bearer "+apiKey)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return fmt.Errorf("请求失败: %v", err)
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(response.Body)
-		return fmt.Errorf("拉取模型失败 %d: %s", response.StatusCode, string(body))
-	}
-
-	return nil
-}
-
-// 流式拉取 Ollama 模型 (支持进度回调)
-func PullOllamaModelStream(baseURL, apiKey, modelName string, progressCallback func(OllamaPullResponse)) error {
-	url := fmt.Sprintf("%s/api/pull", baseURL)
-
-	pullRequest := OllamaPullRequest{
-		Name:   modelName,
-		Stream: true, // 启用流式
-	}
-
-	requestBody, err := common.Marshal(pullRequest)
-	if err != nil {
-		return fmt.Errorf("序列化请求失败: %v", err)
-	}
-
-	client := &http.Client{
-		Timeout: 60 * 60 * 1000 * time.Millisecond, // 1小时超时，支持超大模型
-	}
-	request, err := http.NewRequest("POST", url, strings.NewReader(string(requestBody)))
-	if err != nil {
-		return fmt.Errorf("创建请求失败: %v", err)
-	}
-
-	request.Header.Set("Content-Type", "application/json")
-	if apiKey != "" {
-		request.Header.Set("Authorization", "Bearer "+apiKey)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return fmt.Errorf("请求失败: %v", err)
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(response.Body)
-		return fmt.Errorf("拉取模型失败 %d: %s", response.StatusCode, string(body))
-	}
-
-	// 读取流式响应
-	scanner := helper.NewStreamScanner(response.Body)
-	successful := false
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-
-		var pullResponse OllamaPullResponse
-		if err := common.Unmarshal([]byte(line), &pullResponse); err != nil {
-			continue // 忽略解析失败的行
-		}
-
-		if progressCallback != nil {
-			progressCallback(pullResponse)
-		}
-
-		// 检查是否出现错误或完成
-		if strings.EqualFold(pullResponse.Status, "error") {
-			return fmt.Errorf("拉取模型失败: %s", strings.TrimSpace(line))
-		}
-		if strings.EqualFold(pullResponse.Status, "success") {
-			successful = true
-			break
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("读取流式响应失败: %v", err)
-	}
-
-	if !successful {
-		return fmt.Errorf("拉取模型未完成: 未收到成功状态")
-	}
-
-	return nil
-}
-
-// 删除 Ollama 模型
-func DeleteOllamaModel(baseURL, apiKey, modelName string) error {
-	url := fmt.Sprintf("%s/api/delete", baseURL)
-
-	deleteRequest := OllamaDeleteRequest{
-		Name: modelName,
-	}
-
-	requestBody, err := common.Marshal(deleteRequest)
-	if err != nil {
-		return fmt.Errorf("序列化请求失败: %v", err)
-	}
-
-	client := &http.Client{}
-	request, err := http.NewRequest("DELETE", url, strings.NewReader(string(requestBody)))
-	if err != nil {
-		return fmt.Errorf("创建请求失败: %v", err)
-	}
-
-	request.Header.Set("Content-Type", "application/json")
-	if apiKey != "" {
-		request.Header.Set("Authorization", "Bearer "+apiKey)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return fmt.Errorf("请求失败: %v", err)
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(response.Body)
-		return fmt.Errorf("删除模型失败 %d: %s", response.StatusCode, string(body))
-	}
-
-	return nil
-}
-
-func FetchOllamaVersion(baseURL, apiKey string) (string, error) {
-	trimmedBase := strings.TrimRight(baseURL, "/")
-	if trimmedBase == "" {
-		return "", fmt.Errorf("baseURL 为空")
-	}
-
-	url := fmt.Sprintf("%s/api/version", trimmedBase)
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	request, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", fmt.Errorf("创建请求失败: %v", err)
-	}
-
-	if apiKey != "" {
-		request.Header.Set("Authorization", "Bearer "+apiKey)
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return "", fmt.Errorf("请求失败: %v", err)
-	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return "", fmt.Errorf("读取响应失败: %v", err)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("查询版本失败 %d: %s", response.StatusCode, string(body))
-	}
-
-	var versionResp struct {
-		Version string `json:"version"`
-	}
-
-	if err := common.Unmarshal(body, &versionResp); err != nil {
-		return "", fmt.Errorf("解析响应失败: %v", err)
-	}
-
-	if versionResp.Version == "" {
-		return "", fmt.Errorf("未返回版本信息")
-	}
-
-	return versionResp.Version, nil
+	service.IOCopyBytesGracefully(c, response, body)
+	return &output.Usage, nil
 }

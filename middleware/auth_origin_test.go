@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -82,6 +82,10 @@ func TestSessionCookieOriginGuardDevelopmentCompatibility(t *testing.T) {
 		expected int
 	}{
 		{name: "insecure mode allows mismatched development origins", origin: "http://localhost:3001", expected: http.StatusNoContent},
+		{name: "insecure mode allows literal loopback development origins", origin: "http://127.0.0.1:3001", expected: http.StatusNoContent},
+		{name: "insecure mode rejects remote origin", origin: "https://attacker.example.com", expected: http.StatusForbidden},
+		{name: "insecure mode rejects loopback suffix", origin: "http://localhost.attacker.test:3001", expected: http.StatusForbidden},
+		{name: "insecure mode rejects opaque origin", origin: "null", expected: http.StatusForbidden},
 		{name: "insecure mode allows missing origin", expected: http.StatusNoContent},
 		{name: "secure mode rejects mismatched development origins", secure: true, origin: "http://localhost:3001", expected: http.StatusForbidden},
 	}
@@ -132,4 +136,39 @@ func TestSessionCookieOriginGuardDoesNotTrustForwardedProtoFromClient(t *testing
 	router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusForbidden, response.Code)
+}
+
+func TestInsecureSessionOriginBoundary(t *testing.T) {
+	previousSecure, previousOrigins := common.SessionCookieSecure, common.SessionCookieTrustedURLs
+	common.SessionCookieSecure, common.SessionCookieTrustedURLs = false, nil
+	t.Cleanup(func() { common.SessionCookieSecure, common.SessionCookieTrustedURLs = previousSecure, previousOrigins })
+	for _, test := range []struct {
+		name, target, origin, referer, site string
+		status                              int
+	}{
+		{name: "same origin HTTP", target: "http://panel.example.com", origin: "http://panel.example.com", status: http.StatusNoContent},
+		{name: "TLS termination same host", target: "http://panel.example.com", origin: "https://panel.example.com", status: http.StatusNoContent},
+		{name: "remote host cannot use loopback exemption", target: "http://panel.example.com", origin: "http://localhost:3001", status: http.StatusForbidden},
+		{name: "same site sibling is forbidden", target: "http://panel.example.com", origin: "http://evil.example.com", status: http.StatusForbidden},
+		{name: "cross site referer is forbidden", target: "http://localhost:3000", referer: "https://evil.example.com/form", status: http.StatusForbidden},
+		{name: "fetch metadata rejects missing browser origin", target: "http://localhost:3000", site: "cross-site", status: http.StatusForbidden},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			engine := gin.New()
+			engine.POST("/session", SessionCookieOriginGuard(), func(c *gin.Context) { c.Status(http.StatusNoContent) })
+			req := httptest.NewRequest(http.MethodPost, test.target+"/session", nil)
+			if test.origin != "" {
+				req.Header.Set("Origin", test.origin)
+			}
+			if test.referer != "" {
+				req.Header.Set("Referer", test.referer)
+			}
+			if test.site != "" {
+				req.Header.Set("Sec-Fetch-Site", test.site)
+			}
+			response := httptest.NewRecorder()
+			engine.ServeHTTP(response, req)
+			assert.Equal(t, test.status, response.Code)
+		})
+	}
 }

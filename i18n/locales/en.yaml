@@ -1,7 +1,7 @@
 # English translations
 
 # Task plugin messages
-task_plugin.unknown_meta_field: 'Plugin metadata contains an unknown field "{{.Field}}". If this plugin was downloaded from the official marketplace, it may require a newer version of new-api. Try updating new-api and installing the plugin again.'
+task_plugin.unknown_meta_field: 'Plugin metadata contains an unknown field "{{.Field}}". If this plugin was downloaded from the official marketplace, it may require a newer version of further-api. Try updating further-api and installing the plugin again.'
 
 # Common messages
 common.invalid_params: "Invalid parameters"
@@ -30,9 +30,9 @@ common.batch_too_many: "Too many items in batch request, maximum is {{.Max}}"
 auth.not_logged_in: "Unauthorized, not logged in and no access token provided"
 auth.access_token_invalid: "Unauthorized, invalid access token"
 auth.user_info_invalid: "Unauthorized, invalid user info"
-auth.user_id_not_provided: "Unauthorized, New-Api-User header not provided"
-auth.user_id_format_error: "Unauthorized, New-Api-User header format error"
-auth.user_id_mismatch: "Unauthorized, New-Api-User does not match logged in user"
+auth.user_id_not_provided: "Unauthorized, user identity header not provided"
+auth.user_id_format_error: "Unauthorized, user identity header format error"
+auth.user_id_mismatch: "Unauthorized, user identity does not match the logged-in user"
 auth.user_banned: "User has been banned"
 auth.insufficient_privilege: "Unauthorized, insufficient privileges"
 

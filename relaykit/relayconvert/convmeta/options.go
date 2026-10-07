@@ -1,6 +1,6 @@
 package convmeta
 
-import "github.com/QuantumNous/new-api/relaykit/types"
+import "github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 // Options is the per-request snapshot of host configuration that converters
 // consult. The host fills it from its settings system when constructing the
@@ -46,7 +46,7 @@ type ClaudeOptions struct {
 	// (omitting it is a 400), so when this hook is nil and no other path
 	// supplies a value, OpenAI→Claude request conversion fails with an
 	// explicit error instead of emitting a request the upstream is
-	// guaranteed to reject. The new-api host always provides this hook;
+	// guaranteed to reject. The further-api host always provides this hook;
 	// standalone relaykit users must supply one or guarantee max_tokens on
 	// every request.
 	DefaultMaxTokens func(modelName string) int

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"errors"
@@ -10,21 +11,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
 const (
-	AccessTokenTTL        = 15 * time.Minute
-	SecurityProofTTL      = time.Minute
-	LoginSessionTTL       = 30 * 24 * time.Hour
-	RefreshReplayWindow   = 30 * time.Second
-	accessTokenUse        = "access"
-	securityProofTokenUse = "security_proof"
-	authTokenIssuer       = "new-api"
-	authTokenAudience     = "new-api-dashboard"
+	AccessTokenTTL          = 15 * time.Minute
+	SecurityProofTTL        = time.Minute
+	LoginSessionTTL         = 30 * 24 * time.Hour
+	RefreshReplayWindow     = 30 * time.Second
+	accessTokenUse          = "access"
+	securityProofTokenUse   = "security_proof"
+	authTokenIssuer         = "further-api"
+	authTokenAudience       = "further-api-dashboard"
+	legacyAuthTokenIssuer   = "new-api"
+	legacyAuthTokenAudience = "new-api-dashboard"
 )
 
 var (
@@ -52,6 +55,12 @@ type authClaims struct {
 }
 
 func authSigningKey(purpose string) []byte {
+	mac := hmac.New(sha256.New, []byte(common.SessionSecret))
+	_, _ = mac.Write([]byte("further-api/auth/" + purpose + "/v1"))
+	return mac.Sum(nil)
+}
+
+func legacyAuthSigningKey(purpose string) []byte {
 	mac := hmac.New(sha256.New, []byte(common.SessionSecret))
 	_, _ = mac.Write([]byte("new-api/auth/" + purpose + "/v1"))
 	return mac.Sum(nil)
@@ -83,7 +92,7 @@ func IssueAccessToken(identity AuthIdentity) (string, int64, error) {
 }
 
 func ParseAccessToken(raw string) (AuthIdentity, error) {
-	claims, err := parseAuthClaims(raw, accessTokenUse, authSigningKey(accessTokenUse))
+	claims, err := parseDashboardAuthClaims(raw, accessTokenUse)
 	if err != nil {
 		return AuthIdentity{}, err
 	}
@@ -99,7 +108,7 @@ func ParseAccessToken(raw string) (AuthIdentity, error) {
 	}, nil
 }
 
-// ParseDashboardAccessToken distinguishes new-api dashboard JWTs from opaque
+// ParseDashboardAccessToken distinguishes dashboard JWTs from opaque
 // credentials. A token carrying the dashboard issuer, audience and a known
 // token use is always treated as internal, even when its signature, lifetime
 // or requested purpose is invalid, so it can never fall through to PAT or
@@ -114,9 +123,10 @@ func ParseDashboardAccessToken(raw string) (identity AuthIdentity, internal bool
 	if parseErr != nil || parsed == nil {
 		return AuthIdentity{}, false, nil
 	}
-	audienceMatches := slices.Contains(claims.Audience, authTokenAudience)
+	audienceMatches := (claims.Issuer == authTokenIssuer && slices.Contains(claims.Audience, authTokenAudience)) ||
+		(claims.Issuer == legacyAuthTokenIssuer && slices.Contains(claims.Audience, legacyAuthTokenAudience))
 	knownTokenUse := claims.TokenUse == accessTokenUse || claims.TokenUse == securityProofTokenUse
-	if claims.Issuer != authTokenIssuer || !audienceMatches || !knownTokenUse {
+	if !audienceMatches || !knownTokenUse {
 		return AuthIdentity{}, false, nil
 	}
 	identity, err = ParseAccessToken(raw)
@@ -124,13 +134,20 @@ func ParseDashboardAccessToken(raw string) (identity AuthIdentity, internal bool
 }
 
 func IssueSecurityProof(identity AuthIdentity, method string, binding VerificationBinding) (string, int64, error) {
+	return IssueSecurityProofContext(context.Background(), identity, method, binding)
+}
+
+func IssueSecurityProofContext(ctx context.Context, identity AuthIdentity, method string, binding VerificationBinding) (string, int64, error) {
+	if err := ctx.Err(); err != nil {
+		return "", 0, err
+	}
 	method = strings.TrimSpace(method)
 	if identity.UserID <= 0 || identity.SessionID == "" || identity.UserAuthVersion <= 0 || identity.SessionVersion <= 0 || method == "" || binding.Scope == "" || binding.ContextHash == "" {
 		return "", 0, ErrAuthTokenInvalid
 	}
 	now := time.Now()
 	expiresAt := now.Add(SecurityProofTTL).Truncate(time.Second)
-	proofID, _, err := model.CreateAuthFlow(model.AuthFlowCreate{
+	proofID, _, err := model.CreateAuthFlowContext(ctx, model.AuthFlowCreate{
 		Purpose: model.AuthFlowPurposeSecurityProof, UserId: identity.UserID,
 		SessionId: identity.SessionID, ExpiresAt: expiresAt,
 	})
@@ -160,7 +177,7 @@ func IssueSecurityProof(identity AuthIdentity, method string, binding Verificati
 }
 
 func verifySecurityProof(raw string, identity AuthIdentity, binding VerificationBinding) (*authClaims, error) {
-	claims, err := parseAuthClaims(raw, securityProofTokenUse, authSigningKey(securityProofTokenUse))
+	claims, err := parseDashboardAuthClaims(raw, securityProofTokenUse)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +198,25 @@ func verifySecurityProof(raw string, identity AuthIdentity, binding Verification
 }
 
 func parseAuthClaims(raw, expectedUse string, key []byte) (*authClaims, error) {
+	return parseAuthClaimsWithProfile(raw, expectedUse, key, authTokenIssuer, authTokenAudience)
+}
+
+func parseDashboardAuthClaims(raw, expectedUse string) (*authClaims, error) {
+	claims := &authClaims{}
+	if _, _, err := jwt.NewParser().ParseUnverified(strings.TrimSpace(raw), claims); err != nil {
+		return nil, ErrAuthTokenInvalid
+	}
+	switch {
+	case claims.Issuer == authTokenIssuer && slices.Contains(claims.Audience, authTokenAudience):
+		return parseAuthClaims(raw, expectedUse, authSigningKey(expectedUse))
+	case claims.Issuer == legacyAuthTokenIssuer && slices.Contains(claims.Audience, legacyAuthTokenAudience):
+		return parseAuthClaimsWithProfile(raw, expectedUse, legacyAuthSigningKey(expectedUse), legacyAuthTokenIssuer, legacyAuthTokenAudience)
+	default:
+		return nil, ErrAuthTokenInvalid
+	}
+}
+
+func parseAuthClaimsWithProfile(raw, expectedUse string, key []byte, issuer, audience string) (*authClaims, error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return nil, ErrAuthTokenInvalid
@@ -191,7 +227,7 @@ func parseAuthClaims(raw, expectedUse string, key []byte) (*authClaims, error) {
 			return nil, fmt.Errorf("%w: unexpected signing method", ErrAuthTokenInvalid)
 		}
 		return key, nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithIssuer(authTokenIssuer), jwt.WithAudience(authTokenAudience), jwt.WithExpirationRequired(), jwt.WithIssuedAt(), jwt.WithLeeway(5*time.Second))
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithIssuer(issuer), jwt.WithAudience(audience), jwt.WithExpirationRequired(), jwt.WithIssuedAt(), jwt.WithLeeway(5*time.Second))
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ErrAuthTokenExpired

@@ -11,13 +11,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/plugins"
-	"github.com/QuantumNous/new-api/setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/plugins"
+	"github.com/dqt081228OHVGFY/further-api/setting"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
@@ -107,7 +107,7 @@ func TestDisableThirdPartyPluginSupportsCascadeAndForce(t *testing.T) {
 	channel := model.Channel{Type: constant.ChannelTypeTaskPlugin, Status: common.ChannelStatusEnabled, Name: "linked", Models: "doc", Group: "default", BaseURL: &baseURL, Setting: &setting}
 	require.NoError(t, channel.Insert())
 	gatewaySetting := `{"task_extend_plugin_keys":["lifecycle-only","other"]}`
-	gateway := model.Channel{Type: constant.ChannelTypeNewAPI, Status: common.ChannelStatusEnabled, Name: "gateway", Models: "doc,gpt", Group: "default", BaseURL: &baseURL, Setting: &gatewaySetting}
+	gateway := model.Channel{Type: constant.ChannelTypeGateway, Status: common.ChannelStatusEnabled, Name: "gateway", Models: "doc,gpt", Group: "default", BaseURL: &baseURL, Setting: &gatewaySetting}
 	require.NoError(t, gateway.Insert())
 	require.NoError(t, model.DB.Create(&model.Task{Platform: "lifecycle-only", Status: model.TaskStatusSubmitted}).Error)
 
@@ -448,7 +448,7 @@ export const meta = {
   description: {en: "Video generation via the vendor API", zh: "通过厂商接口生成视频"},
   icon: "text:UO", baseUrl: "http://localhost:9000/",
   channelTypes: [1990, 1991],
-  upstreams: ["vendor", "new_api"],
+  upstreams: ["vendor", "gateway"],
   models: ["usage-options-model"], fetchMode: "per_task",
   usageSchema: {seconds: {type: "number", unit: "second", description: "Video generation unit price"}},
   usageProfiles: [{models:["usage-options-model"],schema:{image_count:{type:"number",unit:"count"}}}]
@@ -495,7 +495,7 @@ export function parseTaskResult() { return {}; }
 		assert.Equal(t, "count", option.UsageProfiles[0].Schema["image_count"].Unit)
 		assert.Equal(t, "text:UO", option.Icon)
 		assert.Equal(t, []int{1990, 1991}, option.ChannelTypes)
-		assert.Equal(t, []string{"vendor", "new_api"}, option.Upstreams, "the New API channel form lists only plugins declaring new_api")
+		assert.Equal(t, []string{"vendor", "gateway"}, option.Upstreams, "the further-api channel form lists only plugins declaring gateway")
 		assert.Equal(t, "http://localhost:9000", option.BaseURL, "the drawer prefills the normalized plugin default")
 		return
 	}
@@ -993,9 +993,9 @@ func TestUploadTaskPluginLocalizesUnknownMetaField(t *testing.T) {
 		language string
 		message  string
 	}{
-		{"en", `Plugin metadata contains an unknown field "futureField". If this plugin was downloaded from the official marketplace, it may require a newer version of new-api. Try updating new-api and installing the plugin again.`},
-		{"zh-CN", "插件元数据包含未知字段“futureField”。如果插件来自官方市场，可能需要更高版本的 new-api。请尝试更新 new-api 后重新安装插件。"},
-		{"zh-TW", "外掛中繼資料包含未知欄位「futureField」。如果外掛來自官方市集，可能需要較新版本的 new-api。請嘗試更新 new-api 後重新安裝外掛。"},
+		{"en", `Plugin metadata contains an unknown field "futureField". If this plugin was downloaded from the official marketplace, it may require a newer version of further-api. Try updating further-api and installing the plugin again.`},
+		{"zh-CN", "插件元数据包含未知字段“futureField”。如果插件来自官方市场，可能需要更高版本的 further-api。请尝试更新 further-api 后重新安装插件。"},
+		{"zh-TW", "外掛中繼資料包含未知欄位「futureField」。如果外掛來自官方市集，可能需要較新版本的 further-api。請嘗試更新 further-api 後重新安裝外掛。"},
 	} {
 		t.Run(tc.language, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
@@ -1182,10 +1182,7 @@ func TestGetTaskPluginMarketplaceSourcesDefaultWhenUnset(t *testing.T) {
 	}
 	require.NoError(t, common.Unmarshal(recorder.Body.Bytes(), &response))
 	require.True(t, response.Success)
-	require.Equal(t, []setting.TaskPluginMarketplaceSource{
-		{Name: "Official", IndexURL: "https://www.newapi.ai/api/v1/plugins/index.json"},
-		{Name: "GitHub", IndexURL: "https://raw.githubusercontent.com/QuantumNous/new-api-plugins/main/index.json"},
-	}, response.Data)
+	require.Empty(t, response.Data)
 	var count int64
 	require.NoError(t, model.DB.Model(&model.Option{}).Where("key = ?", setting.TaskPluginMarketplaceSourcesKey).Count(&count).Error)
 	assert.Zero(t, count)
@@ -1195,7 +1192,7 @@ func TestUpdateTaskPluginMarketplaceSourcesRoundTrip(t *testing.T) {
 	setupTaskPluginMarketplaceSourcesTest(t)
 	payload := []setting.TaskPluginMarketplaceSource{
 		{Name: "Mirror", IndexURL: "https://example.com/plugins/index.json"},
-		{Name: "Official", IndexURL: "https://www.newapi.ai/api/v1/plugins/index.json"},
+		{Name: "Team", IndexURL: "https://plugins.example.com/index.json"},
 	}
 	body, err := common.Marshal(payload)
 	require.NoError(t, err)

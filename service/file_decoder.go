@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -11,9 +12,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,11 @@ import (
 // GetFileTypeFromUrl 获取文件类型，返回 mime type， 例如 image/jpeg, image/png, image/gif, image/bmp, image/tiff, application/pdf
 // 如果获取失败，返回 application/octet-stream
 func GetFileTypeFromUrl(c *gin.Context, url string, reason ...string) (string, error) {
-	response, err := DoDownloadRequest(url, []string{"get_mime_type", strings.Join(reason, ", ")}...)
+	parent := context.Background()
+	if c != nil && c.Request != nil {
+		parent = c.Request.Context()
+	}
+	response, err := DoDownloadRequestContext(parent, url, []string{"get_mime_type", strings.Join(reason, ", ")}...)
 	if err != nil {
 		common.SysLog(fmt.Sprintf("fail to get file type from url: %s, error: %s", url, err.Error()))
 		return "", err

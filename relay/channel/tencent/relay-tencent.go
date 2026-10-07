@@ -1,26 +1,25 @@
 package tencent
 
 import (
-	"bufio"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -90,75 +89,41 @@ func streamResponseTencent2OpenAI(TencentResponse *TencentChatResponse) *dto.Cha
 	return &response
 }
 
-func tencentStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var responseText strings.Builder
-	scanner := helper.NewStreamScanner(resp.Body)
-	scanner.Split(bufio.ScanLines)
-
-	helper.SetEventStreamHeaders(c)
-
-	for scanner.Scan() {
-		data := scanner.Text()
-		if len(data) < 5 || !strings.HasPrefix(data, "data:") {
-			continue
+func tencentStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextStream(c, info, response, func(data []byte) (*dto.ChatCompletionsStreamResponse, *types.GatewayError) {
+		var wire TencentChatResponse
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 		}
-		data = strings.TrimPrefix(data, "data:")
-
-		var tencentResponse TencentChatResponse
-		err := common.Unmarshal([]byte(data), &tencentResponse)
-		if err != nil {
-			common.SysLog("error unmarshalling stream response: " + err.Error())
-			continue
+		if wire.Error.Message != "" {
+			return nil, types.NewError(errors.New(wire.Error.Message), types.ErrorCodeBadResponseBody)
 		}
-
-		response := streamResponseTencent2OpenAI(&tencentResponse)
-		if len(response.Choices) != 0 {
-			responseText.WriteString(response.Choices[0].Delta.GetContentString())
+		frame := streamResponseTencent2OpenAI(&wire)
+		frame.Id = wire.Id
+		frame.Model = info.UpstreamModelName
+		if wire.Usage.TotalTokens > 0 {
+			frame.Usage = &dto.Usage{PromptTokens: wire.Usage.PromptTokens, CompletionTokens: wire.Usage.CompletionTokens, TotalTokens: wire.Usage.TotalTokens}
 		}
-
-		err = helper.ObjectData(c, response)
-		if err != nil {
-			common.SysLog(err.Error())
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		common.SysLog("error reading stream: " + err.Error())
-	}
-
-	helper.Done(c)
-
-	service.CloseResponseBodyGracefully(resp)
-
-	return service.ResponseText2Usage(c, responseText.String(), info.UpstreamModelName, info.GetEstimatePromptTokens()), nil
+		return frame, nil
+	})
 }
 
-func tencentHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	var tencentSb TencentChatResponseSB
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
-	}
-	service.CloseResponseBodyGracefully(resp)
-	err = json.Unmarshal(responseBody, &tencentSb)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	if tencentSb.Response.Error.Code != 0 {
-		return nil, types.WithOpenAIError(types.OpenAIError{
-			Message: tencentSb.Response.Error.Message,
-			Code:    tencentSb.Response.Error.Code,
-		}, resp.StatusCode)
-	}
-	fullTextResponse := responseTencent2OpenAI(&tencentSb.Response)
-	jsonResponse, err := common.Marshal(fullTextResponse)
-	if err != nil {
-		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
-	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	service.IOCopyBytesGracefully(c, resp, jsonResponse)
-	return &fullTextResponse.Usage, nil
+func tencentHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextResponse(c, info, response, func(data []byte) (*dto.OpenAITextResponse, *types.GatewayError) {
+		var wire *TencentChatResponseSB
+		if err := json.Unmarshal(data, &wire); err != nil {
+			return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+		}
+		if wire == nil {
+			return nil, types.NewError(errors.New("Tencent response must be an object"), types.ErrorCodeBadResponseBody)
+		}
+		if wire.Response.Error.Message != "" {
+			return nil, types.NewError(errors.New(wire.Response.Error.Message), types.ErrorCodeBadResponseBody)
+		}
+		output := responseTencent2OpenAI(&wire.Response)
+		output.Model = info.UpstreamModelName
+		return output, nil
+	})
 }
 
 func parseTencentConfig(config string) (appId int64, secretId string, secretKey string, err error) {

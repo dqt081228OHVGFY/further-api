@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -154,7 +154,7 @@ func TestRiskTokenFallbackIsWeakerThanExactSignatures(t *testing.T) {
 	require.Greater(t, exact.RepeatedInput, fallback.RepeatedInput)
 }
 
-func TestRiskNewAPIQuotaExhaustionCountsWithoutChangingHTTPStatus(t *testing.T) {
+func TestRiskGatewayQuotaExhaustionCountsWithoutChangingHTTPStatus(t *testing.T) {
 	now := time.Now().UTC()
 	events := []model.RiskEvent{
 		{ID: 1, UserID: 7, OccurredAt: now.Unix() - 1, StatusCode: 403, QuotaExhausted: true},

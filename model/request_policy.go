@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"maps"
@@ -11,10 +12,10 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting"
-	"github.com/QuantumNous/new-api/setting/config"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/config"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 	"gorm.io/gorm"
 )
 
@@ -221,8 +222,20 @@ func refreshRequestPolicySnapshot() error {
 // UpdateRequestPolicyOptions validates the entire resulting policy before any
 // write. Unknown JSON rule fields stay in the original option string.
 func UpdateRequestPolicyOptions(values map[string]string) error {
+	return UpdateRequestPolicyOptionsContext(context.Background(), values)
+}
+
+func UpdateRequestPolicyOptionsContext(ctx context.Context, values map[string]string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	requestPolicyOptionMutex.Lock()
 	defer requestPolicyOptionMutex.Unlock()
+	plan, err := prepareGatewayOptionPlan(values, false)
+	if err != nil {
+		return err
+	}
+	values = plan.values
 	options := maps.Clone(CurrentRequestPolicy().Options)
 	for key, value := range values {
 		if !IsRequestPolicyOption(key) {
@@ -234,7 +247,7 @@ func UpdateRequestPolicyOptions(values map[string]string) error {
 	if err != nil {
 		return err
 	}
-	if err := DB.Transaction(func(tx *gorm.DB) error {
+	if err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for key, value := range values {
 			option := Option{Key: key}
 			if err := tx.FirstOrCreate(&option, Option{Key: key}).Error; err != nil {
@@ -248,10 +261,8 @@ func UpdateRequestPolicyOptions(values map[string]string) error {
 	}); err != nil {
 		return err
 	}
-	for key, value := range values {
-		if err := updateOptionMap(key, value); err != nil {
-			return err
-		}
+	if err := publishGatewayOptionPlan(plan); err != nil {
+		return err
 	}
 	requestPolicySnapshot.Store(snapshot)
 	return nil

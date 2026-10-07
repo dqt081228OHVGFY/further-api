@@ -15,7 +15,7 @@ export const meta = {
   models: ["suno_music", "suno_lyrics"],
   fetchMode: "batch",
   // Vendor paths already equal the /suno native routes, so no URL changes.
-  upstreams: ["vendor", "new_api"],
+  upstreams: ["vendor", "gateway"],
   usageSchema: {
     // Number of generated music or lyrics clips.
     clips: {

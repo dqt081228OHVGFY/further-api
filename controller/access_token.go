@@ -4,12 +4,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
 
 func GetAccessTokenStatus(c *gin.Context) {
@@ -22,7 +24,8 @@ func GetAccessTokenStatus(c *gin.Context) {
 }
 
 func GenerateAccessToken(c *gin.Context) {
-	if middleware.RequireSecurityProof(c, service.VerificationOperation{Scope: service.VerificationScopeAccessTokenGenerate}) == nil {
+	authorization := middleware.RequireSecurityProof(c, service.VerificationOperation{Scope: service.VerificationScopeAccessTokenGenerate})
+	if authorization == nil {
 		return
 	}
 	id := c.GetInt("id")
@@ -32,7 +35,7 @@ func GenerateAccessToken(c *gin.Context) {
 		return
 	}
 	var existing int64
-	if err := model.DB.Model(&model.User{}).Where("access_token = ?", key).Count(&existing).Error; err != nil {
+	if err := model.DB.WithContext(c.Request.Context()).Session(&gorm.Session{Logger: model.DB.Logger.LogMode(gormlogger.Silent)}).Model(&model.User{}).Where("access_token = ?", key).Count(&existing).Error; err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -40,7 +43,7 @@ func GenerateAccessToken(c *gin.Context) {
 		common.ApiErrorI18n(c, i18n.MsgUuidDuplicate)
 		return
 	}
-	if err := model.UpdateUserAccessToken(id, key); err != nil {
+	if err := model.UpdateUserAccessTokenForSessionContext(c.Request.Context(), authorization.AuthSessionIdentity, key); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -49,10 +52,11 @@ func GenerateAccessToken(c *gin.Context) {
 }
 
 func RevokeAccessToken(c *gin.Context) {
-	if middleware.RequireSecurityProof(c, service.VerificationOperation{Scope: service.VerificationScopeAccessTokenRevoke}) == nil {
+	authorization := middleware.RequireSecurityProof(c, service.VerificationOperation{Scope: service.VerificationScopeAccessTokenRevoke})
+	if authorization == nil {
 		return
 	}
-	ref, err := model.RevokeUserAccessToken(c.GetInt("id"))
+	ref, err := model.RevokeUserAccessTokenForSessionContext(c.Request.Context(), authorization.AuthSessionIdentity)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return

@@ -1,138 +1,109 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/QuantumNous/new-api/model"
-
+	"github.com/dqt081228OHVGFY/further-api/model"
 	pancake "github.com/waffo-com/waffo-pancake-sdk-go"
 )
 
-// WaffoPancakeWebhookEvent mirrors the SDK's WebhookEvent shape using plain
-// strings so controllers don't have to import the SDK package.
 type WaffoPancakeWebhookEvent struct {
-	ID        string
-	Timestamp string
-	EventType string
-	EventID   string
-	StoreID   string
-	Mode      string
-	Data      WaffoPancakeWebhookData
+	ID, Timestamp, EventType, EventID, StoreID, Mode string
+	Data                                             WaffoPancakeWebhookData
 }
 
 type WaffoPancakeWebhookData struct {
-	// OrderID = Pancake ORD_* (logs); OrderMerchantExternalID = our trade_no (lookup).
-	OrderID                       string
-	OrderMerchantExternalID       string
-	BuyerEmail                    string
-	Currency                      string
-	Amount                        string
-	TaxAmount                     string
-	ProductName                   string
-	MerchantProvidedBuyerIdentity string
+	OrderID, OrderMerchantExternalID, BuyerEmail, Currency, Amount, TaxAmount, Subtotal, Total, ProductName, MerchantProvidedBuyerIdentity string
 }
 
-// NormalizedEventType returns the event type or empty string for a nil event.
-func (e *WaffoPancakeWebhookEvent) NormalizedEventType() string {
-	if e == nil {
+func (event *WaffoPancakeWebhookEvent) NormalizedEventType() string {
+	if event == nil {
 		return ""
 	}
-	return e.EventType
+	return strings.TrimSpace(event.EventType)
 }
 
-// WaffoPancakeBuyerIdentityFromUserID renders the canonical buyer identity
-// for checkout. Webhook handlers compare against the value rendered here to
-// reject identity mismatches, so both call sites must use this function.
-func WaffoPancakeBuyerIdentityFromUserID(userID int) string {
-	return fmt.Sprintf("new-api-user-%d", userID)
+func WaffoPancakeBuyerIdentityFromUserID(id int) string {
+	return fmt.Sprintf("further-api-user-%d", id)
 }
 
-// VerifyConfiguredWaffoPancakeWebhook verifies the signature header. The SDK
-// picks the matching test / prod public key from the payload's `mode` field.
-func VerifyConfiguredWaffoPancakeWebhook(payload string, signatureHeader string) (*WaffoPancakeWebhookEvent, error) {
-	evt, err := pancake.VerifyWebhookTyped[pancake.WebhookEventData](payload, signatureHeader, nil)
+func matchesWaffoBuyerIdentity(identity string, id int) bool {
+	if id <= 0 {
+		return false
+	}
+	return identity == WaffoPancakeBuyerIdentityFromUserID(id) || identity == fmt.Sprintf("new-api-user-%d", id)
+}
+
+func pancakeOptionalText(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
+}
+
+func VerifyConfiguredWaffoPancakeWebhook(payload, signature string) (*WaffoPancakeWebhookEvent, error) {
+	if len(payload) > 2<<20 || strings.TrimSpace(payload) == "" || strings.TrimSpace(signature) == "" {
+		return nil, errors.New("支付回调请求无效。")
+	}
+	verified, err := pancake.VerifyWebhookTyped[pancake.WebhookEventData](payload, signature, nil)
 	if err != nil {
 		return nil, err
 	}
-	identity := ""
-	if evt.Data.MerchantProvidedBuyerIdentity != nil {
-		identity = *evt.Data.MerchantProvidedBuyerIdentity
-	}
-	externalID := ""
-	if evt.Data.OrderMerchantExternalID != nil {
-		externalID = *evt.Data.OrderMerchantExternalID
-	}
-	return &WaffoPancakeWebhookEvent{
-		ID:        evt.ID,
-		Timestamp: evt.Timestamp,
-		EventType: evt.EventType,
-		EventID:   evt.EventID,
-		StoreID:   evt.StoreID,
-		Mode:      string(evt.Mode),
-		Data: WaffoPancakeWebhookData{
-			OrderID:                       evt.Data.OrderID,
-			OrderMerchantExternalID:       externalID,
-			BuyerEmail:                    evt.Data.BuyerEmail,
-			Currency:                      evt.Data.Currency,
-			Amount:                        evt.Data.Amount,
-			TaxAmount:                     evt.Data.TaxAmount,
-			ProductName:                   evt.Data.ProductName,
-			MerchantProvidedBuyerIdentity: identity,
-		},
-	}, nil
+	data := verified.Data
+	event := &WaffoPancakeWebhookEvent{ID: verified.ID, Timestamp: verified.Timestamp, EventType: verified.EventType, EventID: verified.EventID, StoreID: verified.StoreID, Mode: string(verified.Mode)}
+	event.Data = WaffoPancakeWebhookData{OrderID: data.OrderID, OrderMerchantExternalID: pancakeOptionalText(data.OrderMerchantExternalID),
+		BuyerEmail: data.BuyerEmail, Currency: data.Currency, Amount: data.Amount, TaxAmount: data.TaxAmount,
+		Subtotal: pancakeOptionalText(data.Subtotal), Total: pancakeOptionalText(data.Total), ProductName: data.ProductName,
+		MerchantProvidedBuyerIdentity: pancakeOptionalText(data.MerchantProvidedBuyerIdentity)}
+	return event, nil
 }
 
-// ResolveWaffoPancakeTradeNo maps a verified webhook event to a local TopUp
-// trade_no via OrderMerchantExternalID, and rejects buyer-identity mismatches.
 func ResolveWaffoPancakeTradeNo(event *WaffoPancakeWebhookEvent) (string, error) {
-	if event == nil {
-		return "", fmt.Errorf("missing webhook event")
-	}
-	tradeNo := strings.TrimSpace(event.Data.OrderMerchantExternalID)
-	if tradeNo == "" {
-		return "", fmt.Errorf("missing webhook orderMerchantExternalId")
-	}
-	topUp := model.GetTopUpByTradeNo(tradeNo)
-	if topUp == nil || topUp.PaymentProvider != model.PaymentProviderWaffoPancake {
-		return "", fmt.Errorf("waffo pancake order not found for tradeNo=%s", tradeNo)
-	}
-	expectedIdentity := WaffoPancakeBuyerIdentityFromUserID(topUp.UserId)
-	actualIdentity := strings.TrimSpace(event.Data.MerchantProvidedBuyerIdentity)
-	if actualIdentity != expectedIdentity {
-		return "", fmt.Errorf(
-			"waffo pancake buyer identity mismatch for tradeNo=%s: expected=%q actual=%q",
-			tradeNo,
-			expectedIdentity,
-			actualIdentity,
-		)
-	}
-	return tradeNo, nil
+	return ResolveWaffoPancakeTradeNoContext(context.Background(), event)
+}
+func ResolveWaffoPancakeTradeNoContext(ctx context.Context, event *WaffoPancakeWebhookEvent) (string, error) {
+	return resolvePancakeOrderOwner(ctx, event, false)
+}
+func ResolveWaffoPancakeSubscriptionTradeNo(event *WaffoPancakeWebhookEvent) (string, error) {
+	return ResolveWaffoPancakeSubscriptionTradeNoContext(context.Background(), event)
+}
+func ResolveWaffoPancakeSubscriptionTradeNoContext(ctx context.Context, event *WaffoPancakeWebhookEvent) (string, error) {
+	return resolvePancakeOrderOwner(ctx, event, true)
 }
 
-// ResolveWaffoPancakeSubscriptionTradeNo is the SubscriptionOrder counterpart
-// of ResolveWaffoPancakeTradeNo.
-func ResolveWaffoPancakeSubscriptionTradeNo(event *WaffoPancakeWebhookEvent) (string, error) {
-	if event == nil {
-		return "", fmt.Errorf("missing webhook event")
+func resolvePancakeOrderOwner(ctx context.Context, event *WaffoPancakeWebhookEvent, subscription bool) (string, error) {
+	if ctx == nil {
+		ctx = context.Background()
 	}
-	tradeNo := strings.TrimSpace(event.Data.OrderMerchantExternalID)
-	if tradeNo == "" {
-		return "", fmt.Errorf("missing webhook orderMerchantExternalId")
+	if err := ctx.Err(); err != nil {
+		return "", err
 	}
-	order := model.GetSubscriptionOrderByTradeNo(tradeNo)
-	if order == nil || order.PaymentProvider != model.PaymentProviderWaffoPancake {
-		return "", fmt.Errorf("waffo pancake subscription order not found for tradeNo=%s", tradeNo)
+	if event == nil || model.DB == nil {
+		return "", errors.New("支付回调订单信息不可用。")
 	}
-	expectedIdentity := WaffoPancakeBuyerIdentityFromUserID(order.UserId)
-	actualIdentity := strings.TrimSpace(event.Data.MerchantProvidedBuyerIdentity)
-	if actualIdentity != expectedIdentity {
-		return "", fmt.Errorf(
-			"waffo pancake buyer identity mismatch for subscription tradeNo=%s: expected=%q actual=%q",
-			tradeNo,
-			expectedIdentity,
-			actualIdentity,
-		)
+	reference := strings.TrimSpace(event.Data.OrderMerchantExternalID)
+	if reference == "" || len(reference) > 128 {
+		return "", errors.New("支付回调缺少有效订单关联。")
 	}
-	return tradeNo, nil
+	identity := strings.TrimSpace(event.Data.MerchantProvidedBuyerIdentity)
+	query := model.DB.WithContext(ctx)
+	if subscription {
+		query = query.Model(&model.SubscriptionOrder{})
+	} else {
+		query = query.Model(&model.TopUp{})
+	}
+	var owner struct {
+		UserID   int    `gorm:"column:user_id"`
+		Provider string `gorm:"column:payment_provider"`
+	}
+	if err := query.Select("user_id", "payment_provider").Where("trade_no = ?", reference).Take(&owner).Error; err != nil {
+		return "", errors.New("支付回调订单不存在。")
+	}
+	if owner.Provider != model.PaymentProviderWaffoPancake || !matchesWaffoBuyerIdentity(identity, owner.UserID) {
+		return "", errors.New("支付回调订单所属账户不匹配。")
+	}
+	return reference, nil
 }

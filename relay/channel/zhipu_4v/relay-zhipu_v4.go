@@ -1,61 +1,53 @@
 package zhipu_4v
 
 import (
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
 	"strings"
-
-	"github.com/QuantumNous/new-api/relaykit/dto"
 )
 
 func requestOpenAI2Zhipu(request dto.GeneralOpenAIRequest) *dto.GeneralOpenAIRequest {
-	messages := make([]dto.Message, 0, len(request.Messages))
-	for _, message := range request.Messages {
-		if !message.IsStringContent() {
-			mediaMessages := message.ParseContent()
-			for j, mediaMessage := range mediaMessages {
-				if mediaMessage.Type == dto.ContentTypeImageURL {
-					imageUrl := mediaMessage.GetImageMedia()
-					// check if base64
-					if strings.HasPrefix(imageUrl.Url, "data:image/") {
-						// 去除base64数据的URL前缀（如果有）
-						if idx := strings.Index(imageUrl.Url, ","); idx != -1 {
-							imageUrl.Url = imageUrl.Url[idx+1:]
-						}
-					}
-					mediaMessage.ImageUrl = imageUrl
-					mediaMessages[j] = mediaMessage
+	output := request
+	output.Messages = make([]dto.Message, len(request.Messages))
+	for index, source := range request.Messages {
+		message := source
+		if !source.IsStringContent() {
+			parts := append([]dto.MediaContent(nil), source.ParseContent()...)
+			for partIndex := range parts {
+				if parts[partIndex].Type != dto.ContentTypeImageURL {
+					continue
 				}
+				image := parts[partIndex].GetImageMedia()
+				if image == nil {
+					continue
+				}
+				copy := *image
+				if strings.HasPrefix(copy.Url, "data:image/") {
+					if _, data, found := strings.Cut(copy.Url, ","); found {
+						copy.Url = data
+					}
+				}
+				parts[partIndex].ImageUrl = &copy
 			}
-			message.SetMediaContent(mediaMessages)
+			message.SetMediaContent(parts)
 		}
-		messages = append(messages, dto.Message{
-			Role:       message.Role,
-			Content:    message.Content,
-			ToolCalls:  message.ToolCalls,
-			ToolCallId: message.ToolCallId,
-		})
+		output.Messages[index] = message
 	}
-	str, ok := request.Stop.(string)
-	var Stop []string
-	if ok {
-		Stop = []string{str}
-	} else {
-		Stop, _ = request.Stop.([]string)
-	}
-	out := &dto.GeneralOpenAIRequest{
-		Model:           request.Model,
-		Stream:          request.Stream,
-		Messages:        messages,
-		Temperature:     request.Temperature,
-		TopP:            request.TopP,
-		Stop:            Stop,
-		Tools:           request.Tools,
-		ToolChoice:      request.ToolChoice,
-		THINKING:        request.THINKING,
-		ReasoningEffort: request.ReasoningEffort,
+	switch stop := request.Stop.(type) {
+	case string:
+		output.Stop = []string{stop}
+	case []any:
+		values := make([]string, 0, len(stop))
+		for _, item := range stop {
+			if value, ok := item.(string); ok {
+				values = append(values, value)
+			}
+		}
+		output.Stop = values
 	}
 	if request.MaxTokens != nil || request.MaxCompletionTokens != nil {
-		maxTokens := request.GetMaxTokens()
-		out.MaxTokens = &maxTokens
+		limit := request.GetMaxTokens()
+		output.MaxTokens = &limit
+		output.MaxCompletionTokens = nil
 	}
-	return out
+	return &output
 }

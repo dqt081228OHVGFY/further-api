@@ -15,8 +15,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
@@ -676,13 +676,30 @@ func TestValidateRequestURL(t *testing.T) {
 	}{
 		{name: "same host", requestURL: "https://api.example.com/v1/task", baseURL: "https://api.example.com/v1"},
 		{name: "default port", requestURL: "https://api.example.com:443/v1/task", baseURL: "https://api.example.com"},
+		{name: "zero-padded default port", requestURL: "https://api.example.com:00443/v1/task", baseURL: "https://api.example.com"},
+		{name: "uppercase scheme", requestURL: "HTTPS://api.example.com:443/v1/task", baseURL: "HTTPS://api.example.com"},
 		{name: "approved host", requestURL: "https://upload.example.com/task", baseURL: "https://api.example.com", allowedHosts: []string{"upload.example.com"}},
 		{name: "approved host with port", requestURL: "http://192.168.1.10:8080/task", baseURL: "http://192.168.1.10:8000", allowedHosts: []string{"192.168.1.10:8080"}},
 		{name: "approved host with explicit default port", requestURL: "https://upload.example.com/task", baseURL: "https://api.example.com", allowedHosts: []string{"upload.example.com:443"}},
+		{name: "approved host with zero-padded port", requestURL: "https://upload.example.com:8443/task", baseURL: "https://api.example.com", allowedHosts: []string{"upload.example.com:08443"}},
+		{name: "https upgrade", requestURL: "https://api.example.com/task", baseURL: "http://api.example.com"},
+		{name: "https downgrade on base host", requestURL: "http://api.example.com/task", baseURL: "https://api.example.com", wantError: "must use HTTPS"},
+		{name: "https downgrade on approved host", requestURL: "http://upload.example.com/task", baseURL: "https://api.example.com", allowedHosts: []string{"upload.example.com"}, wantError: "must use HTTPS"},
+		{name: "non-http request", requestURL: "ftp://api.example.com/task", baseURL: "https://api.example.com", wantError: "http or https"},
+		{name: "userinfo on allowed host", requestURL: "https://user:password@api.example.com/task", baseURL: "https://api.example.com", wantError: "must not contain credentials"},
+		{name: "non-http base", requestURL: "https://api.example.com/task", baseURL: "ftp://api.example.com", wantError: "base URL is invalid"},
 		{name: "approved host port mismatch", requestURL: "http://192.168.1.10:9000/task", baseURL: "http://192.168.1.10:8000", allowedHosts: []string{"192.168.1.10:8080"}, wantError: "not allowed"},
 		{name: "subdomain is not implicit", requestURL: "https://evil.api.example.com/task", baseURL: "https://api.example.com", wantError: "not allowed"},
-		{name: "userinfo trick", requestURL: "https://api.example.com@evil.example/task", baseURL: "https://api.example.com", wantError: "not allowed"},
+		{name: "userinfo trick", requestURL: "https://api.example.com@evil.example/task", baseURL: "https://api.example.com", wantError: "credentials"},
 		{name: "relative URL", requestURL: "/v1/task", baseURL: "https://api.example.com", wantError: "absolute"},
+		{name: "fragment", requestURL: "https://api.example.com/task#section", baseURL: "https://api.example.com", wantError: "fragment"},
+		{name: "empty port", requestURL: "https://api.example.com:/task", baseURL: "https://api.example.com", wantError: "invalid port"},
+		{name: "port zero", requestURL: "https://api.example.com:0/task", baseURL: "https://api.example.com", wantError: "invalid port"},
+		{name: "port overflow", requestURL: "https://api.example.com:65536/task", baseURL: "https://api.example.com", wantError: "invalid port"},
+		{name: "base query", requestURL: "https://api.example.com/task", baseURL: "https://api.example.com?key=secret", wantError: "base URL is invalid"},
+		{name: "base fragment", requestURL: "https://api.example.com/task", baseURL: "https://api.example.com#section", wantError: "base URL is invalid"},
+		{name: "base empty port", requestURL: "https://api.example.com/task", baseURL: "https://api.example.com:", wantError: "base URL is invalid"},
+		{name: "invalid approved host", requestURL: "https://upload.example.com/task", baseURL: "https://api.example.com", allowedHosts: []string{"upload.example.com:"}, wantError: "not allowed"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -693,6 +710,33 @@ func TestValidateRequestURL(t *testing.T) {
 			}
 			require.Error(t, err)
 			assert.True(t, strings.Contains(err.Error(), test.wantError), err.Error())
+		})
+	}
+}
+
+func TestValidateCredentiallessURL(t *testing.T) {
+	t.Parallel()
+	for _, test := range []struct {
+		name      string
+		url       string
+		wantError string
+	}{
+		{name: "signed CDN URL", url: "https://cdn.example/video.mp4?Signature=abc%2Bdef"},
+		{name: "local CDN URL", url: "http://127.0.0.1:8080/file"},
+		{name: "relative URL", url: "/video.mp4", wantError: "absolute"},
+		{name: "userinfo", url: "https://user:pass@cdn.example/video.mp4", wantError: "credentials"},
+		{name: "fragment", url: "https://cdn.example/video.mp4#preview", wantError: "fragment"},
+		{name: "empty port", url: "https://cdn.example:/video.mp4", wantError: "invalid port"},
+		{name: "out of range port", url: "https://cdn.example:65536/video.mp4", wantError: "invalid port"},
+		{name: "non-http scheme", url: "file:///tmp/video.mp4", wantError: "absolute"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			err := ValidateCredentiallessURL(test.url)
+			if test.wantError == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, test.wantError)
+			}
 		})
 	}
 }

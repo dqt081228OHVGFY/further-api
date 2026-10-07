@@ -3,9 +3,9 @@ package model
 import (
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -81,7 +81,7 @@ func TestSharedPluginKeysFilterBothChannelSources(t *testing.T) {
 	assert.Empty(t, emptied)
 }
 
-func TestNewAPIChannelServesExtendedTaskPlugins(t *testing.T) {
+func TestGatewayChannelServesExtendedTaskPlugins(t *testing.T) {
 	truncateTables(t)
 	priority := int64(0)
 	weight := uint(1)
@@ -89,8 +89,8 @@ func TestNewAPIChannelServesExtendedTaskPlugins(t *testing.T) {
 	extended := `{"task_extend_plugin_keys":["alpha","gamma"]}`
 	single := `{"task_plugin_key":"delta"}`
 	channels := []Channel{
-		{Id: 920001, Type: constant.ChannelTypeNewAPI, Status: common.ChannelStatusEnabled, Name: "gateway", Models: "shared,chat", Group: "default", Priority: &priority, Weight: &weight, BaseURL: &baseURL, Setting: &extended},
-		{Id: 920002, Type: constant.ChannelTypeNewAPI, Status: common.ChannelStatusEnabled, Name: "gateway-single", Models: "shared", Group: "default", Priority: &priority, Weight: &weight, BaseURL: &baseURL, Setting: &single},
+		{Id: 920001, Type: constant.ChannelTypeGateway, Status: common.ChannelStatusEnabled, Name: "gateway", Models: "shared,chat", Group: "default", Priority: &priority, Weight: &weight, BaseURL: &baseURL, Setting: &extended},
+		{Id: 920002, Type: constant.ChannelTypeGateway, Status: common.ChannelStatusEnabled, Name: "gateway-single", Models: "shared", Group: "default", Priority: &priority, Weight: &weight, BaseURL: &baseURL, Setting: &single},
 	}
 	for i := range channels {
 		require.NoError(t, channels[i].Insert())
@@ -103,7 +103,7 @@ func TestNewAPIChannelServesExtendedTaskPlugins(t *testing.T) {
 	selected, err = GetChannel("default", "shared", 0, identityFilters("delta", nil))
 	require.NoError(t, err)
 	require.NotNil(t, selected)
-	assert.Equal(t, "gateway-single", selected.Name, "a single task_plugin_key still binds a New API channel")
+	assert.Equal(t, "gateway-single", selected.Name, "a single task_plugin_key still binds a further-api channel")
 	selected, err = GetChannel("default", "shared", 0, identityFilters("beta", nil))
 	require.NoError(t, err)
 	assert.Nil(t, selected, "unbound plugins never reach the gateway channel")

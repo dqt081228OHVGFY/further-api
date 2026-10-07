@@ -1,115 +1,117 @@
 package openai
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 )
 
-func OaiResponsesHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	defer service.CloseResponseBodyGracefully(resp)
-
-	// read response body
-	var responsesResponse dto.OpenAIResponsesResponse
-	responseBody, err := io.ReadAll(resp.Body)
+func responsesContext(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) error {
+	if c == nil || info == nil || response == nil || response.Body == nil {
+		return errors.New("Responses context or body is missing")
+	}
+	return nil
+}
+func OaiResponsesHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if err := responsesContext(c, info, response); err != nil {
+		return nil, chatResponseError(err)
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusBadGateway)
 	}
-	err = common.Unmarshal(responseBody, &responsesResponse)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *dto.OpenAIResponsesResponse
+	if err = json.Unmarshal(body, &wire); err != nil {
+		return nil, chatResponseError(err)
 	}
-	if oaiError := responsesResponse.GetOpenAIError(); oaiError != nil && oaiError.Type != "" {
-		return nil, types.WithOpenAIError(*oaiError, resp.StatusCode)
+	if wire == nil {
+		return nil, chatResponseError(errors.New("Responses response must be an object"))
 	}
-
-	info.ObserveResponseModel(responsesResponse.Model)
-	responseBody = rewriteSGLangResponsesCreatedAt(info, responseBody, "created_at", responsesResponse.CreatedAt)
-
-	// 写入新的 response body
-	service.IOCopyBytesGracefully(c, resp, responseBody)
-
-	// compute usage
+	if failure := wire.GetOpenAIError(); failure != nil && failure.Type != "" {
+		status := response.StatusCode
+		if status < 400 {
+			status = http.StatusBadGateway
+		}
+		return nil, types.WithOpenAIError(*failure, status)
+	}
+	info.ObserveResponseModel(wire.Model)
 	usage := &dto.Usage{}
-	service.ApplyResponsesUsage(usage, responsesResponse.Usage)
-	// Count actual tool invocations from Output (not tool declarations).
-	for _, output := range responsesResponse.Output {
+	service.ApplyResponsesUsage(usage, wire.Usage)
+	images := &relaycommon.ImageGenerationCallCounter{}
+	for index := range wire.Output {
+		output := &wire.Output[index]
 		switch output.Type {
-		case dto.BuildInCallWebSearchCall:
-			info.CountBillableToolCall(dto.BuildInCallWebSearchCall, "")
-		case dto.BuildInCallFileSearchCall:
-			info.CountBillableToolCall(dto.BuildInCallFileSearchCall, "")
+		case dto.BuildInCallWebSearchCall, dto.BuildInCallFileSearchCall:
+			info.CountBillableToolCall(output.Type, "")
 		case dto.BuildInCallFunctionCall:
-			info.CountBillableToolCall(dto.BuildInCallFunctionCall, output.Name)
+			info.CountBillableToolCall(output.Type, output.Name)
+		}
+		if !relaycommon.IsNonBillableResponsesStatus(wire.Status) {
+			position := index
+			images.Observe(output, &position)
 		}
 	}
-
-	imageCounter := &relaycommon.ImageGenerationCallCounter{}
-	if !relaycommon.IsNonBillableResponsesStatus(responsesResponse.Status) {
-		for i := range responsesResponse.Output {
-			idx := i
-			imageCounter.Observe(&responsesResponse.Output[i], &idx)
-		}
-	}
-	imageCounter.Commit(info)
-
+	images.Commit(info)
+	body = rewriteSGLangResponsesCreatedAt(info, body, "created_at", wire.CreatedAt)
+	service.IOCopyBytesGracefully(c, response, body)
 	return usage, nil
 }
-
-func OaiResponsesStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	if resp == nil || resp.Body == nil {
-		logger.LogError(c, "invalid response or response body")
-		return nil, types.NewError(fmt.Errorf("invalid response"), types.ErrorCodeBadResponse)
+func OaiResponsesStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	if err := responsesContext(c, info, response); err != nil {
+		return nil, chatResponseError(err)
 	}
-
-	defer service.CloseResponseBodyGracefully(resp)
-
+	defer service.CloseResponseBodyGracefully(response)
 	accumulator := service.NewResponsesUsageAccumulator(info)
-
-	helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-
-		// 检查当前数据是否包含 completed 状态和 usage 信息
-		var streamResponse dto.ResponsesStreamResponse
-		if err := common.UnmarshalJsonStr(data, &streamResponse); err != nil {
-			logger.LogError(c, "failed to unmarshal stream response: "+err.Error())
-			sr.Error(err)
+	var failure *types.GatewayError
+	helper.StreamScannerHandler(c, response, info, func(data string, result *helper.StreamResult) {
+		var frame *dto.ResponsesStreamResponse
+		if err := json.Unmarshal([]byte(data), &frame); err != nil {
+			failure = chatResponseError(err)
+			result.Stop(failure)
 			return
 		}
-		if streamResponse.Response != nil {
-			data = string(rewriteSGLangResponsesCreatedAt(info, []byte(data), "response.created_at", streamResponse.Response.CreatedAt))
+		if frame == nil {
+			failure = chatResponseError(errors.New("Responses stream frame must be an object"))
+			result.Stop(failure)
+			return
 		}
-		sendResponsesStreamData(c, streamResponse, data)
-		accumulator.Observe(&streamResponse)
+		accumulator.Observe(frame)
+		if frame.Response != nil {
+			data = string(rewriteSGLangResponsesCreatedAt(info, []byte(data), "response.created_at", frame.Response.CreatedAt))
+		}
+		if err := helper.ResponseChunkData(c, *frame, data); err != nil {
+			if c.Request != nil && c.Request.Context().Err() != nil {
+				result.Stop(nil)
+				return
+			}
+			failure = chatResponseError(err)
+			result.Stop(failure)
+		}
 	})
-
 	common.SetContextKey(c, constant.ContextKeyResponseStreamStatus, info.StreamStatus)
 	info.StreamStatus.RequireTerminal()
-	return accumulator.Finish(), nil
+	return accumulator.Finish(), failure
 }
-
-func rewriteSGLangResponsesCreatedAt(info *relaycommon.RelayInfo, payload []byte, path string, createdAt dto.IntValue) []byte {
-	if info.GetChannelType() != constant.ChannelTypeSGLang {
+func rewriteSGLangResponsesCreatedAt(info *relaycommon.RelayInfo, payload []byte, path string, created dto.IntValue) []byte {
+	if info.GetChannelType() != constant.ChannelTypeSGLang || !gjson.GetBytes(payload, path).Exists() {
 		return payload
 	}
-	if !gjson.GetBytes(payload, path).Exists() {
-		return payload
-	}
-	patched, err := sjson.SetBytes(payload, path, int(createdAt))
+	encoded, err := sjson.SetBytes(payload, path, int(created))
 	if err != nil {
 		return payload
 	}
-	return patched
+	return encoded
 }

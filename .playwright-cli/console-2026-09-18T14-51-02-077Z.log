@@ -1,7 +1,0 @@
-[     175ms] [LOG] [Bootstrap] Initializing fixture framework... @ http://127.0.0.1:23000/fixtures/bootstrap.js:14
-[     181ms] [LOG] [Bootstrap] Fixture state initialized: {username: fixture_user, quota: 500000, tokens: 1, checked_in_today: false} @ http://127.0.0.1:23000/fixtures/bootstrap.js:26
-[     182ms] [LOG] [Fixture] Engine installed @ http://127.0.0.1:23000/fixtures/fixture-engine.js:102
-[     182ms] [LOG] [Bootstrap] Fixture framework ready @ http://127.0.0.1:23000/fixtures/bootstrap.js:74
-[     182ms] [LOG] [Bootstrap] Debug utilities available at window.FIXTURE @ http://127.0.0.1:23000/fixtures/bootstrap.js:75
-[     182ms] [LOG] [Bootstrap] Try: FIXTURE.reset(), FIXTURE.checkIn(), FIXTURE.setQuota(1000000) @ http://127.0.0.1:23000/fixtures/bootstrap.js:76
-[     565ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:23000/console/:0

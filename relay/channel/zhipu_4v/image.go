@@ -1,15 +1,15 @@
 package zhipu_4v
 
 import (
+	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,74 +54,69 @@ type openAIImageData struct {
 	B64Json string `json:"b64_json"`
 }
 
-func zhipu4vImageHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.NewAPIError) {
-	responseBody, err := io.ReadAll(resp.Body)
+func zhipu4vImageHandler(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.GatewayError) {
+	if c == nil || info == nil || response == nil || response.Body == nil {
+		return nil, types.NewError(errors.New("Zhipu image response context is missing"), types.ErrorCodeBadResponseBody)
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+		return nil, types.NewError(err, types.ErrorCodeReadResponseBodyFailed)
 	}
-	service.CloseResponseBodyGracefully(resp)
-
-	var zhipuResp zhipuImageResponse
-	if err := common.Unmarshal(responseBody, &zhipuResp); err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
+	var wire *zhipuImageResponse
+	if err = json.Unmarshal(body, &wire); err != nil {
+		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-
-	if zhipuResp.Error != nil && zhipuResp.Error.Message != "" {
-		return nil, types.WithOpenAIError(types.OpenAIError{
-			Message: zhipuResp.Error.Message,
-			Type:    "zhipu_image_error",
-			Code:    zhipuResp.Error.Code,
-		}, resp.StatusCode)
+	if wire == nil {
+		return nil, types.NewError(errors.New("Zhipu image response must be an object"), types.ErrorCodeBadResponseBody)
 	}
-
-	payload := openAIImagePayload{}
-	if zhipuResp.Created != nil && *zhipuResp.Created != 0 {
-		payload.Created = *zhipuResp.Created
-	} else {
-		payload.Created = info.StartTime.Unix()
+	if wire.Error != nil && wire.Error.Message != "" {
+		return nil, types.WithOpenAIError(types.OpenAIError{Message: wire.Error.Message, Type: "zhipu_image_error", Code: wire.Error.Code}, http.StatusBadGateway)
 	}
-	for _, data := range zhipuResp.Data {
-		url := data.Url
-		if url == "" {
-			url = data.ImageUrl
+	output := dto.ImageResponse{Created: info.StartTime.Unix(), Data: make([]dto.ImageData, 0, len(wire.Data))}
+	if wire.Created != nil {
+		output.Created = *wire.Created
+	}
+	format := "b64_json"
+	if request, ok := info.Request.(*dto.ImageRequest); ok && request.ResponseFormat != "" {
+		format = request.ResponseFormat
+	}
+	for _, native := range wire.Data {
+		address := native.Url
+		if address == "" {
+			address = native.ImageUrl
 		}
-		if url == "" {
-			logger.LogWarn(c, "zhipu_image_missing_url")
-			continue
+		encoded := native.B64Json
+		if encoded == "" {
+			encoded = native.B64Image
 		}
-
-		var b64 string
-		switch {
-		case data.B64Json != "":
-			b64 = data.B64Json
-		case data.B64Image != "":
-			b64 = data.B64Image
-		default:
-			_, downloaded, err := service.GetImageFromUrl(url)
-			if err != nil {
-				logger.LogError(c, "zhipu_image_get_b64_failed: "+err.Error())
-				continue
+		image := dto.ImageData{}
+		if format == "url" && address != "" {
+			image.Url = address
+		} else {
+			if encoded == "" && address != "" {
+				encoded, _, err = service.GetBase64Data(c, types.NewURLFileSource(address), "Zhipu generated image")
+				if err != nil {
+					return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
+				}
 			}
-			b64 = downloaded
+			image.B64Json = encoded
 		}
-
-		if b64 == "" {
-			logger.LogWarn(c, "zhipu_image_empty_b64")
-			continue
+		if image.Url != "" || image.B64Json != "" {
+			output.Data = append(output.Data, image)
 		}
-
-		imageData := openAIImageData{
-			B64Json: b64,
-		}
-		payload.Data = append(payload.Data, imageData)
 	}
-
-	jsonResp, err := common.Marshal(payload)
+	if len(output.Data) == 0 {
+		return nil, types.NewError(errors.New("Zhipu returned no generated images"), types.ErrorCodeEmptyResponse)
+	}
+	encoded, err := json.Marshal(output)
 	if err != nil {
 		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-
-	service.IOCopyBytesGracefully(c, resp, jsonResp)
-
+	info.UpdateImageCount(int64(len(output.Data)))
+	service.IOCopyBytesGracefully(c, response, encoded)
+	if wire.Usage != nil {
+		return wire.Usage, nil
+	}
 	return &dto.Usage{}, nil
 }

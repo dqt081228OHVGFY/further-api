@@ -3,18 +3,20 @@ package controller
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,6 +38,9 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	if ctx.Err() != nil {
+		return summary
+	}
 
 	tasks := model.GetAllUnFinishTasks()
 	if len(tasks) == 0 {
@@ -53,7 +58,7 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 			nullTaskIds = append(nullTaskIds, task.Id)
 			continue
 		}
-		taskM[task.MjId] = task
+		taskM[service.TaskPollingIdentity(task.ChannelId, task.MjId)] = task
 		taskChannelM[task.ChannelId] = append(taskChannelM[task.ChannelId], task.MjId)
 	}
 	if len(nullTaskIds) > 0 {
@@ -100,7 +105,11 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 			}
 			continue
 		}
-		requestUrl := fmt.Sprintf("%s/mj/task/list-by-condition", *midjourneyChannel.BaseURL)
+		baseURL := midjourneyChannel.GetBaseURL()
+		if baseURL == "" {
+			baseURL = constant.GetChannelBaseURL(midjourneyChannel.Type)
+		}
+		requestUrl := strings.TrimRight(baseURL, "/") + "/mj/task/list-by-condition"
 
 		body, err := common.Marshal(map[string]any{
 			"ids": taskIds,
@@ -131,7 +140,11 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 			cancel()
 			continue
 		}
-		responseBody, err := io.ReadAll(resp.Body)
+		const responseLimit = 4 << 20
+		responseBody, err := io.ReadAll(io.LimitReader(resp.Body, responseLimit+1))
+		if err == nil && len(responseBody) > responseLimit {
+			err = errors.New("midjourney poll response exceeds 4 MiB limit")
+		}
 		if err != nil {
 			logger.LogError(ctx, fmt.Sprintf("Get Mjp Task parse body error: %v", err))
 			resp.Body.Close()
@@ -141,7 +154,7 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 		var responseItems []dto.MidjourneyDto
 		err = common.Unmarshal(responseBody, &responseItems)
 		if err != nil {
-			logger.LogError(ctx, fmt.Sprintf("Get Mjp Task parse body error2: %v, body: %s", err, string(responseBody)))
+			logger.LogError(ctx, "Midjourney polling returned invalid JSON")
 			resp.Body.Close()
 			cancel()
 			continue
@@ -151,7 +164,8 @@ func runMidjourneyTaskUpdateOnce(ctx context.Context, report func(processed, tot
 		cancel()
 
 		for _, responseItem := range responseItems {
-			task := taskM[responseItem.MjId]
+			responseItem.FailReason = service.RedactKnownUpstreamSecrets(responseItem.FailReason, service.UpstreamCredentialSecrets(midjourneyChannel.Key)...)
+			task := taskM[service.TaskPollingIdentity(channelId, responseItem.MjId)]
 			if task == nil {
 				logger.LogWarn(ctx, fmt.Sprintf("Midjourney task response ignored: unknown mj_id=%s", responseItem.MjId))
 				continue
@@ -294,7 +308,7 @@ func GetAllMidjourney(c *gin.Context) {
 
 	if setting.MjForwardUrlEnabled {
 		for i, midjourney := range items {
-			midjourney.ImageUrl = system_setting.ServerAddress + "/mj/image/" + midjourney.MjId
+			midjourney.ImageUrl, _ = service.BuildMidjourneyImageContentURL(midjourney.Id)
 			items[i] = midjourney
 		}
 	}
@@ -319,7 +333,7 @@ func GetUserMidjourney(c *gin.Context) {
 
 	if setting.MjForwardUrlEnabled {
 		for i, midjourney := range items {
-			midjourney.ImageUrl = system_setting.ServerAddress + "/mj/image/" + midjourney.MjId
+			midjourney.ImageUrl, _ = service.BuildMidjourneyImageContentURL(midjourney.Id)
 			items[i] = midjourney
 		}
 	}

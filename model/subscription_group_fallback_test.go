@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,7 +39,7 @@ func createOverlappingGroupSubscriptions(t *testing.T, shortExpired bool) (User,
 }
 
 func TestExpireDueSubscriptionsRestoresSurvivingPlanGroup(t *testing.T) {
-	setupRelayForStatsTest(t)
+	setupFurtherStatsTest(t)
 	user, vip, svip := createOverlappingGroupSubscriptions(t, true)
 
 	expired, err := ExpireDueSubscriptions(20)
@@ -57,7 +57,7 @@ func TestExpireDueSubscriptionsRestoresSurvivingPlanGroup(t *testing.T) {
 }
 
 func TestAdminInvalidateSubscriptionRestoresSurvivingPlanGroup(t *testing.T) {
-	setupRelayForStatsTest(t)
+	setupFurtherStatsTest(t)
 	user, vip, svip := createOverlappingGroupSubscriptions(t, false)
 
 	message, err := AdminInvalidateUserSubscription(svip.Id)
@@ -75,7 +75,7 @@ func TestAdminInvalidateSubscriptionRestoresSurvivingPlanGroup(t *testing.T) {
 }
 
 func TestAdminDeleteSubscriptionRestoresSurvivingPlanGroup(t *testing.T) {
-	setupRelayForStatsTest(t)
+	setupFurtherStatsTest(t)
 	user, vip, svip := createOverlappingGroupSubscriptions(t, false)
 
 	message, err := AdminDeleteUserSubscription(svip.Id)

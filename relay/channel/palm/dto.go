@@ -1,6 +1,6 @@
 package palm
 
-import "github.com/QuantumNous/new-api/relaykit/dto"
+import "github.com/dqt081228OHVGFY/further-api/relaykit/dto"
 
 type PaLMChatMessage struct {
 	Author  string `json:"author"`
@@ -13,6 +13,7 @@ type PaLMFilter struct {
 }
 
 type PaLMPrompt struct {
+	Context  string            `json:"context,omitempty"`
 	Messages []PaLMChatMessage `json:"messages"`
 }
 

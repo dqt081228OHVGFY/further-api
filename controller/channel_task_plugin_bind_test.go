@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/service/authz"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/service/authz"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
@@ -178,11 +178,11 @@ func putUpdateChannel(t *testing.T, userID, role int, body string) *httptest.Res
 	return recorder
 }
 
-func TestNewAPIChannelPluginBindingsRequireBindPermission(t *testing.T) {
+func TestGatewayChannelPluginBindingsRequireBindPermission(t *testing.T) {
 	setupTaskPluginBindChannelTest(t)
 	const key = "gateway-bind"
 	source := `
-export const meta = {apiVersion: 1, key: "gateway-bind", name: "Gateway", version: "1.0.0", author: {name: "Test"}, models: ["gateway-doc"], fetchMode: "per_task", upstreams: ["vendor", "new_api"]};
+export const meta = {apiVersion: 1, key: "gateway-bind", name: "Gateway", version: "1.0.0", author: {name: "Test"}, models: ["gateway-doc"], fetchMode: "per_task", upstreams: ["vendor", "gateway"]};
 export function buildSubmitRequest() { return {}; }
 export function parseSubmitResponse() { return {}; }
 export function buildQueryRequest() { return {}; }
@@ -203,7 +203,7 @@ export function parseTaskResult() { return {}; }
 
 	baseURL := "https://gateway.example"
 	setting := `{"task_extend_plugin_keys":["gateway-bind"]}`
-	channel := model.Channel{Type: constant.ChannelTypeNewAPI, Status: common.ChannelStatusEnabled, Name: "existing-gateway", Models: "gateway-doc", Group: "default", Key: "sk", BaseURL: &baseURL, Setting: &setting}
+	channel := model.Channel{Type: constant.ChannelTypeGateway, Status: common.ChannelStatusEnabled, Name: "existing-gateway", Models: "gateway-doc", Group: "default", Key: "sk", BaseURL: &baseURL, Setting: &setting}
 	require.NoError(t, channel.Insert())
 	update := func(name, setting string) string {
 		return fmt.Sprintf(`{"id":%d,"type":60,"name":%q,"key":"sk","models":"gateway-doc","group":"default","base_url":"https://gateway.example","setting":%q}`, channel.Id, name, setting)

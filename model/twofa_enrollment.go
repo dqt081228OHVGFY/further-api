@@ -1,11 +1,12 @@
 package model
 
 import (
+	"context"
 	"crypto/hmac"
 	"errors"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -21,11 +22,18 @@ type twoFAEnrollmentPayload struct {
 // CreateTwoFAEnrollment stores the pending credential, recovery codes and
 // session-bound flow atomically. Reinitialization invalidates the previous setup.
 func CreateTwoFAEnrollment(identity AuthSessionIdentity, authorization *AuthFlowAuthorization, secret string, backupCodes []string, expiresAt time.Time) (string, error) {
+	return CreateTwoFAEnrollmentContext(context.Background(), identity, authorization, secret, backupCodes, expiresAt)
+}
+
+func CreateTwoFAEnrollmentContext(ctx context.Context, identity AuthSessionIdentity, authorization *AuthFlowAuthorization, secret string, backupCodes []string, expiresAt time.Time) (string, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
 	if authorization == nil || authorization.ProofID <= 0 || authorization.AuthSessionIdentity != identity {
 		return "", ErrTwoFASetupInvalid
 	}
 	var token string
-	err := DB.Transaction(func(tx *gorm.DB) error {
+	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := ValidateAuthSessionWithTx(tx, identity); err != nil {
 			return err
 		}
@@ -68,11 +76,18 @@ func CreateTwoFAEnrollment(identity AuthSessionIdentity, authorization *AuthFlow
 // EnableTwoFAEnrollment validates and consumes one setup in the same transaction
 // as factor activation and auth_version advancement. A bad code can be retried.
 func EnableTwoFAEnrollment(identity AuthSessionIdentity, token, code string) error {
+	return EnableTwoFAEnrollmentContext(context.Background(), identity, token, code)
+}
+
+func EnableTwoFAEnrollmentContext(ctx context.Context, identity AuthSessionIdentity, token, code string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	cleanCode, err := common.ValidateNumericCode(code)
 	if err != nil {
 		return ErrTwoFACodeInvalid
 	}
-	_, err = ConsumeAuthFlowWithAction(token, AuthFlowMatch{
+	_, err = ConsumeAuthFlowWithActionContext(ctx, token, AuthFlowMatch{
 		Purpose: AuthFlowPurposeTwoFASetup, UserId: identity.UserID, SessionId: identity.SessionID,
 	}, func(tx *gorm.DB, flow *AuthFlow) error {
 		var payload twoFAEnrollmentPayload
@@ -96,13 +111,14 @@ func EnableTwoFAEnrollment(identity AuthSessionIdentity, token, code string) err
 		if !hmac.Equal([]byte(payload.SecretHash), []byte(secretHash)) {
 			return ErrTwoFASetupInvalid
 		}
-		if !common.ValidateTOTPCode(pending.Secret, cleanCode) {
+		step, valid := common.MatchTOTPTimeStep(pending.Secret, cleanCode, time.Now())
+		if !valid {
 			return ErrTwoFACodeInvalid
 		}
 		if _, err := IncrementUserAuthVersionWithTx(tx, identity.UserID); err != nil {
 			return err
 		}
-		return tx.Model(&pending).Updates(map[string]any{"is_enabled": true, "failed_attempts": 0, "locked_until": nil}).Error
+		return tx.Model(&pending).Updates(map[string]any{"is_enabled": true, "failed_attempts": 0, "locked_until": nil, "last_accepted_time_step": step}).Error
 	})
 	if errors.Is(err, ErrAuthFlowInvalid) || errors.Is(err, ErrAuthFlowExpired) || errors.Is(err, ErrAuthFlowConsumed) {
 		return ErrTwoFASetupInvalid

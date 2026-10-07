@@ -5,15 +5,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 )
 
 const (
 	TaskPluginMarketplaceSourcesKey  = "TaskPluginMarketplaceSources"
 	TaskPluginDisabledFactoryKeysKey = "TaskPluginDisabledFactoryKeys"
-
-	officialTaskPluginMarketplaceIndexURL = "https://www.newapi.ai/api/v1/plugins/index.json"
-	githubTaskPluginMarketplaceIndexURL   = "https://raw.githubusercontent.com/QuantumNous/new-api-plugins/main/index.json"
 )
 
 type TaskPluginMarketplaceSource struct {
@@ -22,10 +19,9 @@ type TaskPluginMarketplaceSource struct {
 }
 
 func defaultTaskPluginMarketplaceSources() []TaskPluginMarketplaceSource {
-	return []TaskPluginMarketplaceSource{
-		{Name: "Official", IndexURL: officialTaskPluginMarketplaceIndexURL},
-		{Name: "GitHub", IndexURL: githubTaskPluginMarketplaceIndexURL},
-	}
+	// Bundled plugins are available locally. Remote catalogs are operator
+	// configuration and are never fetched from an unrelated gateway by default.
+	return []TaskPluginMarketplaceSource{}
 }
 
 func GetTaskPluginMarketplaceSources() []TaskPluginMarketplaceSource {

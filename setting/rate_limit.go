@@ -5,7 +5,7 @@ import (
 	"math"
 	"sync"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 )
 
 // maxRateLimitDurationSeconds is the largest window the count cap is computed
@@ -37,11 +37,14 @@ func ModelRequestRateLimitGroup2JSONString() string {
 }
 
 func UpdateModelRequestRateLimitGroupByJSONString(jsonStr string) error {
-	ModelRequestRateLimitMutex.RLock()
-	defer ModelRequestRateLimitMutex.RUnlock()
-
-	ModelRequestRateLimitGroup = make(map[string][2]int)
-	return common.Unmarshal([]byte(jsonStr), &ModelRequestRateLimitGroup)
+	updated := make(map[string][2]int)
+	if err := common.Unmarshal([]byte(jsonStr), &updated); err != nil {
+		return err
+	}
+	ModelRequestRateLimitMutex.Lock()
+	defer ModelRequestRateLimitMutex.Unlock()
+	ModelRequestRateLimitGroup = updated
+	return nil
 }
 
 func GetGroupRateLimit(group string) (totalCount, successCount int, found bool) {

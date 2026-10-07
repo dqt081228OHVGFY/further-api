@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +38,7 @@ func SystemPerformanceCheck() gin.HandlerFunc {
 }
 
 // checkSystemPerformance 检查系统性能是否超过阈值
-func checkSystemPerformance() *types.NewAPIError {
+func checkSystemPerformance() *types.GatewayError {
 	config := common.GetPerformanceMonitorConfig()
 	if !config.Enabled {
 		return nil

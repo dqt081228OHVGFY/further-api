@@ -1,11 +1,12 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 type TwoFASetup struct {
@@ -17,10 +18,17 @@ type TwoFASetup struct {
 }
 
 func StartTwoFASetup(identity AuthIdentity, authorization *model.AuthFlowAuthorization) (*TwoFASetup, error) {
+	return StartTwoFASetupContext(context.Background(), identity, authorization)
+}
+
+func StartTwoFASetupContext(ctx context.Context, identity AuthIdentity, authorization *model.AuthFlowAuthorization) (*TwoFASetup, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if err := ValidateFlowAuthorization(identity, VerificationOperation{Scope: VerificationScopeTwoFASetup}, authorization); err != nil {
 		return nil, err
 	}
-	user, err := model.GetUserById(identity.UserID, false)
+	user, err := model.GetUserByIdContext(ctx, identity.UserID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +41,7 @@ func StartTwoFASetup(identity AuthIdentity, authorization *model.AuthFlowAuthori
 		return nil, err
 	}
 	expiresAt := time.Now().Add(5 * time.Minute)
-	flowToken, err := model.CreateTwoFAEnrollment(identity, authorization, key.Secret(), codes, expiresAt)
+	flowToken, err := model.CreateTwoFAEnrollmentContext(ctx, identity, authorization, key.Secret(), codes, expiresAt)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +49,14 @@ func StartTwoFASetup(identity AuthIdentity, authorization *model.AuthFlowAuthori
 }
 
 func FinishTwoFASetup(identity AuthIdentity, flowToken, code string) error {
-	flow, err := model.GetAuthFlow(flowToken, model.AuthFlowMatch{
+	return FinishTwoFASetupContext(context.Background(), identity, flowToken, code)
+}
+
+func FinishTwoFASetupContext(ctx context.Context, identity AuthIdentity, flowToken, code string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	flow, err := model.GetAuthFlowContext(ctx, flowToken, model.AuthFlowMatch{
 		Purpose: model.AuthFlowPurposeTwoFASetup, UserId: identity.UserID, SessionId: identity.SessionID,
 	})
 	if errors.Is(err, model.ErrAuthFlowInvalid) || errors.Is(err, model.ErrAuthFlowExpired) || errors.Is(err, model.ErrAuthFlowConsumed) {
@@ -62,5 +77,5 @@ func FinishTwoFASetup(identity AuthIdentity, flowToken, code string) error {
 		}
 		return err
 	}
-	return model.EnableTwoFAEnrollment(identity, flowToken, code)
+	return model.EnableTwoFAEnrollmentContext(ctx, identity, flowToken, code)
 }

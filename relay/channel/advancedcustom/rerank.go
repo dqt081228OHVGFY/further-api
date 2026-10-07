@@ -4,15 +4,15 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-func (a *Adaptor) doSGLangRerankResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (any, *types.NewAPIError) {
+func (a *Adaptor) doSGLangRerankResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (any, *types.GatewayError) {
 	defer service.CloseResponseBodyGracefully(resp)
 	// SGLang v0.5.19 returns a sorted array with score, not a Jina results envelope.
 	// https://github.com/sgl-project/sglang/blob/v0.5.19/python/sglang/srt/entrypoints/openai/serving_rerank.py

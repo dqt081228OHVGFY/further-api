@@ -5,17 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/setting/system_setting"
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 )
@@ -91,10 +90,16 @@ func init() {
 // NewTelegramProvider shares the HTTP client with a long-lived, cached JWKS
 // verifier. Tests can exercise the real protocol using a local HTTP transport.
 func NewTelegramProvider(client *http.Client) *TelegramProvider {
+	guarded := *client
+	transport := client.Transport
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
+	guarded.Transport = oauthBoundedTransport{transport: transport}
 	return &TelegramProvider{
-		client: client,
+		client: &guarded,
 		keys: oidc.NewRemoteKeySet(
-			oidc.ClientContext(context.Background(), client),
+			oidc.ClientContext(context.Background(), &guarded),
 			TelegramIssuer+"/.well-known/jwks.json",
 		),
 	}
@@ -125,21 +130,21 @@ func (p *TelegramProvider) ExchangeToken(ctx context.Context, code string, c *gi
 	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, TelegramIssuer+"/token", strings.NewReader(values.Encode()))
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+		return nil, errors.Join(ErrTelegramOAuthFailed, safeOAuthCause(ctx, err))
 	}
 	request.SetBasicAuth(flow.ClientID, strings.TrimSpace(settings.ClientSecret))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	response, err := p.client.Do(request)
+	response, err := doOAuthRequest(ctx, p.client, request)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+		return nil, errors.Join(ErrTelegramOAuthFailed, safeOAuthCause(ctx, err))
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%w: token endpoint status %d", ErrTelegramOAuthFailed, response.StatusCode)
 	}
 	var token OAuthToken
-	if err := common.DecodeJson(io.LimitReader(response.Body, 1<<20), &token); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+	if err := decodeOAuthResponse(ctx, response, &token); err != nil {
+		return nil, errors.Join(ErrTelegramOAuthFailed, safeOAuthCause(ctx, err))
 	}
 	if token.IDToken == "" {
 		return nil, ErrTelegramOAuthFailed
@@ -160,11 +165,11 @@ func (p *TelegramProvider) GetUserInfo(ctx context.Context, token *OAuthToken) (
 	})
 	verified, err := verifier.Verify(ctx, token.IDToken)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+		return nil, errors.Join(ErrTelegramOAuthFailed, safeOAuthCause(ctx, err))
 	}
 	var rawClaims json.RawMessage
 	if err := verified.Claims(&rawClaims); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+		return nil, errors.Join(ErrTelegramOAuthFailed, errOAuthResponseInvalid)
 	}
 	var claims struct {
 		ID       json.Number `json:"id"`
@@ -172,7 +177,7 @@ func (p *TelegramProvider) GetUserInfo(ctx context.Context, token *OAuthToken) (
 		Username string      `json:"preferred_username"`
 	}
 	if err := common.Unmarshal(rawClaims, &claims); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrTelegramOAuthFailed, err)
+		return nil, errors.Join(ErrTelegramOAuthFailed, errOAuthResponseInvalid)
 	}
 	id, err := strconv.ParseUint(claims.ID.String(), 10, 64)
 	if err != nil || id == 0 || verified.Subject == "" {

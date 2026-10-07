@@ -1,10 +1,11 @@
 package model
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
@@ -23,7 +24,7 @@ type UserQuotaAdjustment struct {
 	After    int
 }
 
-func AdjustUserQuota(userID, operatorRole int, mode string, value int) (*UserQuotaAdjustment, error) {
+func AdjustUserQuota(ctx context.Context, userID int, operator AccountSecurityOperator, mode string, value int) (*UserQuotaAdjustment, error) {
 	if userID <= 0 || (mode != "add" && mode != "subtract" && mode != "override") {
 		return nil, ErrInvalidUserQuotaAdjustment
 	}
@@ -35,13 +36,13 @@ func AdjustUserQuota(userID, operatorRole int, mode string, value int) (*UserQuo
 	}
 
 	var adjustment UserQuotaAdjustment
-	err := DB.Transaction(func(tx *gorm.DB) error {
-		var user User
-		if err := lockForUpdate(tx).First(&user, userID).Error; err != nil {
-			return err
-		}
-		if operatorRole != common.RoleRootUser && operatorRole <= user.Role {
+	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		user, _, err := lockManagedAccountOperator(tx, operator, userID, false)
+		if errors.Is(err, ErrAccountSecurityPermission) {
 			return ErrUserQuotaPermission
+		}
+		if err != nil {
+			return err
 		}
 		if user.Quota > common.MaxWalletQuota || user.Quota < -common.MaxWalletQuota {
 			return ErrWalletQuotaLimitExceeded

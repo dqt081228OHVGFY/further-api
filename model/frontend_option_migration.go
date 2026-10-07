@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/console_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/console_setting"
 	"gorm.io/gorm"
 )
 
 const retiredThemeOptionKey = "theme.frontend"
+const retiredChatOptionKey = "Chats"
+
+var ErrRetiredChatOption = errors.New("聊天预设已移除")
 
 type legacyOptionTransform func(string) (string, error)
 
@@ -23,8 +26,14 @@ func MigrateRetiredFrontendOptions() error {
 	}
 
 	var migrationErrors []error
+	if err := migrateDefaultBranding(); err != nil {
+		migrationErrors = append(migrationErrors, fmt.Errorf("normalize default branding: %w", err))
+	}
 	if err := normalizeRetiredThemeOption(); err != nil {
 		migrationErrors = append(migrationErrors, fmt.Errorf("normalize %s: %w", retiredThemeOptionKey, err))
+	}
+	if err := DB.Where(&Option{Key: retiredChatOptionKey}).Delete(&Option{}).Error; err != nil {
+		migrationErrors = append(migrationErrors, fmt.Errorf("remove retired chat presets: %w", err))
 	}
 
 	migrations := []struct {
@@ -45,6 +54,20 @@ func MigrateRetiredFrontendOptions() error {
 		migrationErrors = append(migrationErrors, err)
 	}
 	return errors.Join(migrationErrors...)
+}
+
+// Product branding is fixed. Historical values are migrated before the option
+// loader runs, while the loader also protects nodes that do not run migrations.
+func migrateDefaultBranding() error {
+	return DB.Transaction(func(tx *gorm.DB) error {
+		for _, key := range []string{"SystemName", "Logo", "passkey.rp_display_name"} {
+			canonical, _ := common.CanonicalBrandingValue(key)
+			if err := tx.Model(&Option{}).Where(&Option{Key: key}).Where("value IS NULL OR value <> ?", canonical).Update("value", canonical).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func normalizeRetiredThemeOption() error {

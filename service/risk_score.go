@@ -1,14 +1,13 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"sort"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 const (
@@ -321,18 +320,25 @@ func CalculateRiskSnapshot(userID int, windowDays int, events []model.RiskEvent,
 }
 
 func RefreshRiskScoresForUser(userID int) error {
+	return refreshRiskScoresForUserContext(context.Background(), userID)
+}
+
+func refreshRiskScoresForUserContext(ctx context.Context, userID int) error {
 	if userID <= 0 {
 		return errors.New("invalid risk user")
 	}
 	now := time.Now().UTC()
-	events, err := model.ListRiskEvents(userID, now.AddDate(0, 0, -riskEventRetentionDays).Unix(), riskEventSampleLimit)
+	events, err := model.ListRiskEventsContext(ctx, userID, now.AddDate(0, 0, -riskEventRetentionDays).Unix(), riskEventSampleLimit)
 	if err != nil {
 		return err
 	}
 	for _, windowDays := range []int{3, 7} {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		snapshot := CalculateRiskSnapshot(userID, windowDays, events, now)
 		snapshot.SampleLimited = len(events) == riskEventSampleLimit
-		if err := model.UpsertRiskSnapshot(&snapshot); err != nil {
+		if err := model.UpsertRiskSnapshotContext(ctx, &snapshot); err != nil {
 			return err
 		}
 	}
@@ -342,13 +348,20 @@ func RefreshRiskScoresForUser(userID int) error {
 // PruneExpiredRiskEvents is also invoked by the background timer, including
 // while there are no requests. Batches keep each write transaction bounded.
 func PruneExpiredRiskEvents(now time.Time) error {
+	return pruneExpiredRiskEventsContext(context.Background(), now)
+}
+
+func pruneExpiredRiskEventsContext(ctx context.Context, now time.Time) error {
 	if !riskPruneMutex.TryLock() {
 		return nil
 	}
 	defer riskPruneMutex.Unlock()
 	cutoff := now.AddDate(0, 0, -riskEventRetentionDays).Unix()
 	for range 50 {
-		deleted, err := model.PruneRiskEvents(cutoff, 1000)
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		deleted, err := model.PruneRiskEventsContext(ctx, cutoff, 1000)
 		if err != nil {
 			return err
 		}
@@ -356,7 +369,7 @@ func PruneExpiredRiskEvents(now time.Time) error {
 			break
 		}
 	}
-	return model.PruneRiskSnapshots(now.Unix())
+	return model.PruneRiskSnapshotsContext(ctx, now.Unix())
 }
 
 func riskAssessment(snapshot model.RiskSnapshot, username string, status string) RiskUserAssessment {
@@ -385,61 +398,4 @@ func riskAssessment(snapshot model.RiskSnapshot, username string, status string)
 			SampleLimited:                  snapshot.SampleLimited,
 		},
 	}
-}
-
-func ListRiskUsers(query RiskListQuery) (RiskListPage, error) {
-	cutoff := time.Now().UTC().AddDate(0, 0, -query.WindowDays).Unix()
-	snapshots, total, err := model.ListRiskSnapshots(query.WindowDays, cutoff, query.Page, query.PageSize, query.Username, query.Level, query.Status)
-	if err != nil {
-		return RiskListPage{}, err
-	}
-	page := RiskListPage{Items: make([]RiskUserAssessment, 0, len(snapshots)), Total: total,
-		Page: query.Page, PageSize: query.PageSize, Window: strconv.Itoa(query.WindowDays) + "d"}
-	ids := make([]int, 0, len(snapshots))
-	for _, snapshot := range snapshots {
-		ids = append(ids, snapshot.UserID)
-	}
-	names, err := model.RiskUserNames(ids)
-	if err != nil {
-		return RiskListPage{}, err
-	}
-	statuses, err := model.RiskReviewStatuses(ids)
-	if err != nil {
-		return RiskListPage{}, err
-	}
-	for _, snapshot := range snapshots {
-		page.Items = append(page.Items, riskAssessment(snapshot, names[snapshot.UserID], statuses[snapshot.UserID]))
-	}
-	return page, nil
-}
-
-func GetRiskUser(userID int, windowDays int) (RiskUserAssessment, error) {
-	user, err := model.GetUserById(userID, false)
-	if err != nil {
-		return RiskUserAssessment{}, err
-	}
-	if err := RefreshRiskScoresForUser(userID); err != nil {
-		return RiskUserAssessment{}, err
-	}
-	snapshot, err := model.GetRiskSnapshot(userID, windowDays)
-	if err != nil {
-		return RiskUserAssessment{}, err
-	}
-	statuses, err := model.RiskReviewStatuses([]int{userID})
-	if err != nil {
-		return RiskUserAssessment{}, err
-	}
-	return riskAssessment(*snapshot, user.Username, statuses[userID]), nil
-}
-
-func SetRiskReviewStatus(userID int, reviewedBy int, status string) error {
-	status = strings.TrimSpace(status)
-	if status != "unreviewed" && status != "watching" && status != "confirmed" && status != "dismissed" {
-		return errors.New("invalid risk review status")
-	}
-	if _, err := model.GetUserById(userID, false); err != nil {
-		return err
-	}
-	return model.UpsertRiskReview(&model.RiskReview{UserID: userID, Status: status,
-		ReviewedBy: reviewedBy, UpdatedAt: time.Now().UTC().Unix()})
 }

@@ -74,16 +74,20 @@ var privateIPv4Nets = []net.IPNet{
 // https://www.iana.org/assignments/iana-ipv6-special-registry/
 var privateIPv6Nets = func() []net.IPNet {
 	cidrs := []string{
-		"::/128",        // 未指定地址
-		"::1/128",       // 回环
-		"::ffff:0:0/96", // IPv4-mapped
-		"64:ff9b::/96",  // IPv4/IPv6 translation
-		"100::/64",      // Discard-Only
-		"2001::/23",     // IETF Protocol Assignments
-		"2001:db8::/32", // 文档
-		"fc00::/7",      // Unique Local Address (ULA)
-		"fe80::/10",     // 链路本地
-		"ff00::/8",      // 组播
+		"::/128",         // 未指定地址
+		"::1/128",        // 回环
+		"::/96",          // Deprecated IPv4-compatible addresses
+		"::ffff:0:0/96",  // IPv4-mapped
+		"64:ff9b::/96",   // IPv4/IPv6 translation
+		"64:ff9b:1::/48", // Local-use IPv4/IPv6 translation
+		"100::/64",       // Discard-Only
+		"2001::/23",      // IETF Protocol Assignments
+		"2001:db8::/32",  // 文档
+		"2002::/16",      // Deprecated 6to4 translation embeds IPv4 targets
+		"fc00::/7",       // Unique Local Address (ULA)
+		"fe80::/10",      // 链路本地
+		"fec0::/10",      // Deprecated site-local addresses
+		"ff00::/8",       // 组播
 	}
 	nets := make([]net.IPNet, 0, len(cidrs))
 	for _, c := range cidrs {

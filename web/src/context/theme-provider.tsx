@@ -30,7 +30,7 @@ import {
   THEME_STORAGE_KEYS,
   writeThemePreference,
 } from '@/lib/theme-storage'
-import { watchSeasonalTheme } from '@/relayfor/seasonal-theme'
+import { watchSeasonalTheme } from '@/further/seasonal-theme'
 
 type Theme = 'dark' | 'light' | 'system'
 type ResolvedTheme = Exclude<Theme, 'system'>

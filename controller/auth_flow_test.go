@@ -17,12 +17,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/oauth"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/oauth"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
@@ -388,7 +388,9 @@ func TestSecurityLoginAllPrimaryTransportsRequireAdditionalVerification(t *testi
 				router := gin.New()
 				router.GET("/api/oauth/:provider", HandleOAuth)
 				response = httptest.NewRecorder()
-				router.ServeHTTP(response, httptest.NewRequest("GET", "/api/oauth/"+slug+"?state="+token+"&code=provider-code", nil))
+				request := httptest.NewRequest("GET", "/api/oauth/"+slug+"?state="+token+"&code=provider-code", nil)
+				addOAuthTestBrowserCookie(request, token)
+				router.ServeHTTP(response, request)
 			}
 			var result struct {
 				Success bool                   `json:"success"`
@@ -399,7 +401,7 @@ func TestSecurityLoginAllPrimaryTransportsRequireAdditionalVerification(t *testi
 			assert.True(t, result.Data.RequireVerification)
 			assert.Equal(t, []service.VerificationMethodOption{{Method: "passkey", Available: true}}, result.Data.Methods)
 			assert.NotEmpty(t, result.Data.FlowToken)
-			assert.Empty(t, response.Header().Values("Set-Cookie"))
+			assertNoLoginCookieIssued(t, response)
 			count, err := model.CountActiveUserSessions(user.Id, time.Now().Unix())
 			require.NoError(t, err)
 			assert.EqualValues(t, 1, count)
@@ -843,6 +845,7 @@ func TestOAuthLoginConsumesFlowOnlyAfterProviderIdentity(t *testing.T) {
 			router := gin.New()
 			router.GET("/api/oauth/:provider", HandleOAuth)
 			request := httptest.NewRequest(http.MethodGet, "/api/oauth/auth-flow-test?state="+token+"&code=test", nil)
+			addOAuthTestBrowserCookie(request, token)
 			response := httptest.NewRecorder()
 			router.ServeHTTP(response, request)
 
@@ -868,6 +871,7 @@ func TestOAuthLoginConsumesFlowAfterProviderIdentityAndOnProviderError(t *testin
 	router := gin.New()
 	router.GET("/api/oauth/:provider", HandleOAuth)
 	request := httptest.NewRequest(http.MethodGet, "/api/oauth/auth-flow-test?state="+successToken+"&code=test", nil)
+	addOAuthTestBrowserCookie(request, successToken)
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 	_, err = model.GetAuthFlow(successToken, model.AuthFlowMatch{Purpose: model.AuthFlowPurposeOAuth})
@@ -881,6 +885,7 @@ func TestOAuthLoginConsumesFlowAfterProviderIdentityAndOnProviderError(t *testin
 	})
 	require.NoError(t, err)
 	request = httptest.NewRequest(http.MethodGet, "/api/oauth/auth-flow-test?state="+providerErrorToken+"&error=access_denied", nil)
+	addOAuthTestBrowserCookie(request, providerErrorToken)
 	response = httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 	_, err = model.GetAuthFlow(providerErrorToken, model.AuthFlowMatch{Purpose: model.AuthFlowPurposeOAuth})
@@ -960,8 +965,26 @@ func legacyGitHubOAuthLogin(t *testing.T, provider *legacyGitHubOAuthProvider) *
 	router := gin.New()
 	router.GET("/api/oauth/:provider", HandleOAuth)
 	response := httptest.NewRecorder()
-	router.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/api/oauth/"+slug+"?state="+token+"&code=provider-code", nil))
+	request := httptest.NewRequest(http.MethodGet, "/api/oauth/"+slug+"?state="+token+"&code=provider-code", nil)
+	addOAuthTestBrowserCookie(request, token)
+	router.ServeHTTP(response, request)
 	return response
+}
+
+// Supply the initiating browser cookie in tests focused on provider/flow
+// behavior. Browser transfer attacks are exercised separately over HTTP.
+func addOAuthTestBrowserCookie(request *http.Request, state string) {
+	name, value := oauthBrowserBinding(state)
+	request.AddCookie(&http.Cookie{Name: name, Value: value})
+}
+
+func assertNoLoginCookieIssued(t *testing.T, response *httptest.ResponseRecorder) {
+	t.Helper()
+	for _, cookie := range response.Result().Cookies() {
+		assert.True(t, cookie.MaxAge < 0 && cookie.Value == "" &&
+			(strings.HasPrefix(cookie.Name, "further_api_oauth_") || strings.HasPrefix(cookie.Name, "__Host-further_api_oauth_")),
+			"only a consumed OAuth flow cookie may be cleared before login verification")
+	}
 }
 
 // legacyGitHubBindingAudits returns the account binding audit rows in creation
@@ -1077,7 +1100,7 @@ func TestOAuthLoginLegacyGitHubBindingRequiresAccountEvidence(t *testing.T) {
 				assert.Equal(t, created.Id, result.Data.User.Id)
 				return
 			}
-			assert.Empty(t, response.Header().Values("Set-Cookie"))
+			assertNoLoginCookieIssued(t, response)
 			if test.expectAuditParams != "" {
 				assert.Equal(t, declined, result.Message)
 			}
@@ -1103,7 +1126,7 @@ func TestOAuthLoginLegacyGitHubBindingMigratesAfterLoginVerification(t *testing.
 			require.True(t, challenge.Success, response.Body.String())
 			require.True(t, challenge.Data.RequireVerification)
 			assert.Equal(t, []service.VerificationMethodOption{{Method: "2fa", Available: true}}, challenge.Data.Methods)
-			assert.Empty(t, response.Header().Values("Set-Cookie"))
+			assertNoLoginCookieIssued(t, response)
 			assert.Zero(t, provider.verifiedEmailCalls, "a second factor is checked before the provider emails")
 			var reloaded model.User
 			require.NoError(t, model.DB.First(&reloaded, existing.Id).Error)

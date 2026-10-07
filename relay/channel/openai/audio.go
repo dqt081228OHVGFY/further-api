@@ -2,148 +2,233 @@ package openai
 
 import (
 	"bytes"
-	"fmt"
+	"context"
+	"errors"
 	"io"
 	"math"
 	"net/http"
+	"strconv"
+	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-func OpenaiTTSHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) *dto.Usage {
-	// the status code has been judged before, if there is a body reading failure,
-	// it should be regarded as a non-recoverable error, so it should not return err for external retry.
-	// Analogous to nginx's load balancing, it will only retry if it can't be requested or
-	// if the upstream returns a specific status code, once the upstream has already written the header,
-	// the subsequent failure of the response body should be regarded as a non-recoverable error,
-	// and can be terminated directly.
-	defer service.CloseResponseBodyGracefully(resp)
-	usage := &dto.Usage{}
-	usage.PromptTokens = info.GetEstimatePromptTokens()
-	usage.TotalTokens = info.GetEstimatePromptTokens()
-	for k, v := range resp.Header {
-		if !service.ShouldCopyUpstreamHeader(c, k, v) {
+const mediaResponseLimit = 256 << 20
+
+func readMediaResponse(c *gin.Context, response *http.Response) ([]byte, error) {
+	if c == nil || c.Request == nil || response == nil || response.Body == nil {
+		return nil, errors.New("media response context or body is missing")
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	ctx := c.Request.Context()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	stop := context.AfterFunc(ctx, func() { _ = response.Body.Close() })
+	defer stop()
+	body, err := io.ReadAll(io.LimitReader(response.Body, mediaResponseLimit+1))
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if len(body) > mediaResponseLimit {
+		return nil, errors.New("media response exceeds the gateway body limit")
+	}
+	return body, nil
+}
+
+func writeMediaResponse(c *gin.Context, response *http.Response, body []byte) error {
+	if c == nil || c.Writer == nil || c.Request == nil {
+		return errors.New("media response writer is missing")
+	}
+	if err := c.Request.Context().Err(); err != nil {
+		return err
+	}
+	if c.Writer.Written() {
+		return errors.New("media response was already committed")
+	}
+	for name, values := range response.Header {
+		if !service.ShouldCopyUpstreamHeader(c, name, values) {
 			continue
 		}
-		c.Writer.Header().Set(k, v[0])
+		c.Writer.Header().Del(name)
+		for _, value := range values {
+			c.Writer.Header().Add(name, value)
+		}
 	}
-	c.Writer.WriteHeader(resp.StatusCode)
+	for _, name := range []string{"Content-Encoding", "Transfer-Encoding", "Connection"} {
+		c.Writer.Header().Del(name)
+	}
+	c.Writer.Header().Set("Content-Length", strconv.Itoa(len(body)))
+	if c.Writer.Header().Get("Content-Type") == "" {
+		c.Writer.Header().Set("Content-Type", http.DetectContentType(body))
+	}
+	c.Writer.WriteHeader(response.StatusCode)
+	_, err := c.Writer.Write(body)
+	return err
+}
 
-	if info.IsStream {
-		helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-			if service.SundaySearch(data, "usage") {
-				var simpleResponse dto.SimpleResponse
-				if err := common.Unmarshal([]byte(data), &simpleResponse); err != nil {
-					logger.LogError(c, err.Error())
-					sr.Error(err)
-				} else if simpleResponse.Usage.TotalTokens != 0 {
-					usage.PromptTokens = simpleResponse.Usage.InputTokens
-					usage.CompletionTokens = simpleResponse.OutputTokens
-					usage.TotalTokens = simpleResponse.TotalTokens
+func audioResponseError(err error) *types.GatewayError {
+	return types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusBadGateway)
+}
+
+func normalizeAudioUsage(usage *dto.Usage) {
+	if usage.PromptTokens == 0 {
+		usage.PromptTokens = usage.InputTokens
+	}
+	if usage.CompletionTokens == 0 {
+		usage.CompletionTokens = usage.OutputTokens
+	}
+	if usage.InputTokensDetails != nil {
+		usage.PromptTokensDetails = usage.InputTokensDetails.Clone()
+	}
+	if usage.OutputTokensDetails != nil {
+		usage.CompletionTokenDetails = *usage.OutputTokensDetails
+	}
+	if usage.TotalTokens == 0 {
+		usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	}
+}
+
+func completeAudioUsage(usage *dto.Usage, speech bool) {
+	normalizeAudioUsage(usage)
+	if usage.PromptTokensDetails.TextTokens+usage.PromptTokensDetails.AudioTokens == 0 {
+		if speech {
+			usage.PromptTokensDetails.TextTokens = usage.PromptTokens
+		} else {
+			usage.PromptTokensDetails.AudioTokens = usage.PromptTokens
+		}
+	}
+	if usage.CompletionTokenDetails.TextTokens+usage.CompletionTokenDetails.AudioTokens == 0 {
+		if speech {
+			usage.CompletionTokenDetails.AudioTokens = usage.CompletionTokens
+		} else {
+			usage.CompletionTokenDetails.TextTokens = usage.CompletionTokens
+		}
+	}
+}
+
+func OpenaiTTSHandler(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.GatewayError) {
+	if err := responseContext(c, info, response); err != nil {
+		return nil, audioResponseError(err)
+	}
+	if c.Request == nil || c.Writer == nil {
+		return nil, audioResponseError(errors.New("speech request context is missing"))
+	}
+	estimate := &dto.Usage{PromptTokens: info.GetEstimatePromptTokens(), TotalTokens: info.GetEstimatePromptTokens()}
+	estimate.PromptTokensDetails.TextTokens = estimate.PromptTokens
+	if strings.Contains(strings.ToLower(response.Header.Get("Content-Type")), "text/event-stream") {
+		usage := estimate
+		var failure error
+		reported := false
+		helper.StreamScannerHandler(c, response, info, func(data string, result *helper.StreamResult) {
+			var event struct {
+				Usage *dto.Usage `json:"usage"`
+			}
+			if err := common.Unmarshal([]byte(data), &event); err != nil {
+				failure = err
+				result.Stop(err)
+				return
+			}
+			if event.Usage != nil {
+				completeAudioUsage(event.Usage, true)
+				if service.ValidUsage(event.Usage) {
+					if !reported {
+						usage = &dto.Usage{}
+					}
+					reported = true
+					usage = dto.MergeUsageNonZero(usage, event.Usage)
 				}
 			}
 			if err := helper.StringData(c, data); err != nil {
-				sr.Error(err)
+				failure = err
+				result.Stop(err)
+			}
+			if isOpenAIImageStreamErrorEvent([]byte(data)) {
+				failure = errors.New("speech provider returned an error event")
+				result.Error(failure)
 			}
 		})
-	} else {
-		common.SetContextKey(c, constant.ContextKeyLocalCountTokens, true)
-		// 读取响应体到缓冲区
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			logger.LogError(c, fmt.Sprintf("failed to read TTS response body: %v", err))
-			c.Writer.WriteHeaderNow()
-			return usage
+		if failure != nil {
+			return usage, audioResponseError(failure)
 		}
-
-		// 写入响应到客户端
-		c.Writer.WriteHeaderNow()
-		_, err = c.Writer.Write(bodyBytes)
-		if err != nil {
-			logger.LogError(c, fmt.Sprintf("failed to write TTS response: %v", err))
+		if err := c.Request.Context().Err(); err != nil {
+			return usage, audioResponseError(err)
 		}
-
-		// 计算音频时长并更新 usage
-		audioFormat := "mp3" // 默认格式
-		if audioReq, ok := info.Request.(*dto.AudioRequest); ok && audioReq.ResponseFormat != "" {
-			audioFormat = audioReq.ResponseFormat
+		if info.StreamStatus != nil && info.StreamStatus.HasErrors() {
+			return usage, audioResponseError(errors.New("audio stream did not complete"))
 		}
-
-		var duration float64
-		var durationErr error
-
-		if audioFormat == "pcm" {
-			// PCM 格式没有文件头，根据 OpenAI TTS 的 PCM 参数计算时长
-			// 采样率: 24000 Hz, 位深度: 16-bit (2 bytes), 声道数: 1
-			const sampleRate = 24000
-			const bytesPerSample = 2
-			const channels = 1
-			duration = float64(len(bodyBytes)) / float64(sampleRate*bytesPerSample*channels)
-		} else {
-			ext := "." + audioFormat
-			reader := bytes.NewReader(bodyBytes)
-			duration, durationErr = common.GetAudioDuration(c.Request.Context(), reader, ext)
+		if info.StreamStatus != nil && info.StreamStatus.EndReason == relaycommon.StreamEndReasonDone {
+			if err := helper.StringData(c, "[DONE]"); err != nil {
+				return usage, audioResponseError(err)
+			}
 		}
-
-		usage.PromptTokensDetails.TextTokens = usage.PromptTokens
-
-		if durationErr != nil {
-			logger.LogWarn(c, fmt.Sprintf("failed to get audio duration: %v", durationErr))
-			// 如果无法获取时长，则设置保底的 CompletionTokens，根据body大小计算
-			sizeInKB := float64(len(bodyBytes)) / 1000.0
-			estimatedTokens := int(math.Ceil(sizeInKB)) // 粗略估算每KB约等于1 token
-			usage.CompletionTokens = estimatedTokens
-			usage.CompletionTokenDetails.AudioTokens = estimatedTokens
-		} else if duration > 0 {
-			// 计算 token: ceil(duration) / 60.0 * 1000，即每分钟 1000 tokens。
-			// duration 解析自上游返回的音频元数据，饱和转换防止 int 回绕。
-			completionTokens := common.QuotaRound(math.Ceil(duration) / 60.0 * 1000)
-			usage.CompletionTokens = completionTokens
-			usage.CompletionTokenDetails.AudioTokens = completionTokens
+		if !reported {
+			common.SetContextKey(c, constant.ContextKeyLocalCountTokens, true)
 		}
-		usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+		return usage, nil
 	}
-
-	return usage
+	body, err := readMediaResponse(c, response)
+	if err != nil {
+		return nil, audioResponseError(err)
+	}
+	if len(body) == 0 {
+		return nil, audioResponseError(errors.New("speech provider returned empty audio"))
+	}
+	format := "mp3"
+	if request, ok := info.Request.(*dto.AudioRequest); ok && request.ResponseFormat != "" {
+		format = request.ResponseFormat
+	}
+	duration := float64(0)
+	if format == "pcm" {
+		duration = float64(len(body)) / 48000
+	} else {
+		duration, err = common.GetAudioDuration(c.Request.Context(), bytes.NewReader(body), "."+format)
+	}
+	completion := common.QuotaRound(math.Ceil(duration) * 1000 / 60)
+	if err != nil || math.IsNaN(duration) || math.IsInf(duration, 0) || duration <= 0 {
+		completion = common.QuotaRound(math.Ceil(float64(len(body)) / 1000))
+	}
+	estimate.CompletionTokens = completion
+	estimate.CompletionTokenDetails.AudioTokens = completion
+	estimate.TotalTokens = estimate.PromptTokens + completion
+	common.SetContextKey(c, constant.ContextKeyLocalCountTokens, true)
+	if err := writeMediaResponse(c, response, body); err != nil {
+		return estimate, audioResponseError(err)
+	}
+	return estimate, nil
 }
 
-func OpenaiSTTHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo, responseFormat string) (*types.NewAPIError, *dto.Usage) {
-	defer service.CloseResponseBodyGracefully(resp)
-
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError), nil
+func OpenaiSTTHandler(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo, _ string) (*types.GatewayError, *dto.Usage) {
+	if err := responseContext(c, info, response); err != nil {
+		return audioResponseError(err), nil
 	}
-	// 写入新的 response body
-	service.IOCopyBytesGracefully(c, resp, responseBody)
-
-	var responseData struct {
+	body, err := readMediaResponse(c, response)
+	if err != nil {
+		return audioResponseError(err), nil
+	}
+	usage := &dto.Usage{PromptTokens: info.GetEstimatePromptTokens(), TotalTokens: info.GetEstimatePromptTokens()}
+	usage.PromptTokensDetails.AudioTokens = usage.PromptTokens
+	var payload struct {
 		Usage *dto.Usage `json:"usage"`
 	}
-	if err := common.Unmarshal(responseBody, &responseData); err == nil && responseData.Usage != nil {
-		if responseData.Usage.TotalTokens > 0 {
-			usage := responseData.Usage
-			if usage.PromptTokens == 0 {
-				usage.PromptTokens = usage.InputTokens
-			}
-			if usage.CompletionTokens == 0 {
-				usage.CompletionTokens = usage.OutputTokens
-			}
-			return nil, usage
+	if common.Unmarshal(body, &payload) == nil && payload.Usage != nil {
+		completeAudioUsage(payload.Usage, false)
+		if service.ValidUsage(payload.Usage) {
+			usage = payload.Usage
 		}
 	}
-
-	usage := &dto.Usage{}
-	usage.PromptTokens = info.GetEstimatePromptTokens()
-	usage.CompletionTokens = 0
-	usage.TotalTokens = usage.PromptTokens + usage.CompletionTokens
+	if err := writeMediaResponse(c, response, body); err != nil {
+		return audioResponseError(err), usage
+	}
 	return nil, usage
 }

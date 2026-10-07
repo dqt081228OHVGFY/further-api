@@ -11,15 +11,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	relaytypes "github.com/QuantumNous/new-api/relaykit/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream"
 	"github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream/eventstreamapi"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	relaytypes "github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -261,7 +261,7 @@ func TestAwsHandlersCancelSdkRequestAndSkipRetry(t *testing.T) {
 	tests := []struct {
 		name    string
 		request any
-		handle  func(*gin.Context, *relaycommon.RelayInfo, *Adaptor) (*relaytypes.NewAPIError, *dto.Usage)
+		handle  func(*gin.Context, *relaycommon.RelayInfo, *Adaptor) (*relaytypes.GatewayError, *dto.Usage)
 	}{
 		{name: "non-stream", request: newAwsInvokeModelInput(), handle: awsHandler},
 		{name: "stream", request: newAwsStreamInput(), handle: awsStreamHandler},
@@ -284,7 +284,7 @@ func TestAwsHandlersCancelSdkRequestAndSkipRetry(t *testing.T) {
 			info := newAwsTestRelayInfo()
 
 			type handlerResult struct {
-				err   *relaytypes.NewAPIError
+				err   *relaytypes.GatewayError
 				usage *dto.Usage
 			}
 			results := make(chan handlerResult, 1)
@@ -405,7 +405,7 @@ func TestAwsStreamHandlerStopsAtClientCancellation(t *testing.T) {
 	adaptor := &Adaptor{AwsClient: client, AwsReq: newAwsStreamInput()}
 
 	type handlerResult struct {
-		err   *relaytypes.NewAPIError
+		err   *relaytypes.GatewayError
 		usage *dto.Usage
 	}
 	results := make(chan handlerResult, 1)

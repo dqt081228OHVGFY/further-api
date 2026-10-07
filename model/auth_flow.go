@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
@@ -8,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -282,7 +283,11 @@ func ConsumeAuthFlowWithAction(token string, match AuthFlowMatch, action func(tx
 }
 
 func DeleteExpiredAuthFlows(now time.Time) error {
+	return DeleteExpiredAuthFlowsContext(context.Background(), now)
+}
+
+func DeleteExpiredAuthFlowsContext(ctx context.Context, now time.Time) error {
 	cutoff := now.Add(-AuthFlowDefaultCleanupRetention)
-	return DB.Where("expires_at < ? OR (consumed_at IS NOT NULL AND consumed_at < ?)", cutoff, cutoff).
+	return DB.WithContext(ctx).Where("expires_at < ? OR (consumed_at IS NOT NULL AND consumed_at < ?)", cutoff, cutoff).
 		Delete(&AuthFlow{}).Error
 }

@@ -7,12 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
+	"mime"
 	"net/http"
 	"strings"
+	"time"
 
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -107,199 +111,223 @@ var responseFormatToEncodingMap = map[string]string{
 	"pcm":  "pcm",
 }
 
-func parseVolcengineAuth(apiKey string) (appID, token string, err error) {
-	parts := strings.Split(apiKey, "|")
-	if len(parts) != 2 {
-		return "", "", errors.New("invalid api key format, expected: appid|access_token")
+func parseVolcengineAuth(raw string) (string, string, error) {
+	app, token, found := strings.Cut(raw, "|")
+	app, token = strings.TrimSpace(app), strings.TrimSpace(token)
+	if !found || app == "" || token == "" || strings.Contains(token, "|") || strings.ContainsAny(app+token, "\r\n") {
+		return "", "", errors.New("火山语音鉴权格式应为 appid|access_token。")
 	}
-	return parts[0], parts[1], nil
+	return app, token, nil
 }
-
-func mapVoiceType(openAIVoice string) string {
-	if voice, ok := openAIToVolcengineVoiceMap[openAIVoice]; ok {
-		return voice
+func mapVoiceType(voice string) string {
+	if native, known := openAIToVolcengineVoiceMap[voice]; known {
+		return native
 	}
-	return openAIVoice
+	return voice
 }
-
-func mapEncoding(responseFormat string) string {
-	if encoding, ok := responseFormatToEncodingMap[responseFormat]; ok {
-		return encoding
+func mapEncoding(format string) string {
+	switch format {
+	case "ogg_opus", "mp3", "wav", "pcm":
+		return format
+	}
+	if mapped, known := responseFormatToEncodingMap[format]; known {
+		return mapped
 	}
 	return "mp3"
 }
-
 func getContentTypeByEncoding(encoding string) string {
-	contentTypeMap := map[string]string{
-		"mp3":      "audio/mpeg",
-		"ogg_opus": "audio/ogg",
-		"wav":      "audio/wav",
-		"pcm":      "audio/pcm",
-	}
-	if ct, ok := contentTypeMap[encoding]; ok {
-		return ct
+	switch encoding {
+	case "mp3":
+		return "audio/mpeg"
+	case "ogg_opus":
+		return "audio/ogg"
+	case "wav":
+		return "audio/wav"
+	case "pcm":
+		return "audio/pcm"
 	}
 	return "application/octet-stream"
 }
+func generateRequestID() string { return uuid.NewString() }
 
-func handleTTSResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo, encoding string) (usage any, err *types.NewAPIError) {
-	body, readErr := io.ReadAll(resp.Body)
-	if readErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			errors.New("failed to read volcengine response"),
-			types.ErrorCodeReadResponseBodyFailed,
-			http.StatusInternalServerError,
-		)
+func prepareVolcSpeech(info *relaycommon.RelayInfo, source dto.AudioRequest) (*VolcengineTTSRequest, error) {
+	app, token, err := parseVolcengineAuth(info.ApiKey)
+	if err != nil {
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	var volcResp VolcengineTTSResponse
-	if unmarshalErr := json.Unmarshal(body, &volcResp); unmarshalErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			errors.New("failed to parse volcengine response"),
-			types.ErrorCodeBadResponseBody,
-			http.StatusInternalServerError,
-		)
+	speed := 1.0
+	if source.Speed != nil {
+		speed = *source.Speed
 	}
-
-	if volcResp.Code != 3000 {
-		return nil, types.NewErrorWithStatusCode(
-			errors.New(volcResp.Message),
-			types.ErrorCodeBadResponse,
-			http.StatusBadRequest,
-		)
-	}
-
-	audioData, decodeErr := base64.StdEncoding.DecodeString(volcResp.Data)
-	if decodeErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			errors.New("failed to decode audio data"),
-			types.ErrorCodeBadResponseBody,
-			http.StatusInternalServerError,
-		)
-	}
-
-	contentType := getContentTypeByEncoding(encoding)
-	c.Header("Content-Type", contentType)
-	c.Data(http.StatusOK, contentType, audioData)
-
-	usage = &dto.Usage{
-		PromptTokens:     info.GetEstimatePromptTokens(),
-		CompletionTokens: 0,
-		TotalTokens:      info.GetEstimatePromptTokens(),
-	}
-
-	return usage, nil
-}
-
-func generateRequestID() string {
-	return uuid.New().String()
-}
-
-func handleTTSWebSocketResponse(c *gin.Context, requestURL string, volcRequest VolcengineTTSRequest, info *relaycommon.RelayInfo, encoding string) (usage any, err *types.NewAPIError) {
-	_, token, parseErr := parseVolcengineAuth(info.ApiKey)
-	if parseErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			parseErr,
-			types.ErrorCodeChannelInvalidKey,
-			http.StatusUnauthorized,
-		)
-	}
-
-	header := http.Header{}
-	header.Set("Authorization", fmt.Sprintf("Bearer;%s", token))
-
-	conn, resp, dialErr := websocket.DefaultDialer.DialContext(context.Background(), requestURL, header)
-	if dialErr != nil {
-		if resp != nil {
-			return nil, types.NewErrorWithStatusCode(
-				fmt.Errorf("failed to connect to websocket: %w, status: %d", dialErr, resp.StatusCode),
-				types.ErrorCodeBadResponseStatusCode,
-				http.StatusBadGateway,
-			)
+	request := &VolcengineTTSRequest{App: VolcengineTTSApp{AppID: app, Token: token, Cluster: "volcano_tts"},
+		User:    VolcengineTTSUser{UID: fmt.Sprintf("further-api-user-%d", info.UserId)},
+		Audio:   VolcengineTTSAudio{VoiceType: mapVoiceType(source.Voice), Encoding: mapEncoding(source.ResponseFormat), SpeedRatio: speed, Rate: 24000},
+		Request: VolcengineTTSReqInfo{ReqID: generateRequestID(), Text: source.Input, Operation: "submit", Model: info.UpstreamModelName}}
+	if len(source.Metadata) > 0 {
+		if err := json.Unmarshal(source.Metadata, request); err != nil {
+			return nil, fmt.Errorf("火山语音metadata无效：%w", err)
 		}
-		return nil, types.NewErrorWithStatusCode(
-			fmt.Errorf("failed to connect to websocket: %w", dialErr),
-			types.ErrorCodeBadResponseStatusCode,
-			http.StatusBadGateway,
-		)
 	}
-	defer conn.Close()
-
-	payload, marshalErr := json.Marshal(volcRequest)
-	if marshalErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			fmt.Errorf("failed to marshal request: %w", marshalErr),
-			types.ErrorCodeBadRequestBody,
-			http.StatusInternalServerError,
-		)
+	request.App.AppID, request.App.Token = app, token
+	request.User.UID = fmt.Sprintf("further-api-user-%d", info.UserId)
+	request.Request.Text, request.Request.ReqID = source.Input, generateRequestID()
+	if request.Request.Model == "" {
+		request.Request.Model = info.OriginModelName
 	}
-
-	if sendErr := FullClientRequest(conn, payload); sendErr != nil {
-		return nil, types.NewErrorWithStatusCode(
-			fmt.Errorf("failed to send request: %w", sendErr),
-			types.ErrorCodeBadRequestBody,
-			http.StatusInternalServerError,
-		)
+	request.Audio.Encoding = mapEncoding(request.Audio.Encoding)
+	if err := validateVolcSpeech(request); err != nil {
+		return nil, err
 	}
+	return request, nil
+}
+func validateVolcSpeech(request *VolcengineTTSRequest) error {
+	if request == nil || strings.TrimSpace(request.Request.Text) == "" || request.App.AppID == "" || request.App.Token == "" {
+		return errors.New("火山语音请求缺少文本或鉴权。")
+	}
+	if request.Request.Operation != "submit" && request.Request.Operation != "query" {
+		return errors.New("火山语音operation必须为submit或query。")
+	}
+	if request.Audio.SpeedRatio == 0 {
+		request.Audio.SpeedRatio = 1
+	}
+	if math.IsNaN(request.Audio.SpeedRatio) || math.IsInf(request.Audio.SpeedRatio, 0) || request.Audio.SpeedRatio < 0.2 || request.Audio.SpeedRatio > 3 {
+		return errors.New("火山语音speed必须在0.2到3之间。")
+	}
+	if request.Audio.Rate <= 0 {
+		request.Audio.Rate = 24000
+	}
+	return nil
+}
+func volcSpeechUsage(info *relaycommon.RelayInfo) *dto.Usage {
+	input := max(0, info.GetEstimatePromptTokens())
+	return &dto.Usage{PromptTokens: input, TotalTokens: input}
+}
+func volcSpeechError(err error) *types.GatewayError {
+	return types.NewErrorWithStatusCode(err, types.ErrorCodeBadResponse, http.StatusBadGateway)
+}
 
-	contentType := getContentTypeByEncoding(encoding)
-	c.Header("Content-Type", contentType)
-	c.Header("Transfer-Encoding", "chunked")
+func writeVolcAudio(c *gin.Context, encoding string, data []byte) error {
+	if c == nil || c.Request == nil || c.Writer == nil {
+		return errors.New("语音输出上下文无效。")
+	}
+	if err := c.Request.Context().Err(); err != nil {
+		return err
+	}
+	c.Header("Content-Type", getContentTypeByEncoding(encoding))
+	_ = http.NewResponseController(c.Writer).SetWriteDeadline(time.Now().Add(30 * time.Second))
+	defer func() { _ = http.NewResponseController(c.Writer).SetWriteDeadline(time.Time{}) }()
+	if _, err := c.Writer.Write(data); err != nil {
+		return err
+	}
+	c.Writer.Flush()
+	return nil
+}
+func handleTTSResponse(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo, encoding string) (any, *types.GatewayError) {
+	if c == nil || c.Request == nil || response == nil || response.Body == nil || info == nil {
+		return nil, volcSpeechError(errors.New("语音HTTP响应内容不存在。"))
+	}
+	defer response.Body.Close()
+	done := make(chan struct{})
+	stop := context.AfterFunc(c.Request.Context(), func() { response.Body.Close(); close(done) })
+	defer func() {
+		if !stop() {
+			<-done
+		}
+	}()
+	const limit = 256 << 20
+	body, err := io.ReadAll(io.LimitReader(response.Body, limit+1))
+	if err != nil {
+		return nil, volcSpeechError(err)
+	}
+	if err := c.Request.Context().Err(); err != nil {
+		return nil, volcSpeechError(err)
+	}
+	if len(body) > limit {
+		return nil, volcSpeechError(errors.New("语音HTTP响应超过容量限制。"))
+	}
+	media, _, _ := mime.ParseMediaType(response.Header.Get("Content-Type"))
+	audio := body
+	if !strings.HasPrefix(media, "audio/") && media != "application/octet-stream" {
+		var result VolcengineTTSResponse
+		if err := json.Unmarshal(body, &result); err != nil {
+			return nil, volcSpeechError(err)
+		}
+		if result.Code != 3000 {
+			return nil, types.NewErrorWithStatusCode(fmt.Errorf("火山语音错误 code=%d：%s", result.Code, result.Message), types.ErrorCodeBadResponse, 400)
+		}
+		audio, err = base64.StdEncoding.DecodeString(result.Data)
+		if err != nil {
+			return nil, volcSpeechError(err)
+		}
+	}
+	if len(audio) == 0 {
+		return nil, volcSpeechError(errors.New("语音服务未返回音频。"))
+	}
+	if err := writeVolcAudio(c, encoding, audio); err != nil {
+		return nil, volcSpeechError(err)
+	}
+	info.SetFirstResponseTime()
+	return volcSpeechUsage(info), nil
+}
 
+func consumeVolcSpeech(c *gin.Context, info *relaycommon.RelayInfo, socket *channel.NativeSocketSession, encoding string) (any, *types.GatewayError) {
+	if c == nil || c.Request == nil || info == nil || socket == nil {
+		return nil, volcSpeechError(errors.New("语音WebSocket上下文无效。"))
+	}
+	info.StreamStatus = relaycommon.NewStreamStatus()
+	info.StreamStatus.RequireTerminal()
+	totalBytes := 0
+	fail := func(err error) (any, *types.GatewayError) {
+		if c.Request.Context().Err() != nil {
+			err = c.Request.Context().Err()
+			info.StreamStatus.MarkCancelled()
+			info.StreamStatus.SetEndReason(relaycommon.StreamEndReasonClientGone, err)
+		} else {
+			info.StreamStatus.MarkFailed("speech_protocol", "upstream_error", 502)
+			info.StreamStatus.SetEndReason(relaycommon.StreamEndReasonScannerErr, err)
+		}
+		if totalBytes > 0 {
+			return volcSpeechUsage(info), volcSpeechError(err)
+		}
+		return nil, volcSpeechError(err)
+	}
 	for {
-		msg, recvErr := ReceiveMessage(conn)
-		if recvErr != nil {
-			if websocket.IsCloseError(recvErr, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				break
-			}
-			return nil, types.NewErrorWithStatusCode(
-				fmt.Errorf("failed to receive message: %w", recvErr),
-				types.ErrorCodeBadResponse,
-				http.StatusInternalServerError,
-			)
+		kind, frame, err := socket.Read()
+		if err != nil {
+			return fail(err)
 		}
-
-		switch msg.MsgType {
-		case MsgTypeError:
-			return nil, types.NewErrorWithStatusCode(
-				fmt.Errorf("received error from server: code=%d, %s", msg.ErrorCode, string(msg.Payload)),
-				types.ErrorCodeBadResponse,
-				http.StatusBadRequest,
-			)
-		case MsgTypeFrontEndResultServer:
-			continue
-		case MsgTypeAudioOnlyServer:
-			if len(msg.Payload) > 0 {
-				if _, writeErr := c.Writer.Write(msg.Payload); writeErr != nil {
-					return nil, types.NewErrorWithStatusCode(
-						fmt.Errorf("failed to write audio data: %w", writeErr),
-						types.ErrorCodeBadResponse,
-						http.StatusInternalServerError,
-					)
-				}
-				c.Writer.Flush()
+		if kind != websocket.BinaryMessage && kind != websocket.TextMessage {
+			return fail(errors.New("语音上游返回非数据帧。"))
+		}
+		message, err := NewMessageFromBytes(frame)
+		if err != nil {
+			return fail(err)
+		}
+		info.ReceivedResponseCount++
+		if message.MsgType == MsgTypeError {
+			return fail(fmt.Errorf("火山语音错误 code=%d：%s", message.ErrorCode, string(message.Payload)))
+		}
+		if message.EventType == EventType_ConnectionFailed || message.EventType == EventType_SessionFailed {
+			return fail(errors.New("火山语音会话创建失败。"))
+		}
+		terminal := message.Sequence < 0 || message.MsgTypeFlag == MsgTypeFlagBits(2) || message.EventType == EventType_TTSEnded || message.EventType == EventType_SessionFinished
+		if message.MsgType == MsgTypeAudioOnlyServer && len(message.Payload) > 0 {
+			totalBytes += len(message.Payload)
+			if totalBytes > 256<<20 {
+				return fail(errors.New("累计语音输出超过容量限制。"))
 			}
-
-			if msg.Sequence < 0 {
-				c.Status(http.StatusOK)
-				usage = &dto.Usage{
-					PromptTokens:     info.GetEstimatePromptTokens(),
-					CompletionTokens: 0,
-					TotalTokens:      info.GetEstimatePromptTokens(),
-				}
-				return usage, nil
+			if err := writeVolcAudio(c, encoding, message.Payload); err != nil {
+				return fail(err)
 			}
-		default:
-			continue
+			info.SetFirstResponseTime()
+		}
+		if terminal {
+			if totalBytes == 0 {
+				return fail(errors.New("语音终态没有音频内容。"))
+			}
+			info.StreamStatus.MarkCompleted()
+			info.StreamStatus.SetEndReason(relaycommon.StreamEndReasonDone, nil)
+			return volcSpeechUsage(info), nil
 		}
 	}
-
-	c.Status(http.StatusOK)
-	usage = &dto.Usage{
-		PromptTokens:     info.GetEstimatePromptTokens(),
-		CompletionTokens: 0,
-		TotalTokens:      info.GetEstimatePromptTokens(),
-	}
-	return usage, nil
 }

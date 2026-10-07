@@ -10,13 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/relay"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/relay"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,8 +24,8 @@ type responsesWSRequestContextKey struct{}
 
 type responsesWSRequestState struct {
 	requestID string
-	handle    func(*gin.Context) *types.NewAPIError
-	apiError  *types.NewAPIError
+	handle    func(*gin.Context) *types.GatewayError
+	apiError  *types.GatewayError
 }
 
 // Each response.create runs the ordinary request middleware to completion,
@@ -82,7 +82,7 @@ func newResponsesWSRequestRunner(c *gin.Context) relay.ResponsesWSRequestRunner 
 		headers.Del(name)
 	}
 	remoteAddr := net.JoinHostPort(c.ClientIP(), "0")
-	return func(request *http.Request, requestID string, handle func(*gin.Context) *types.NewAPIError) *types.NewAPIError {
+	return func(request *http.Request, requestID string, handle func(*gin.Context) *types.GatewayError) *types.GatewayError {
 		state := &responsesWSRequestState{requestID: requestID, handle: handle}
 		ctx := context.WithValue(request.Context(), responsesWSRequestContextKey{}, state)
 		ctx = context.WithValue(ctx, common.RequestIdKey, requestID)

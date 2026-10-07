@@ -61,5 +61,5 @@ func LogSystemError(message string) {
 }
 
 // Debug reports whether verbose kit diagnostics are enabled. The host sets
-// this once at startup (new-api mirrors common.DebugEnabled into it).
+// this once at startup (further-api mirrors common.DebugEnabled into it).
 var Debug atomic.Bool

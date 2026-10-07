@@ -8,15 +8,13 @@ import (
 	"sync"
 
 	"context"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	claudemessages "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/claude_messages"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/convdiag"
-	geminichat "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/gemini_chat"
-	oaichat "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/oai_chat"
-	oairesponses "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/oai_responses"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/toolconv"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	claudemessages "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/claude_messages"
+	geminichat "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/gemini_chat"
+	oaichat "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/oai_chat"
+	oairesponses "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/oai_responses"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 type RequestConverterFunc func(c context.Context, info convmeta.Meta, request any) (any, error)
@@ -152,158 +150,6 @@ func LookupRequestConverter(converter string) (RequestConverterSpec, bool) {
 	return cloneRequestConverterSpec(spec), true
 }
 
-func ConvertRequest(c context.Context, info convmeta.Meta, target types.RelayFormat, request any) (*RequestResult, error) {
-	from, err := inferRequestRelayFormat(request)
-	if err != nil {
-		return nil, err
-	}
-	if target == "" {
-		return nil, errors.New("target relay format is required")
-	}
-	if from == target {
-		return &RequestResult{
-			Value: request,
-			From:  from,
-			To:    target,
-		}, nil
-	}
-
-	spec, ok := lookupRequestRoute(from, target)
-	if !ok {
-		return nil, fmt.Errorf("request converter from %s to %s is not registered", from, target)
-	}
-	return executeRequestSpec(c, info, from, target, request, spec)
-}
-
-func ConvertRequestVia(c context.Context, info convmeta.Meta, request any, path ...types.RelayFormat) (*RequestResult, error) {
-	from, err := inferRequestRelayFormat(request)
-	if err != nil {
-		return nil, err
-	}
-	if len(path) == 0 {
-		return nil, errors.New("request conversion path is required")
-	}
-
-	targets := make([]types.RelayFormat, 0, len(path))
-	for _, format := range path {
-		if format == "" {
-			return nil, errors.New("request conversion path contains empty relay format")
-		}
-		targets = append(targets, format)
-	}
-	if targets[0] == from {
-		targets = targets[1:]
-	}
-	if len(targets) == 0 {
-		return &RequestResult{
-			Value: request,
-			From:  from,
-			To:    from,
-		}, nil
-	}
-
-	steps := make([]RequestConverterSpec, 0, len(targets))
-	current := from
-	for _, target := range targets {
-		spec, ok := lookupRequestDirectRoute(current, target)
-		if !ok {
-			return nil, fmt.Errorf("request converter from %s to %s is not registered", current, target)
-		}
-		steps = append(steps, spec)
-		current = target
-	}
-	return executeRequestSteps(c, info, from, targets[len(targets)-1], request, "", "", steps)
-}
-
-func ConvertRequestByID(c context.Context, info convmeta.Meta, converter string, request any) (*RequestResult, error) {
-	from, err := inferRequestRelayFormat(request)
-	if err != nil {
-		return nil, err
-	}
-
-	spec, ok := LookupRequestConverter(converter)
-	if !ok {
-		return nil, fmt.Errorf("request converter %q is not registered", strings.TrimSpace(converter))
-	}
-	if spec.From != "" && spec.From != from {
-		return nil, fmt.Errorf("request converter %q expects %s request, got %s", spec.ID, spec.From, from)
-	}
-	return executeRequestSpec(c, info, from, spec.To, request, spec)
-}
-
-func executeRequestSpec(c context.Context, info convmeta.Meta, from types.RelayFormat, target types.RelayFormat, request any, spec RequestConverterSpec) (*RequestResult, error) {
-	steps, err := expandRequestConverterSteps(spec)
-	if err != nil {
-		return nil, err
-	}
-	return executeRequestSteps(c, info, from, target, request, spec.ID, spec.Quality, steps)
-}
-
-func executeRequestSteps(c context.Context, info convmeta.Meta, from types.RelayFormat, target types.RelayFormat, request any, converter string, quality RequestConverterQuality, specs []RequestConverterSpec) (*RequestResult, error) {
-	c, diagnosticCollector := convdiag.WithCollector(c)
-	current, tools, err := toolconv.ExtractRequest(from, request)
-	if err != nil {
-		return nil, err
-	}
-	steps := make([]RequestStep, 0, len(specs))
-	for _, spec := range specs {
-		current, err = prepareRequestForStep(current, spec, target)
-		if err != nil {
-			return nil, err
-		}
-
-		var step RequestStep
-		current, step, err = executeRequestStep(c, info, spec, current)
-		if err != nil {
-			return nil, err
-		}
-		steps = append(steps, step)
-	}
-
-	current, toolDiagnostics, err := toolconv.AttachRequest(target, current, tools, convmeta.OptionsOf(info))
-	diagnostics := append(diagnosticCollector.Diagnostics(), toolDiagnostics...)
-	for i := range diagnostics {
-		if diagnostics[i].From == "" {
-			diagnostics[i].From = from
-		}
-		if diagnostics[i].To == "" {
-			diagnostics[i].To = target
-		}
-	}
-	if err != nil {
-		return &RequestResult{
-			Value:       current,
-			From:        from,
-			To:          target,
-			Quality:     quality,
-			Steps:       steps,
-			Diagnostics: diagnostics,
-		}, err
-	}
-	if info != nil {
-		for _, step := range steps {
-			info.AppendRequestConversion(step.To)
-		}
-	}
-
-	converters := make([]string, 0, len(steps))
-	for _, step := range steps {
-		converters = append(converters, step.Converter)
-	}
-	if converter == "" {
-		converter = strings.Join(converters, ",")
-	}
-	return &RequestResult{
-		Value:       current,
-		From:        from,
-		To:          target,
-		Converter:   converter,
-		Quality:     quality,
-		Steps:       steps,
-		Diagnostics: diagnostics,
-	}, nil
-}
-
 func expandRequestConverterSteps(spec RequestConverterSpec) ([]RequestConverterSpec, error) {
 	if len(spec.StepConverters) == 0 {
 		if spec.Convert == nil {
@@ -335,22 +181,6 @@ func expandRequestConverterSteps(spec RequestConverterSpec) ([]RequestConverterS
 		return nil, fmt.Errorf("request converter %q ends at %s, expected %s", spec.ID, current, spec.To)
 	}
 	return steps, nil
-}
-
-func executeRequestStep(c context.Context, info convmeta.Meta, spec RequestConverterSpec, request any) (any, RequestStep, error) {
-	if spec.Convert == nil {
-		return nil, RequestStep{}, fmt.Errorf("request converter %q has no registered implementation", spec.ID)
-	}
-
-	value, err := spec.Convert(c, info, request)
-	if err != nil {
-		return nil, RequestStep{}, err
-	}
-	return value, RequestStep{
-		Converter: spec.ID,
-		From:      spec.From,
-		To:        spec.To,
-	}, nil
 }
 
 func prepareRequestForStep(request any, spec RequestConverterSpec, finalTarget types.RelayFormat) (any, error) {

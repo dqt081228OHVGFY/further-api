@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,12 +14,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service/authz"
 	"github.com/alicebob/miniredis/v2"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service/authz"
 	"github.com/go-redis/redis/v8"
 
 	"github.com/gin-gonic/gin"
@@ -80,6 +81,11 @@ func setupManageUserTestDB(t *testing.T) *gorm.DB {
 
 func performManageUserRequest(t *testing.T, body string) *httptest.ResponseRecorder {
 	t.Helper()
+	var actorCount int64
+	require.NoError(t, model.DB.Model(&model.User{}).Where("id = ?", 9999).Count(&actorCount).Error)
+	if actorCount == 0 {
+		createQuotaTestOperator(t, model.DB, common.RoleRootUser)
+	}
 	gin.SetMode(gin.TestMode)
 	recorder := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(recorder)
@@ -88,6 +94,7 @@ func performManageUserRequest(t *testing.T, body string) *httptest.ResponseRecor
 	c.Set("id", 9999)
 	c.Set("role", common.RoleRootUser)
 	c.Set("username", "root-operator")
+	setManageOperatorSession(c)
 	c.Set(common.RequestIdKey, "quota-test-request")
 	ManageUser(c)
 	return recorder
@@ -199,7 +206,14 @@ func createQuotaTestOperator(t *testing.T, db *gorm.DB, role int) model.User {
 	}
 	operator := model.User{Id: 9999, Username: "root-operator", Role: role, Status: common.UserStatusEnabled, AuthVersion: 1, AffCode: "root-operator-aff"}
 	require.NoError(t, db.Create(&operator).Error)
+	require.NoError(t, db.Create(&model.UserSession{SID: "manage-fixture-session", UserID: operator.Id, Version: 1, UserAuthVersion: 1, Status: model.UserSessionStatusActive, RefreshHash: "manage-fixture-refresh", ExpiresAt: time.Now().Unix() + 3600}).Error)
 	return operator
+}
+
+func setManageOperatorSession(c *gin.Context) {
+	c.Set("session_id", "manage-fixture-session")
+	c.Set("auth_version", int64(1))
+	c.Set("session_version", int64(1))
 }
 
 func TestManageUserQuotaRecordsTopupAndAudit(t *testing.T) {
@@ -405,6 +419,7 @@ func TestManageUserQuotaTargetsAndWalletBounds(t *testing.T) {
 			}
 			c.Set("id", 9999)
 			c.Set("role", role)
+			setManageOperatorSession(c)
 			ManageUser(c)
 			require.Contains(t, recorder.Body.String(), `"success":false`)
 			if tc.failRead {
@@ -487,13 +502,16 @@ func TestManageUserQuotaMiddlewareKeepsOneOperationPerRequest(t *testing.T) {
 
 func TestManageUserQuotaConcurrentSnapshots(t *testing.T) {
 	db := setupManageUserTestDB(t)
+	actor := createQuotaTestOperator(t, db, common.RoleRootUser)
+	identity := model.AuthSessionIdentity{UserID: actor.Id, SessionID: "manage-fixture-session", UserAuthVersion: 1, SessionVersion: 1}
+	operator := model.AccountSecurityOperator{UserID: actor.Id, Role: actor.Role, Session: &identity}
 	user := model.User{Username: "concurrent-quota", Quota: 1000}
 	require.NoError(t, db.Create(&user).Error)
 	var ready sync.WaitGroup
 	ready.Add(2)
 	release := make(chan struct{})
 	require.NoError(t, db.Callback().Query().Before("gorm:query").Register("test:concurrent_quota_start", func(tx *gorm.DB) {
-		if tx.Statement.Table == "users" {
+		if _, ok := tx.Statement.Dest.(*[]model.User); ok && tx.Statement.Table == "users" {
 			ready.Done()
 			<-release
 		}
@@ -506,7 +524,7 @@ func TestManageUserQuotaConcurrentSnapshots(t *testing.T) {
 	results := make(chan result, 2)
 	for _, value := range []int{10, 20} {
 		go func(value int) {
-			adjustment, err := model.AdjustUserQuota(user.Id, common.RoleRootUser, "add", value)
+			adjustment, err := model.AdjustUserQuota(context.Background(), user.Id, operator, "add", value)
 			results <- result{adjustment, err, value}
 		}(value)
 	}

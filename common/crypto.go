@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -22,15 +23,43 @@ func GenerateHMAC(data string) string {
 }
 
 func Password2Hash(password string) (string, error) {
+	return Password2HashContext(context.Background(), password)
+}
+
+func Password2HashContext(ctx context.Context, password string) (string, error) {
+	release, err := acquirePasswordKDF(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer release()
 	passwordBytes := []byte(password)
 	hashedPassword, err := bcrypt.GenerateFromPassword(passwordBytes, bcrypt.DefaultCost)
+	if ctx.Err() != nil {
+		return "", ctx.Err()
+	}
 	return string(hashedPassword), err
 }
 
 func ValidatePasswordAndHash(password string, hash string) bool {
-	if strings.HasPrefix(hash, "$argon2id$") {
-		return validateArgon2AccountPassword(password, hash)
+	valid, _ := ValidatePasswordAndHashContext(context.Background(), password, hash)
+	return valid
+}
+
+func ValidatePasswordAndHashContext(ctx context.Context, password string, hash string) (bool, error) {
+	if err := ctx.Err(); err != nil {
+		return false, err
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+	if strings.HasPrefix(hash, "$argon2id$") {
+		return validateArgon2AccountPasswordContext(ctx, password, hash)
+	}
+	release, err := acquirePasswordKDF(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+	err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if ctx.Err() != nil {
+		return false, ctx.Err()
+	}
+	return err == nil, nil
 }

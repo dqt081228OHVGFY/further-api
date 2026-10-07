@@ -13,7 +13,7 @@ import (
 
 func TestGetAllUserSubscriptionsPreservesPlanTitlesAndMarksInternalFunding(t *testing.T) {
 	truncateTables(t)
-	require.NoError(t, DB.AutoMigrate(&RelayForSubscriptionPolicy{}, &RelayForPrepaidCard{}))
+	require.NoError(t, DB.AutoMigrate(&FurtherSubscriptionPolicy{}, &FurtherPrepaidCard{}))
 
 	publicPlan := SubscriptionPlan{Title: "Retired VIP"}
 	internalPlan := SubscriptionPlan{Title: "Internal benefit"}
@@ -24,13 +24,13 @@ func TestGetAllUserSubscriptionsPreservesPlanTitlesAndMarksInternalFunding(t *te
 	}
 	planIDs := []int{publicPlan.Id, internalPlan.Id, prepaidPlan.Id}
 	t.Cleanup(func() {
-		DB.Unscoped().Where("plan_id IN ?", planIDs).Delete(&RelayForPrepaidCard{})
-		DB.Where("plan_id IN ?", planIDs).Delete(&RelayForSubscriptionPolicy{})
+		DB.Unscoped().Where("plan_id IN ?", planIDs).Delete(&FurtherPrepaidCard{})
+		DB.Where("plan_id IN ?", planIDs).Delete(&FurtherSubscriptionPolicy{})
 	})
-	require.NoError(t, DB.Create(&RelayForSubscriptionPolicy{
+	require.NoError(t, DB.Create(&FurtherSubscriptionPolicy{
 		PlanID: internalPlan.Id, Code: "summary-internal", Internal: true,
 	}).Error)
-	card := RelayForPrepaidCard{Code: "summary-prepaid", CodeHash: "summary-prepaid-hash", PlanID: prepaidPlan.Id, Status: 1}
+	card := FurtherPrepaidCard{Code: "summary-prepaid", CodeHash: "summary-prepaid-hash", PlanID: prepaidPlan.Id, Status: 1}
 	require.NoError(t, DB.Create(&card).Error)
 	require.NoError(t, DB.Delete(&card).Error) // Historical cards still identify the funding plan.
 
@@ -39,7 +39,7 @@ func TestGetAllUserSubscriptionsPreservesPlanTitlesAndMarksInternalFunding(t *te
 		{UserId: 80101, PlanId: publicPlan.Id, Status: "expired", EndTime: now - 300},
 		{UserId: 80101, PlanId: publicPlan.Id, Status: "active", EndTime: now + 300},
 		{UserId: 80101, PlanId: internalPlan.Id, Status: "active", EndTime: now + 200},
-		{UserId: 80101, PlanId: prepaidPlan.Id, Status: "active", Source: "relayfor_prepaid", EndTime: now + 100},
+		{UserId: 80101, PlanId: prepaidPlan.Id, Status: "active", Source: "further_prepaid", EndTime: now + 100},
 		{UserId: 80101, PlanId: 999991, Status: "expired", EndTime: now - 400},
 		{UserId: 80102, PlanId: publicPlan.Id, Status: "active", EndTime: now + 400},
 	}
@@ -85,7 +85,7 @@ func TestGetAllUserSubscriptionsPreservesPlanTitlesAndMarksInternalFunding(t *te
 	assert.True(t, activeByPlan[prepaidPlan.Id].PlanInternal)
 }
 
-func TestSubscriptionSummariesWorkBeforeRelayForMetadataTablesExist(t *testing.T) {
+func TestSubscriptionSummariesWorkBeforeFurtherMetadataTablesExist(t *testing.T) {
 	previousDB := DB
 	legacyDB, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	require.NoError(t, err)
@@ -98,8 +98,8 @@ func TestSubscriptionSummariesWorkBeforeRelayForMetadataTablesExist(t *testing.T
 		_ = sqlDB.Close()
 	})
 	require.NoError(t, legacyDB.AutoMigrate(&SubscriptionPlan{}, &UserSubscription{}))
-	assert.False(t, legacyDB.Migrator().HasTable(&RelayForSubscriptionPolicy{}))
-	assert.False(t, legacyDB.Migrator().HasTable(&RelayForPrepaidCard{}))
+	assert.False(t, legacyDB.Migrator().HasTable(&FurtherSubscriptionPolicy{}))
+	assert.False(t, legacyDB.Migrator().HasTable(&FurtherPrepaidCard{}))
 	plan := SubscriptionPlan{Title: "Legacy VIP"}
 	require.NoError(t, legacyDB.Create(&plan).Error)
 	now := time.Now().Unix()

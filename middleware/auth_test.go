@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/golang-jwt/jwt/v5"
@@ -254,6 +254,38 @@ func TestTryUserAuthCredentialClassification(t *testing.T) {
 	router.ServeHTTP(databaseFailureResponse, databaseFailureRequest)
 	assert.Equal(t, http.StatusInternalServerError, databaseFailureResponse.Code)
 	assert.Contains(t, databaseFailureResponse.Body.String(), "AUTH_INTERNAL_ERROR")
+}
+
+func TestTryUserAuthCannotExposeDisabledAccountsPrivateContext(t *testing.T) {
+	setupDashboardAuthMiddlewareTest(t)
+	for _, invalid := range []string{"disabled", "invalid_role", "empty_username"} {
+		t.Run(invalid, func(t *testing.T) {
+			pat := "optional-invalid-" + invalid
+			user := createMiddlewarePATUser(t, "optional-"+invalid, pat)
+			changes := map[string]any{"status": common.UserStatusDisabled}
+			if invalid == "invalid_role" {
+				changes = map[string]any{"role": 999}
+			}
+			if invalid == "empty_username" {
+				changes = map[string]any{"username": ""}
+			}
+			require.NoError(t, model.DB.Model(&model.User{}).Where("id = ?", user.Id).Updates(changes).Error)
+			require.NoError(t, model.PublishUserAuthCache(user.Id))
+			called := false
+			router := gin.New()
+			router.GET("/optional", TryUserAuth(), func(c *gin.Context) {
+				called = true
+				c.JSON(http.StatusOK, gin.H{"private_group": c.GetString("group")})
+			})
+			request := httptest.NewRequest(http.MethodGet, "/optional", nil)
+			request.Header.Set("Authorization", "Bearer "+pat)
+			response := httptest.NewRecorder()
+			router.ServeHTTP(response, request)
+			require.Equal(t, http.StatusUnauthorized, response.Code)
+			require.False(t, called)
+			require.NotContains(t, response.Body.String(), "private_group")
+		})
+	}
 }
 
 func TestAPIKeyFromWebSocketSubprotocol(t *testing.T) {

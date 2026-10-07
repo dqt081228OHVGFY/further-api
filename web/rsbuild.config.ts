@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginTailwindcss } from '@rsbuild/plugin-tailwindcss'
-import { tanstackRouter } from '@tanstack/router-plugin/rspack'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -55,7 +54,7 @@ export default defineConfig(({ envMode }) => {
     source: {
       entry: {
         index: './src/main.tsx',
-        'relayfor-bridge': './src/relayfor/bootstrap.ts',
+        'further-bridge': './src/further/bootstrap.ts',
       },
     },
     resolve: {
@@ -65,7 +64,7 @@ export default defineConfig(({ envMode }) => {
     },
     html: {
       template: './index.html',
-      favicon: './public/relayfor-logo.svg',
+      favicon: './public/further-api-logo.svg',
     },
     server: {
       host: '0.0.0.0',
@@ -87,18 +86,6 @@ export default defineConfig(({ envMode }) => {
       // Remove console in production
       removeConsole: isProd ? ['log'] : false,
       buildCache: false,
-    },
-    tools: {
-      rspack: {
-        plugins: [
-          tanstackRouter({
-            target: 'react',
-            // Dev: avoid per-route async chunks (reduces white flash on navigation + faster HMR feedback).
-            // Prod: keep route-based code splitting.
-            autoCodeSplitting: isProd,
-          }),
-        ],
-      },
     },
   }
 })

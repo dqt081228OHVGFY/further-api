@@ -21,36 +21,47 @@ func RedisKeyCacheSeconds() int {
 }
 
 // InitRedisClient This function is called after init()
-func InitRedisClient() (err error) {
+func InitRedisClient() error {
 	if os.Getenv("REDIS_CONN_STRING") == "" {
 		RedisEnabled = false
 		SysLog("REDIS_CONN_STRING not set, Redis is not enabled")
-		return nil
+		return CloseRedisClient()
 	}
-	if os.Getenv("SYNC_FREQUENCY") == "" {
-		SysLog("SYNC_FREQUENCY not set, use default value 60")
-		SyncFrequency = 60
-	}
-	SysLog("Redis is enabled")
 	opt, err := redis.ParseURL(os.Getenv("REDIS_CONN_STRING"))
 	if err != nil {
-		FatalLog("failed to parse Redis connection string: " + err.Error())
+		return fmt.Errorf("invalid REDIS_CONN_STRING")
 	}
-	opt.PoolSize = GetEnvOrDefault("REDIS_POOL_SIZE", 10)
-	RDB = redis.NewClient(opt)
-
+	opt.PoolSize, err = runtimeInteger(os.Getenv, "REDIS_POOL_SIZE", 10, 1)
+	if err != nil {
+		return err
+	}
+	client := redis.NewClient(opt)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	_, err = RDB.Ping(ctx).Result()
-	if err != nil {
-		FatalLog("Redis ping test failed: " + err.Error())
+	if err := client.Ping(ctx).Err(); err != nil {
+		_ = client.Close()
+		return fmt.Errorf("Redis connection check failed: %w", err)
 	}
+	previous := RDB
+	RDB, RedisEnabled = client, true
+	if previous != nil {
+		_ = previous.Close()
+	}
+	SysLog("Redis is enabled")
 	if DebugEnabled {
-		SysLog(fmt.Sprintf("Redis connected to %s", opt.Addr))
-		SysLog(fmt.Sprintf("Redis database: %d", opt.DB))
+		SysLog(fmt.Sprintf("Redis connected to %s (database %d)", opt.Addr, opt.DB))
 	}
-	return err
+	return nil
+}
+
+func CloseRedisClient() error {
+	client := RDB
+	RDB = nil
+	RedisEnabled = false
+	if client != nil {
+		return client.Close()
+	}
+	return nil
 }
 
 func ParseRedisOption() *redis.Options {

@@ -3,10 +3,10 @@ package authz
 import (
 	"fmt"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
 	casbinmodel "github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -20,11 +20,15 @@ func newGormAdapter(db *gorm.DB) *gormAdapter {
 }
 
 func (a *gormAdapter) LoadPolicy(m casbinmodel.Model) error {
+	ctx := common.BackgroundContext()
 	var rules []model.CasbinRule
-	if err := a.db.Order("id asc").Find(&rules).Error; err != nil {
+	if err := a.db.WithContext(ctx).Order("id asc").Find(&rules).Error; err != nil {
 		return err
 	}
 	for _, rule := range rules {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		if rule.Ptype != "p" {
 			// This model has no role-inheritance or other policy sections.
 			continue

@@ -1,42 +1,41 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
-echo "Building New API Electron App..."
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_dir="$(cd -- "$script_dir/.." && pwd)"
+release_version="$(tr -d '\r\n' < "$repo_dir/VERSION")"
+if [[ -z "$release_version" ]]; then
+    echo "VERSION must contain the application version." >&2
+    exit 1
+fi
+export GOWORK=off
+
+echo "Building further-api desktop app ($release_version)..."
 
 echo "Step 1: Building frontend..."
-cd ../web
+cd "$repo_dir/web"
 bun install --frozen-lockfile
-DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(git describe --tags --always) bun run build
-cd ../electron
+DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION="$release_version" bun run build
 
 echo "Step 2: Building Go backend..."
-cd ..
-
+cd "$repo_dir"
+ldflags="-s -w -X github.com/dqt081228OHVGFY/further-api/common.Version=$release_version"
+backend_file=further-api
+package_script=build
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Building for macOS..."
-    CGO_ENABLED=1 go build -ldflags="-s -w" -o new-api
-    cd electron
-    npm install
-    npm run build:mac
+    package_script=build:mac
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo "Building for Linux..."
-    CGO_ENABLED=1 go build -ldflags="-s -w" -o new-api
-    cd electron
-    npm install
-    npm run build:linux
-elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
-    echo "Building for Windows..."
-    CGO_ENABLED=1 go build -ldflags="-s -w" -o new-api.exe
-    cd electron
-    npm install
-    npm run build:win
-else
-    echo "Unknown OS, building for current platform..."
-    CGO_ENABLED=1 go build -ldflags="-s -w" -o new-api
-    cd electron
-    npm install
-    npm run build
+    package_script=build:linux
+elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* || "$OSTYPE" == "win32"* ]]; then
+    backend_file=further-api.exe
+    package_script=build:win
 fi
+CGO_ENABLED=0 go build -ldflags="$ldflags" -o "$backend_file"
+
+echo "Step 3: Packaging desktop app..."
+cd "$script_dir"
+npm ci --include=dev
+npm run "$package_script" -- "--config.extraMetadata.version=${release_version#v}"
 
 echo "Build complete! Check electron/dist/ for output."

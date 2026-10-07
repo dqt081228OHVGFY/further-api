@@ -10,14 +10,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	taskdto "github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/billingexpr"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
 	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	taskdto "github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/billingexpr"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -242,7 +242,7 @@ func TestPollingPassesExecutingChannelTypeToAdaptor(t *testing.T) {
 	truncate(t)
 	const channelID = 112
 	baseURL := "https://gateway.example"
-	gateway := &model.Channel{Id: channelID, Type: constant.ChannelTypeNewAPI, Name: "gateway", Key: "sk-gateway", Status: common.ChannelStatusEnabled, BaseURL: &baseURL}
+	gateway := &model.Channel{Id: channelID, Type: constant.ChannelTypeGateway, Name: "gateway", Key: "sk-gateway", Status: common.ChannelStatusEnabled, BaseURL: &baseURL}
 	gateway.SetOtherSettings(dto.ChannelOtherSettings{DisableTaskPollingSleep: true})
 	require.NoError(t, model.DB.Create(gateway).Error)
 	task := seedPollingTask(t, channelID, "task_gateway", "upstream_gateway")
@@ -256,7 +256,7 @@ func TestPollingPassesExecutingChannelTypeToAdaptor(t *testing.T) {
 	require.NoError(t, UpdateVideoTasks(context.Background(), constant.TaskPlatform("kling"), taskChannels, tasks))
 	meta := perTask.initChannelMeta()
 	require.NotNil(t, meta, "per-task polling initializes the adaptor with channel metadata")
-	assert.Equal(t, constant.ChannelTypeNewAPI, meta.ChannelType, "the adaptor derives the upstream kind from the channel type")
+	assert.Equal(t, constant.ChannelTypeGateway, meta.ChannelType, "the adaptor derives the upstream kind from the channel type")
 	assert.Equal(t, channelID, meta.ChannelId)
 	assert.Equal(t, baseURL, meta.ChannelBaseUrl)
 
@@ -264,7 +264,7 @@ func TestPollingPassesExecutingChannelTypeToAdaptor(t *testing.T) {
 	require.NoError(t, UpdateBatchTasks(context.Background(), batch, taskChannels, tasks))
 	meta = batch.initChannelMeta()
 	require.NotNil(t, meta, "batch polling initializes the adaptor with channel metadata")
-	assert.Equal(t, constant.ChannelTypeNewAPI, meta.ChannelType)
+	assert.Equal(t, constant.ChannelTypeGateway, meta.ChannelType)
 	assert.Equal(t, channelID, meta.ChannelId)
 	assert.Equal(t, baseURL, meta.ChannelBaseUrl)
 }

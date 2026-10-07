@@ -1,184 +1,112 @@
 package claude
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-func ClaudeResponsesStreamHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.NewAPIError) {
-	responseID := helper.GetResponseID(c)
-	created := common.GetTimestamp()
-	state, err := relayconvert.NewResponseStreamState(types.RelayFormatClaude, types.RelayFormatOpenAIResponses, relayconvert.ResponseStreamOptions{
-		ID:                 responseID,
-		Model:              info.UpstreamModelName,
-		Created:            created,
-		EmitSequenceNumber: true,
-	})
+func ClaudeResponsesStreamHandler(c *gin.Context, response *http.Response, info *relaycommon.RelayInfo) (*dto.Usage, *types.GatewayError) {
+	if c == nil || info == nil || response == nil || response.Body == nil {
+		return nil, messagesResponseError(errors.New("Messages Responses bridge context is missing"))
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	model := info.OriginModelName
+	if info.HasChannelMeta() {
+		model = info.UpstreamModelName
+	}
+	id, created := helper.GetResponseID(c), common.GetTimestamp()
+	codec, err := relayconvert.NewResponseStreamState(types.RelayFormatClaude, types.RelayFormatOpenAIResponses, relayconvert.ResponseStreamOptions{ID: id, Model: model, Created: created, EmitSequenceNumber: true})
 	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
+		return nil, messagesResponseError(err)
 	}
-	hostedBridge := relayconvert.NewClaudeHostedStreamBridge()
-
-	claudeInfo := &ClaudeResponseInfo{
-		ResponseId:   responseID,
-		Created:      created,
-		Model:        info.UpstreamModelName,
-		ResponseText: strings.Builder{},
-		Usage:        &dto.Usage{},
+	emitter := &openai.ResponsesEventWriter{Context: c, Info: info, State: codec}
+	hosted := relayconvert.NewClaudeHostedStreamBridge()
+	usageState := &ClaudeResponseInfo{ResponseId: id, Created: created, Model: model, Usage: &dto.Usage{}}
+	stopWithFailure := func(err error, result *helper.StreamResult) {
+		if !emitter.Fail(err) {
+			emitter.Failure = messagesResponseError(err)
+		}
+		result.Stop(emitter.Failure)
 	}
-	var streamErr *types.NewAPIError
-	// streamFailed means a Responses-native terminal error was sent successfully.
-	// In that case the scanner stops without a transport error and the partial
-	// upstream usage remains billable.
-	streamFailed := false
-
-	sendResponsesEvent := func(eventType string, payload dto.ResponsesStreamResponse) bool {
-		payload.Type = eventType
-		data, err := common.Marshal(payload)
+	helper.StreamScannerHandler(c, response, info, func(data string, result *helper.StreamResult) {
+		var frame *dto.ClaudeResponse
+		if err := json.Unmarshal([]byte(data), &frame); err != nil {
+			stopWithFailure(err, result)
+			return
+		}
+		if frame == nil {
+			stopWithFailure(errors.New("Messages stream frame must be an object"), result)
+			return
+		}
+		if failure := frame.GetClaudeError(); failure != nil && failure.Type != "" {
+			stopWithFailure(errors.New(failure.Message), result)
+			return
+		}
+		observeMessagesFrame(c, info, frame)
+		if frame.Type == "message_start" && frame.Message != nil && info.HasChannelMeta() {
+			info.UpstreamModelName = frame.Message.Model
+		}
+		FormatClaudeResponseInfo(frame, nil, usageState)
+		countClaudeStreamBillableTools(c, info, frame)
+		events, consumed, err := hosted.Convert(frame, codec)
 		if err != nil {
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeJsonMarshalFailed, http.StatusInternalServerError)
-			return false
-		}
-		if err := helper.ResponseChunkData(c, dto.ResponsesStreamResponse{Type: eventType}, string(data)); err != nil {
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
-			return false
-		}
-		return true
-	}
-	sendResult := func(result relayconvert.ResponseResult) bool {
-		event, ok := result.Value.(relayconvert.ChatToResponsesStreamEvent)
-		if !ok {
-			streamErr = types.NewOpenAIError(
-				fmt.Errorf("expected OpenAI Responses stream event, got %T", result.Value),
-				types.ErrorCodeBadResponse,
-				http.StatusInternalServerError,
-			)
-			return false
-		}
-		return sendResponsesEvent(event.Type, event.Payload)
-	}
-	failResponsesStream := func(err error) bool {
-		failureResults, handled := state.FailResponsesStream("server_error", err.Error(), "")
-		if !handled {
-			return false
-		}
-		for _, result := range failureResults {
-			if !sendResult(result) {
-				return true
-			}
-		}
-		streamFailed = true
-		return true
-	}
-
-	helper.StreamScannerHandler(c, resp, info, func(data string, sr *helper.StreamResult) {
-		var claudeResponse dto.ClaudeResponse
-		if err := common.UnmarshalJsonStr(data, &claudeResponse); err != nil {
-			logger.LogError(c, "failed to unmarshal Claude stream event: "+err.Error())
-			if failResponsesStream(err) {
-				// A nil streamErr here is intentional: the protocol-level failure
-				// event was delivered, so only the scanner needs to stop.
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-			sr.Stop(streamErr)
+			stopWithFailure(err, result)
 			return
 		}
-		if claudeError := claudeResponse.GetClaudeError(); claudeError != nil && claudeError.Type != "" {
-			if failResponsesStream(fmt.Errorf("%s", claudeError.Message)) {
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.WithClaudeError(*claudeError, http.StatusInternalServerError)
-			sr.Stop(streamErr)
-			return
-		}
-
-		if claudeResponse.StopReason != "" {
-			maybeMarkClaudeRefusal(c, info, claudeResponse.StopReason)
-		}
-		if claudeResponse.Delta != nil && claudeResponse.Delta.StopReason != nil {
-			maybeMarkClaudeRefusal(c, info, *claudeResponse.Delta.StopReason)
-		}
-		if claudeResponse.Type == "message_stop" {
-			info.StreamStatus.MarkCompleted()
-		}
-		if claudeResponse.Type == "message_start" && claudeResponse.Message != nil {
-			info.ObserveResponseModel(claudeResponse.Message.Model)
-			info.UpstreamModelName = claudeResponse.Message.Model
-		}
-		FormatClaudeResponseInfo(&claudeResponse, nil, claudeInfo)
-		countClaudeStreamBillableTools(c, info, &claudeResponse)
-		hostedEvents, consumed, err := hostedBridge.Convert(&claudeResponse, state)
-		if err != nil {
-			if failResponsesStream(err) {
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
-			sr.Stop(streamErr)
-			return
-		}
-		for _, event := range hostedEvents {
-			if !sendResponsesEvent(event.Type, event.Payload) {
-				sr.Stop(streamErr)
+		for _, event := range events {
+			if !emitter.Send(event) {
+				result.Stop(emitter.Failure)
 				return
 			}
 		}
 		if consumed {
 			return
 		}
-
-		results, err := service.ConvertStreamResponseChunk(c, info, state, &claudeResponse)
+		results, err := service.ConvertStreamResponseChunk(c, info, codec, frame)
 		if err != nil {
-			if failResponsesStream(err) {
-				sr.Stop(streamErr)
-				return
-			}
-			streamErr = types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
-			sr.Stop(streamErr)
+			stopWithFailure(err, result)
 			return
 		}
-		for _, result := range results {
-			if !sendResult(result) {
-				sr.Stop(streamErr)
-				return
-			}
+		if !emitter.Results(results) {
+			result.Stop(emitter.Failure)
 		}
 	})
-	if streamErr != nil {
-		return nil, streamErr
+	info.StreamStatus.RequireTerminal()
+	settleMessagesStream(c, info, usageState)
+	if emitter.Failure != nil {
+		return usageState.Usage, emitter.Failure
 	}
-	if streamFailed {
-		return claudeInfo.Usage, nil
+	if emitter.NativeFailureDelivered {
+		return usageState.Usage, nil
 	}
-
-	HandleStreamFinalResponse(c, info, claudeInfo)
-	openAIUsage := buildOpenAIStyleUsageFromClaudeUsage(claudeInfo.Usage)
-	state.SetUsage(&openAIUsage)
-	finalResults, err := service.FinalizeStreamResponse(c, info, state)
+	if c.Request != nil && c.Request.Context().Err() != nil {
+		return usageState.Usage, nil
+	}
+	if info.StreamStatus != nil && !info.StreamStatus.IsNormalEnd() {
+		emitter.Fail(fmt.Errorf("Messages stream ended before completion: %s", info.StreamStatus.Summary()))
+		return usageState.Usage, emitter.Failure
+	}
+	mapped := buildOpenAIStyleUsageFromClaudeUsage(usageState.Usage)
+	codec.SetUsage(&mapped)
+	results, err := service.FinalizeStreamResponse(c, info, codec)
 	if err != nil {
-		if failResponsesStream(err) {
-			return claudeInfo.Usage, streamErr
+		if !emitter.Fail(err) {
+			emitter.Failure = messagesResponseError(err)
 		}
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError)
+		return usageState.Usage, emitter.Failure
 	}
-	for _, result := range finalResults {
-		if !sendResult(result) {
-			return nil, streamErr
-		}
-	}
-	return claudeInfo.Usage, nil
+	emitter.Results(results)
+	return usageState.Usage, emitter.Failure
 }

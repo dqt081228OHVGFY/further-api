@@ -1,11 +1,12 @@
 package tencent
 
 import (
+	"net/url"
 	"testing"
 
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -56,15 +57,20 @@ func TestDispatchAdaptorInit(t *testing.T) {
 				ApiKey:         tt.apiKey,
 				ChannelBaseUrl: tt.baseURL,
 			}}
+			info.RequestURLPath = "/v1/chat/completions"
 
 			dispatch := &DispatchAdaptor{}
 			dispatch.Init(info)
 
 			require.NotNil(t, dispatch.Adaptor)
+			endpoint, err := dispatch.GetRequestURL(info)
+			require.NoError(t, err)
+			parsed, err := url.Parse(endpoint)
+			require.NoError(t, err)
 			if tt.wantTC3 {
-				assert.IsType(t, &Adaptor{}, dispatch.Adaptor)
+				assert.Equal(t, "/", parsed.Path)
 			} else {
-				assert.IsType(t, &openai.Adaptor{}, dispatch.Adaptor)
+				assert.Equal(t, "/v1/chat/completions", parsed.Path)
 			}
 			assert.Equal(t, tt.wantBaseURL, info.ChannelBaseUrl)
 		})

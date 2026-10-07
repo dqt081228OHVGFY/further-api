@@ -33,7 +33,10 @@ type OAuthError struct {
 	Params map[string]any
 	// RawError is the underlying error for logging purposes
 	RawError string
+	Cause    error
 }
+
+func (e *OAuthError) Unwrap() error { return e.Cause }
 
 func (e *OAuthError) Error() string {
 	if e.RawError != "" {

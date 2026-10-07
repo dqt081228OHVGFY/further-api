@@ -1,11 +1,13 @@
 package model
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -39,12 +41,28 @@ type QuotaDataLogParams struct {
 }
 
 func UpdateQuotaData() {
+	ctx := common.BackgroundContext()
 	for {
+		if ctx.Err() != nil {
+			return
+		}
 		if common.DataExportEnabled {
 			common.SysLog("正在更新数据看板数据...")
-			SaveQuotaDataCache()
+			if err := flushQuotaDataCache(ctx); err != nil && ctx.Err() == nil {
+				common.SysError("save quota statistics: " + err.Error())
+			}
 		}
-		time.Sleep(time.Duration(common.DataExportInterval) * time.Minute)
+		interval := time.Duration(common.DataExportInterval) * time.Minute
+		if interval <= 0 {
+			interval = time.Minute
+		}
+		timer := time.NewTimer(interval)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return
+		case <-timer.C:
+		}
 	}
 }
 
@@ -98,44 +116,72 @@ func LogQuotaData(params QuotaDataLogParams) {
 }
 
 func SaveQuotaDataCache() {
-	CacheQuotaDataLock.Lock()
-	defer CacheQuotaDataLock.Unlock()
-	size := len(CacheQuotaData)
-	// 如果缓存中有数据，就保存到数据库中
-	// 1. 先查询数据库中是否有数据
-	// 2. 如果有数据，就更新数据
-	// 3. 如果没有数据，就插入数据
-	for _, quotaData := range CacheQuotaData {
-		quotaDataDB := &QuotaData{}
-		DB.Table("quota_data").
-			Where("user_id = ? and username = ? and model_name = ? and created_at = ? and use_group = ? and token_id = ? and channel_id = ? and node_name = ?",
-				quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.CreatedAt, quotaData.UseGroup, quotaData.TokenID, quotaData.ChannelID, quotaData.NodeName).
-			First(quotaDataDB)
-		if quotaDataDB.Id > 0 {
-			//quotaDataDB.Count += quotaData.Count
-			//quotaDataDB.Quota += quotaData.Quota
-			//DB.Table("quota_data").Save(quotaDataDB)
-			increaseQuotaData(quotaData)
-		} else {
-			DB.Table("quota_data").Create(quotaData)
-		}
+	if err := FlushQuotaDataCache(); err != nil {
+		common.SysError("save quota statistics: " + err.Error())
 	}
-	CacheQuotaData = make(map[string]*QuotaData)
-	common.SysLog(fmt.Sprintf("保存数据看板数据成功，共保存%d条数据", size))
 }
 
-func increaseQuotaData(quotaData *QuotaData) {
-	err := DB.Table("quota_data").
-		Where("user_id = ? and username = ? and model_name = ? and created_at = ? and use_group = ? and token_id = ? and channel_id = ? and node_name = ?",
-			quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.CreatedAt, quotaData.UseGroup, quotaData.TokenID, quotaData.ChannelID, quotaData.NodeName).
-		Updates(map[string]any{
-			"count":      gorm.Expr("count + ?", quotaData.Count),
-			"quota":      gorm.Expr("quota + ?", quotaData.Quota),
-			"token_used": gorm.Expr("token_used + ?", quotaData.TokenUsed),
-		}).Error
-	if err != nil {
-		common.SysLog(fmt.Sprintf("increaseQuotaData error: %s", err))
+// FlushQuotaDataCache retains failed buckets for retry. Shutdown uses a fresh
+// context after cancelling workers so their final statistics can still persist.
+func FlushQuotaDataCache() error {
+	return flushQuotaDataCache(context.Background())
+}
+
+func FlushQuotaDataCacheContext(ctx context.Context) error {
+	return flushQuotaDataCache(ctx)
+}
+
+func flushQuotaDataCache(ctx context.Context) error {
+	CacheQuotaDataLock.Lock()
+	defer CacheQuotaDataLock.Unlock()
+	if len(CacheQuotaData) == 0 {
+		return nil
 	}
+	if DB == nil {
+		return errors.New("database is not initialized")
+	}
+	var flushErr error
+	saved := 0
+	for key, quotaData := range CacheQuotaData {
+		if ctx.Err() != nil {
+			return errors.Join(flushErr, ctx.Err())
+		}
+		err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+			var existing QuotaData
+			query := tx.Table("quota_data").Where("user_id = ? and username = ? and model_name = ? and created_at = ? and use_group = ? and token_id = ? and channel_id = ? and node_name = ?",
+				quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.CreatedAt, quotaData.UseGroup, quotaData.TokenID, quotaData.ChannelID, quotaData.NodeName)
+			if err := query.First(&existing).Error; err != nil {
+				if !errors.Is(err, gorm.ErrRecordNotFound) {
+					return err
+				}
+				row := *quotaData
+				row.Id = 0
+				return tx.Create(&row).Error
+			}
+			result := tx.Model(&QuotaData{}).Where("id = ?", existing.Id).Updates(map[string]any{
+				"count":      gorm.Expr("count + ?", quotaData.Count),
+				"quota":      gorm.Expr("quota + ?", quotaData.Quota),
+				"token_used": gorm.Expr("token_used + ?", quotaData.TokenUsed),
+			})
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected != 1 {
+				return errors.New("quota statistics bucket disappeared while flushing")
+			}
+			return nil
+		})
+		if err != nil {
+			flushErr = errors.Join(flushErr, err)
+			continue
+		}
+		delete(CacheQuotaData, key)
+		saved++
+	}
+	if saved > 0 {
+		common.SysLog(fmt.Sprintf("saved %d quota statistics buckets", saved))
+	}
+	return flushErr
 }
 
 func GetQuotaDataByUsername(username string, startTime int64, endTime int64) (quotaData []*QuotaData, err error) {

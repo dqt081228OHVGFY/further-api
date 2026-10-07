@@ -1,136 +1,206 @@
 package common
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
+	"net"
+	"net/mail"
 	"net/smtp"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 )
 
-func generateMessageID() (string, error) {
-	split := strings.Split(SMTPFrom, "@")
-	if len(split) < 2 {
-		return "", fmt.Errorf("invalid SMTP account")
+type smtpDeliveryProfile struct {
+	host        string
+	port        int
+	from        string
+	account     string
+	secret      string
+	implicitTLS bool
+	startTLS    bool
+	skipVerify  bool
+}
+
+func snapshotSMTPProfile() smtpDeliveryProfile {
+	from := SMTPFrom
+	if from == "" {
+		from = SMTPAccount
 	}
-	domain := strings.Split(SMTPFrom, "@")[1]
+	return smtpDeliveryProfile{
+		host: SMTPServer, port: SMTPPort, from: from, account: SMTPAccount, secret: SMTPToken,
+		implicitTLS: SMTPSSLEnabled || SMTPPort == 465 && !SMTPStartTLSEnabled,
+		startTLS:    SMTPStartTLSEnabled, skipVerify: SMTPInsecureSkipVerify,
+	}
+}
+
+func generateMessageID() (string, error) {
+	return smtpMessageID(snapshotSMTPProfile().from)
+}
+func smtpMessageID(sender string) (string, error) {
+	address, err := mail.ParseAddress(sender)
+	if err != nil {
+		return "", errors.New("SMTP 发件人地址无效。")
+	}
+	_, domain, found := strings.Cut(address.Address, "@")
+	if !found || domain == "" {
+		return "", errors.New("SMTP 发件人地址无效。")
+	}
 	return fmt.Sprintf("<%d.%s@%s>", time.Now().UnixNano(), GetRandomString(12), domain), nil
 }
-
 func shouldUseSMTPLoginAuth() bool {
-	if SMTPForceAuthLogin {
-		return true
-	}
-	return isOutlookServer(SMTPAccount) || slices.Contains(EmailLoginAuthServerList, SMTPServer)
+	return SMTPForceAuthLogin || isOutlookServer(SMTPAccount) || slices.Contains(EmailLoginAuthServerList, SMTPServer)
 }
-
-func getSMTPAuth() smtp.Auth {
-	return AutoSMTPAuth(SMTPAccount, SMTPToken)
-}
-
-func shouldAuthenticateSMTP() bool {
-	return SMTPAccount != "" && SMTPToken != ""
-}
-
+func getSMTPAuth() smtp.Auth       { return AutoSMTPAuth(SMTPAccount, SMTPToken) }
+func shouldAuthenticateSMTP() bool { return SMTPAccount != "" && SMTPToken != "" }
 func smtpTLSConfig() *tls.Config {
-	return &tls.Config{
-		ServerName:         SMTPServer,
-		InsecureSkipVerify: SMTPInsecureSkipVerify, // #nosec G402 -- admin-controlled SMTP compatibility option.
-	}
+	profile := snapshotSMTPProfile()
+	return &tls.Config{ServerName: profile.host, InsecureSkipVerify: profile.skipVerify, MinVersion: tls.VersionTLS12}
 }
 
-func newSMTPClient(addr string) (*smtp.Client, error) {
-	if SMTPSSLEnabled || (SMTPPort == 465 && !SMTPStartTLSEnabled) {
-		conn, err := tls.Dial("tcp", addr, smtpTLSConfig())
-		if err != nil {
-			return nil, err
-		}
-		client, err := smtp.NewClient(conn, SMTPServer)
-		if err != nil {
-			_ = conn.Close()
-			return nil, err
-		}
-		return client, nil
+func dialSMTPDelivery(ctx context.Context, profile smtpDeliveryProfile) (*smtp.Client, net.Conn, error) {
+	address := net.JoinHostPort(profile.host, strconv.Itoa(profile.port))
+	dialer := &net.Dialer{Timeout: 10 * time.Second}
+	socket, err := dialer.DialContext(ctx, "tcp", address)
+	if err != nil {
+		return nil, nil, err
 	}
+	connected := socket
+	stopCancellation := context.AfterFunc(ctx, func() { _ = connected.Close() })
+	defer stopCancellation()
+	if deadline, ok := ctx.Deadline(); ok {
+		_ = socket.SetDeadline(deadline)
+	}
+	if profile.implicitTLS {
+		secure := tls.Client(socket, &tls.Config{ServerName: profile.host, InsecureSkipVerify: profile.skipVerify, MinVersion: tls.VersionTLS12})
+		if err := secure.HandshakeContext(ctx); err != nil {
+			_ = socket.Close()
+			return nil, nil, err
+		}
+		socket = secure
+	}
+	client, err := smtp.NewClient(socket, profile.host)
+	if err != nil {
+		_ = socket.Close()
+		return nil, nil, err
+	}
+	if profile.startTLS && !profile.implicitTLS {
+		if supported, _ := client.Extension("STARTTLS"); !supported {
+			_ = client.Close()
+			return nil, nil, errors.New("SMTP server does not support STARTTLS")
+		}
+		if err := client.StartTLS(&tls.Config{ServerName: profile.host, InsecureSkipVerify: profile.skipVerify, MinVersion: tls.VersionTLS12}); err != nil {
+			_ = client.Close()
+			return nil, nil, err
+		}
+	}
+	return client, socket, nil
+}
 
-	client, err := smtp.Dial(addr)
+func newSMTPClient(address string) (*smtp.Client, error) {
+	profile := snapshotSMTPProfile()
+	host, port, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
 	}
-
-	if SMTPStartTLSEnabled {
-		startTLSSupported, _ := client.Extension("STARTTLS")
-		if !startTLSSupported {
-			_ = client.Close()
-			return nil, fmt.Errorf("SMTP server does not support STARTTLS")
-		}
-		if err := client.StartTLS(smtpTLSConfig()); err != nil {
-			_ = client.Close()
-			return nil, err
-		}
+	number, err := strconv.Atoi(port)
+	if err != nil {
+		return nil, err
 	}
-
-	return client, nil
+	profile.host, profile.port = host, number
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	client, _, err := dialSMTPDelivery(ctx, profile)
+	return client, err
 }
 
-func SendEmail(subject string, receiver string, content string) error {
-	if SMTPFrom == "" { // for compatibility
-		SMTPFrom = SMTPAccount
+func smtpRecipients(receiver string) ([]string, error) {
+	var result []string
+	for _, part := range strings.Split(receiver, ";") {
+		if strings.TrimSpace(part) == "" {
+			continue
+		}
+		address, err := mail.ParseAddress(strings.TrimSpace(part))
+		if err != nil || strings.ContainsAny(address.Address, "\r\n") {
+			return nil, errors.New("SMTP 收件人地址无效。")
+		}
+		result = append(result, address.Address)
 	}
-	id, err2 := generateMessageID()
-	if err2 != nil {
-		return err2
+	if len(result) == 0 {
+		return nil, errors.New("SMTP 收件人地址不能为空。")
 	}
-	if SMTPServer == "" && SMTPAccount == "" {
-		return fmt.Errorf("SMTP 服务器未配置")
+	return result, nil
+}
+
+func SendEmail(subject, receiver, content string) error {
+	return SendEmailContext(context.Background(), subject, receiver, content)
+}
+
+func SendEmailContext(parent context.Context, subject, receiver, content string) error {
+	if parent == nil {
+		parent = context.Background()
 	}
-	encodedSubject := fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(subject)))
-	mail := []byte(fmt.Sprintf("To: %s\r\n"+
-		"From: %s <%s>\r\n"+
-		"Subject: %s\r\n"+
-		"Date: %s\r\n"+
-		"Message-ID: %s\r\n"+ // 添加 Message-ID 头
-		"Content-Type: text/html; charset=UTF-8\r\n\r\n%s\r\n",
-		receiver, SystemName, SMTPFrom, encodedSubject, time.Now().Format(time.RFC1123Z), id, content))
-	auth := getSMTPAuth()
-	addr := fmt.Sprintf("%s:%d", SMTPServer, SMTPPort)
-	to := strings.Split(receiver, ";")
-	var err error
-	client, err := newSMTPClient(addr)
+	ctx, cancel := context.WithTimeout(parent, 30*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	profile := snapshotSMTPProfile()
+	if profile.host == "" || profile.port < 1 || profile.port > 65535 {
+		return errors.New("SMTP 服务器尚未正确配置。")
+	}
+	from, err := mail.ParseAddress(profile.from)
+	if err != nil {
+		return errors.New("SMTP 发件人地址无效。")
+	}
+	recipients, err := smtpRecipients(receiver)
+	if err != nil {
+		return err
+	}
+	id, err := smtpMessageID(from.Address)
+	if err != nil {
+		return err
+	}
+	header := fmt.Sprintf("To: %s\r\nFrom: %s\r\nSubject: =?UTF-8?B?%s?=\r\nDate: %s\r\nMessage-ID: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n%s\r\n",
+		strings.Join(recipients, ", "), (&mail.Address{Name: "further-api", Address: from.Address}).String(),
+		base64.StdEncoding.EncodeToString([]byte(subject)), time.Now().Format(time.RFC1123Z), id, content)
+	client, socket, err := dialSMTPDelivery(ctx, profile)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
-	if shouldAuthenticateSMTP() {
-		if err = client.Auth(auth); err != nil {
+	stop := context.AfterFunc(ctx, func() { _ = socket.Close() })
+	defer stop()
+	if profile.account != "" && profile.secret != "" {
+		if err := client.Auth(AutoSMTPAuth(profile.account, profile.secret)); err != nil {
 			return err
 		}
 	}
-	if err = client.Mail(SMTPFrom); err != nil {
+	if err := client.Mail(from.Address); err != nil {
 		return err
 	}
-	for _, receiver := range to {
-		if err = client.Rcpt(receiver); err != nil {
+	for _, recipient := range recipients {
+		if err := client.Rcpt(recipient); err != nil {
 			return err
 		}
 	}
-	w, err := client.Data()
+	body, err := client.Data()
 	if err != nil {
 		return err
 	}
-	_, err = w.Write(mail)
-	if err != nil {
+	if _, err := body.Write([]byte(header)); err != nil {
+		_ = body.Close()
 		return err
 	}
-	err = w.Close()
-	if err != nil {
+	if err := body.Close(); err != nil {
 		return err
 	}
-	err = client.Quit()
-	if err != nil {
-		SysError(fmt.Sprintf("failed to send email to %s: %v", receiver, err))
-	}
-	return err
+	// DATA acknowledgement has committed delivery. QUIT failures must not
+	// report a delivered message as failed and trigger duplicate notifications.
+	_ = client.Quit()
+	return nil
 }

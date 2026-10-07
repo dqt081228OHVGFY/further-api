@@ -14,11 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 	"github.com/tidwall/gjson"
@@ -115,7 +115,7 @@ func (p *GenericOAuthProvider) ExchangeToken(ctx context.Context, code string, c
 
 	req, err = http.NewRequestWithContext(ctx, "POST", p.config.TokenEndpoint, strings.NewReader(values.Encode()))
 	if err != nil {
-		return nil, err
+		return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
@@ -126,25 +126,21 @@ func (p *GenericOAuthProvider) ExchangeToken(ctx context.Context, code string, c
 		req.Header.Set("Authorization", "Basic "+credentials)
 	}
 
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] ExchangeToken: token_endpoint=%s, redirect_uri=%s, auth_style=%d",
-		p.config.Slug, p.config.TokenEndpoint, redirectUri, authStyle)
-
 	client := http.Client{
 		Timeout: 20 * time.Second,
 	}
-	res, err := client.Do(req)
+	res, err := doOAuthRequest(ctx, &client, req)
 	if err != nil {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] ExchangeToken error: %s", p.config.Slug, err.Error()))
-		return nil, NewOAuthErrorWithRaw(i18n.MsgOAuthConnectFailed, map[string]any{"Provider": p.config.Name}, err.Error())
+		return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthConnectFailed, map[string]any{"Provider": p.config.Name}, err)
 	}
 	defer res.Body.Close()
-
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] ExchangeToken response status: %d", p.config.Slug, res.StatusCode)
+	if res.StatusCode != http.StatusOK {
+		return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, errOAuthResponseInvalid)
+	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] ExchangeToken read body error: %s", p.config.Slug, err.Error()))
-		return nil, err
+		return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, err)
 	}
 
 	bodyStr := string(body)
@@ -165,26 +161,21 @@ func (p *GenericOAuthProvider) ExchangeToken(ctx context.Context, code string, c
 		// Try to parse as URL-encoded (some OAuth servers like GitHub return this format)
 		parsedValues, parseErr := url.ParseQuery(bodyStr)
 		if parseErr != nil {
-			logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] ExchangeToken parse error: %s", p.config.Slug, err.Error()))
-			return nil, err
+			return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, err)
 		}
 		tokenResponse.AccessToken = parsedValues.Get("access_token")
 		tokenResponse.TokenType = parsedValues.Get("token_type")
 		tokenResponse.Scope = parsedValues.Get("scope")
+		tokenResponse.Error = parsedValues.Get("error")
 	}
 
 	if tokenResponse.Error != "" {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] ExchangeToken OAuth error: %s - %s",
-			p.config.Slug, tokenResponse.Error, tokenResponse.ErrorDesc))
-		return nil, NewOAuthErrorWithRaw(i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, tokenResponse.ErrorDesc)
+		return nil, providerFailure(ctx, "custom", "token", i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name}, errOAuthResponseInvalid)
 	}
 
 	if tokenResponse.AccessToken == "" {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] ExchangeToken failed: empty access token", p.config.Slug))
 		return nil, NewOAuthError(i18n.MsgOAuthTokenFailed, map[string]any{"Provider": p.config.Name})
 	}
-
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] ExchangeToken success: scope=%s", p.config.Slug, tokenResponse.Scope)
 
 	return &OAuthToken{
 		AccessToken:  tokenResponse.AccessToken,
@@ -197,11 +188,9 @@ func (p *GenericOAuthProvider) ExchangeToken(ctx context.Context, code string, c
 }
 
 func (p *GenericOAuthProvider) GetUserInfo(ctx context.Context, token *OAuthToken) (*OAuthUser, error) {
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] GetUserInfo: fetching user info from %s", p.config.Slug, p.config.UserInfoEndpoint)
-
 	req, err := http.NewRequestWithContext(ctx, "GET", p.config.UserInfoEndpoint, nil)
 	if err != nil {
-		return nil, err
+		return nil, providerFailure(ctx, "custom", "userinfo", i18n.MsgOAuthGetUserErr, map[string]any{"Provider": p.config.Name}, err)
 	}
 
 	// Set authorization header
@@ -212,27 +201,25 @@ func (p *GenericOAuthProvider) GetUserInfo(ctx context.Context, token *OAuthToke
 	client := http.Client{
 		Timeout: 20 * time.Second,
 	}
-	res, err := client.Do(req)
+	res, err := doOAuthRequest(ctx, &client, req)
 	if err != nil {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] GetUserInfo error: %s", p.config.Slug, err.Error()))
-		return nil, NewOAuthErrorWithRaw(i18n.MsgOAuthConnectFailed, map[string]any{"Provider": p.config.Name}, err.Error())
+		return nil, providerFailure(ctx, "custom", "userinfo", i18n.MsgOAuthConnectFailed, map[string]any{"Provider": p.config.Name}, err)
 	}
 	defer res.Body.Close()
 
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] GetUserInfo response status: %d", p.config.Slug, res.StatusCode)
-
 	if res.StatusCode != http.StatusOK {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] GetUserInfo failed: status=%d", p.config.Slug, res.StatusCode))
 		return nil, NewOAuthError(i18n.MsgOAuthGetUserErr, nil)
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] GetUserInfo read body error: %s", p.config.Slug, err.Error()))
-		return nil, err
+		return nil, providerFailure(ctx, "custom", "userinfo", i18n.MsgOAuthGetUserErr, map[string]any{"Provider": p.config.Name}, err)
 	}
 
 	bodyStr := string(body)
+	if !stdjson.Valid(body) {
+		return nil, providerFailure(ctx, "custom", "userinfo", i18n.MsgOAuthGetUserErr, map[string]any{"Provider": p.config.Name}, errOAuthResponseInvalid)
+	}
 
 	// Extract fields using gjson (supports JSONPath-like syntax)
 	userId := gjson.Get(bodyStr, p.config.UserIdField).String()
@@ -252,25 +239,19 @@ func (p *GenericOAuthProvider) GetUserInfo(ctx context.Context, token *OAuthToke
 	}
 
 	if userId == "" {
-		logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] GetUserInfo failed: empty user ID (field: %s)", p.config.Slug, p.config.UserIdField))
 		return nil, NewOAuthError(i18n.MsgOAuthUserInfoEmpty, map[string]any{"Provider": p.config.Name})
 	}
-
-	logger.LogDebug(ctx, "[OAuth-Generic-%s] GetUserInfo success: id=%s, username=%s, name=%s, email=%s",
-		p.config.Slug, userId, username, displayName, email)
 
 	policyRaw := strings.TrimSpace(p.config.AccessPolicy)
 	if policyRaw != "" {
 		policy, err := parseAccessPolicy(policyRaw)
 		if err != nil {
-			logger.LogError(ctx, fmt.Sprintf("[OAuth-Generic-%s] invalid access policy: %s", p.config.Slug, err.Error()))
-			return nil, NewOAuthErrorWithRaw(i18n.MsgOAuthGetUserErr, nil, "invalid access policy configuration")
+			return nil, providerFailure(ctx, "custom", "userinfo", i18n.MsgOAuthGetUserErr, nil, errOAuthResponseInvalid)
 		}
 		allowed, failure := evaluateAccessPolicy(bodyStr, policy)
 		if !allowed {
 			message := renderAccessDeniedMessage(p.config.AccessDeniedMessage, p.config.Name, bodyStr, failure)
-			logger.LogWarn(ctx, fmt.Sprintf("[OAuth-Generic-%s] access denied by policy: field=%s op=%s expected=%v current=%v",
-				p.config.Slug, failure.Field, failure.Op, failure.Expected, failure.Current))
+			logger.LogWarn(ctx, "OAuth request rejected: provider=custom stage=userinfo category=access_denied")
 			return nil, &AccessDeniedError{Message: message}
 		}
 	}

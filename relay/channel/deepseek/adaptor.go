@@ -7,80 +7,76 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/setting/model_setting"
-	"github.com/QuantumNous/new-api/setting/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/setting/model_setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/reasoning"
 	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
-	adaptor := claude.Adaptor{}
-	convertedRequest, err := adaptor.ConvertClaudeRequest(c, info, req)
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	converted, err := openai.ChatFrom(c, info, request)
 	if err != nil {
 		return nil, err
 	}
-	claudeRequest, ok := convertedRequest.(*dto.ClaudeRequest)
-	if !ok {
-		return convertedRequest, nil
-	}
-	if err := applyDeepSeekV4ClaudeThinkingSuffix(info, claudeRequest); err != nil {
+	return a.ConvertOpenAIRequest(c, info, converted)
+}
+
+func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
+	converted, err := claude.NativeMessages(c, info, request)
+	if err != nil {
 		return nil, err
 	}
-	return claudeRequest, nil
+	if err = applyDeepSeekV4ClaudeThinkingSuffix(info, converted); err != nil {
+		return nil, err
+	}
+	return converted, nil
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("deepseek", "audio operations")
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("deepseek", "image generation")
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	fimBaseUrl := info.ChannelBaseUrl
-	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		return fmt.Sprintf("%s/anthropic/v1/messages", info.ChannelBaseUrl), nil
-	default:
-		if !strings.HasSuffix(info.ChannelBaseUrl, "/beta") {
-			fimBaseUrl += "/beta"
-		}
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("DeepSeek provider configuration is missing")
+	}
+	route := "/v1/chat/completions"
+	if info.RelayFormat == types.RelayFormatClaude {
+		route = "/anthropic/v1/messages"
+	} else {
 		switch info.RelayMode {
-		case constant.RelayModeCompletions:
-			return fmt.Sprintf("%s/completions", fimBaseUrl), nil
 		case constant.RelayModeResponses:
-			return fmt.Sprintf("%s/responses", info.ChannelBaseUrl), nil
-		default:
-			return fmt.Sprintf("%s/v1/chat/completions", info.ChannelBaseUrl), nil
+			route = "/responses"
+		case constant.RelayModeCompletions:
+			route = "/beta/completions"
+			if strings.HasSuffix(strings.TrimRight(info.ChannelBaseUrl, "/"), "/beta") {
+				route = "/completions"
+			}
 		}
 	}
+	return openai.ProviderEndpoint(info.ChannelBaseUrl, route)
 }
 
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
-	channel.SetupApiRequestHeader(info, c, req)
-	req.Set("Authorization", "Bearer "+info.ApiKey)
-	return nil
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	return openai.SetupProviderHeaders(c, headers, info)
 }
 
 func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
@@ -159,12 +155,11 @@ func applyDeepSeekV4ClaudeThinkingSuffix(info *relaycommon.RelayInfo, request *d
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
+	return nil, openai.UnsupportedOperation("deepseek", "reranking")
 }
 
 func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("deepseek", "embeddings")
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(_ *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
@@ -203,19 +198,17 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
-		adaptor := claude.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return claude.MessagesResponse(c, resp, info)
 	default:
-		adaptor := openai.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return openai.ProtocolResponse(c, resp, info, "")
 	}
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

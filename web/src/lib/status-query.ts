@@ -133,7 +133,13 @@ function writeCachedStatus(status: StatusData | null): void {
  */
 async function fetchStatus(): Promise<StatusData | null> {
   const status = (await getStatus()) as StatusData | null
+  publishWorkspaceStatus(status)
+  return status
+}
 
+// A workspace bootstrap already contains the same public status snapshot.
+// Publish it without starting a second network request for the same fields.
+export function publishWorkspaceStatus(status: StatusData | null): void {
   if (status) {
     try {
       useSystemConfigStore.getState().setConfig(mapStatusDataToConfig(status))
@@ -146,7 +152,6 @@ async function fetchStatus(): Promise<StatusData | null> {
     writeCachedStatus(status)
   }
 
-  return status
 }
 
 export const statusQueryOptions = queryOptions({

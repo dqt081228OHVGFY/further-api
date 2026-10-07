@@ -8,21 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var defaultTrustedProxyCIDRs = []string{
-	"127.0.0.0/8",
-	"::1",
-	"10.0.0.0/8",
-	"172.16.0.0/12",
-	"192.168.0.0/16",
-	"fc00::/7",
-}
-
 // ResolveTrustedProxies parses TRUSTED_PROXIES without applying it to an
 // engine. The returned slice can be reused by the outer and plugin engines.
 func ResolveTrustedProxies(raw string) (trustedProxies []string, usedDefaults bool, err error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
-		return append([]string(nil), defaultTrustedProxyCIDRs...), true, nil
+		// An internal or loopback address does not prove that a peer is our
+		// reverse proxy. Honor forwarded identity only after explicit setup.
+		return nil, true, nil
 	}
 	if strings.EqualFold(raw, "none") {
 		return nil, false, nil

@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,7 +29,7 @@ func SetUpLogger(server *gin.Engine) {
 		if tag == "" {
 			tag = "web"
 		}
-		path := param.Path
+		path := redactLoggedRequestPath(param.Path)
 		// OAuth callbacks carry one-time codes and state in the query string.
 		// Redact the log value only; the handler still needs the original query.
 		if strings.HasPrefix(path, "/api/oauth/") || strings.HasPrefix(path, "/oauth/") {
@@ -45,4 +46,30 @@ func SetUpLogger(server *gin.Engine) {
 			path,
 		)
 	}))
+}
+
+func redactLoggedRequestPath(path string) string {
+	base, rawQuery, present := strings.Cut(path, "?")
+	if !present {
+		return path
+	}
+	if strings.HasPrefix(base, "/api/oauth/") || strings.HasPrefix(base, "/oauth/") {
+		return base
+	}
+	query, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		return base
+	}
+	changed := false
+	for name := range query {
+		switch strings.ToLower(name) {
+		case "key", "api_key", "api-key", "token", "access_token", "refresh_token", "access", "password", "secret", "code", "state", "nonce", "signature", "sign", "jwt", "ticket":
+			query.Set(name, "[REDACTED]")
+			changed = true
+		}
+	}
+	if !changed {
+		return path
+	}
+	return base + "?" + query.Encode()
 }

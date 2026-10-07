@@ -1,0 +1,56 @@
+/* One owner moves each surface. Document snapshots and automatic descendant
+   arrivals would replay the same page and keep extra full-page layers alive. */
+:root,:host {
+  --further-motion-press-duration:120ms;
+  --further-motion-state-duration:180ms;
+  --further-motion-section-duration:180ms;
+  --further-motion-enter-duration:220ms;
+  --further-motion-exit-duration:140ms;
+  --further-motion-ripple-duration:420ms;
+  --further-motion-spinner-duration:700ms;
+  --further-motion-standard:cubic-bezier(.2,.8,.2,1);
+  --further-motion-enter:cubic-bezier(.2,.8,.2,1);
+  --further-motion-exit:cubic-bezier(.4,0,1,1);
+}
+.main-content { position:relative; }
+.workspace-startup-status { position:absolute; inset:80px auto auto 24px; z-index:6; display:inline-flex; align-items:center; gap:10px; max-width:calc(100% - 48px); box-sizing:border-box; padding:10px 14px; border:1px solid var(--md-sys-color-outline-variant); border-radius:12px; background:var(--md-sys-color-surface-container-low); color:var(--md-sys-color-on-surface-variant); font-size:13px; line-height:1.5; opacity:1; pointer-events:none; transition:opacity var(--further-motion-exit-duration) var(--further-motion-standard); }
+.workspace-startup-status::before { content:''; flex:none; width:8px; height:8px; border-radius:50%; background:var(--md-sys-color-primary); }
+.workspace-startup-status[data-loading='true']::before { animation:workspace-loading-pulse var(--further-motion-spinner-duration) linear infinite; }
+.workspace-startup-status.is-leaving { opacity:0; }
+.workspace-page-load-status { position:absolute; top:calc(100% + 6px); right:24px; z-index:6; display:flex; align-items:center; gap:10px; max-width:calc(100% - 48px); box-sizing:border-box; padding:8px 12px; border:1px solid var(--md-sys-color-outline-variant); border-radius:16px; background:var(--md-sys-color-surface-container-low); color:var(--md-sys-color-on-surface-variant); font-size:12px; line-height:1.5; box-shadow:0 4px 12px #0000000a; opacity:1; transform:translate3d(0,0,0); transition:opacity 180ms var(--further-motion-standard),transform 180ms var(--further-motion-standard); }
+.workspace-page-load-status[data-loading='true'] { pointer-events:none; }
+.workspace-page-load-status[data-loading='true']::before { content:''; width:6px; height:6px; flex:none; border-radius:50%; background:var(--md-sys-color-primary); animation:workspace-loading-pulse 700ms linear infinite; }
+.workspace-page-load-status.is-leaving { opacity:0; transform:translate3d(0,-4px,0); pointer-events:none; }
+.workspace-page-load-status .md-btn { min-height:28px; padding:4px 9px; }
+@media(max-width:820px) { .workspace-page-load-status { right:14px; max-width:calc(100% - 28px); } }
+@keyframes workspace-loading-pulse { 0%,100% { opacity:.35; } 50% { opacity:1; } }
+@media(max-width:820px) { .workspace-startup-status { left:18px; max-width:calc(100% - 36px); } }
+[data-surface-motion-engine='web'].rf-entering,[data-surface-motion-engine='web'].rf-leaving { animation:none!important; }
+.rf-item-enter,[data-motion-enter='item'] { animation:workspace-item-enter var(--further-motion-section-duration) var(--further-motion-enter) backwards; }
+@keyframes workspace-item-enter { from { opacity:0; } to { opacity:1; } }
+.workspace-search { overflow:hidden; transform-origin:center; }
+.workspace-search[aria-expanded='true'] { background:var(--md-sys-color-primary-container); box-shadow:0 0 0 4px color-mix(in srgb,var(--md-sys-color-primary) 12%,transparent); }
+.workspace-search[aria-expanded='true'] > .material-symbol { animation:workspace-search-icon var(--further-motion-section-duration) var(--further-motion-enter) backwards; }
+@keyframes workspace-search-icon { from { opacity:.5; } to { opacity:1; } }
+.workspace-jump-dialog { border-radius:26px; overflow:hidden; }
+.workspace-jump-input { transition:background-color var(--further-motion-state-duration) var(--further-motion-standard), border-color var(--further-motion-state-duration) var(--further-motion-standard); }
+.workspace-jump-input:focus { box-shadow:0 0 0 4px color-mix(in srgb,var(--md-sys-color-primary) 14%,transparent); }
+.workspace-jump-results button { animation:workspace-result-arrive var(--further-motion-section-duration) var(--further-motion-enter) backwards; }
+@keyframes workspace-result-arrive { from { opacity:0; } to { opacity:1; } }
+.md-input:focus,.settings-directory-search:focus-within { transition:border-color var(--further-motion-state-duration) var(--further-motion-standard), background-color var(--further-motion-state-duration) var(--further-motion-standard); }
+
+/* The disclosure owner measures the expanded body once. Only its small body
+   clips while opening/closing; unrelated page cards never inherit the work. */
+[data-disclosure-body] { transform-origin:top; }
+[data-disclosure-body][data-disclosure-state='closed'] { block-size:0; opacity:0; overflow:clip; pointer-events:none; }
+[data-disclosure-body]:is([data-disclosure-state='opening'],[data-disclosure-state='closing']) { overflow:clip; }
+[data-disclosure-body][data-disclosure-state='closing'] { pointer-events:none; }
+[data-disclosure-body][data-disclosure-state='opening']:not([data-disclosure-motion-engine='web']) { animation:workspace-item-enter var(--further-motion-section-duration) var(--further-motion-enter) backwards; }
+[data-disclosure-body][data-disclosure-motion-engine='web'] { animation:none!important; transition:none; }
+details > summary { transition:color var(--further-motion-state-duration) var(--further-motion-standard), background-color var(--further-motion-state-duration) var(--further-motion-standard); }
+details > summary :is(.material-symbol,svg) { transition:transform var(--further-motion-section-duration) var(--further-motion-standard); }
+
+/* The surrounding surface owns arrival; lists stay still as data refreshes. */
+html :is(.vip-plan-card,.user-logs-metric,.multi-user-card),
+html .user-logs-results .usage-table tbody tr,
+html .frisk-account { animation:none!important; }

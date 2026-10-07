@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,7 +30,7 @@ func newClientIPRouter() *gin.Engine {
 	return router
 }
 
-func TestConfigureTrustedProxiesDefaultsToLoopbackAndPrivateNetworks(t *testing.T) {
+func TestConfigureTrustedProxiesDefaultsRejectLoopbackAndPrivatePeerHeaders(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	t.Setenv("TRUSTED_PROXIES", "")
 	router := newClientIPRouter()
@@ -50,7 +51,9 @@ func TestConfigureTrustedProxiesDefaultsToLoopbackAndPrivateNetworks(t *testing.
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			clientIP := requestClientIP(router, testCase.remoteAddr, "203.0.113.10")
-			assert.Equal(t, "203.0.113.10", clientIP)
+			peerIP, _, err := net.SplitHostPort(testCase.remoteAddr)
+			require.NoError(t, err)
+			assert.Equal(t, peerIP, clientIP)
 		})
 	}
 }
@@ -65,9 +68,9 @@ func TestConfigureTrustedProxiesDefaultRejectsPublicPeerHeaders(t *testing.T) {
 	assert.Equal(t, "198.51.100.10", clientIP, "a public peer must not make a spoofed X-Forwarded-For authoritative")
 }
 
-func TestConfigureTrustedProxiesDefaultStopsAtPublicClientInForwardedChain(t *testing.T) {
+func TestConfigureTrustedProxiesExplicitPeerStopsAtPublicClientInForwardedChain(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	t.Setenv("TRUSTED_PROXIES", "")
+	t.Setenv("TRUSTED_PROXIES", "172.20.0.2")
 	router := newClientIPRouter()
 	require.NoError(t, ConfigureTrustedProxies(router))
 
@@ -101,7 +104,7 @@ func TestConfigureTrustedProxiesAcceptsTrimmedIPsAndCIDRs(t *testing.T) {
 	assert.Equal(t, "198.51.100.20", untrustedClientIP)
 
 	defaultProxyIP := requestClientIP(router, "127.0.0.1:12345", "203.0.113.23")
-	assert.Equal(t, "127.0.0.1", defaultProxyIP, "an explicit list must replace, not extend, the compatibility defaults")
+	assert.Equal(t, "127.0.0.1", defaultProxyIP, "an explicit peer list must not trust other loopback peers")
 }
 
 func TestConfigureTrustedProxiesRejectsInvalidConfiguration(t *testing.T) {

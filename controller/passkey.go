@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
-	passkeysvc "github.com/QuantumNous/new-api/service/passkey"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	passkeysvc "github.com/dqt081228OHVGFY/further-api/service/passkey"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
@@ -62,7 +62,7 @@ func PasskeyRegisterBegin(c *gin.Context) {
 		return
 	}
 
-	credential, err := model.GetPasskeyByUserID(user.Id)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id)
 	if err != nil && !errors.Is(err, model.ErrPasskeyNotFound) {
 		writeSecurityOperationError(c, err)
 		return
@@ -97,7 +97,7 @@ func PasskeyRegisterBegin(c *gin.Context) {
 		common.ApiErrorMsg(c, "当前认证方式不支持安全验证")
 		return
 	}
-	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlow(
+	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlowContext(c.Request.Context(),
 		model.AuthFlowPurposePasskeyRegister,
 		passkeysvc.FlowSecurity{AuthSessionIdentity: identity, Scope: authorization.Scope, ContextHash: authorization.ContextHash, Authorization: authorization},
 		sessionData,
@@ -143,7 +143,7 @@ func PasskeyRegisterFinish(c *gin.Context) {
 		return
 	}
 
-	credentialRecord, err := model.GetPasskeyByUserID(user.Id)
+	credentialRecord, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id)
 	if err != nil && !errors.Is(err, model.ErrPasskeyNotFound) {
 		writeSecurityOperationError(c, err)
 		return
@@ -157,7 +157,7 @@ func PasskeyRegisterFinish(c *gin.Context) {
 		common.ApiErrorMsg(c, "当前认证方式不支持安全验证")
 		return
 	}
-	sessionData, security, err := passkeysvc.PopSessionDataFlow(
+	sessionData, security, err := passkeysvc.PopSessionDataFlowContext(c.Request.Context(),
 		request.FlowToken,
 		model.AuthFlowPurposePasskeyRegister,
 		identity,
@@ -195,7 +195,7 @@ func PasskeyRegisterFinish(c *gin.Context) {
 	}
 
 	passkeyCredential.RPID = &sessionData.RelyingPartyID
-	if err := model.RegisterPasskeyForSession(identity, passkeyCredential); err != nil {
+	if err := model.RegisterPasskeyForSessionContext(c.Request.Context(), identity, passkeyCredential); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -229,7 +229,7 @@ func PasskeyDelete(c *gin.Context) {
 		common.ApiErrorMsg(c, "当前认证方式不支持安全验证")
 		return
 	}
-	if err := model.DeletePasskeyForSession(identity); err != nil {
+	if err := model.DeletePasskeyForSessionContext(c.Request.Context(), identity); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -254,7 +254,7 @@ func PasskeyStatus(c *gin.Context) {
 		return
 	}
 
-	credential, err := model.GetPasskeyByUserID(user.Id)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id)
 	if errors.Is(err, model.ErrPasskeyNotFound) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
@@ -312,7 +312,7 @@ func PasskeyLoginBegin(c *gin.Context) {
 		return
 	}
 
-	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlow(
+	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlowContext(c.Request.Context(),
 		model.AuthFlowPurposePasskeyLogin,
 		passkeysvc.FlowSecurity{},
 		sessionData,
@@ -354,7 +354,7 @@ func PasskeyLoginFinish(c *gin.Context) {
 		return
 	}
 
-	sessionData, _, err := passkeysvc.PopSessionDataFlow(
+	sessionData, _, err := passkeysvc.PopSessionDataFlowContext(c.Request.Context(),
 		request.FlowToken,
 		model.AuthFlowPurposePasskeyLogin,
 		service.AuthIdentity{},
@@ -376,7 +376,7 @@ func PasskeyLoginFinish(c *gin.Context) {
 
 	handler := func(rawID, userHandle []byte) (webauthnlib.User, error) {
 		// 首先通过凭证ID查找用户
-		credential, err := model.GetPasskeyByCredentialID(rawID)
+		credential, err := model.GetPasskeyByCredentialIDContext(c.Request.Context(), rawID)
 		if err != nil {
 			return nil, fmt.Errorf("未找到 Passkey 凭证: %w", err)
 		}
@@ -431,7 +431,7 @@ func PasskeyLoginFinish(c *gin.Context) {
 		return
 	}
 
-	if err := model.UpdatePasskeyAssertionState(modelUser.Id, credential, time.Now(), sessionData.RelyingPartyID); err != nil {
+	if err := model.UpdatePasskeyAssertionStateContext(c.Request.Context(), modelUser.Id, credential, time.Now(), sessionData.RelyingPartyID); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -458,7 +458,7 @@ func AdminResetPasskey(c *gin.Context) {
 		return
 	}
 
-	if _, err := model.GetPasskeyByUserID(user.Id); err != nil {
+	if _, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id); err != nil {
 		if errors.Is(err, model.ErrPasskeyNotFound) {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
@@ -470,11 +470,7 @@ func AdminResetPasskey(c *gin.Context) {
 		return
 	}
 
-	if err := model.DeletePasskeyByUserIDWithAuthVersion(user.Id); err != nil {
-		writeSecurityOperationError(c, err)
-		return
-	}
-	if _, err := model.RevokeAllUserSessions(user.Id, "admin_passkey_reset"); err != nil {
+	if _, err := model.MutateManagedAccountSecurityContext(c.Request.Context(), managedSecurityOperator(c), model.ManagedSecurityMutation{TargetID: user.Id, Action: "passkey-reset"}); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
@@ -523,8 +519,12 @@ func PasskeyVerifyBegin(c *gin.Context) {
 		return
 	}
 
-	credential, err := model.GetPasskeyByUserID(user.Id)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id)
 	if err != nil {
+		if !errors.Is(err, model.ErrPasskeyNotFound) {
+			writeSecurityOperationError(c, err)
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": "该用户尚未绑定 Passkey",
@@ -549,7 +549,7 @@ func PasskeyVerifyBegin(c *gin.Context) {
 		return
 	}
 
-	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlow(
+	flowToken, expiresAt, err := passkeysvc.CreateSessionDataFlowContext(c.Request.Context(),
 		model.AuthFlowPurposePasskeyStepUp,
 		passkeysvc.FlowSecurity{AuthSessionIdentity: identity, Scope: binding.Scope, ContextHash: binding.ContextHash},
 		sessionData,
@@ -597,7 +597,7 @@ func PasskeyVerifyFinish(c *gin.Context) {
 		return
 	}
 
-	credential, err := model.GetPasskeyByUserID(user.Id)
+	credential, err := model.GetPasskeyByUserIDContext(c.Request.Context(), user.Id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -611,7 +611,7 @@ func PasskeyVerifyFinish(c *gin.Context) {
 		common.ApiErrorMsg(c, "当前认证方式不支持安全验证")
 		return
 	}
-	sessionData, security, err := passkeysvc.PopSessionDataFlow(
+	sessionData, security, err := passkeysvc.PopSessionDataFlowContext(c.Request.Context(),
 		request.FlowToken,
 		model.AuthFlowPurposePasskeyStepUp,
 		identity,
@@ -642,12 +642,12 @@ func PasskeyVerifyFinish(c *gin.Context) {
 		return
 	}
 
-	if err := model.UpdatePasskeyAssertionState(user.Id, validatedCredential, time.Now(), sessionData.RelyingPartyID); err != nil {
+	if err := model.UpdatePasskeyAssertionStateContext(c.Request.Context(), user.Id, validatedCredential, time.Now(), sessionData.RelyingPartyID); err != nil {
 		writeSecurityOperationError(c, err)
 		return
 	}
 
-	proof, err := service.CompleteSecurityVerification(identity, service.VerificationBinding{Scope: security.Scope, ContextHash: security.ContextHash}, service.VerificationMethodPasskey)
+	proof, err := service.CompleteSecurityVerificationContext(c.Request.Context(), identity, service.VerificationBinding{Scope: security.Scope, ContextHash: security.ContextHash}, service.VerificationMethodPasskey)
 	if err != nil {
 		writeSecurityOperationError(c, err)
 		return
@@ -662,7 +662,7 @@ func getAuthenticatedUser(c *gin.Context) (*model.User, error) {
 	if id == 0 {
 		return nil, service.ErrAuthTokenInvalid
 	}
-	user, err := model.GetUserById(id, false)
+	user, err := model.GetUserByIdContext(c.Request.Context(), id, false)
 	if err != nil {
 		return nil, err
 	}

@@ -1,68 +1,102 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
 )
 
-// DecideRelayRetry is the single retry decision for relay attempts. The reason
-// is recorded in the request policy decision events of the log details.
-func DecideRelayRetry(c *gin.Context, err *types.NewAPIError, retryTimes int) PolicyDecision {
+type relayRetryBoundary struct {
+	remaining     int
+	canceled      bool
+	committed     bool
+	strictSession bool
+	sessionSource string
+	pinned        bool
+}
+
+func retryDecision(action, reason, source string) PolicyDecision {
+	return PolicyDecision{Action: action, Reason: reason, Source: source}
+}
+
+// A retry can only start while its caller is waiting for the first response.
+// These lifecycle limits also apply to locally generated channel errors.
+func decideRetryWithinBoundary(err *types.GatewayError, boundary relayRetryBoundary) PolicyDecision {
 	if err == nil {
-		return PolicyDecision{Action: "stop", Reason: "request_completed", Source: "system"}
+		return retryDecision("stop", "request_completed", "system")
 	}
-	if ShouldSkipRetryAfterChannelAffinityFailure(c) {
-		source := RequestPolicy(c).SessionModeSource
-		if source == "" {
-			source = "session_rule"
-		}
-		return PolicyDecision{Action: "stop", Reason: "strict_session", Source: source}
+	if boundary.canceled || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return retryDecision("stop", "request_canceled", "request")
 	}
-	if GetChannelConstraints(c).SuppressesRetry() {
-		return PolicyDecision{Action: "stop", Reason: "pinned_channel", Source: "channel_constraint"}
+	if boundary.committed {
+		return retryDecision("stop", "response_committed", "request")
 	}
-	if types.IsChannelError(err) {
-		return PolicyDecision{Action: "retry", Reason: "channel_error", Source: "system"}
+	if boundary.strictSession {
+		return retryDecision("stop", "strict_session", boundary.sessionSource)
+	}
+	if boundary.pinned {
+		return retryDecision("stop", "pinned_channel", "channel_constraint")
 	}
 	if types.IsSkipRetryError(err) {
-		return PolicyDecision{Action: "stop", Reason: "non_retryable_error", Source: "system"}
+		return retryDecision("stop", "non_retryable_error", "system")
 	}
-	if retryTimes <= 0 {
-		return PolicyDecision{Action: "stop", Reason: "attempt_budget_exhausted", Source: "global"}
+	if boundary.remaining <= 0 {
+		return retryDecision("stop", "attempt_budget_exhausted", "global")
 	}
-	code := err.StatusCode
-	if code >= 200 && code < 300 {
-		return PolicyDecision{Action: "stop", Reason: "system_retry_exclusion", Source: "system"}
+	status := err.StatusCode
+	if status >= http.StatusOK && status < http.StatusMultipleChoices ||
+		operation_setting.IsAlwaysSkipRetryCode(err.GetErrorCode()) ||
+		operation_setting.IsAlwaysSkipRetryStatusCode(status) {
+		return retryDecision("stop", "system_retry_exclusion", "system")
 	}
-	if code < 100 || code > 599 {
-		return PolicyDecision{Action: "retry", Reason: "unrecognized_status", Source: "system"}
+	if types.IsChannelError(err) {
+		return retryDecision("retry", "channel_error", "system")
 	}
-	if operation_setting.IsAlwaysSkipRetryCode(err.GetErrorCode()) || operation_setting.IsAlwaysSkipRetryStatusCode(code) {
-		return PolicyDecision{Action: "stop", Reason: "system_retry_exclusion", Source: "system"}
+	if status < 100 || status > 599 {
+		return retryDecision("retry", "unrecognized_status", "system")
 	}
-	if operation_setting.ShouldRetryByStatusCode(code) {
-		return PolicyDecision{Action: "retry", Reason: "retry_status_matched", Source: "global"}
+	if operation_setting.ShouldRetryByStatusCode(status) {
+		return retryDecision("retry", "retry_status_matched", "global")
 	}
-	return PolicyDecision{Action: "stop", Reason: "status_not_retryable", Source: "global"}
+	return retryDecision("stop", "status_not_retryable", "global")
 }
 
-func ShouldRetryRelayError(c *gin.Context, openaiErr *types.NewAPIError, retryTimes int) bool {
-	return DecideRelayRetry(c, openaiErr, retryTimes).Action == "retry"
+// Snapshot request state at the boundary; the policy itself has no Gin writes.
+func DecideRelayRetry(c *gin.Context, err *types.GatewayError, retryTimes int) PolicyDecision {
+	boundary := relayRetryBoundary{remaining: retryTimes, sessionSource: "session_rule"}
+	if c != nil {
+		boundary.canceled = c.Request != nil && c.Request.Context().Err() != nil
+		boundary.committed = c.Writer != nil && c.Writer.Written()
+		boundary.strictSession = ShouldSkipRetryAfterChannelAffinityFailure(c)
+		boundary.pinned = GetChannelConstraints(c).SuppressesRetry()
+		if boundary.strictSession {
+			if source := RequestPolicy(c).SessionModeSource; source != "" {
+				boundary.sessionSource = source
+			}
+		}
+	}
+	return decideRetryWithinBoundary(err, boundary)
 }
 
-func ProcessChannelError(c *gin.Context, channelError types.ChannelError, err *types.NewAPIError, relayInfo *relaycommon.RelayInfo) {
-	if err == nil {
+func ShouldRetryRelayError(c *gin.Context, gatewayErr *types.GatewayError, retryTimes int) bool {
+	return DecideRelayRetry(c, gatewayErr, retryTimes).Action == "retry"
+}
+
+func ProcessChannelError(c *gin.Context, channelError types.ChannelError, err *types.GatewayError, relayInfo *relaycommon.RelayInfo) {
+	if err == nil || c == nil {
 		return
 	}
 	logger.LogError(c, fmt.Sprintf("channel error (channel #%d, status code: %d): %s", channelError.ChannelId, err.StatusCode, common.LocalLogPreview(err.MaskSensitiveErrorWithStatusCode())))

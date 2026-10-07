@@ -200,7 +200,8 @@
     {
       "files": ["src/**/__tests__/**/*.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
       "rules": {
-        "typescript/no-non-null-assertion": "off"
+        "typescript/no-non-null-assertion": "off",
+        "no-eval": "off"
       }
     },
     {

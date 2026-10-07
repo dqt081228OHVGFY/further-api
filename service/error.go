@@ -11,220 +11,180 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	taskdto "github.com/QuantumNous/new-api/dto"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	taskdto "github.com/dqt081228OHVGFY/further-api/dto"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
-func MidjourneyErrorWrapper(code int, desc string) *taskdto.MidjourneyResponse {
-	return &taskdto.MidjourneyResponse{
-		Code:        code,
-		Description: desc,
-	}
+const maxUpstreamErrorBodyBytes = 1 << 20
+
+func MidjourneyErrorWrapper(code int, description string) *taskdto.MidjourneyResponse {
+	return &taskdto.MidjourneyResponse{Code: code, Description: description}
 }
 
-func MidjourneyErrorWithStatusCodeWrapper(code int, desc string, statusCode int) *taskdto.MidjourneyResponseWithStatusCode {
-	return &taskdto.MidjourneyResponseWithStatusCode{
-		StatusCode: statusCode,
-		Response:   *MidjourneyErrorWrapper(code, desc),
-	}
+func MidjourneyErrorWithStatusCodeWrapper(code int, description string, status int) *taskdto.MidjourneyResponseWithStatusCode {
+	return &taskdto.MidjourneyResponseWithStatusCode{StatusCode: status, Response: *MidjourneyErrorWrapper(code, description)}
 }
 
-//// OpenAIErrorWrapper wraps an error into an OpenAIErrorWithStatusCode
-//func OpenAIErrorWrapper(err error, code string, statusCode int) *dto.OpenAIErrorWithStatusCode {
-//	text := err.Error()
-//	lowerText := strings.ToLower(text)
-//	if !strings.HasPrefix(lowerText, "get file base64 from url") && !strings.HasPrefix(lowerText, "mime type is not supported") {
-//		if strings.Contains(lowerText, "post") || strings.Contains(lowerText, "dial") || strings.Contains(lowerText, "http") {
-//			common.SysLog(fmt.Sprintf("error: %s", text))
-//			text = "请求上游地址失败"
-//		}
-//	}
-//	openAIError := dto.OpenAIError{
-//		Message: text,
-//		Type:    "new_api_error",
-//		Code:    code,
-//	}
-//	return &dto.OpenAIErrorWithStatusCode{
-//		Error:      openAIError,
-//		StatusCode: statusCode,
-//	}
-//}
-//
-//func OpenAIErrorWrapperLocal(err error, code string, statusCode int) *dto.OpenAIErrorWithStatusCode {
-//	openaiErr := OpenAIErrorWrapper(err, code, statusCode)
-//	openaiErr.LocalError = true
-//	return openaiErr
-//}
+func publicLocalError(err error) string {
+	if err == nil {
+		return "网关暂时无法完成请求，请稍后重试。"
+	}
+	return common.MaskSensitiveInfo(err.Error())
+}
 
-func ClaudeErrorWrapper(err error, code string, statusCode int) *dto.ClaudeErrorWithStatusCode {
-	text := err.Error()
-	lowerText := strings.ToLower(text)
-	if !strings.HasPrefix(lowerText, "get file base64 from url") {
-		if strings.Contains(lowerText, "post") || strings.Contains(lowerText, "dial") || strings.Contains(lowerText, "http") {
-			common.SysLog(fmt.Sprintf("error: %s", text))
-			text = "请求上游地址失败"
-		}
-	}
-	claudeError := types.ClaudeError{
-		Message: text,
-		Type:    "new_api_error",
-	}
+func ClaudeErrorWrapper(err error, code string, status int) *dto.ClaudeErrorWithStatusCode {
 	return &dto.ClaudeErrorWithStatusCode{
-		Error:      claudeError,
-		StatusCode: statusCode,
+		Error:      types.ClaudeError{Message: publicLocalError(err), Type: "gateway_error"},
+		StatusCode: status,
 	}
 }
 
-func ClaudeErrorWrapperLocal(err error, code string, statusCode int) *dto.ClaudeErrorWithStatusCode {
-	claudeErr := ClaudeErrorWrapper(err, code, statusCode)
-	claudeErr.LocalError = true
-	return claudeErr
+func ClaudeErrorWrapperLocal(err error, code string, status int) *dto.ClaudeErrorWithStatusCode {
+	result := ClaudeErrorWrapper(err, code, status)
+	result.LocalError = true
+	return result
 }
 
-func RelayErrorHandler(ctx context.Context, resp *http.Response, showBodyWhenFail bool) (newApiErr *types.NewAPIError) {
-	newApiErr = types.InitOpenAIError(types.ErrorCodeBadResponseStatusCode, resp.StatusCode)
-
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
+func upstreamResponseStatus(response *http.Response) int {
+	if response == nil || response.StatusCode < 200 || response.StatusCode > 599 {
+		return http.StatusBadGateway
 	}
-	CloseResponseBodyGracefully(resp)
-	var errResponse dto.GeneralErrorResponse
-	responseBodyText := string(responseBody)
-	responseBodyPreview := common.LocalLogPreview(responseBodyText)
-	buildErrWithBody := func(message string) error {
-		if message == "" {
-			return fmt.Errorf("bad response status code %d, body: %s", resp.StatusCode, responseBodyText)
+	return response.StatusCode
+}
+
+// Failure bodies are separate from successful protocol payloads: bounded,
+// always closed, and interruptible even before the provider's body has data.
+func RelayErrorHandler(ctx context.Context, response *http.Response, showBody bool) *types.GatewayError {
+	status := upstreamResponseStatus(response)
+	fallback := fmt.Sprintf("bad response status code %d", status)
+	if response == nil || response.Body == nil {
+		return types.NewOpenAIError(errors.New(fallback), types.ErrorCodeBadResponseStatusCode, status)
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	defer CloseResponseBodyGracefully(response)
+	stop := context.AfterFunc(ctx, func() { _ = response.Body.Close() })
+	defer stop()
+	if err := ctx.Err(); err != nil {
+		return types.NewErrorWithStatusCode(err, types.ErrorCodeBadResponseStatusCode, status, types.ErrOptionWithSkipRetry())
+	}
+	body, readErr := io.ReadAll(io.LimitReader(response.Body, maxUpstreamErrorBodyBytes+1))
+	if readErr != nil {
+		cause := readErr
+		if ctx.Err() != nil {
+			cause = ctx.Err()
 		}
-		return fmt.Errorf("bad response status code %d, message: %s, body: %s", resp.StatusCode, message, responseBodyText)
+		return types.NewErrorWithStatusCode(fmt.Errorf("read upstream failure: %w", cause), types.ErrorCodeBadResponseStatusCode, status,
+			types.ErrOptionWithHideErrMsg(fallback), types.ErrOptionWithSkipRetry())
 	}
-
-	err = common.Unmarshal(responseBody, &errResponse)
-	if err != nil {
-		if showBodyWhenFail {
-			newApiErr.Err = buildErrWithBody("")
-		} else {
-			logger.LogError(ctx, fmt.Sprintf("bad response status code %d, body: %s", resp.StatusCode, responseBodyPreview))
-			newApiErr.Err = fmt.Errorf("bad response status code %d", resp.StatusCode)
-		}
-		return
+	truncated := len(body) > maxUpstreamErrorBodyBytes
+	if truncated {
+		body = body[:maxUpstreamErrorBodyBytes]
 	}
-
-	if common.GetJsonType(errResponse.Error) == "object" {
-		// General format error (OpenAI, Anthropic, Gemini, etc.)
-		oaiError := errResponse.TryToOpenAIError()
-		if oaiError != nil {
-			newApiErr = types.WithOpenAIError(*oaiError, resp.StatusCode)
-			if showBodyWhenFail {
-				newApiErr.Err = buildErrWithBody(newApiErr.Error())
+	body = []byte(RedactKnownUpstreamSecrets(string(body), UpstreamRequestSecrets(response.Request)...))
+	text := string(body)
+	var envelope dto.GeneralErrorResponse
+	var gatewayErr *types.GatewayError
+	if !truncated && json.Unmarshal(body, &envelope) == nil {
+		if structured := envelope.TryToOpenAIError(); structured != nil {
+			if len(structured.Metadata) == 0 {
+				structured.Metadata = append(json.RawMessage(nil), envelope.Metadata...)
 			}
-			return
+			gatewayErr = types.WithOpenAIError(*structured, status)
+		} else if message := strings.TrimSpace(envelope.ToMessage()); message != "" {
+			gatewayErr = types.NewOpenAIError(errors.New(message), types.ErrorCodeBadResponseStatusCode, status)
 		}
 	}
-	message := errResponse.ToMessage()
-	if message == "" {
-		// The body parsed as JSON but carried no usable error message; log the
-		// raw body so the upstream failure remains diagnosable.
-		logger.LogError(ctx, fmt.Sprintf("bad response status code %d with empty error message, body: %s", resp.StatusCode, responseBodyPreview))
+	if gatewayErr == nil {
+		preview := common.LocalLogPreview(common.MaskSensitiveInfo(text))
+		if truncated {
+			preview += fmt.Sprintf(" [body exceeded %d bytes]", maxUpstreamErrorBodyBytes)
+		}
+		logger.LogError(ctx, fmt.Sprintf("%s, body: %s", fallback, preview))
+		gatewayErr = types.NewOpenAIError(errors.New(fallback), types.ErrorCodeBadResponseStatusCode, status)
 	}
-	newApiErr = types.NewOpenAIError(errors.New(message), types.ErrorCodeBadResponseStatusCode, resp.StatusCode)
-	if showBodyWhenFail {
-		newApiErr.Err = buildErrWithBody(newApiErr.Error())
+	if showBody {
+		diagnostic := fmt.Sprintf("%s, message: %s, body: %s", fallback, gatewayErr.Error(), common.MaskSensitiveInfo(text))
+		if truncated {
+			diagnostic += " [truncated upstream error body]"
+		}
+		gatewayErr.Err = errors.New(diagnostic)
 	}
-	return
+	return gatewayErr
 }
 
-func ResetStatusCode(newApiErr *types.NewAPIError, statusCodeMappingStr string) {
-	if newApiErr == nil {
+func ResetStatusCode(gatewayErr *types.GatewayError, configuration string) {
+	if gatewayErr == nil || gatewayErr.StatusCode == http.StatusOK || strings.TrimSpace(configuration) == "" {
 		return
 	}
-	if statusCodeMappingStr == "" || statusCodeMappingStr == "{}" {
+	var mapping map[string]json.RawMessage
+	if json.Unmarshal([]byte(configuration), &mapping) != nil {
 		return
 	}
-	statusCodeMapping := make(map[string]any)
-	err := common.Unmarshal([]byte(statusCodeMappingStr), &statusCodeMapping)
-	if err != nil {
+	raw, found := mapping[strconv.Itoa(gatewayErr.StatusCode)]
+	if !found {
 		return
 	}
-	if newApiErr.StatusCode == http.StatusOK {
+	decoder := json.NewDecoder(strings.NewReader(string(raw)))
+	decoder.UseNumber()
+	var value any
+	if decoder.Decode(&value) != nil {
 		return
 	}
-	codeStr := strconv.Itoa(newApiErr.StatusCode)
-	if value, ok := statusCodeMapping[codeStr]; ok {
-		intCode, ok := parseStatusCodeMappingValue(value)
-		if !ok {
-			return
-		}
-		newApiErr.StatusCode = intCode
+	status, valid := parseStatusCodeMappingValue(value)
+	if valid {
+		gatewayErr.StatusCode = status
 	}
 }
 
 func parseStatusCodeMappingValue(value any) (int, bool) {
-	switch v := value.(type) {
+	var status int
+	switch typed := value.(type) {
 	case string:
-		if v == "" {
-			return 0, false
-		}
-		statusCode, err := strconv.Atoi(v)
+		number, err := strconv.Atoi(strings.TrimSpace(typed))
 		if err != nil {
 			return 0, false
 		}
-		return statusCode, true
-	case float64:
-		if v != math.Trunc(v) {
-			return 0, false
-		}
-		return int(v), true
-	case int:
-		return v, true
+		status = number
 	case json.Number:
-		statusCode, err := strconv.Atoi(v.String())
+		number, err := strconv.Atoi(typed.String())
 		if err != nil {
 			return 0, false
 		}
-		return statusCode, true
+		status = number
+	case int:
+		status = typed
+	case float64:
+		if math.IsNaN(typed) || math.IsInf(typed, 0) || typed != math.Trunc(typed) || typed < 200 || typed > 599 {
+			return 0, false
+		}
+		status = int(typed)
 	default:
 		return 0, false
 	}
+	return status, status >= 200 && status <= 599
 }
 
-func TaskErrorWrapperLocal(err error, code string, statusCode int) *taskdto.TaskError {
-	openaiErr := TaskErrorWrapper(err, code, statusCode)
-	openaiErr.LocalError = true
-	return openaiErr
+func TaskErrorWrapper(err error, code string, status int) *taskdto.TaskError {
+	return &taskdto.TaskError{Code: code, Message: publicLocalError(err), StatusCode: status, Error: err}
 }
 
-func TaskErrorWrapper(err error, code string, statusCode int) *taskdto.TaskError {
-	text := err.Error()
-	lowerText := strings.ToLower(text)
-	if strings.Contains(lowerText, "post") || strings.Contains(lowerText, "dial") || strings.Contains(lowerText, "http") {
-		common.SysLog(fmt.Sprintf("error: %s", text))
-		//text = "请求上游地址失败"
-		text = common.MaskSensitiveInfo(text)
-	}
-	//避免暴露内部错误
-	taskError := &taskdto.TaskError{
-		Code:       code,
-		Message:    text,
-		StatusCode: statusCode,
-		Error:      err,
-	}
-
-	return taskError
+func TaskErrorWrapperLocal(err error, code string, status int) *taskdto.TaskError {
+	result := TaskErrorWrapper(err, code, status)
+	result.LocalError = true
+	return result
 }
 
-// TaskErrorFromAPIError 将 PreConsumeBilling 返回的 NewAPIError 转换为 TaskError。
-func TaskErrorFromAPIError(apiErr *types.NewAPIError) *taskdto.TaskError {
-	if apiErr == nil {
+func TaskErrorFromAPIError(err *types.GatewayError) *taskdto.TaskError {
+	if err == nil {
 		return nil
 	}
 	return &taskdto.TaskError{
-		Code:       string(apiErr.GetErrorCode()),
-		Message:    apiErr.Err.Error(),
-		StatusCode: apiErr.StatusCode,
-		Error:      apiErr.Err,
+		Code: string(err.GetErrorCode()), Message: err.MaskSensitiveError(),
+		StatusCode: err.StatusCode, Error: err,
 	}
 }

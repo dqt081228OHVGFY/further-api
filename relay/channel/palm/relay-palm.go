@@ -2,133 +2,106 @@ package palm
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
-// https://developers.generativeai.google/api/rest/generativelanguage/models/generateMessage#request-body
-// https://developers.generativeai.google/api/rest/generativelanguage/models/generateMessage#response-body
-
-func responsePaLM2OpenAI(response *PaLMChatResponse) *dto.OpenAITextResponse {
-	fullTextResponse := dto.OpenAITextResponse{
-		Choices: make([]dto.OpenAITextResponseChoice, 0, len(response.Candidates)),
-	}
-	for i, candidate := range response.Candidates {
-		choice := dto.OpenAITextResponseChoice{
-			Index: i,
-			Message: dto.Message{
-				Role:    "assistant",
-				Content: candidate.Content,
-			},
-			FinishReason: "stop",
-		}
-		fullTextResponse.Choices = append(fullTextResponse.Choices, choice)
-	}
-	return &fullTextResponse
-}
-
-func streamResponsePaLM2OpenAI(palmResponse *PaLMChatResponse) *dto.ChatCompletionsStreamResponse {
-	var choice dto.ChatCompletionsStreamResponseChoice
-	if len(palmResponse.Candidates) > 0 {
-		choice.Delta.SetContentString(palmResponse.Candidates[0].Content)
-	}
-	choice.FinishReason = &constant.FinishReasonStop
-	var response dto.ChatCompletionsStreamResponse
-	response.Object = "chat.completion.chunk"
-	response.Model = "palm2"
-	response.Choices = []dto.ChatCompletionsStreamResponseChoice{choice}
-	return &response
-}
-
-func palmStreamHandler(c *gin.Context, resp *http.Response) (*types.NewAPIError, string) {
-	responseText := ""
-	responseId := helper.GetResponseID(c)
-	createdTime := common.GetTimestamp()
-	dataChan := make(chan string)
-	stopChan := make(chan bool)
-	go func() {
-		responseBody, err := io.ReadAll(resp.Body)
-		if err != nil {
-			common.SysLog("error reading stream response: " + err.Error())
-			stopChan <- true
-			return
-		}
-		service.CloseResponseBodyGracefully(resp)
-		var palmResponse PaLMChatResponse
-		err = json.Unmarshal(responseBody, &palmResponse)
-		if err != nil {
-			common.SysLog("error unmarshalling stream response: " + err.Error())
-			stopChan <- true
-			return
-		}
-		fullTextResponse := streamResponsePaLM2OpenAI(&palmResponse)
-		fullTextResponse.Id = responseId
-		fullTextResponse.Created = createdTime
-		if len(palmResponse.Candidates) > 0 {
-			responseText = palmResponse.Candidates[0].Content
-		}
-		jsonResponse, err := json.Marshal(fullTextResponse)
-		if err != nil {
-			common.SysLog("error marshalling stream response: " + err.Error())
-			stopChan <- true
-			return
-		}
-		dataChan <- string(jsonResponse)
-		stopChan <- true
-	}()
-	helper.SetEventStreamHeaders(c)
-	c.Stream(func(w io.Writer) bool {
-		select {
-		case data := <-dataChan:
-			c.Render(-1, common.CustomEvent{Data: "data: " + data})
-			return true
-		case <-stopChan:
-			c.Render(-1, common.CustomEvent{Data: "data: [DONE]"})
-			return false
-		}
-	})
-	service.CloseResponseBodyGracefully(resp)
-	return nil, responseText
-}
-
-func palmHandler(c *gin.Context, info *relaycommon.RelayInfo, resp *http.Response) (*dto.Usage, *types.NewAPIError) {
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
-	}
-	service.CloseResponseBodyGracefully(resp)
-	var palmResponse PaLMChatResponse
-	err = json.Unmarshal(responseBody, &palmResponse)
-	if err != nil {
-		return nil, types.NewOpenAIError(err, types.ErrorCodeBadResponseBody, http.StatusInternalServerError)
-	}
-	if palmResponse.Error.Code != 0 || len(palmResponse.Candidates) == 0 {
-		return nil, types.WithOpenAIError(types.OpenAIError{
-			Message: palmResponse.Error.Message,
-			Type:    palmResponse.Error.Status,
-			Param:   "",
-			Code:    palmResponse.Error.Code,
-		}, resp.StatusCode)
-	}
-	fullTextResponse := responsePaLM2OpenAI(&palmResponse)
-	usage := service.ResponseText2Usage(c, palmResponse.Candidates[0].Content, info.UpstreamModelName, info.GetEstimatePromptTokens())
-	fullTextResponse.Usage = *usage
-	jsonResponse, err := common.Marshal(fullTextResponse)
-	if err != nil {
+func decodePaLM(data []byte) (*PaLMChatResponse, *types.GatewayError) {
+	var wire *PaLMChatResponse
+	if err := json.Unmarshal(data, &wire); err != nil {
 		return nil, types.NewError(err, types.ErrorCodeBadResponseBody)
 	}
-	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.WriteHeader(resp.StatusCode)
-	service.IOCopyBytesGracefully(c, resp, jsonResponse)
-	return usage, nil
+	if wire == nil {
+		return nil, types.NewError(errors.New("PaLM response must be an object"), types.ErrorCodeBadResponseBody)
+	}
+	if wire.Error.Code != 0 {
+		return nil, types.WithOpenAIError(types.OpenAIError{Message: wire.Error.Message, Type: wire.Error.Status, Code: wire.Error.Code}, wire.Error.Code)
+	}
+	if len(wire.Candidates) == 0 {
+		return nil, types.NewError(errors.New("PaLM returned no candidates"), types.ErrorCodeEmptyResponse)
+	}
+	return wire, nil
+}
+func responsePaLM2OpenAI(wire *PaLMChatResponse) *dto.OpenAITextResponse {
+	response := &dto.OpenAITextResponse{Object: "chat.completion", Created: common.GetTimestamp(), Choices: make([]dto.OpenAITextResponseChoice, 0, len(wire.Candidates))}
+	for index, candidate := range wire.Candidates {
+		response.Choices = append(response.Choices, dto.OpenAITextResponseChoice{Index: index, Message: dto.Message{Role: "assistant", Content: candidate.Content}, FinishReason: "stop"})
+	}
+	return response
+}
+func streamResponsePaLM2OpenAI(wire *PaLMChatResponse) *dto.ChatCompletionsStreamResponse {
+	response := &dto.ChatCompletionsStreamResponse{Object: "chat.completion.chunk", Created: common.GetTimestamp(), Choices: make([]dto.ChatCompletionsStreamResponseChoice, 0, len(wire.Candidates))}
+	for index, candidate := range wire.Candidates {
+		choice := dto.ChatCompletionsStreamResponseChoice{Index: index}
+		choice.Delta.SetContentString(candidate.Content)
+		response.Choices = append(response.Choices, choice)
+	}
+	return response
+}
+func palmStreamHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*types.GatewayError, string) {
+	if c == nil || info == nil || !info.HasChannelMeta() || response == nil || response.Body == nil {
+		return types.NewError(errors.New("PaLM stream context is missing"), types.ErrorCodeBadResponseBody), ""
+	}
+	defer service.CloseResponseBodyGracefully(response)
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), ""
+	}
+	wire, failure := decodePaLM(data)
+	if failure != nil {
+		return failure, ""
+	}
+	frame := streamResponsePaLM2OpenAI(wire)
+	frame.Id = helper.GetResponseID(c)
+	frame.Model = info.UpstreamModelName
+	if c.Request != nil && c.Request.Context().Err() != nil {
+		return nil, ""
+	}
+	encoded, err := json.Marshal(frame)
+	if err == nil {
+		err = openai.HandleStreamFormat(c, info, string(encoded), info.ChannelSetting.ForceFormat, info.ChannelSetting.ThinkingToContent)
+	}
+	if err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), ""
+	}
+	reason := "stop"
+	stop := helper.GenerateStopResponse(frame.Id, frame.Created, frame.Model, reason)
+	encoded, err = json.Marshal(stop)
+	if err == nil {
+		err = openai.HandleStreamFormat(c, info, string(encoded), false, false)
+	}
+	if err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), ""
+	}
+	text := ""
+	for _, candidate := range wire.Candidates {
+		text += candidate.Content
+	}
+	usage := service.ResponseText2Usage(c, text, info.UpstreamModelName, info.GetEstimatePromptTokens())
+	if err = openai.FinalizeChatStream(c, info, string(encoded), frame.Id, frame.Created, frame.Model, "", usage, false); err != nil {
+		return types.NewError(err, types.ErrorCodeBadResponseBody), text
+	}
+	return nil, text
+}
+func palmHandler(c *gin.Context, info *relaycommon.RelayInfo, response *http.Response) (*dto.Usage, *types.GatewayError) {
+	return openai.NativeTextResponse(c, info, response, func(data []byte) (*dto.OpenAITextResponse, *types.GatewayError) {
+		wire, failure := decodePaLM(data)
+		if failure != nil {
+			return nil, failure
+		}
+		frame := responsePaLM2OpenAI(wire)
+		frame.Id = helper.GetResponseID(c)
+		frame.Model = info.UpstreamModelName
+		return frame, nil
+	})
 }

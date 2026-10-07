@@ -28,6 +28,17 @@ func TestPluginCLI(t *testing.T) {
 	assert.Contains(t, stdout.String(), "1/1 cases")
 }
 
+func TestPluginCLIUsageNamesFurtherAPI(t *testing.T) {
+	pluginPath := filepath.Join(t.TempDir(), "fixture.js")
+	require.NoError(t, os.WriteFile(pluginPath, []byte(cliFixturePluginSource), 0o600))
+	for _, args := range [][]string{nil, {"lint", pluginPath, "extra"}, {"test", pluginPath}} {
+		var stdout, stderr bytes.Buffer
+		assert.Equal(t, 2, RunCLI(args, &stdout, &stderr))
+		assert.Contains(t, stderr.String(), "usage: further-api plugin")
+		assert.NotContains(t, stderr.String(), "new-api")
+	}
+}
+
 func TestPluginCLIWarnsOnParseTaskResultInProgressFallback(t *testing.T) {
 	tempDir := t.TempDir()
 	pluginPath := filepath.Join(tempDir, "fallback.js")

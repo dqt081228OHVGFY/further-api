@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
 	"github.com/casbin/casbin/v2"
 	casbinmodel "github.com/casbin/casbin/v2/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -85,8 +85,18 @@ func StartPolicySync(frequency int) {
 	if frequency <= 0 {
 		return
 	}
+	ctx := common.BackgroundContext()
+	ticker := time.NewTicker(time.Duration(frequency) * time.Second)
+	defer ticker.Stop()
 	for {
-		time.Sleep(time.Duration(frequency) * time.Second)
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+		if ctx.Err() != nil {
+			return
+		}
 		if err := ReloadPolicy(); err != nil {
 			common.SysError("failed to reload authz policy: " + err.Error())
 		}

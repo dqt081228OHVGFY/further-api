@@ -11,17 +11,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/jsplugin"
-	relaychannel "github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/ollama"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/service/authz"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	relaychannel "github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/ollama"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/service/authz"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -257,8 +257,10 @@ func GetAllChannels(c *gin.Context) {
 		}
 	}
 
+	visibleChannels := make([]any, 0, len(channelData))
 	for _, datum := range channelData {
 		clearChannelInfo(datum)
+		visibleChannels = append(visibleChannels, channelReadResponse(c, datum))
 	}
 
 	countQuery := buildChannelListQuery(groupFilter, statusFilter, -1)
@@ -276,7 +278,7 @@ func GetAllChannels(c *gin.Context) {
 		typeCounts[r.Type] = r.Count
 	}
 	common.ApiSuccess(c, gin.H{
-		"items":       channelData,
+		"items":       visibleChannels,
 		"total":       total,
 		"page":        pageInfo.GetPage(),
 		"page_size":   pageInfo.GetPageSize(),
@@ -332,7 +334,7 @@ func FetchUpstreamModels(c *gin.Context) {
 		return
 	}
 
-	ids, err := fetchChannelUpstreamModelIDs(channel)
+	ids, err := fetchChannelUpstreamModelIDsContext(c.Request.Context(), channel)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -464,15 +466,17 @@ func SearchChannels(c *gin.Context) {
 
 	pagedData := channelData[startIdx:endIdx]
 
+	visibleChannels := make([]any, 0, len(pagedData))
 	for _, datum := range pagedData {
 		clearChannelInfo(datum)
+		visibleChannels = append(visibleChannels, channelReadResponse(c, datum))
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
 		"data": gin.H{
-			"items":       pagedData,
+			"items":       visibleChannels,
 			"total":       total,
 			"type_counts": typeCounts,
 		},
@@ -497,7 +501,7 @@ func GetChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    channel,
+		"data":    channelReadResponse(c, channel),
 	})
 	return
 }
@@ -538,7 +542,7 @@ func GetChannelKey(c *gin.Context) {
 	})
 }
 
-// maxTaskExtendPluginKeys bounds the plugins one New API channel can be
+// maxTaskExtendPluginKeys bounds the plugins one gateway channel can be
 // extended with; it comfortably covers every built-in and installed plugin.
 const maxTaskExtendPluginKeys = 32
 
@@ -577,14 +581,14 @@ func validateChannel(channel *model.Channel, isAdd bool) error {
 	}
 
 	setting := channel.GetSetting()
-	if channel.Type != constant.ChannelTypeNewAPI && len(setting.TaskExtendPluginKeys) > 0 {
-		return fmt.Errorf("task_extend_plugin_keys is only supported on New API channels")
+	if channel.Type != constant.ChannelTypeGateway && len(setting.TaskExtendPluginKeys) > 0 {
+		return fmt.Errorf("task_extend_plugin_keys is only supported on further-api gateway channels")
 	}
-	if channel.Type == constant.ChannelTypeNewAPI {
+	if channel.Type == constant.ChannelTypeGateway {
 		if len(setting.TaskExtendPluginKeys) > maxTaskExtendPluginKeys {
 			return fmt.Errorf("task_extend_plugin_keys must not exceed %d plugins", maxTaskExtendPluginKeys)
 		}
-		// The single key stays valid on a New API channel, so both bindings are
+		// The single key stays valid on a gateway channel, so both bindings are
 		// checked as one set.
 		keys := setting.TaskExtendPluginKeys
 		if setting.TaskPluginKey != "" {
@@ -605,15 +609,15 @@ func validateChannel(channel *model.Channel, isAdd bool) error {
 			if !ok {
 				return fmt.Errorf("task plugin %q is not registered", key)
 			}
-			if !plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindNewAPI) {
-				return fmt.Errorf("task plugin %q does not support a New API upstream and cannot be bound to a New API channel", key)
+			if !plugin.Meta.SupportsUpstream(jsplugin.UpstreamKindGateway) {
+				return fmt.Errorf("task plugin %q does not support a gateway upstream and cannot be bound to a further-api gateway channel", key)
 			}
 			bound[key] = struct{}{}
 		}
 	}
 
-	if channel.Type == constant.ChannelTypeNewAPI && strings.TrimSpace(channel.GetBaseURL()) == "" {
-		return fmt.Errorf("New API channel base URL cannot be empty")
+	if channel.Type == constant.ChannelTypeGateway && strings.TrimSpace(channel.GetBaseURL()) == "" {
+		return fmt.Errorf("further-api gateway channel base URL cannot be empty")
 	}
 	if channel.Type == constant.ChannelTypeVLLM && strings.TrimSpace(channel.GetBaseURL()) == "" {
 		return fmt.Errorf("vLLM channel base URL cannot be empty")
@@ -707,13 +711,6 @@ func RefreshCodexChannelCredential(c *gin.Context) {
 	})
 }
 
-type AddChannelRequest struct {
-	Mode                      string                `json:"mode"`
-	MultiKeyMode              constant.MultiKeyMode `json:"multi_key_mode"`
-	BatchAddSetKeyPrefix2Name bool                  `json:"batch_add_set_key_prefix_2_name"`
-	Channel                   *model.Channel        `json:"channel"`
-}
-
 func getVertexArrayKeys(keys string) ([]string, error) {
 	if keys == "" {
 		return nil, nil
@@ -744,164 +741,6 @@ func getVertexArrayKeys(keys string) ([]string, error) {
 		return nil, fmt.Errorf("批量添加 Vertex AI 的 keys 不能为空")
 	}
 	return cleanKeys, nil
-}
-
-func AddChannel(c *gin.Context) {
-	addChannelRequest := AddChannelRequest{}
-	err := c.ShouldBindJSON(&addChannelRequest)
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-
-	// Binding a plugin needs the same permission on a New API channel as the
-	// type-61 channel dedicated to it.
-	if addChannelRequest.Channel != nil &&
-		(addChannelRequest.Channel.Type == constant.ChannelTypeTaskPlugin || len(addChannelRequest.Channel.GetSetting().TaskPluginBindings()) > 0) &&
-		!authz.Can(c.GetInt("id"), c.GetInt("role"), authz.TaskPluginBind) {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "task plugin channels require the task_plugin.bind permission",
-		})
-		return
-	}
-
-	baseURLFromPluginDefault := addChannelRequest.Channel != nil &&
-		addChannelRequest.Channel.Type == constant.ChannelTypeTaskPlugin &&
-		(addChannelRequest.Channel.BaseURL == nil || strings.TrimSpace(*addChannelRequest.Channel.BaseURL) == "")
-	// 使用统一的校验函数
-	if err := validateChannel(addChannelRequest.Channel, true); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
-		})
-		return
-	}
-
-	addChannelRequest.Channel.CreatedTime = common.GetTimestamp()
-	keys := make([]string, 0)
-	switch addChannelRequest.Mode {
-	case "multi_to_single":
-		addChannelRequest.Channel.ChannelInfo.IsMultiKey = true
-		addChannelRequest.Channel.ChannelInfo.MultiKeyMode = addChannelRequest.MultiKeyMode
-		if addChannelRequest.Channel.Type == constant.ChannelTypeVertexAi && addChannelRequest.Channel.GetOtherSettings().VertexKeyType != dto.VertexKeyTypeAPIKey {
-			array, err := getVertexArrayKeys(addChannelRequest.Channel.Key)
-			if err != nil {
-				c.JSON(http.StatusOK, gin.H{
-					"success": false,
-					"message": err.Error(),
-				})
-				return
-			}
-			addChannelRequest.Channel.ChannelInfo.MultiKeySize = len(array)
-			addChannelRequest.Channel.Key = strings.Join(array, "\n")
-		} else {
-			cleanKeys := make([]string, 0)
-			for key := range strings.SplitSeq(addChannelRequest.Channel.Key, "\n") {
-				if key == "" {
-					continue
-				}
-				key = strings.TrimSpace(key)
-				cleanKeys = append(cleanKeys, key)
-			}
-			addChannelRequest.Channel.ChannelInfo.MultiKeySize = len(cleanKeys)
-			addChannelRequest.Channel.Key = strings.Join(cleanKeys, "\n")
-		}
-		keys = []string{addChannelRequest.Channel.Key}
-	case "batch":
-		if addChannelRequest.Channel.Type == constant.ChannelTypeVertexAi && addChannelRequest.Channel.GetOtherSettings().VertexKeyType != dto.VertexKeyTypeAPIKey {
-			// multi json
-			keys, err = getVertexArrayKeys(addChannelRequest.Channel.Key)
-			if err != nil {
-				c.JSON(http.StatusOK, gin.H{
-					"success": false,
-					"message": err.Error(),
-				})
-				return
-			}
-		} else {
-			keys = strings.Split(addChannelRequest.Channel.Key, "\n")
-		}
-	case "single":
-		keys = []string{addChannelRequest.Channel.Key}
-	default:
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "不支持的添加模式",
-		})
-		return
-	}
-
-	channels := make([]model.Channel, 0, len(keys))
-	for _, key := range keys {
-		if key == "" {
-			continue
-		}
-		localChannel := addChannelRequest.Channel
-		localChannel.Key = key
-		if addChannelRequest.BatchAddSetKeyPrefix2Name && len(keys) > 1 {
-			keyPrefix := localChannel.Key
-			if len(localChannel.Key) > 8 {
-				keyPrefix = localChannel.Key[:8]
-			}
-			localChannel.Name = fmt.Sprintf("%s %s", localChannel.Name, keyPrefix)
-		}
-		channels = append(channels, *localChannel)
-	}
-	err = model.BatchInsertChannels(channels)
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	createAudit := map[string]any{
-		"name":  addChannelRequest.Channel.Name,
-		"type":  addChannelRequest.Channel.Type,
-		"count": len(channels),
-	}
-	if baseURLFromPluginDefault {
-		createAudit["base_url_source"] = "plugin_default"
-	}
-	recordManageAudit(c, "channel.create", createAudit)
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-	})
-	return
-}
-
-func DeleteChannel(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	channelName := ""
-	channelProxy := ""
-	channelLookupFailed := false
-	if existing, err := model.GetChannelById(id, false); err == nil && existing != nil {
-		channelName = existing.Name
-		channelProxy = existing.GetSetting().Proxy
-	} else {
-		channelLookupFailed = true
-	}
-	channel := model.Channel{Id: id}
-	err := channel.Delete()
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	model.InitChannelCache()
-	if channelLookupFailed {
-		service.ResetProxyClientCache()
-	} else {
-		service.InvalidateProxyClient(channelProxy)
-	}
-	recordManageAudit(c, "channel.delete", map[string]any{
-		"id":   id,
-		"name": channelName,
-	})
-	closeActiveChannelWebSockets([]int{id})
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-	})
-	return
 }
 
 func DeleteDisabledChannel(c *gin.Context) {
@@ -1136,6 +975,11 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 	clearChannelReadOnlyFields(&channel, requestData)
+	originChannel, err := model.GetChannelById(channel.Id, true)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+		return
+	}
 
 	if channel.Type == constant.ChannelTypeTaskPlugin &&
 		!authz.Can(c.GetInt("id"), c.GetInt("role"), authz.TaskPluginBind) {
@@ -1148,22 +992,33 @@ func UpdateChannel(c *gin.Context) {
 
 	baseURLFromPluginDefault := channel.Type == constant.ChannelTypeTaskPlugin &&
 		(channel.BaseURL == nil || strings.TrimSpace(*channel.BaseURL) == "")
-	// 使用统一的校验函数
-	if err := validateChannel(&channel.Channel, false); err != nil {
+	// Routing-only readers omit sensitive configuration. Validate their patch
+	// against stored provider settings without adding those fields to the write.
+	validationChannel := channel.Channel
+	if _, present := requestData["type"]; !present {
+		validationChannel.Type = originChannel.Type
+	}
+	if _, present := requestData["base_url"]; !present {
+		validationChannel.BaseURL = originChannel.BaseURL
+	}
+	if _, present := requestData["setting"]; !present {
+		validationChannel.Setting = originChannel.Setting
+	}
+	if _, present := requestData["settings"]; !present {
+		validationChannel.OtherSettings = originChannel.OtherSettings
+	}
+	if _, present := requestData["other"]; !present {
+		validationChannel.Other = originChannel.Other
+	}
+	if err := validateChannel(&validationChannel, false); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": err.Error(),
 		})
 		return
 	}
-	// Preserve existing ChannelInfo to ensure multi-key channels keep correct state even if the client does not send ChannelInfo in the request.
-	originChannel, err := model.GetChannelById(channel.Id, true)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
-		})
-		return
+	if _, present := requestData["base_url"]; present {
+		channel.BaseURL = validationChannel.BaseURL
 	}
 	originProxy := originChannel.GetSetting().Proxy
 	proxyChanged := false
@@ -1174,7 +1029,7 @@ func UpdateChannel(c *gin.Context) {
 		proxyChanged = originProxyErr != nil || normalizedOriginProxy != newProxy
 	}
 	// Changing which plugins a channel binds needs the bind permission on any
-	// channel type; resubmitting an unchanged New API binding list does not, so
+	// channel type; resubmitting an unchanged gateway binding list does not, so
 	// administrators without it can still edit the rest of a gateway channel.
 	if settingProvided &&
 		!slices.Equal(channel.GetSetting().TaskPluginBindings(), originChannel.GetSetting().TaskPluginBindings()) &&
@@ -1280,7 +1135,7 @@ func UpdateChannel(c *gin.Context) {
 			// 覆盖模式：直接使用新密钥（默认行为，不需要特殊处理）
 		}
 	}
-	err = channel.Update()
+	err = model.UpdateChannelCatalog(c.Request.Context(), &channel.Channel, requestData)
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -1320,7 +1175,7 @@ func UpdateChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    channel,
+		"data":    channelReadResponse(c, &channel.Channel),
 	})
 	return
 }
@@ -1412,6 +1267,10 @@ type fetchModelsRequest struct {
 	AdvancedCustom *string `json:"advanced_custom"`
 	HeaderOverride *string `json:"header_override"`
 	Proxy          *string `json:"proxy"`
+	Setting        *string `json:"setting"`
+	Settings       *string `json:"settings"`
+	Other          *string `json:"other"`
+	Organization   *string `json:"openai_organization"`
 }
 
 func buildAdvancedCustomModelPreviewChannel(req fetchModelsRequest) (*model.Channel, error) {
@@ -1493,38 +1352,12 @@ func FetchModels(c *gin.Context) {
 		return
 	}
 
-	var channel *model.Channel
-	if req.Type == constant.ChannelTypeAdvancedCustom || req.ChannelID > 0 {
-		var err error
-		channel, err = buildAdvancedCustomModelPreviewChannel(req)
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"success": false,
-				"message": err.Error(),
-			})
-			return
-		}
-	} else {
-		baseURL := ""
-		if req.BaseURL != nil {
-			baseURL = strings.TrimSpace(*req.BaseURL)
-		}
-		if baseURL == "" {
-			baseURL = constant.GetChannelBaseURL(req.Type)
-		}
-
-		key := strings.TrimSpace(req.Key)
-		if req.Type != constant.ChannelTypeCodex {
-			key = strings.Split(key, "\n")[0]
-		}
-		channel = &model.Channel{
-			Type:    req.Type,
-			Key:     key,
-			BaseURL: &baseURL,
-		}
+	channel, err := buildChannelModelPreview(req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": err.Error()})
+		return
 	}
-
-	models, err := fetchChannelUpstreamModelIDs(channel)
+	models, err := fetchChannelUpstreamModelIDsContext(c.Request.Context(), channel)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,

@@ -1,11 +1,12 @@
 package model
 
 import (
+	"crypto/rand"
 	"errors"
-	"math/rand"
+	"math/big"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
@@ -40,7 +41,7 @@ func GetUserCheckinRecords(userId int, startDate, endDate string) ([]Checkin, er
 
 // HasCheckedInToday 检查用户今天是否已签到
 func HasCheckedInToday(userId int) (bool, error) {
-	today := time.Now().In(RelayForActivityLocation).Format("2006-01-02")
+	today := time.Now().In(FurtherActivityLocation).Format("2006-01-02")
 	var count int64
 	err := DB.Model(&Checkin{}).
 		Where("user_id = ? AND checkin_date = ?", userId, today).
@@ -55,7 +56,7 @@ func UserCheckin(userId int) (*Checkin, error) {
 }
 
 func userCheckinAt(userId int, now time.Time) (*Checkin, error) {
-	setting := RelayForCheckinSettingsSnapshot()
+	setting := FurtherCheckinSettingsSnapshot()
 	if !setting.Enabled {
 		return nil, errors.New("签到功能未启用")
 	}
@@ -64,7 +65,7 @@ func userCheckinAt(userId int, now time.Time) (*Checkin, error) {
 	}
 
 	// 检查今天是否已签到
-	today := now.In(RelayForActivityLocation).Format("2006-01-02")
+	today := now.In(FurtherActivityLocation).Format("2006-01-02")
 	var count int64
 	if err := DB.Model(&Checkin{}).Where("user_id = ? AND checkin_date = ?", userId, today).Count(&count).Error; err != nil {
 		return nil, err
@@ -76,7 +77,11 @@ func userCheckinAt(userId int, now time.Time) (*Checkin, error) {
 	// 计算随机额度奖励
 	quotaAwarded := setting.MinQuota
 	if setting.MaxQuota > setting.MinQuota {
-		quotaAwarded = setting.MinQuota + rand.Intn(setting.MaxQuota-setting.MinQuota+1)
+		award, err := rand.Int(rand.Reader, big.NewInt(int64(setting.MaxQuota-setting.MinQuota+1)))
+		if err != nil {
+			return nil, errors.New("签到奖励暂时不可用，请稍后重试")
+		}
+		quotaAwarded = setting.MinQuota + int(award.Int64())
 	}
 
 	checkin := &Checkin{

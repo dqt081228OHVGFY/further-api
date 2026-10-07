@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "AI模型接口",
-    "description": "",
+    "title": "further-api 模型接口",
+    "description": "further-api 模型调用 API。可用模型、协议和任务能力取决于站点配置的上游渠道与插件。",
     "version": "1.0.0"
   },
   "tags": [
@@ -4613,13 +4613,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT or PAT",
-        "description": "面板短期 JWT 或 User.AccessToken PAT；不再要求 New-Api-User"
-      },
-      "NewApiUser": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "New-Api-User",
-        "description": "已废弃且不再参与鉴权；PAT 客户端可以移除此请求头"
+        "description": "further-api 面板短期 JWT 或 User.AccessToken PAT"
       },
       "Combination": {
         "group": [

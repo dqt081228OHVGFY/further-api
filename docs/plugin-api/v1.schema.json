@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/QuantumNous/new-api/docs/plugin-api/v1.schema.json",
-  "title": "new-api Task Plugin v1 manifest",
+  "$id": "https://github.com/dqt081228OHVGFY/further-api/docs/plugin-api/v1.schema.json",
+  "title": "further-api Task Plugin v1 manifest",
   "type": "object",
   "additionalProperties": false,
   "required": ["apiVersion", "key", "name", "version", "author", "models", "fetchMode"],
@@ -13,7 +13,7 @@
     "baseUrl": {"type": "string", "format": "uri", "pattern": "^https?://", "maxLength": 191},
     "channelTypes": {"type": "array", "uniqueItems": true, "items": {"type": "integer", "minimum": 1}}, "models": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "fetchMode": {"enum": ["per_task", "batch"]}, "allowedHosts": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-    "upstreams": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/upstreamKind"}, "description": "Upstream kinds the driver addresses. vendor is implied; new_api makes the plugin bindable to type-60 New API channels."},
+    "upstreams": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/upstreamKind"}, "description": "Upstream kinds the driver addresses. vendor is implied; gateway binds the plugin to type-60 gateway channels."},
     "protocols": {"type": "array", "uniqueItems": true, "items": {"oneOf": [
       {"enum": ["openai_video", "openai_image"]},
       {"type": "object", "additionalProperties": false, "required": ["name", "supports"], "properties": {"name": {"const": "openai_responses"}, "supports": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["stream", "sync", "background"]}}, "models": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}}},
@@ -105,13 +105,13 @@
       }
     },
     "route": {"type": "object", "additionalProperties": false, "required": ["method", "path", "type", "render"], "properties": {"method": {"enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]}, "path": {"type": "string", "pattern": "^/"}, "type": {"enum": ["submit", "query", "dynamic"]}, "action": {"type": "string"}, "taskIdParam": {"type": "string"}, "retainResult": {"type": "boolean"}, "decode": {"type": "string"}, "render": {"type": "string"}, "models": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}}, "allOf": [{"if": {"properties": {"type": {"const": "query"}}}, "then": {"allOf": [{"not": {"required": ["decode"]}}, {"not": {"required": ["models"]}}, {"not": {"required": ["retainResult"]}}]}}, {"if": {"properties": {"type": {"enum": ["submit", "dynamic"]}}}, "then": {"required": ["decode"]}}]},
-    "upstreamKind": {"enum": ["vendor", "new_api"]},
+    "upstreamKind": {"enum": ["vendor", "gateway"]},
     "upstreamContext": {
       "type": "object",
       "additionalProperties": false,
       "required": ["kind"],
       "properties": {"kind": {"$ref": "#/$defs/upstreamKind"}},
-      "description": "Host-injected on every driver hook context; new_api means the executing channel is a type-60 New API channel with Bearer credentials already applied."
+      "description": "Host-injected on every driver hook context; gateway means the executing channel is a type-60 gateway channel with Bearer credentials already applied."
     },
     "taskQueryContext": {
       "type": "object",

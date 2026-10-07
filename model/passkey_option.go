@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"crypto/hmac"
 	"errors"
 	"maps"
@@ -8,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -94,6 +95,13 @@ func validatePasskeyRPIDWithTx(tx *gorm.DB, rpID string) error {
 // including unrelated keys from UpdateOptionsBulk. Preview rolls back even the
 // initial default rows and never publishes a local configuration change.
 func UpdatePasskeyDomainOptions(values map[string]string, preview bool, confirmation string) (*PasskeyDomainChange, error) {
+	return UpdatePasskeyDomainOptionsContext(context.Background(), values, preview, confirmation)
+}
+
+func UpdatePasskeyDomainOptionsContext(ctx context.Context, values map[string]string, preview bool, confirmation string) (*PasskeyDomainChange, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	passkeyOptionMutex.Lock()
 	defer passkeyOptionMutex.Unlock()
 	values = maps.Clone(values)
@@ -103,7 +111,7 @@ func UpdatePasskeyDomainOptions(values map[string]string, preview bool, confirma
 		}
 	}
 	var change *PasskeyDomainChange
-	err := DB.Transaction(func(tx *gorm.DB) error {
+	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		settings, serverAddress, err := lockPasskeyDomainSettings(tx)
 		if err != nil {
 			return err

@@ -2,12 +2,12 @@ package volcengine
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/binary"
+	"errors"
 	"fmt"
-	"io"
-	"math"
-
 	"github.com/gorilla/websocket"
+	"io"
 )
 
 type (
@@ -207,327 +207,234 @@ func (t EventType) String() string {
 }
 
 type Message struct {
-	Version       VersionBits
-	HeaderSize    HeaderSizeBits
-	MsgType       MsgType
-	MsgTypeFlag   MsgTypeFlagBits
-	Serialization SerializationBits
-	Compression   CompressionBits
-
-	EventType EventType
-	SessionID string
-	ConnectID string
-	Sequence  int32
-	ErrorCode uint32
-
-	Payload []byte
+	Version              VersionBits
+	HeaderSize           HeaderSizeBits
+	MsgType              MsgType
+	MsgTypeFlag          MsgTypeFlagBits
+	Serialization        SerializationBits
+	Compression          CompressionBits
+	EventType            EventType
+	SessionID, ConnectID string
+	Sequence             int32
+	ErrorCode            uint32
+	Payload              []byte
 }
 
+const maxVolcengineFramePayload = 32 << 20
+
+func NewMessage(kind MsgType, flags MsgTypeFlagBits) (*Message, error) {
+	if !validVolcengineKind(kind) || flags > MsgTypeFlagWithEvent {
+		return nil, errors.New("语音帧类型或标记无效。")
+	}
+	return &Message{Version: Version1, HeaderSize: HeaderSize4, MsgType: kind, MsgTypeFlag: flags, Serialization: SerializationJSON, Compression: CompressionNone}, nil
+}
 func NewMessageFromBytes(data []byte) (*Message, error) {
-	if len(data) < 3 {
-		return nil, fmt.Errorf("data too short: expected at least 3 bytes, got %d", len(data))
-	}
-
-	typeAndFlag := data[1]
-
-	msg, err := NewMessage(MsgType(typeAndFlag>>4), MsgTypeFlagBits(typeAndFlag&0b00001111))
-	if err != nil {
+	message := &Message{}
+	if err := message.Unmarshal(data); err != nil {
 		return nil, err
 	}
-
-	if err := msg.Unmarshal(data); err != nil {
-		return nil, err
+	return message, nil
+}
+func validVolcengineKind(kind MsgType) bool {
+	switch kind {
+	case MsgTypeFullClientRequest, MsgTypeAudioOnlyClient, MsgTypeFullServerResponse, MsgTypeAudioOnlyServer, MsgTypeFrontEndResultServer, MsgTypeError:
+		return true
 	}
-
-	return msg, nil
+	return false
+}
+func (message *Message) String() string {
+	if message == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%s, %s, Sequence: %d, ErrorCode: %d, PayloadSize: %d", message.MsgType, message.EventType, message.Sequence, message.ErrorCode, len(message.Payload))
+}
+func connectionEvent(event EventType) bool {
+	return event == EventType_StartConnection || event == EventType_FinishConnection || event == EventType_ConnectionStarted || event == EventType_ConnectionFailed || event == EventType_ConnectionFinished
+}
+func responseConnectionEvent(event EventType) bool {
+	return event == EventType_ConnectionStarted || event == EventType_ConnectionFailed || event == EventType_ConnectionFinished
 }
 
-func NewMessage(msgType MsgType, flag MsgTypeFlagBits) (*Message, error) {
-	return &Message{
-		MsgType:       msgType,
-		MsgTypeFlag:   flag,
-		Version:       Version1,
-		HeaderSize:    HeaderSize4,
-		Serialization: SerializationJSON,
-		Compression:   CompressionNone,
-	}, nil
-}
-
-func (m *Message) String() string {
-	switch m.MsgType {
-	case MsgTypeAudioOnlyServer, MsgTypeAudioOnlyClient:
-		if m.MsgTypeFlag == MsgTypeFlagPositiveSeq || m.MsgTypeFlag == MsgTypeFlagNegativeSeq {
-			return fmt.Sprintf("%s, %s, Sequence: %d, PayloadSize: %d", m.MsgType, m.EventType, m.Sequence, len(m.Payload))
-		}
-		return fmt.Sprintf("%s, %s, PayloadSize: %d", m.MsgType, m.EventType, len(m.Payload))
-	case MsgTypeError:
-		return fmt.Sprintf("%s, %s, ErrorCode: %d, Payload: %s", m.MsgType, m.EventType, m.ErrorCode, string(m.Payload))
-	default:
-		if m.MsgTypeFlag == MsgTypeFlagPositiveSeq || m.MsgTypeFlag == MsgTypeFlagNegativeSeq {
-			return fmt.Sprintf("%s, %s, Sequence: %d, Payload: %s",
-				m.MsgType, m.EventType, m.Sequence, string(m.Payload))
-		}
-		return fmt.Sprintf("%s, %s, Payload: %s", m.MsgType, m.EventType, string(m.Payload))
+func (message *Message) Marshal() ([]byte, error) {
+	if message == nil || !validVolcengineKind(message.MsgType) || message.MsgTypeFlag > MsgTypeFlagWithEvent || len(message.Payload) > maxVolcengineFramePayload {
+		return nil, errors.New("语音帧参数无效。")
 	}
-}
-
-func (m *Message) Marshal() ([]byte, error) {
-	buf := new(bytes.Buffer)
-
-	header := []uint8{
-		uint8(m.Version)<<4 | uint8(m.HeaderSize),
-		uint8(m.MsgType)<<4 | uint8(m.MsgTypeFlag),
-		uint8(m.Serialization)<<4 | uint8(m.Compression),
+	version, words := message.Version, message.HeaderSize
+	if version == 0 {
+		version = Version1
 	}
-
-	headerSize := 4 * int(m.HeaderSize)
-	if padding := headerSize - len(header); padding > 0 {
-		header = append(header, make([]uint8, padding)...)
+	if words == 0 {
+		words = HeaderSize4
 	}
-
-	if err := binary.Write(buf, binary.BigEndian, header); err != nil {
-		return nil, err
+	if version != Version1 || words > 15 || message.Serialization > 1 || message.Compression > 1 {
+		return nil, errors.New("语音帧协议版本或编码无效。")
 	}
-
-	writers, err := m.writers()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, write := range writers {
-		if err := write(buf); err != nil {
+	body := append([]byte(nil), message.Payload...)
+	if message.Compression == 1 {
+		var compressed bytes.Buffer
+		writer := gzip.NewWriter(&compressed)
+		if _, err := writer.Write(body); err != nil {
 			return nil, err
 		}
-	}
-
-	return buf.Bytes(), nil
-}
-
-func (m *Message) Unmarshal(data []byte) error {
-	buf := bytes.NewBuffer(data)
-
-	versionAndHeaderSize, err := buf.ReadByte()
-	if err != nil {
-		return err
-	}
-
-	m.Version = VersionBits(versionAndHeaderSize >> 4)
-	m.HeaderSize = HeaderSizeBits(versionAndHeaderSize & 0b00001111)
-
-	_, err = buf.ReadByte()
-	if err != nil {
-		return err
-	}
-
-	serializationCompression, err := buf.ReadByte()
-	if err != nil {
-		return err
-	}
-
-	m.Serialization = SerializationBits(serializationCompression & 0b11110000)
-	m.Compression = CompressionBits(serializationCompression & 0b00001111)
-
-	headerSize := 4 * int(m.HeaderSize)
-	readSize := 3
-	if paddingSize := headerSize - readSize; paddingSize > 0 {
-		if n, err := buf.Read(make([]byte, paddingSize)); err != nil || n < paddingSize {
-			return fmt.Errorf("insufficient header bytes: expected %d, got %d", paddingSize, n)
+		if err := writer.Close(); err != nil {
+			return nil, err
+		}
+		body = compressed.Bytes()
+		if len(body) > maxVolcengineFramePayload {
+			return nil, errors.New("压缩语音帧超过容量限制。")
 		}
 	}
-
-	readers, err := m.readers()
-	if err != nil {
-		return err
+	data := make([]byte, int(words)*4)
+	data[0] = byte(version)<<4 | byte(words)
+	data[1] = byte(message.MsgType)<<4 | byte(message.MsgTypeFlag)
+	data[2] = byte(message.Serialization)<<4 | byte(message.Compression)
+	integer := func(value uint32) { data = binary.BigEndian.AppendUint32(data, value) }
+	field := func(value string) error {
+		if len(value) > 8192 {
+			return errors.New("语音帧标识符超过容量限制。")
+		}
+		integer(uint32(len(value)))
+		data = append(data, value...)
+		return nil
 	}
+	if message.MsgType == MsgTypeError {
+		integer(message.ErrorCode)
+	} else if message.MsgTypeFlag&1 != 0 {
+		integer(uint32(message.Sequence))
+	}
+	if message.MsgTypeFlag == MsgTypeFlagWithEvent {
+		integer(uint32(message.EventType))
+		if responseConnectionEvent(message.EventType) {
+			if err := field(message.ConnectID); err != nil {
+				return nil, err
+			}
+		} else if !connectionEvent(message.EventType) {
+			if err := field(message.SessionID); err != nil {
+				return nil, err
+			}
+		}
+	}
+	integer(uint32(len(body)))
+	data = append(data, body...)
+	return data, nil
+}
 
-	for _, read := range readers {
-		if err := read(buf); err != nil {
+func (message *Message) Unmarshal(data []byte) error {
+	if message == nil || len(data) < 4 {
+		return io.ErrUnexpectedEOF
+	}
+	decoded := Message{Version: VersionBits(data[0] >> 4), HeaderSize: HeaderSizeBits(data[0] & 15), MsgType: MsgType(data[1] >> 4), MsgTypeFlag: MsgTypeFlagBits(data[1] & 15), Serialization: SerializationBits(data[2] >> 4), Compression: CompressionBits(data[2] & 15)}
+	header := int(decoded.HeaderSize) * 4
+	if decoded.Version != Version1 || header < 4 || header > len(data) || !validVolcengineKind(decoded.MsgType) || decoded.MsgTypeFlag > MsgTypeFlagWithEvent || decoded.Serialization > 1 || decoded.Compression > 1 {
+		return errors.New("语音帧头无效。")
+	}
+	cursor := header
+	integer := func() (uint32, error) {
+		if len(data)-cursor < 4 {
+			return 0, io.ErrUnexpectedEOF
+		}
+		value := binary.BigEndian.Uint32(data[cursor : cursor+4])
+		cursor += 4
+		return value, nil
+	}
+	field := func(limit int) ([]byte, error) {
+		size, err := integer()
+		if err != nil {
+			return nil, err
+		}
+		if uint64(size) > uint64(limit) {
+			return nil, errors.New("语音帧字段超过容量限制。")
+		}
+		if uint64(size) > uint64(len(data)-cursor) {
+			return nil, io.ErrUnexpectedEOF
+		}
+		value := data[cursor : cursor+int(size)]
+		cursor += int(size)
+		return value, nil
+	}
+	if decoded.MsgType == MsgTypeError {
+		value, err := integer()
+		if err != nil {
 			return err
 		}
-	}
-
-	if _, err := buf.ReadByte(); err != io.EOF {
-		return fmt.Errorf("unexpected data after message: %v", err)
-	}
-
-	return nil
-}
-
-func (m *Message) writers() (writers []func(*bytes.Buffer) error, _ error) {
-	if m.MsgTypeFlag == MsgTypeFlagWithEvent {
-		writers = append(writers, m.writeEvent, m.writeSessionID)
-	}
-
-	switch m.MsgType {
-	case MsgTypeFullClientRequest, MsgTypeFullServerResponse, MsgTypeFrontEndResultServer, MsgTypeAudioOnlyClient, MsgTypeAudioOnlyServer:
-		if m.MsgTypeFlag == MsgTypeFlagPositiveSeq || m.MsgTypeFlag == MsgTypeFlagNegativeSeq {
-			writers = append(writers, m.writeSequence)
+		decoded.ErrorCode = value
+	} else if decoded.MsgTypeFlag&1 != 0 {
+		value, err := integer()
+		if err != nil {
+			return err
 		}
-	case MsgTypeError:
-		writers = append(writers, m.writeErrorCode)
-	default:
-		return nil, fmt.Errorf("unsupported message type: %d", m.MsgType)
+		decoded.Sequence = int32(value)
 	}
-
-	writers = append(writers, m.writePayload)
-	return writers, nil
-}
-
-func (m *Message) writeEvent(buf *bytes.Buffer) error {
-	return binary.Write(buf, binary.BigEndian, m.EventType)
-}
-
-func (m *Message) writeSessionID(buf *bytes.Buffer) error {
-	switch m.EventType {
-	case EventType_StartConnection, EventType_FinishConnection,
-		EventType_ConnectionStarted, EventType_ConnectionFailed:
-		return nil
-	}
-
-	size := len(m.SessionID)
-	if int64(size) > math.MaxUint32 {
-		return fmt.Errorf("session ID size (%d) exceeds max(uint32)", size)
-	}
-
-	if err := binary.Write(buf, binary.BigEndian, uint32(size)); err != nil {
-		return err
-	}
-
-	buf.WriteString(m.SessionID)
-	return nil
-}
-
-func (m *Message) writeSequence(buf *bytes.Buffer) error {
-	return binary.Write(buf, binary.BigEndian, m.Sequence)
-}
-
-func (m *Message) writeErrorCode(buf *bytes.Buffer) error {
-	return binary.Write(buf, binary.BigEndian, m.ErrorCode)
-}
-
-func (m *Message) writePayload(buf *bytes.Buffer) error {
-	size := len(m.Payload)
-	if int64(size) > math.MaxUint32 {
-		return fmt.Errorf("payload size (%d) exceeds max(uint32)", size)
-	}
-
-	if err := binary.Write(buf, binary.BigEndian, uint32(size)); err != nil {
-		return err
-	}
-
-	buf.Write(m.Payload)
-	return nil
-}
-
-func (m *Message) readers() (readers []func(*bytes.Buffer) error, _ error) {
-	switch m.MsgType {
-	case MsgTypeFullClientRequest, MsgTypeFullServerResponse, MsgTypeFrontEndResultServer, MsgTypeAudioOnlyClient, MsgTypeAudioOnlyServer:
-		if m.MsgTypeFlag == MsgTypeFlagPositiveSeq || m.MsgTypeFlag == MsgTypeFlagNegativeSeq {
-			readers = append(readers, m.readSequence)
+	if decoded.MsgTypeFlag == MsgTypeFlagWithEvent {
+		event, err := integer()
+		if err != nil {
+			return err
 		}
-	case MsgTypeError:
-		readers = append(readers, m.readErrorCode)
-	default:
-		return nil, fmt.Errorf("unsupported message type: %d", m.MsgType)
+		decoded.EventType = EventType(int32(event))
+		if responseConnectionEvent(decoded.EventType) {
+			value, err := field(8192)
+			if err != nil {
+				return err
+			}
+			decoded.ConnectID = string(value)
+		} else if !connectionEvent(decoded.EventType) {
+			value, err := field(8192)
+			if err != nil {
+				return err
+			}
+			decoded.SessionID = string(value)
+		}
 	}
-
-	if m.MsgTypeFlag == MsgTypeFlagWithEvent {
-		readers = append(readers, m.readEvent, m.readSessionID, m.readConnectID)
-	}
-
-	readers = append(readers, m.readPayload)
-	return readers, nil
-}
-
-func (m *Message) readEvent(buf *bytes.Buffer) error {
-	return binary.Read(buf, binary.BigEndian, &m.EventType)
-}
-
-func (m *Message) readSessionID(buf *bytes.Buffer) error {
-	switch m.EventType {
-	case EventType_StartConnection, EventType_FinishConnection,
-		EventType_ConnectionStarted, EventType_ConnectionFailed,
-		EventType_ConnectionFinished:
-		return nil
-	}
-
-	var size uint32
-	if err := binary.Read(buf, binary.BigEndian, &size); err != nil {
+	payload, err := field(maxVolcengineFramePayload)
+	if err != nil {
 		return err
 	}
-
-	if size > 0 {
-		m.SessionID = string(buf.Next(int(size)))
+	if cursor != len(data) {
+		return errors.New("语音帧包含未声明的尾部数据。")
 	}
-
+	if decoded.Compression == 1 {
+		reader, err := gzip.NewReader(bytes.NewReader(payload))
+		if err != nil {
+			return err
+		}
+		decompressed, readErr := io.ReadAll(io.LimitReader(reader, maxVolcengineFramePayload+1))
+		closeErr := reader.Close()
+		if err := errors.Join(readErr, closeErr); err != nil {
+			return err
+		}
+		if len(decompressed) > maxVolcengineFramePayload {
+			return errors.New("语音帧解压后超过容量限制。")
+		}
+		decoded.Payload = decompressed
+	} else {
+		decoded.Payload = append([]byte(nil), payload...)
+	}
+	*message = decoded
 	return nil
 }
 
-func (m *Message) readConnectID(buf *bytes.Buffer) error {
-	switch m.EventType {
-	case EventType_ConnectionStarted, EventType_ConnectionFailed,
-		EventType_ConnectionFinished:
-	default:
-		return nil
+func ReceiveMessage(socket *websocket.Conn) (*Message, error) {
+	if socket == nil {
+		return nil, errors.New("语音连接为空。")
 	}
-
-	var size uint32
-	if err := binary.Read(buf, binary.BigEndian, &size); err != nil {
-		return err
-	}
-
-	if size > 0 {
-		m.ConnectID = string(buf.Next(int(size)))
-	}
-
-	return nil
-}
-
-func (m *Message) readSequence(buf *bytes.Buffer) error {
-	return binary.Read(buf, binary.BigEndian, &m.Sequence)
-}
-
-func (m *Message) readErrorCode(buf *bytes.Buffer) error {
-	return binary.Read(buf, binary.BigEndian, &m.ErrorCode)
-}
-
-func (m *Message) readPayload(buf *bytes.Buffer) error {
-	var size uint32
-	if err := binary.Read(buf, binary.BigEndian, &size); err != nil {
-		return err
-	}
-
-	if size > 0 {
-		m.Payload = buf.Next(int(size))
-	}
-
-	return nil
-}
-
-func ReceiveMessage(conn *websocket.Conn) (*Message, error) {
-	mt, frame, err := conn.ReadMessage()
+	kind, frame, err := socket.ReadMessage()
 	if err != nil {
 		return nil, err
 	}
-	if mt != websocket.BinaryMessage && mt != websocket.TextMessage {
-		return nil, fmt.Errorf("unexpected Websocket message type: %d", mt)
+	if kind != websocket.BinaryMessage && kind != websocket.TextMessage {
+		return nil, errors.New("语音连接返回了非数据帧。")
 	}
-	msg, err := NewMessageFromBytes(frame)
-	if err != nil {
-		return nil, err
-	}
-	return msg, nil
+	return NewMessageFromBytes(frame)
 }
-
-func FullClientRequest(conn *websocket.Conn, payload []byte) error {
-	msg, err := NewMessage(MsgTypeFullClientRequest, MsgTypeFlagNoSeq)
+func FullClientRequest(socket *websocket.Conn, payload []byte) error {
+	message, err := NewMessage(MsgTypeFullClientRequest, MsgTypeFlagNoSeq)
 	if err != nil {
 		return err
 	}
-	msg.Payload = payload
-	frame, err := msg.Marshal()
+	message.Payload = payload
+	frame, err := message.Marshal()
 	if err != nil {
 		return err
 	}
-	return conn.WriteMessage(websocket.BinaryMessage, frame)
+	return socket.WriteMessage(websocket.BinaryMessage, frame)
 }

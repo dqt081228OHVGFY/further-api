@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	"image"
+	"io"
 	"os"
 	"strings"
 	"sync"
@@ -156,7 +157,8 @@ type CachedFileData struct {
 	diskClosed      bool       // 是否已关闭/清理
 	statDecremented bool       // 是否已扣减统计
 
-	OnClose func(size int64)
+	OnClose   func(size int64)
+	OnCleanup func()
 }
 
 func NewMemoryCachedData(base64Data string, mimeType string, size int64) *CachedFileData {
@@ -178,28 +180,64 @@ func NewDiskCachedData(diskPath string, mimeType string, size int64) *CachedFile
 }
 
 func (c *CachedFileData) GetBase64Data() (string, error) {
-	if !c.isDisk {
-		return c.base64Data, nil
-	}
-
 	c.diskMu.Lock()
 	defer c.diskMu.Unlock()
 
 	if c.diskClosed {
-		return "", fmt.Errorf("disk cache already closed")
+		return "", fmt.Errorf("file cache already closed")
+	}
+	if !c.isDisk || c.base64Data != "" {
+		return c.base64Data, nil
 	}
 
 	data, err := os.ReadFile(c.diskPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read from disk cache: %w", err)
 	}
-	return string(data), nil
+	c.base64Data = string(data)
+	return c.base64Data, nil
 }
 
 func (c *CachedFileData) SetBase64Data(data string) {
+	c.diskMu.Lock()
+	defer c.diskMu.Unlock()
 	if !c.isDisk {
 		c.base64Data = data
 	}
+}
+
+type cachedFileReader struct {
+	io.ReadCloser
+	unlock func()
+	once   sync.Once
+}
+
+func (reader *cachedFileReader) Close() error {
+	err := reader.ReadCloser.Close()
+	reader.once.Do(reader.unlock)
+	return err
+}
+
+// OpenBase64Reader keeps metadata inspection streaming for large disk caches.
+// Close the returned reader before closing the cache itself.
+func (c *CachedFileData) OpenBase64Reader() (io.ReadCloser, error) {
+	c.diskMu.Lock()
+	if c.diskClosed {
+		c.diskMu.Unlock()
+		return nil, fmt.Errorf("file cache already closed")
+	}
+	var reader io.ReadCloser
+	if !c.isDisk || c.base64Data != "" {
+		reader = io.NopCloser(strings.NewReader(c.base64Data))
+	} else {
+		file, err := os.Open(c.diskPath)
+		if err != nil {
+			c.diskMu.Unlock()
+			return nil, err
+		}
+		reader = file
+	}
+	return &cachedFileReader{ReadCloser: reader, unlock: c.diskMu.Unlock}, nil
 }
 
 func (c *CachedFileData) IsDisk() bool {
@@ -207,11 +245,6 @@ func (c *CachedFileData) IsDisk() bool {
 }
 
 func (c *CachedFileData) Close() error {
-	if !c.isDisk {
-		c.base64Data = ""
-		return nil
-	}
-
 	c.diskMu.Lock()
 	defer c.diskMu.Unlock()
 
@@ -220,6 +253,13 @@ func (c *CachedFileData) Close() error {
 	}
 
 	c.diskClosed = true
+	c.base64Data = ""
+	if c.OnCleanup != nil {
+		c.OnCleanup()
+	}
+	if !c.isDisk {
+		return nil
+	}
 	if c.diskPath != "" {
 		err := os.Remove(c.diskPath)
 		if err == nil && !c.statDecremented && c.OnClose != nil {

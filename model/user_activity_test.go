@@ -11,7 +11,7 @@ import (
 )
 
 func TestInactiveUserFilterUsesCallLogsBeforePaginationAcrossSeparateDatabases(t *testing.T) {
-	setupRelayForStatsTest(t)
+	setupFurtherStatsTest(t)
 	insertUsersForPaginationTest(t, 7)
 	logDB, err := gorm.Open(sqlite.Open(filepath.Join(t.TempDir(), "separate-logs.db")), &gorm.Config{})
 	require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestInactiveUserFilterUsesCallLogsBeforePaginationAcrossSeparateDatabases(t
 }
 
 func TestInactiveUserFilterDoesNotHideUnavailableActivityDatabase(t *testing.T) {
-	setupRelayForStatsTest(t)
+	setupFurtherStatsTest(t)
 	insertUsersForPaginationTest(t, 1)
 	previous := LOG_DB
 	LOG_DB = nil

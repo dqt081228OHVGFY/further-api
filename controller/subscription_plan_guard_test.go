@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
@@ -28,7 +28,7 @@ func setupSubscriptionPlanGuardTest(t *testing.T) *gorm.DB {
 			_ = connection.Close()
 		}
 	})
-	require.NoError(t, db.AutoMigrate(&model.SubscriptionPlan{}, &model.RelayForSubscriptionPolicy{}, &model.RelayForPrepaidCard{}))
+	require.NoError(t, db.AutoMigrate(&model.SubscriptionPlan{}, &model.FurtherSubscriptionPolicy{}, &model.FurtherPrepaidCard{}))
 	confirmPaymentComplianceForTest(t)
 	return db
 }
@@ -64,8 +64,8 @@ func TestSubscriptionPlanCatalogExcludesInternalAndPrepaid(t *testing.T) {
 	for _, plan := range []*model.SubscriptionPlan{&ordinary, &internal, &prepaid} {
 		require.NoError(t, db.Create(plan).Error)
 	}
-	require.NoError(t, db.Create(&model.RelayForSubscriptionPolicy{PlanID: internal.Id, Code: "internal-test", Internal: true}).Error)
-	card := model.RelayForPrepaidCard{PlanID: prepaid.Id, Code: "rfp_test", CodeHash: "test-hash", Name: "Prepaid"}
+	require.NoError(t, db.Create(&model.FurtherSubscriptionPolicy{PlanID: internal.Id, Code: "internal-test", Internal: true}).Error)
+	card := model.FurtherPrepaidCard{PlanID: prepaid.Id, Code: "rfp_test", CodeHash: "test-hash", Name: "Prepaid"}
 	require.NoError(t, db.Create(&card).Error)
 	require.NoError(t, db.Delete(&card).Error, "soft-deleted prepaid cards still reserve their plan")
 
@@ -87,8 +87,8 @@ func TestAdminSubscriptionPlanMutationRejectsInternalAndPrepaid(t *testing.T) {
 	for _, plan := range []*model.SubscriptionPlan{&ordinary, &internal, &prepaid} {
 		require.NoError(t, db.Create(plan).Error)
 	}
-	require.NoError(t, db.Create(&model.RelayForSubscriptionPolicy{PlanID: internal.Id, Code: "internal-mutation", Internal: true}).Error)
-	require.NoError(t, db.Create(&model.RelayForPrepaidCard{PlanID: prepaid.Id, Code: "rfp_mutation", CodeHash: "mutation-hash"}).Error)
+	require.NoError(t, db.Create(&model.FurtherSubscriptionPolicy{PlanID: internal.Id, Code: "internal-mutation", Internal: true}).Error)
+	require.NoError(t, db.Create(&model.FurtherPrepaidCard{PlanID: prepaid.Id, Code: "rfp_mutation", CodeHash: "mutation-hash"}).Error)
 
 	for _, protected := range []model.SubscriptionPlan{internal, prepaid} {
 		id := fmt.Sprint(protected.Id)

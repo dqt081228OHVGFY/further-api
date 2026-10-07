@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/setting/system_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/setting/system_setting"
 	"github.com/stretchr/testify/require"
 )
 
@@ -247,7 +247,7 @@ func TestProtectedFetchRoundTripperRejectsPrivateTargetBeforeProxy(t *testing.T)
 	proxyURL := mustParseURL(t, "http://127.0.0.1:3128")
 	var dialed []string
 	client := newProtectedFetchHTTPClientWithProxy(
-		staticSSRFResolver{},
+		staticSSRFResolver{"localhost": {{IP: net.ParseIP("127.0.0.1")}}},
 		func(ctx context.Context, network, address string) (net.Conn, error) {
 			dialed = append(dialed, address)
 			return nil, errors.New("proxy should not be dialed")

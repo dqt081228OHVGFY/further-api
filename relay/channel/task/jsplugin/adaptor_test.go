@@ -14,17 +14,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/pkg/billingexpr"
-	pluginruntime "github.com/QuantumNous/new-api/pkg/jsplugin"
-	"github.com/QuantumNous/new-api/plugins"
-	"github.com/QuantumNous/new-api/relay/channel"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/helper"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/pkg/billingexpr"
+	pluginruntime "github.com/dqt081228OHVGFY/further-api/pkg/jsplugin"
+	"github.com/dqt081228OHVGFY/further-api/plugins"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/helper"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -1901,11 +1901,11 @@ func TestAlibabaSubmitDeltaDoesNotMutateControlState(t *testing.T) {
 	assert.JSONEq(t, `{"choices":[{"count":2,"lastText":false,"finishReason":"stop"}],"hasUsage":true}`, string(encoded))
 }
 
-// newAPIGateway emulates the upstream New API instance a type-60 channel
+// gatewayGateway emulates the upstream further-api instance a type-60 channel
 // points at: it answers only on the plugin's prefixed native routes, requires
 // the gateway token as a Bearer header, and renders what its own presenters
 // render (the public task id already substituted into the id fields).
-func newAPIGateway(t *testing.T, routes map[string]string, seen *[]string) *httptest.Server {
+func gatewayGateway(t *testing.T, routes map[string]string, seen *[]string) *httptest.Server {
 	t.Helper()
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		*seen = append(*seen, r.Method+" "+r.URL.Path)
@@ -1923,11 +1923,11 @@ func newAPIGateway(t *testing.T, routes map[string]string, seen *[]string) *http
 	}))
 }
 
-func TestTaskAdaptorChainsDoubaoThroughNewAPIUpstream(t *testing.T) {
+func TestTaskAdaptorChainsDoubaoThroughGatewayUpstream(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	service.InitHttpClient()
 	var seen []string
-	gateway := newAPIGateway(t, map[string]string{
+	gateway := gatewayGateway(t, map[string]string{
 		"POST /doubao/api/v3/contents/generations/tasks":               `{"id":"task_up_public"}`,
 		"GET /doubao/api/v3/contents/generations/tasks/task_up_public": `{"id":"task_up_public","status":"succeeded","content":{"video_url":"https://cdn.example/v.mp4"},"usage":{"completion_tokens":1200,"total_tokens":1200}}`,
 	}, &seen)
@@ -1940,7 +1940,7 @@ func TestTaskAdaptorChainsDoubaoThroughNewAPIUpstream(t *testing.T) {
 	adaptor := New(plugin)
 	const modelName = "doubao-seedance-1-0-pro-250528"
 	info := &relaycommon.RelayInfo{
-		ChannelMeta:     &relaycommon.ChannelMeta{ChannelType: constant.ChannelTypeNewAPI, ChannelBaseUrl: gateway.URL, ApiKey: "sk-gateway", UpstreamModelName: modelName},
+		ChannelMeta:     &relaycommon.ChannelMeta{ChannelType: constant.ChannelTypeGateway, ChannelBaseUrl: gateway.URL, ApiKey: "sk-gateway", UpstreamModelName: modelName},
 		OriginModelName: modelName,
 		TaskRelayInfo:   &relaycommon.TaskRelayInfo{PublicTaskID: "task_local"},
 	}
@@ -1982,11 +1982,11 @@ func TestTaskAdaptorChainsDoubaoThroughNewAPIUpstream(t *testing.T) {
 	}, seen)
 }
 
-func TestTaskAdaptorChainsSunoBatchFetchThroughNewAPIUpstream(t *testing.T) {
+func TestTaskAdaptorChainsSunoBatchFetchThroughGatewayUpstream(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	service.InitHttpClient()
 	var seen []string
-	gateway := newAPIGateway(t, map[string]string{
+	gateway := gatewayGateway(t, map[string]string{
 		"POST /suno/submit/MUSIC": `{"code":"success","message":"","data":"task_up_public"}`,
 		"POST /suno/fetch":        `{"code":"success","message":"","data":[{"task_id":"task_up_public","status":"SUCCESS","progress":"100%","data":[{"id":"clip-1","status":"complete","audio_url":"https://cdn.example/a.mp3"}]}]}`,
 	}, &seen)
@@ -1998,7 +1998,7 @@ func TestTaskAdaptorChainsSunoBatchFetchThroughNewAPIUpstream(t *testing.T) {
 	require.NoError(t, err)
 	adaptor := New(plugin)
 	info := &relaycommon.RelayInfo{
-		ChannelMeta:     &relaycommon.ChannelMeta{ChannelType: constant.ChannelTypeNewAPI, ChannelBaseUrl: gateway.URL, ApiKey: "sk-gateway", UpstreamModelName: "suno_music"},
+		ChannelMeta:     &relaycommon.ChannelMeta{ChannelType: constant.ChannelTypeGateway, ChannelBaseUrl: gateway.URL, ApiKey: "sk-gateway", UpstreamModelName: "suno_music"},
 		OriginModelName: "suno_music",
 		TaskRelayInfo:   &relaycommon.TaskRelayInfo{PublicTaskID: "task_local", Action: "MUSIC"},
 	}

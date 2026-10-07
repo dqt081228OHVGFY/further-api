@@ -79,6 +79,14 @@ function absoluteCssUrls(root, sourceFile, distRoot) {
 
 export function transformNativeFeatureCss(css, { sourceFile, distRoot } = {}) {
   const root = postcss.parse(css, { from: sourceFile })
+  // Embedded vendor styles, including toast loaders, follow the same full
+  // motion policy as the workspace without changing installed dependencies.
+  root.walkAtRules('media', (rule) => {
+    const preference = rule.params.match(/^\(\s*prefers-reduced-motion\s*(?::\s*(reduce|no-preference)\s*)?\)$/i)
+    if (!preference) return
+    if (preference[1]?.toLowerCase() === 'no-preference') rule.replaceWith(...rule.nodes)
+    else rule.remove()
+  })
   root.walkRules((rule) => {
     // Preserve animation steps and all other at-rules exactly as emitted.
     if (rule.parent?.type === 'atrule' && rule.parent.name.endsWith('keyframes')) return
@@ -124,13 +132,13 @@ export async function publishNativeFeatureStyles({ distRoot, overrideFile }) {
   const foundationCss = `${foundations.join('\n')}\n`
   const version = createHash('sha256').update(css).digest('hex').slice(0, 16)
   const foundationVersion = createHash('sha256').update(foundationCss).digest('hex').slice(0, 16)
-  const outputRoot = path.join(distRoot, 'relayfor-assets')
+  const outputRoot = path.join(distRoot, 'further-assets')
   await mkdir(outputRoot, { recursive: true })
   await writeFile(path.join(outputRoot, 'native-features.css'), css)
   await writeFile(path.join(outputRoot, 'native-features-foundations.css'), foundationCss)
   const manifest = {
-    styles: [`/relayfor-assets/native-features.css?v=${version}`],
-    globals: [`/relayfor-assets/native-features-foundations.css?v=${foundationVersion}`],
+    styles: [`/further-assets/native-features.css?v=${version}`],
+    globals: [`/further-assets/native-features-foundations.css?v=${foundationVersion}`],
   }
   await writeFile(path.join(outputRoot, 'native-features-manifest.json'), JSON.stringify(manifest))
   return { cssFiles, manifest }

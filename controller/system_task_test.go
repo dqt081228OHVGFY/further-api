@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
@@ -67,7 +67,7 @@ func TestSystemTaskInvalidFiltersAreRejected(t *testing.T) {
 			c.Request = httptest.NewRequest(http.MethodGet, "/"+tc.query, nil)
 			tc.handler(c)
 			assert.Equal(t, http.StatusBadRequest, recorder.Code)
-			assert.JSONEq(t, `{"success":false,"message":"invalid system task filters"}`, recorder.Body.String())
+			assert.JSONEq(t, `{"success":false,"message":"系统任务筛选条件无效"}`, recorder.Body.String())
 		})
 	}
 }

@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -27,125 +26,101 @@ import '@/lib/dayjs'
 import { applyFaviconToDom } from '@/lib/dom-utils'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
 import { createAppQueryClient } from '@/lib/query-client'
-import { readCachedStatus, statusQueryOptions } from '@/lib/status-query'
-import { normalizeNativeFeaturePath } from '@/relayfor/native-feature-paths'
+import { publishWorkspaceStatus, STATUS_QUERY_KEY } from '@/lib/status-query'
+import { loadWorkspaceBootstrap } from '@/further/workspace-bootstrap'
+import { initializeWorkspacePalette } from '@/further/appearance-preferences'
+import { normalizeNativeFeaturePath } from '@/further/native-feature-paths'
 import {
   activityShellTarget,
-  originalShellTarget,
-} from '@/relayfor/original-shell-target'
+  workspaceShellTarget,
+} from '@/further/workspace-target'
 import { useAuthStore } from '@/stores/auth-store'
 
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 import './i18n/config'
-// Generated Routes
-import { routeTree } from './routeTree.gen'
 
 // Styles
 import './styles/index.css'
 
-// Ensure VChart theme is initialized before any chart mounts (prevents white default theme flash)
-// VChart theme is driven by our ThemeProvider (html.light/html.dark) via per-chart `theme` prop.
 initializeFrontendCache()
+initializeWorkspacePalette()
 installBuildMetadata()
 
-const queryClient = createAppQueryClient(() => {
-  void router.navigate({ to: '/500' })
-})
+const queryClient = createAppQueryClient()
 
-// Create a new router instance
-const router = createRouter({
-  routeTree,
-  context: { queryClient },
-  defaultPreload: 'intent',
-  defaultPreloadStaleTime: 0,
-})
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
+const rootElement = (() => {
+  let element = document.querySelector<HTMLElement>('#root')
+  if (!element && document.body.dataset.page === 'public' && location.pathname !== '/') {
+    element = document.createElement('div')
+    element.id = 'root'
+    document.body.replaceChildren(element)
   }
-}
-
-// Render the app
-const rootElement = document.querySelector<HTMLElement>('#root')
-if (!rootElement) {
-  throw new Error('Root element not found')
-}
-// Set document.title and favicon from cached status, then refresh from network
-;(function initSystemBranding() {
-  try {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
-    const apply = (name: string) => {
-      document.title = name
-      const metaTitle = document.querySelector(
-        'meta[name="title"]'
-      ) as HTMLMetaElement | null
-      if (metaTitle) metaTitle.setAttribute('content', name)
-    }
-    // Cache-first
-    const cached = readCachedStatus()
-    if (cached?.system_name) apply(cached.system_name as string)
-    if (cached?.logo) applyFaviconToDom(cached.logo as string)
-
-    // Background refresh through the shared cache. This primes ['status']
-    // before React mounts, so the root guard and every status consumer reuse
-    // this one request instead of firing their own. `fetchStatus` owns the
-    // localStorage write and the system-config store sync.
-    queryClient
-      .ensureQueryData(statusQueryOptions)
-      .then((s) => {
-        if (s?.system_name) apply(s.system_name as string)
-        if (s?.logo) applyFaviconToDom(s.logo as string)
-      })
-      .catch(() => {
-        /* empty */
-      })
-  } catch {
-    /* empty */
-  }
+  return element
 })()
-let protectedFeature: string | null = null
-try {
-  const requestedFeature = location.pathname + location.search
-  protectedFeature = activityShellTarget(requestedFeature)
-    ? requestedFeature
-    : normalizeNativeFeaturePath(requestedFeature)
-} catch {
-  /* Public/auth routes keep their own entry. */
-}
-if (protectedFeature) {
-  const destination = protectedFeature
-  void resolveAuthentication()
-    .then(() => {
-      const user = useAuthStore.getState().auth.user
-      if (!user) {
-        location.replace(
-          '/auth/?mode=login&redirect=' + encodeURIComponent(destination)
-        )
-        return
-      }
-      location.replace(originalShellTarget(destination, Number(user.role)))
-    })
-    .catch(() => {
-      rootElement.textContent = '无法验证登录状态，请刷新重试。'
-      rootElement.setAttribute('role', 'alert')
-    })
-} else if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <FontProvider>
-            <DirectionProvider>
-              <RouterProvider router={router} />
-            </DirectionProvider>
-          </FontProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </StrictMode>
+
+async function mountPublicApplication(element: HTMLElement): Promise<void> {
+  document.title = 'further-api'
+  applyFaviconToDom('/further-api-logo.svg?v=handshake-20261004')
+  const styles = document.querySelector<HTMLMetaElement>('meta[name="further-app-styles"]')?.content.split(',') || []
+  for (const href of styles) {
+    if (!href.startsWith('/static/') || document.querySelector(`link[href="${href}"]`)) continue
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = href
+    document.head.append(link)
+  }
+  const status = document.createElement('p')
+  status.className = 'further-startup'
+  status.setAttribute('role', 'status')
+  status.textContent = '正在打开 further-api…'
+  element.replaceChildren(status)
+  await resolveAuthentication()
+  const bootstrap = await loadWorkspaceBootstrap()
+  publishWorkspaceStatus(bootstrap.status)
+  queryClient.setQueryData(STATUS_QUERY_KEY, bootstrap.status)
+
+  if (location.pathname.replace(/\/+$/, '') === '/welcome' && !useAuthStore.getState().auth.user) {
+    location.replace(`/auth/?mode=login&redirect=${encodeURIComponent(location.pathname + location.search)}`)
+    return
+  }
+
+  let protectedFeature: string | null = null
+  try {
+    const requestedFeature = location.pathname + location.search
+    protectedFeature = activityShellTarget(requestedFeature)
+      ? requestedFeature
+      : normalizeNativeFeaturePath(requestedFeature)
+  } catch { /* Public and authentication pages mount below. */ }
+  if (protectedFeature) {
+    const user = useAuthStore.getState().auth.user
+    location.replace(user
+      ? workspaceShellTarget(protectedFeature, Number(user.role))
+      : `/auth/?mode=login&redirect=${encodeURIComponent(protectedFeature)}`)
+    return
+  }
+  const { FurtherPublicApp } = await import('@/further/public-pages')
+  ReactDOM.createRoot(element).render(
+    <StrictMode><QueryClientProvider client={queryClient}>
+      <ThemeProvider><FontProvider><DirectionProvider><FurtherPublicApp /></DirectionProvider></FontProvider></ThemeProvider>
+    </QueryClientProvider></StrictMode>
   )
+  document.body.dataset.gatewayReady = 'true'
+}
+
+if (rootElement) {
+  void mountPublicApplication(rootElement).catch(() => {
+    const notice = document.createElement('div')
+    notice.className = 'further-startup further-error'
+    notice.setAttribute('role', 'alert')
+    const text = document.createElement('p')
+    text.textContent = '页面暂时无法打开，请重新载入重试。'
+    const retry = document.createElement('button')
+    retry.className = 'further-button'
+    retry.textContent = '重新载入'
+    retry.addEventListener('click', () => location.reload())
+    notice.append(text, retry)
+    rootElement.replaceChildren(notice)
+  })
 }

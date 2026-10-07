@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -38,6 +38,23 @@ func requireOptionMissing(t *testing.T, db *gorm.DB, key string) {
 	t.Helper()
 	var option Option
 	assert.ErrorIs(t, db.Where(&Option{Key: key}).First(&option).Error, gorm.ErrRecordNotFound)
+}
+
+func TestDefaultBrandingMigrationEnforcesCanonicalGatewayBrand(t *testing.T) {
+	for _, tc := range []struct{ name, logo, expectedName, expectedLogo string }{
+		{"further-api", "/further-logo.svg", "further-api", common.ProductLogo},
+		{"Further", "/further-logo.png", "further-api", common.ProductLogo},
+		{"My Gateway", "https://assets.example/custom.svg", "further-api", common.ProductLogo},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			db := useFrontendOptionMigrationDB(t)
+			require.NoError(t, db.Create(&[]Option{{Key: "SystemName", Value: tc.name}, {Key: "Logo", Value: tc.logo}}).Error)
+			require.NoError(t, MigrateRetiredFrontendOptions())
+			require.NoError(t, MigrateRetiredFrontendOptions())
+			assert.Equal(t, tc.expectedName, requireOptionValue(t, db, "SystemName"))
+			assert.Equal(t, tc.expectedLogo, requireOptionValue(t, db, "Logo"))
+		})
+	}
 }
 
 func TestMigrateRetiredFrontendOptionsMigratesValidValuesIdempotently(t *testing.T) {
@@ -177,4 +194,20 @@ func TestRetiredThemeOptionIsPersistedButNotPublished(t *testing.T) {
 	assert.Equal(t, "default", requireOptionValue(t, db, retiredThemeOptionKey))
 	_, published := common.OptionMap[retiredThemeOptionKey]
 	assert.False(t, published)
+}
+
+func TestRetiredChatPresetsAreRemovedAndCannotBeRestored(t *testing.T) {
+	db := useFrontendOptionMigrationDB(t)
+	previousMap := common.OptionMap
+	common.OptionMap = map[string]string{retiredChatOptionKey: "obsolete"}
+	t.Cleanup(func() { common.OptionMap = previousMap })
+	require.NoError(t, db.Create(&Option{Key: retiredChatOptionKey, Value: "obsolete"}).Error)
+	require.NoError(t, MigrateRetiredFrontendOptions())
+	require.NoError(t, MigrateRetiredFrontendOptions())
+	requireOptionMissing(t, db, retiredChatOptionKey)
+	require.ErrorIs(t, UpdateOption(retiredChatOptionKey, "[]"), ErrRetiredChatOption)
+	require.NoError(t, updateOptionMap(retiredChatOptionKey, "obsolete"))
+	_, published := common.OptionMap[retiredChatOptionKey]
+	require.False(t, published)
+	requireOptionMissing(t, db, retiredChatOptionKey)
 }

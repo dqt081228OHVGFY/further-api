@@ -8,8 +8,8 @@ const pendingImages: HTMLImageElement[] = []
 beforeEach(() => {
   vi.resetModules()
   pendingImages.length = 0
-  document.head.innerHTML = '<link rel="icon" type="image/svg+xml" href="/relayfor-logo.svg">'
-  document.body.innerHTML = '<span class="rail-logo"><img src="/relayfor-logo.svg" alt=""></span>'
+  document.head.innerHTML = '<link rel="icon" type="image/svg+xml" href="/further-api-logo.svg?v=handshake-20261004">'
+  document.body.innerHTML = '<span class="rail-logo"><img src="/further-api-logo.svg?v=handshake-20261004" alt=""></span>'
   vi.stubGlobal('Image', function () {
     const image = document.createElement('img')
     pendingImages.push(image)
@@ -23,10 +23,10 @@ describe('site branding during failures and repeated initialization', () => {
   it.each(['index.html', 'auth/index.html', 'console/index.html', 'admin/index.html', 'prepaid/index.html'])(
     'renders a logo and favicon before any request or script runs in %s',
     (page) => {
-      const html = readFileSync(resolve(process.cwd(), '../relayfor-ui', page), 'utf8')
+      const html = readFileSync(resolve(process.cwd(), '../further-ui', page), 'utf8')
       const parsed = new DOMParser().parseFromString(html, 'text/html')
-      expect(parsed.querySelector('.rail-logo img')?.getAttribute('src')).toBe('/relayfor-logo.svg')
-      expect(parsed.querySelector('link[rel="icon"]')?.getAttribute('href')).toBe('/relayfor-logo.svg')
+      expect(parsed.querySelector('.rail-logo img, .further-brand img')?.getAttribute('src')).toBe('/further-api-logo.svg?v=handshake-20261004')
+      expect(parsed.querySelector('link[rel="icon"]')?.getAttribute('href')).toBe('/further-api-logo.svg?v=handshake-20261004')
     }
   )
 
@@ -36,7 +36,7 @@ describe('site branding during failures and repeated initialization', () => {
     const first = applySiteLogoToDom('/custom-logo.svg')
     const repeated = applySiteLogoToDom('/custom-logo.svg')
     expect(pendingImages).toHaveLength(1)
-    expect(original).toHaveAttribute('src', '/relayfor-logo.svg')
+    expect(original).toHaveAttribute('src', '/further-api-logo.svg?v=handshake-20261004')
     pendingImages[0].dispatchEvent(new Event('load'))
     await Promise.all([first, repeated])
     expect(document.querySelector('.rail-logo img')).toBe(original)
@@ -52,9 +52,9 @@ describe('site branding during failures and repeated initialization', () => {
     expect(pendingImages).toHaveLength(1)
     pendingImages[0].dispatchEvent(new Event('error'))
     await update
-    expect(await reactConsumer).toBe('/relayfor-logo.svg')
-    expect(document.querySelector('.rail-logo img')).toHaveAttribute('src', '/relayfor-logo.svg')
-    expect(document.querySelector('link[rel="icon"]')).toHaveAttribute('href', '/relayfor-logo.svg')
+    expect(await reactConsumer).toBe('/further-api-logo.svg?v=handshake-20261004')
+    expect(document.querySelector('.rail-logo img')).toHaveAttribute('src', '/further-api-logo.svg?v=handshake-20261004')
+    expect(document.querySelector('link[rel="icon"]')).toHaveAttribute('href', '/further-api-logo.svg?v=handshake-20261004')
     await applySiteLogoToDom('/broken.svg')
     expect(pendingImages).toHaveLength(1)
   })

@@ -6,25 +6,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"math/rand"
-	"net"
 	"net/http"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 
 	"github.com/gin-gonic/gin"
-)
-
-// 上游地址
-const (
-	upstreamModelsURL  = "https://basellm.github.io/llm-metadata/api/newapi/models.json"
-	upstreamVendorsURL = "https://basellm.github.io/llm-metadata/api/newapi/vendors.json"
 )
 
 func normalizeLocale(locale string) (string, bool) {
@@ -41,16 +33,20 @@ func normalizeLocale(locale string) (string, bool) {
 }
 
 func getUpstreamBase() string {
-	return common.GetEnvOrDefaultString("SYNC_UPSTREAM_BASE", "https://basellm.github.io/llm-metadata")
+	return strings.TrimSpace(common.GetEnvOrDefaultString("FURTHER_METADATA_BASE", ""))
 }
 
 func getUpstreamURLs(locale string) (modelsURL, vendorsURL string) {
 	base := strings.TrimRight(getUpstreamBase(), "/")
-	if l, ok := normalizeLocale(locale); ok && l != "" {
-		return fmt.Sprintf("%s/api/i18n/%s/newapi/models.json", base, l),
-			fmt.Sprintf("%s/api/i18n/%s/newapi/vendors.json", base, l)
+	parsed, err := url.Parse(base)
+	if err != nil || (parsed.Scheme != "https" && parsed.Scheme != "http") || parsed.Host == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" {
+		return "", ""
 	}
-	return fmt.Sprintf("%s/api/newapi/models.json", base), fmt.Sprintf("%s/api/newapi/vendors.json", base)
+	if l, ok := normalizeLocale(locale); ok && l != "" {
+		return fmt.Sprintf("%s/%s/models.json", base, l),
+			fmt.Sprintf("%s/%s/vendors.json", base, l)
+	}
+	return fmt.Sprintf("%s/models.json", base), fmt.Sprintf("%s/vendors.json", base)
 }
 
 type upstreamEnvelope[T any] struct {
@@ -75,158 +71,6 @@ type upstreamVendor struct {
 	Icon        string `json:"icon"`
 	Name        string `json:"name"`
 	Status      int    `json:"status"`
-}
-
-var (
-	etagCache  = make(map[string]string)
-	bodyCache  = make(map[string][]byte)
-	cacheMutex sync.RWMutex
-)
-
-func newHTTPClient() *http.Client {
-	timeoutSec := common.GetEnvOrDefault("SYNC_HTTP_TIMEOUT_SECONDS", 10)
-	dialer := &net.Dialer{Timeout: time.Duration(timeoutSec) * time.Second}
-	transport := &http.Transport{
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   time.Duration(timeoutSec) * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		ResponseHeaderTimeout: time.Duration(timeoutSec) * time.Second,
-	}
-	if common.TLSInsecureSkipVerify {
-		transport.TLSClientConfig = common.InsecureTLSConfig
-	}
-	transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		host, _, err := net.SplitHostPort(addr)
-		if err != nil {
-			host = addr
-		}
-		if strings.HasSuffix(host, "github.io") {
-			if conn, err := dialer.DialContext(ctx, "tcp4", addr); err == nil {
-				return conn, nil
-			}
-			return dialer.DialContext(ctx, "tcp6", addr)
-		}
-		return dialer.DialContext(ctx, network, addr)
-	}
-	return &http.Client{Transport: transport}
-}
-
-var (
-	httpClientOnce sync.Once
-	httpClient     *http.Client
-)
-
-func getHTTPClient() *http.Client {
-	httpClientOnce.Do(func() {
-		httpClient = newHTTPClient()
-	})
-	return httpClient
-}
-
-func fetchJSON[T any](ctx context.Context, url string, out *upstreamEnvelope[T]) error {
-	var lastErr error
-	attempts := max(common.GetEnvOrDefault("SYNC_HTTP_RETRY", 3), 1)
-	baseDelay := 200 * time.Millisecond
-	maxMB := common.GetEnvOrDefault("SYNC_HTTP_MAX_MB", 10)
-	maxBytes := int64(maxMB) << 20
-	for attempt := 0; attempt < attempts; attempt++ {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-		if err != nil {
-			return err
-		}
-		// ETag conditional request
-		cacheMutex.RLock()
-		if et := etagCache[url]; et != "" {
-			req.Header.Set("If-None-Match", et)
-		}
-		cacheMutex.RUnlock()
-
-		resp, err := getHTTPClient().Do(req)
-		if err != nil {
-			lastErr = err
-			// backoff with jitter
-			sleep := baseDelay * time.Duration(1<<attempt)
-			jitter := time.Duration(rand.Intn(150)) * time.Millisecond
-			time.Sleep(sleep + jitter)
-			continue
-		}
-		func() {
-			defer resp.Body.Close()
-			switch resp.StatusCode {
-			case http.StatusOK:
-				// read body into buffer for caching and flexible decode
-				limited := io.LimitReader(resp.Body, maxBytes+1)
-				buf, err := io.ReadAll(limited)
-				if err != nil {
-					lastErr = err
-					return
-				}
-				if int64(len(buf)) > maxBytes {
-					lastErr = errors.New("upstream metadata exceeds size limit")
-					return
-				}
-				// cache body and ETag
-				cacheMutex.Lock()
-				if et := resp.Header.Get("ETag"); et != "" {
-					etagCache[url] = et
-				}
-				bodyCache[url] = buf
-				cacheMutex.Unlock()
-
-				// Try decode as envelope first
-				if err := common.Unmarshal(buf, out); err != nil {
-					// Try decode as pure array
-					var arr []T
-					if err2 := common.Unmarshal(buf, &arr); err2 != nil {
-						lastErr = err
-						return
-					}
-					out.Success = true
-					out.Data = arr
-					out.Message = ""
-				} else {
-					if !out.Success && len(out.Data) == 0 && out.Message == "" {
-						out.Success = true
-					}
-				}
-				lastErr = nil
-			case http.StatusNotModified:
-				// use cache
-				cacheMutex.RLock()
-				buf := bodyCache[url]
-				cacheMutex.RUnlock()
-				if len(buf) == 0 {
-					lastErr = errors.New("cache miss for 304 response")
-					return
-				}
-				if err := common.Unmarshal(buf, out); err != nil {
-					var arr []T
-					if err2 := common.Unmarshal(buf, &arr); err2 != nil {
-						lastErr = err
-						return
-					}
-					out.Success = true
-					out.Data = arr
-					out.Message = ""
-				} else {
-					if !out.Success && len(out.Data) == 0 && out.Message == "" {
-						out.Success = true
-					}
-				}
-				lastErr = nil
-			default:
-				lastErr = errors.New(resp.Status)
-			}
-		}()
-		if lastErr == nil {
-			return nil
-		}
-		sleep := baseDelay * time.Duration(1<<attempt)
-		jitter := time.Duration(rand.Intn(150)) * time.Millisecond
-		time.Sleep(sleep + jitter)
-	}
-	return lastErr
 }
 
 type metadataSyncSource struct {
@@ -258,6 +102,9 @@ func fetchMetadataCatalog(c *gin.Context, locale string) (metadataSyncSource, ma
 		return metadataSyncSource{}, nil, nil, errors.New("unsupported metadata language")
 	}
 	modelsURL, vendorsURL := getUpstreamURLs(resolved)
+	if modelsURL == "" || vendorsURL == "" {
+		return metadataSyncSource{}, nil, nil, errors.New("尚未配置有效的模型资料源，请设置 FURTHER_METADATA_BASE 后重试")
+	}
 	source := metadataSyncSource{Locale: resolved, ModelsURL: modelsURL, VendorsURL: vendorsURL}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(common.GetEnvOrDefault("SYNC_HTTP_TIMEOUT_SECONDS", 15))*time.Second)
 	defer cancel()

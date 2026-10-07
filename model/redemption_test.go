@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
@@ -138,6 +138,15 @@ func TestRedemptionBatchesKeepLegacyCodesDistinctAndUsedCodesDuringCleanup(t *te
 	require.NoError(t, err)
 	assert.EqualValues(t, 2, total)
 	assert.NotEqual(t, legacy[0].BatchID, legacy[1].BatchID)
+	// Unbatched codes accept the current gateway identifier as an alias
+	// for the stable numeric storage record.
+	assert.Equal(t, "legacy-2", legacy[0].BatchID)
+	deleted, err = DeleteUnusedRedemptionBatch("further-2")
+	require.NoError(t, err)
+	assert.EqualValues(t, 1, deleted)
+	deleted, err = DeleteUnusedRedemptionBatch("legacy-1")
+	require.NoError(t, err)
+	assert.EqualValues(t, 1, deleted)
 }
 
 func setupRedeemFixture(t *testing.T, quota int) (userId int, key string) {

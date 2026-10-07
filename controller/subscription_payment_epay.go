@@ -1,116 +1,59 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/Calcium-Ion/go-epay/epay"
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
-	"github.com/samber/lo"
+	"net/http"
 )
 
 func SubscriptionEpayNotify(c *gin.Context) {
-	var params map[string]string
-
-	if c.Request.Method == "POST" {
-		// POST 请求：从 POST body 解析参数
-		if err := c.Request.ParseForm(); err != nil {
-			_, _ = c.Writer.Write([]byte("fail"))
-			return
-		}
-		params = lo.Reduce(lo.Keys(c.Request.PostForm), func(r map[string]string, t string, i int) map[string]string {
-			r[t] = c.Request.PostForm.Get(t)
-			return r
-		}, map[string]string{})
-	} else {
-		// GET 请求：从 URL Query 解析参数
-		params = lo.Reduce(lo.Keys(c.Request.URL.Query()), func(r map[string]string, t string, i int) map[string]string {
-			r[t] = c.Request.URL.Query().Get(t)
-			return r
-		}, map[string]string{})
-	}
-
-	if len(params) == 0 {
-		_, _ = c.Writer.Write([]byte("fail"))
+	response := "fail"
+	defer func() { c.Data(http.StatusOK, "text/plain; charset=utf-8", []byte(response)) }()
+	params, err := paymentCallbackParameters(c)
+	if err != nil || len(params) == 0 {
 		return
 	}
-
 	client := GetEpayClient()
 	if client == nil {
-		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
-	verifyInfo, err := client.Verify(params)
-	if err != nil || !verifyInfo.VerifyStatus {
-		_, _ = c.Writer.Write([]byte("fail"))
+	verified, err := client.Verify(params)
+	if err != nil || !verified.VerifyStatus || verified.TradeStatus != epay.StatusTradeSuccess {
 		return
 	}
-
-	if verifyInfo.TradeStatus != epay.StatusTradeSuccess {
-		_, _ = c.Writer.Write([]byte("fail"))
+	LockOrder(verified.ServiceTradeNo)
+	defer UnlockOrder(verified.ServiceTradeNo)
+	if err := model.CompleteSubscriptionOrderWithEvidenceContext(c.Request.Context(), verified.ServiceTradeNo, common.GetJsonString(gin.H{"trade_no": verified.ServiceTradeNo, "amount": params["money"], "method": verified.Type}), model.PaymentProviderEpay, verified.Type, &model.PaymentEvidence{Amount: params["money"], Currency: "CNY"}); err != nil {
 		return
 	}
-
-	LockOrder(verifyInfo.ServiceTradeNo)
-	defer UnlockOrder(verifyInfo.ServiceTradeNo)
-
-	if err := model.CompleteSubscriptionOrder(verifyInfo.ServiceTradeNo, common.GetJsonString(verifyInfo), model.PaymentProviderEpay, verifyInfo.Type); err != nil {
-		_, _ = c.Writer.Write([]byte("fail"))
-		return
-	}
-
-	_, _ = c.Writer.Write([]byte("success"))
+	response = "success"
 }
 
-// SubscriptionEpayReturn handles browser return after payment.
-// It verifies the payload and completes the order, then redirects to console.
 func SubscriptionEpayReturn(c *gin.Context) {
-	var params map[string]string
-
-	if c.Request.Method == "POST" {
-		// POST 请求：从 POST body 解析参数
-		if err := c.Request.ParseForm(); err != nil {
-			c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=fail"))
-			return
-		}
-		params = lo.Reduce(lo.Keys(c.Request.PostForm), func(r map[string]string, t string, i int) map[string]string {
-			r[t] = c.Request.PostForm.Get(t)
-			return r
-		}, map[string]string{})
-	} else {
-		// GET 请求：从 URL Query 解析参数
-		params = lo.Reduce(lo.Keys(c.Request.URL.Query()), func(r map[string]string, t string, i int) map[string]string {
-			r[t] = c.Request.URL.Query().Get(t)
-			return r
-		}, map[string]string{})
-	}
-
-	if len(params) == 0 {
-		c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=fail"))
+	outcome := "fail"
+	defer func() { c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay="+outcome)) }()
+	params, err := paymentCallbackParameters(c)
+	if err != nil || len(params) == 0 {
 		return
 	}
-
 	client := GetEpayClient()
 	if client == nil {
-		c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=fail"))
 		return
 	}
-	verifyInfo, err := client.Verify(params)
-	if err != nil || !verifyInfo.VerifyStatus {
-		c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=fail"))
+	verified, err := client.Verify(params)
+	if err != nil || !verified.VerifyStatus {
 		return
 	}
-	if verifyInfo.TradeStatus == epay.StatusTradeSuccess {
-		LockOrder(verifyInfo.ServiceTradeNo)
-		defer UnlockOrder(verifyInfo.ServiceTradeNo)
-		if err := model.CompleteSubscriptionOrder(verifyInfo.ServiceTradeNo, common.GetJsonString(verifyInfo), model.PaymentProviderEpay, verifyInfo.Type); err != nil {
-			c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=fail"))
-			return
-		}
-		c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=success"))
+	if verified.TradeStatus != epay.StatusTradeSuccess {
+		outcome = "pending"
 		return
 	}
-	c.Redirect(http.StatusFound, paymentReturnPath("/wallet?pay=pending"))
+	LockOrder(verified.ServiceTradeNo)
+	defer UnlockOrder(verified.ServiceTradeNo)
+	if err := model.CompleteSubscriptionOrderWithEvidenceContext(c.Request.Context(), verified.ServiceTradeNo, common.GetJsonString(gin.H{"trade_no": verified.ServiceTradeNo, "amount": params["money"], "method": verified.Type}), model.PaymentProviderEpay, verified.Type, &model.PaymentEvidence{Amount: params["money"], Currency: "CNY"}); err != nil {
+		return
+	}
+	outcome = "success"
 }

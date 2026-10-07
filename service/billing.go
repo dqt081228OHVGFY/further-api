@@ -1,12 +1,13 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/logger"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,91 +16,79 @@ const (
 	BillingSourceSubscription = "subscription"
 )
 
-// PreConsumeBilling 根据用户计费偏好创建 BillingSession 并执行预扣费。
-// 会话存储在 relayInfo.Billing 上，供后续 Settle / Refund 使用。
-func PreConsumeBilling(c *gin.Context, preConsumedQuota int, relayInfo *relaycommon.RelayInfo) *types.NewAPIError {
-	if relayInfo != nil && relayInfo.QuotaClamp != nil {
-		return types.NewErrorWithStatusCode(
-			relayInfo.QuotaClamp,
-			types.ErrorCodeModelPriceError,
-			http.StatusBadRequest,
-			types.ErrOptionWithSkipRetry(),
-		)
+func PreConsumeBilling(c *gin.Context, amount int, info *relaycommon.RelayInfo) *types.GatewayError {
+	if info == nil {
+		return types.NewErrorWithStatusCode(errors.New("计费请求上下文无效。"), types.ErrorCodeInvalidRequest, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 	}
-	if preConsumedQuota < 0 {
-		return types.NewErrorWithStatusCode(
-			fmt.Errorf("pre-consume quota cannot be negative: %d", preConsumedQuota),
-			types.ErrorCodeModelPriceError,
-			http.StatusBadRequest,
-			types.ErrOptionWithSkipRetry(),
-		)
+	if info.QuotaClamp != nil {
+		return types.NewErrorWithStatusCode(info.QuotaClamp, types.ErrorCodeModelPriceError, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 	}
-	session, apiErr := NewBillingSession(c, relayInfo, preConsumedQuota)
-	if apiErr != nil {
-		return apiErr
+	if !validFundingAmount(amount) {
+		return types.NewErrorWithStatusCode(ErrFundingAmountInvalid, types.ErrorCodeModelPriceError, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 	}
-	relayInfo.Billing = session
-	return nil
+	session, failure := NewBillingSession(c, info, amount)
+	if failure == nil {
+		info.Billing = session
+	}
+	return failure
 }
 
-// ---------------------------------------------------------------------------
-// SettleBilling — 后结算辅助函数
-// ---------------------------------------------------------------------------
-
-// SettleBilling 执行计费结算。如果 RelayInfo 上有 BillingSession 则通过 session 结算，
-// 否则回退到旧的 PostConsumeQuota 路径（兼容按次计费等场景）。
-func SettleBilling(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, actualQuota int) error {
-	if relayInfo.Billing != nil {
-		preConsumed := relayInfo.Billing.GetPreConsumedQuota()
-		delta := actualQuota - preConsumed
-
-		if delta > 0 {
-			logger.LogInfo(ctx, fmt.Sprintf("预扣费后补扣费：%s（实际消耗：%s，预扣费：%s）",
-				logger.FormatQuota(delta),
-				logger.FormatQuota(actualQuota),
-				logger.FormatQuota(preConsumed),
-			))
-		} else if delta < 0 {
-			logger.LogInfo(ctx, fmt.Sprintf("预扣费后返还扣费：%s（实际消耗：%s，预扣费：%s）",
-				logger.FormatQuota(-delta),
-				logger.FormatQuota(actualQuota),
-				logger.FormatQuota(preConsumed),
-			))
-		} else {
-			logger.LogInfo(ctx, fmt.Sprintf("预扣费与实际消耗一致，无需调整：%s（按次计费）",
-				logger.FormatQuota(actualQuota),
-			))
-		}
-
-		if err := relayInfo.Billing.Settle(actualQuota); err != nil {
-			return err
-		}
-
-		// 发送额度通知（订阅计费使用订阅剩余额度）
-		if actualQuota != 0 {
-			if relayInfo.BillingSource == BillingSourceSubscription {
-				checkAndSendSubscriptionQuotaNotify(relayInfo)
-			} else {
-				checkAndSendQuotaNotify(relayInfo, actualQuota-preConsumed, preConsumed)
-			}
+func SettleBilling(c *gin.Context, info *relaycommon.RelayInfo, actual int) error {
+	if info == nil || !validFundingAmount(actual) {
+		return ErrFundingAmountInvalid
+	}
+	reserved := info.FinalPreConsumedQuota
+	if info.Billing == nil {
+		if delta := actual - reserved; delta != 0 {
+			return PostConsumeQuota(info, delta, reserved, true)
 		}
 		return nil
 	}
-
-	// 回退：无 BillingSession 时使用旧路径
-	quotaDelta := actualQuota - relayInfo.FinalPreConsumedQuota
-	if quotaDelta != 0 {
-		return PostConsumeQuota(relayInfo, quotaDelta, relayInfo.FinalPreConsumedQuota, true)
+	reserved = info.Billing.GetPreConsumedQuota()
+	if err := info.Billing.Settle(actual); err != nil {
+		return err
+	}
+	if session, ok := info.Billing.(*BillingSession); ok {
+		session.mu.Lock()
+		if session.notificationPublished {
+			session.mu.Unlock()
+			return nil
+		}
+		session.notificationPublished = true
+		if session.furtherFinalQuota != nil {
+			actual = *session.furtherFinalQuota
+		}
+		session.mu.Unlock()
+	}
+	logger.LogInfo(c, fmt.Sprintf("计费结算：预留 %s，实际扣费 %s", logger.FormatQuota(reserved), logger.FormatQuota(actual)))
+	if actual > 0 {
+		if info.BillingSource == BillingSourceSubscription {
+			checkAndSendSubscriptionQuotaNotify(info)
+		} else {
+			checkAndSendQuotaNotify(info, actual-reserved, reserved)
+		}
 	}
 	return nil
 }
 
-// SettleBillingWithFinalQuota lets usage logs and quota counters record the
-// amount actually charged after the selected subscription policy.
-func SettleBillingWithFinalQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, actualQuota int) (int, error) {
-	err := SettleBilling(ctx, relayInfo, actualQuota)
-	if session, ok := relayInfo.Billing.(*BillingSession); ok && session.relayForFinalQuota != nil {
-		return *session.relayForFinalQuota, err
+func SettleBillingWithFinalQuota(c *gin.Context, info *relaycommon.RelayInfo, actual int) (int, error) {
+	err := SettleBilling(c, info, actual)
+	if info != nil {
+		if session, ok := info.Billing.(*BillingSession); ok {
+			if charged, known := session.FinalQuota(); known {
+				return charged, err
+			}
+		}
 	}
-	return actualQuota, err
+	return actual, err
+}
+
+func BillingReservationCovers(info *relaycommon.RelayInfo, target int) bool {
+	if info == nil || info.Billing == nil || target < 0 {
+		return false
+	}
+	if reservation, ok := info.Billing.(interface{ ReservedTargetQuota() int }); ok {
+		return reservation.ReservedTargetQuota() >= target
+	}
+	return info.Billing.GetPreConsumedQuota() >= target
 }

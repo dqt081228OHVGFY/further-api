@@ -6,8 +6,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
 )
 
@@ -35,14 +37,31 @@ func GenerateTOTPSecret(accountName string) (*otp.Key, error) {
 
 // ValidateTOTPCode 验证TOTP验证码
 func ValidateTOTPCode(secret, code string) bool {
+	_, valid := MatchTOTPTimeStep(secret, code, time.Now())
+	return valid
+}
+
+// MatchTOTPTimeStep returns the exact accepted counter so the factor store can
+// reject its reuse. The window and options match the original totp.Validate.
+func MatchTOTPTimeStep(secret, code string, at time.Time) (int64, bool) {
 	// 清理验证码格式
 	cleanCode := strings.ReplaceAll(code, " ", "")
 	if len(cleanCode) != 6 {
-		return false
+		return 0, false
 	}
 
 	// 验证验证码
-	return totp.Validate(cleanCode, secret)
+	step := at.Unix() / 30
+	for _, counter := range []int64{step, step + 1, step - 1} {
+		if counter < 0 {
+			continue
+		}
+		valid, err := hotp.ValidateCustom(cleanCode, uint64(counter), secret, hotp.ValidateOpts{Digits: otp.DigitsSix, Algorithm: otp.AlgorithmSHA1})
+		if err == nil && valid {
+			return counter, true
+		}
+	}
+	return 0, false
 }
 
 // GenerateBackupCodes 生成备用恢复码
@@ -113,7 +132,7 @@ func HashBackupCode(code string) (string, error) {
 
 // Get2FAIssuer 获取2FA发行者名称
 func Get2FAIssuer() string {
-	return SystemName
+	return ProductName
 }
 
 // getEnvOrDefault 获取环境变量或默认值

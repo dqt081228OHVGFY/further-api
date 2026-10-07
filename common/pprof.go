@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"runtime/pprof"
@@ -11,16 +12,21 @@ import (
 
 // Monitor 定时监控cpu使用率，超过阈值输出pprof文件
 func Monitor() {
-	for {
-		percent, err := cpu.Percent(time.Second, false)
+	MonitorContext(BackgroundContext())
+}
+
+func MonitorContext(ctx context.Context) {
+	for ctx.Err() == nil {
+		percent, err := cpu.PercentWithContext(ctx, time.Second, false)
 		if err != nil {
-			panic(err)
-		}
-		if percent[0] > 80 {
+			if ctx.Err() == nil {
+				SysError("CPU monitor failed: " + err.Error())
+			}
+		} else if len(percent) > 0 && percent[0] > 80 {
 			fmt.Println("cpu usage too high")
 			// write pprof file
 			if _, err := os.Stat("./pprof"); os.IsNotExist(err) {
-				err := os.Mkdir("./pprof", os.ModePerm)
+				err := os.Mkdir("./pprof", 0700)
 				if err != nil {
 					SysLog("创建pprof文件夹失败 " + err.Error())
 					continue
@@ -34,12 +40,24 @@ func Monitor() {
 			err = pprof.StartCPUProfile(f)
 			if err != nil {
 				SysLog("启动pprof失败 " + err.Error())
+				f.Close()
 				continue
 			}
-			time.Sleep(10 * time.Second) // profile for 30 seconds
+			timer := time.NewTimer(10 * time.Second)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+			case <-timer.C:
+			}
 			pprof.StopCPUProfile()
 			f.Close()
 		}
-		time.Sleep(30 * time.Second)
+		timer := time.NewTimer(30 * time.Second)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return
+		case <-timer.C:
+		}
 	}
 }

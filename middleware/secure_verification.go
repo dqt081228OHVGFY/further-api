@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -47,7 +47,7 @@ func RequireSecurityProof(c *gin.Context, operation service.VerificationOperatio
 		securityProofError(c, "SECURITY_PROOF_REQUIRED", "需要安全验证")
 		return nil
 	}
-	authorization, err := service.ConsumeOperationProof(raw, identity, operation)
+	authorization, err := service.ConsumeOperationProofContext(c.Request.Context(), raw, identity, operation)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrAuthTokenExpired):

@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	"github.com/QuantumNous/new-api/relay/channel/openai"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relay/constant"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
@@ -46,9 +46,12 @@ func aliAnthropicMessagesModelPatterns() []string {
 	})
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	converted, err := openai.ChatFrom(c, info, request)
+	if err != nil {
+		return nil, err
+	}
+	return a.ConvertOpenAIRequest(c, info, converted)
 }
 
 func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, req *dto.ClaudeRequest) (any, error) {
@@ -71,33 +74,29 @@ func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayIn
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
+	openai.InitializeProtocol(info)
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	var fullRequestURL string
-	switch info.RelayFormat {
-	case types.RelayFormatClaude:
-		if supportsAliAnthropicMessages(info.UpstreamModelName) {
-			fullRequestURL = fmt.Sprintf("%s/apps/anthropic/v1/messages", info.ChannelBaseUrl)
-		} else {
-			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/chat/completions", info.ChannelBaseUrl)
-		}
-	default:
+	if info == nil || !info.HasChannelMeta() {
+		return "", errors.New("Bailian provider configuration is missing")
+	}
+	route := "/compatible-mode/v1/chat/completions"
+	if info.RelayFormat == types.RelayFormatClaude && supportsAliAnthropicMessages(info.UpstreamModelName) {
+		route = "/apps/anthropic/v1/messages"
+	} else {
 		switch info.RelayMode {
 		case constant.RelayModeEmbeddings:
-			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/embeddings", info.ChannelBaseUrl)
+			route = "/compatible-mode/v1/embeddings"
 		case constant.RelayModeRerank:
-			fullRequestURL = fmt.Sprintf("%s/api/v1/services/rerank/text-rerank/text-rerank", info.ChannelBaseUrl)
+			route = "/api/v1/services/rerank/text-rerank/text-rerank"
 		case constant.RelayModeResponses:
-			fullRequestURL = fmt.Sprintf("%s/api/v2/apps/protocols/compatible-mode/v1/responses", info.ChannelBaseUrl)
+			route = "/api/v2/apps/protocols/compatible-mode/v1/responses"
 		case constant.RelayModeCompletions:
-			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/completions", info.ChannelBaseUrl)
-		default:
-			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/chat/completions", info.ChannelBaseUrl)
+			route = "/compatible-mode/v1/completions"
 		}
 	}
-
-	return fullRequestURL, nil
+	return openai.ProviderEndpoint(info.ChannelBaseUrl, route)
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
@@ -135,7 +134,7 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 	}
 }
 
-// ConvertImageRequest is not implemented: Ali image generation and editing
+// Bailian image generation and editing
 // are served by the alibaba task plugin through the openai_image host
 // protocol, which claims every declared image model on /v1/images/*. A model
 // reaching this adaptor is not declared by the plugin (or is named
@@ -161,8 +160,7 @@ func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.Rela
 }
 
 func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
+	return nil, openai.UnsupportedOperation("ali", "audio operations")
 }
 
 func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
@@ -173,30 +171,26 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.GatewayError) {
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
 		if supportsAliAnthropicMessages(info.UpstreamModelName) {
-			adaptor := claude.Adaptor{}
-			return adaptor.DoResponse(c, resp, info)
+			return claude.MessagesResponse(c, resp, info)
 		}
-
-		adaptor := openai.Adaptor{}
-		return adaptor.DoResponse(c, resp, info)
+		return openai.ProtocolResponse(c, resp, info, "")
 	default:
 		switch info.RelayMode {
 		case constant.RelayModeRerank:
 			err, usage = RerankHandler(c, resp, info)
 		default:
-			adaptor := openai.Adaptor{}
-			usage, err = adaptor.DoResponse(c, resp, info)
+			usage, err = openai.ProtocolResponse(c, resp, info, "")
 		}
 		return usage, err
 	}
 }
 
 func (a *Adaptor) GetModelList() []string {
-	return ModelList
+	return append([]string(nil), ModelList...)
 }
 
 func (a *Adaptor) GetChannelName() string {

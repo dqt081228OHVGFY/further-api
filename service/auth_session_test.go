@@ -2,22 +2,102 @@ package service
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
 	"github.com/alicebob/miniredis/v2"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
+
+func TestLegacyRefreshDigestSurvivesJWTMigration(t *testing.T) {
+	user := setupAuthSessionTestDB(t)
+	useTestSessionSecret(t)
+	sid, secret := uuid.NewString(), strings.Repeat("a", 64)
+	mac := hmac.New(sha256.New, []byte(common.SessionSecret))
+	_, err := mac.Write([]byte("new-api/auth/refresh/v1"))
+	require.NoError(t, err)
+	legacyHash := common.GenerateHMACWithKey(mac.Sum(nil), secret)
+	now := time.Now().Unix()
+	require.NoError(t, model.DB.Create(&model.UserSession{
+		SID: sid, UserID: user.Id, Version: 1, UserAuthVersion: user.AuthVersion,
+		Status: model.UserSessionStatusActive, RefreshHash: legacyHash,
+		CreatedAt: now, LastActiveAt: now, ExpiresAt: now + 3600, LoginMethod: "password",
+	}).Error)
+	bundle, currentUser, err := RefreshLoginSession(sid+"."+secret, sid, "127.0.0.1", "migration-test")
+	require.NoError(t, err)
+	assert.Equal(t, user.Id, currentUser.Id)
+	assert.NotEqual(t, sid+"."+secret, bundle.RefreshToken)
+	identity, err := ParseAccessToken(bundle.AccessToken)
+	require.NoError(t, err)
+	assert.Equal(t, sid, identity.SessionID)
+	stored, err := model.GetUserSessionBySID(sid)
+	require.NoError(t, err)
+	assert.Equal(t, legacyHash, stored.PreviousRefreshHash)
+	assert.NotEqual(t, legacyHash, stored.RefreshHash)
+	replayed, _, err := RefreshLoginSession(sid+"."+secret, sid, "127.0.0.1", "migration-test")
+	require.NoError(t, err)
+	assert.Equal(t, bundle.RefreshToken, replayed.RefreshToken)
+}
+
+func TestRefreshCookieNameMigration(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	request := httptest.NewRequest(http.MethodPost, "/api/user/auth/refresh", nil)
+	request.AddCookie(&http.Cookie{Name: legacyRefreshCookieName, Value: "legacy-secret"})
+	context, _ := gin.CreateTestContext(httptest.NewRecorder())
+	context.Request = request
+	value, err := ReadRefreshCookie(context)
+	require.NoError(t, err)
+	assert.Equal(t, "legacy-secret", value)
+
+	request.AddCookie(&http.Cookie{Name: RefreshCookieName, Value: "current-secret"})
+	value, err = ReadRefreshCookie(context)
+	require.NoError(t, err)
+	assert.Equal(t, "current-secret", value)
+
+	writeRecorder := httptest.NewRecorder()
+	writeContext, _ := gin.CreateTestContext(writeRecorder)
+	WriteRefreshCookie(writeContext, "opaque-refresh")
+	written := make(map[string]*http.Cookie)
+	for _, cookie := range writeRecorder.Result().Cookies() {
+		written[cookie.Name] = cookie
+	}
+	assert.Equal(t, "opaque-refresh", written[RefreshCookieName].Value)
+	assert.True(t, written[RefreshCookieName].HttpOnly)
+	assert.Equal(t, "/api/user/auth", written[RefreshCookieName].Path)
+	assert.Less(t, written[legacyRefreshCookieName].MaxAge, 0)
+	for _, name := range []string{SessionHintCookieName} {
+		assert.Equal(t, SessionHintCookieValue, written[name].Value)
+		assert.False(t, written[name].HttpOnly)
+		assert.Equal(t, "/", written[name].Path)
+	}
+	assert.Less(t, written[legacySessionHintCookieName].MaxAge, 0)
+
+	clearRecorder := httptest.NewRecorder()
+	clearContext, _ := gin.CreateTestContext(clearRecorder)
+	ClearRefreshCookie(clearContext)
+	cleared := make(map[string]*http.Cookie)
+	for _, cookie := range clearRecorder.Result().Cookies() {
+		cleared[cookie.Name] = cookie
+	}
+	for _, name := range []string{RefreshCookieName, legacyRefreshCookieName, SessionHintCookieName, legacySessionHintCookieName} {
+		assert.Less(t, cleared[name].MaxAge, 0)
+	}
+}
 
 func setupAuthSessionTestDB(t *testing.T) *model.User {
 	t.Helper()

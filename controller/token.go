@@ -1,18 +1,19 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/setting"
-	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/i18n"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/service"
+	"github.com/dqt081228OHVGFY/further-api/setting"
+	"github.com/dqt081228OHVGFY/further-api/setting/operation_setting"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -33,8 +34,18 @@ func (input *tokenAutoGroupsInput) UnmarshalJSON(data []byte) error {
 }
 
 type tokenRequest struct {
-	model.Token
-	AutoGroups tokenAutoGroupsInput `json:"auto_groups"`
+	Id                 int                  `json:"id"`
+	Status             int                  `json:"status"`
+	Name               string               `json:"name"`
+	ExpiredTime        int64                `json:"expired_time"`
+	RemainQuota        int                  `json:"remain_quota"`
+	UnlimitedQuota     bool                 `json:"unlimited_quota"`
+	ModelLimitsEnabled bool                 `json:"model_limits_enabled"`
+	ModelLimits        string               `json:"model_limits"`
+	AllowIps           *string              `json:"allow_ips"`
+	Group              string               `json:"group"`
+	CrossGroupRetry    bool                 `json:"cross_group_retry"`
+	AutoGroups         tokenAutoGroupsInput `json:"auto_groups"`
 }
 
 type tokenResponse struct {
@@ -50,6 +61,112 @@ func maxTokenQuota() int {
 		return common.MaxWalletQuota
 	}
 	return quota
+}
+
+func bindTokenRequest(c *gin.Context) (*tokenRequest, bool) {
+	var request *tokenRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		common.ApiError(c, err)
+		return nil, false
+	}
+	if request == nil {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return nil, false
+	}
+	return request, true
+}
+
+func validateTokenSettings(c *gin.Context, request *tokenRequest) bool {
+	if len(request.Name) > 50 {
+		common.ApiErrorI18n(c, i18n.MsgTokenNameTooLong)
+		return false
+	}
+	if request.UnlimitedQuota {
+		return true
+	}
+	if request.RemainQuota < 0 {
+		common.ApiErrorI18n(c, i18n.MsgTokenQuotaNegative)
+		return false
+	}
+	maxQuota := maxTokenQuota()
+	if request.RemainQuota > maxQuota {
+		common.ApiErrorI18n(c, i18n.MsgTokenQuotaExceedMax, map[string]any{"Max": maxQuota})
+		return false
+	}
+	return true
+}
+
+func applyTokenSettings(c *gin.Context, token *model.Token, request *tokenRequest, creating bool) bool {
+	token.Name = request.Name
+	token.ExpiredTime = request.ExpiredTime
+	token.RemainQuota = request.RemainQuota
+	token.UnlimitedQuota = request.UnlimitedQuota
+	token.ModelLimitsEnabled = request.ModelLimitsEnabled
+	token.ModelLimits = request.ModelLimits
+	token.AllowIps = request.AllowIps
+	token.Group = request.Group
+	token.CrossGroupRetry = request.CrossGroupRetry
+	if token.Group != "auto" {
+		token.CrossGroupRetry = false
+		return setTokenAutoGroups(c, token, nil)
+	}
+	if creating || request.AutoGroups.Set {
+		return setTokenAutoGroups(c, token, request.AutoGroups.Groups)
+	}
+	return true
+}
+
+func validateTokenStatus(c *gin.Context, token *model.Token, status int) bool {
+	switch status {
+	case common.TokenStatusEnabled:
+		if token.ExpiredTime != -1 && token.ExpiredTime <= common.GetTimestamp() {
+			common.ApiErrorI18n(c, i18n.MsgTokenExpiredCannotEnable)
+			return false
+		}
+		if !token.UnlimitedQuota && token.RemainQuota <= 0 {
+			common.ApiErrorI18n(c, i18n.MsgTokenExhaustedCannotEable)
+			return false
+		}
+	case common.TokenStatusDisabled, common.TokenStatusExpired, common.TokenStatusExhausted:
+	default:
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return false
+	}
+	return true
+}
+
+func tokenPathID(c *gin.Context) (int, bool) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return 0, false
+	}
+	return id, true
+}
+
+func tokenChangedFields(previous, current *model.Token) []string {
+	changedFields := make([]string, 0)
+	for _, field := range []struct {
+		name    string
+		changed bool
+	}{
+		{"name", previous.Name != current.Name},
+		{"expired_time", previous.ExpiredTime != current.ExpiredTime},
+		{"remain_quota", previous.RemainQuota != current.RemainQuota},
+		{"unlimited_quota", previous.UnlimitedQuota != current.UnlimitedQuota},
+		{"model_limits_enabled", previous.ModelLimitsEnabled != current.ModelLimitsEnabled},
+		{"model_limits", previous.ModelLimits != current.ModelLimits},
+		{"allow_ips", (previous.AllowIps == nil) != (current.AllowIps == nil) ||
+			(previous.AllowIps != nil && current.AllowIps != nil && *previous.AllowIps != *current.AllowIps)},
+		{"group", previous.Group != current.Group},
+		{"cross_group_retry", previous.CrossGroupRetry != current.CrossGroupRetry},
+		{"auto_groups", previous.AutoGroups != current.AutoGroups},
+	} {
+		if field.changed {
+			changedFields = append(changedFields, field.name)
+		}
+	}
+	return changedFields
 }
 
 func buildMaskedTokenResponse(token *model.Token) *tokenResponse {
@@ -135,7 +252,11 @@ func GetAllTokens(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
-	total, _ := model.CountUserTokens(userId)
+	total, err := model.CountUserTokens(userId)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
 	pageInfo.SetTotal(int(total))
 	pageInfo.SetItems(buildMaskedTokenResponses(tokens))
 	common.ApiSuccess(c, pageInfo)
@@ -159,13 +280,11 @@ func SearchTokens(c *gin.Context) {
 }
 
 func GetToken(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	userId := c.GetInt("id")
-	if err != nil {
-		common.ApiError(c, err)
+	id, ok := tokenPathID(c)
+	if !ok {
 		return
 	}
-	token, err := model.GetTokenByIds(id, userId)
+	token, err := model.GetTokenByIds(id, c.GetInt("id"))
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -186,13 +305,11 @@ func GetTokenAutoGroups(c *gin.Context) {
 }
 
 func GetTokenKey(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	userId := c.GetInt("id")
-	if err != nil {
-		common.ApiError(c, err)
+	id, ok := tokenPathID(c)
+	if !ok {
 		return
 	}
-	token, err := model.GetTokenByIds(id, userId)
+	token, err := model.GetTokenByIds(id, c.GetInt("id"))
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -276,52 +393,24 @@ func GetTokenUsage(c *gin.Context) {
 }
 
 func AddToken(c *gin.Context) {
-	request := tokenRequest{}
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	token := request.Token
-	if len(token.Name) > 50 {
-		common.ApiErrorI18n(c, i18n.MsgTokenNameTooLong)
+	request, ok := bindTokenRequest(c)
+	if !ok {
 		return
 	}
 	params := tokenAuditParams(c)
-	params["name"] = token.Name
-	// 非无限额度时，检查额度值是否超出有效范围
-	if !token.UnlimitedQuota {
-		if token.RemainQuota < 0 {
-			common.ApiErrorI18n(c, i18n.MsgTokenQuotaNegative)
-			return
-		}
-		maxQuotaValue := maxTokenQuota()
-		if token.RemainQuota > maxQuotaValue {
-			common.ApiErrorI18n(c, i18n.MsgTokenQuotaExceedMax, map[string]any{"Max": maxQuotaValue})
-			return
-		}
+	params["name"] = request.Name
+	if !validateTokenSettings(c, request) {
+		return
 	}
-	// 检查用户令牌数量是否已达上限
+	userID := c.GetInt("id")
 	maxTokens := operation_setting.GetMaxUserTokens()
-	count, err := model.CountUserTokens(c.GetInt("id"))
-	if err != nil {
-		common.ApiError(c, err)
-		return
+	now := common.GetTimestamp()
+	token := model.Token{
+		UserId: userID, Status: common.TokenStatusEnabled,
+		CreatedTime: now, AccessedTime: now,
 	}
-	if int(count) >= maxTokens {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": fmt.Sprintf("已达到最大令牌数量限制 (%d)", maxTokens),
-		})
+	if !applyTokenSettings(c, &token, request, true) {
 		return
-	}
-	if token.Group == "auto" {
-		if !setTokenAutoGroups(c, &token, request.AutoGroups.Groups) {
-			return
-		}
-	} else {
-		token.CrossGroupRetry = false
-		_ = token.SetAutoGroups(nil)
 	}
 	key, err := common.GenerateKey()
 	if err != nil {
@@ -329,40 +418,34 @@ func AddToken(c *gin.Context) {
 		common.SysLog("failed to generate token key: " + err.Error())
 		return
 	}
-	cleanToken := model.Token{
-		UserId:             c.GetInt("id"),
-		Name:               token.Name,
-		Key:                key,
-		CreatedTime:        common.GetTimestamp(),
-		AccessedTime:       common.GetTimestamp(),
-		ExpiredTime:        token.ExpiredTime,
-		RemainQuota:        token.RemainQuota,
-		UnlimitedQuota:     token.UnlimitedQuota,
-		ModelLimitsEnabled: token.ModelLimitsEnabled,
-		ModelLimits:        token.ModelLimits,
-		AllowIps:           token.AllowIps,
-		Group:              token.Group,
-		CrossGroupRetry:    token.CrossGroupRetry,
-		AutoGroups:         token.AutoGroups,
-	}
-	err = cleanToken.Insert()
+	token.Key = key
+	err = token.InsertWithUserLimit(maxTokens)
 	if err != nil {
-		common.ApiError(c, err)
+		switch {
+		case errors.Is(err, model.ErrTokenLimitReached):
+			common.ApiErrorMsg(c, fmt.Sprintf("已达到最大令牌数量限制 (%d)", maxTokens))
+		case errors.Is(err, model.ErrTokenOwnerDisabled):
+			common.ApiErrorI18n(c, i18n.MsgUserDisabled)
+		default:
+			common.ApiError(c, err)
+		}
 		return
 	}
-	params["id"] = cleanToken.Id
+	params["id"] = token.Id
 	common.SetContextKey(c, constant.ContextKeyTokenAuditSucceeded, true)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    gin.H{"id": cleanToken.Id},
+		"data":    gin.H{"id": token.Id},
 	})
 }
 
 func DeleteToken(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	userId := c.GetInt("id")
-	token, err := model.GetTokenByIds(id, userId)
+	id, ok := tokenPathID(c)
+	if !ok {
+		return
+	}
+	token, err := model.GetTokenByIds(id, c.GetInt("id"))
 	if err != nil {
 		common.ApiError(c, err)
 		return
@@ -382,110 +465,55 @@ func DeleteToken(c *gin.Context) {
 }
 
 func UpdateToken(c *gin.Context) {
-	userId := c.GetInt("id")
-	statusOnly := c.Query("status_only")
-	request := tokenRequest{}
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		common.ApiError(c, err)
+	request, ok := bindTokenRequest(c)
+	if !ok {
 		return
 	}
-	token := request.Token
 	params := tokenAuditParams(c)
-	if token.Id > 0 {
-		params["id"] = token.Id
-	}
-	if len(token.Name) > 50 {
-		common.ApiErrorI18n(c, i18n.MsgTokenNameTooLong)
+	if request.Id <= 0 {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
 	}
-	if !token.UnlimitedQuota {
-		if token.RemainQuota < 0 {
-			common.ApiErrorI18n(c, i18n.MsgTokenQuotaNegative)
-			return
-		}
-		maxQuotaValue := maxTokenQuota()
-		if token.RemainQuota > maxQuotaValue {
-			common.ApiErrorI18n(c, i18n.MsgTokenQuotaExceedMax, map[string]any{"Max": maxQuotaValue})
-			return
-		}
+	params["id"] = request.Id
+	// Existing clients select the status operation with any non-empty value.
+	statusOnly := c.Query("status_only") != ""
+	if !statusOnly && !validateTokenSettings(c, request) {
+		return
 	}
-	cleanToken, err := model.GetTokenByIds(token.Id, userId)
+	current, err := model.GetTokenByIds(request.Id, c.GetInt("id"))
 	if err != nil {
 		common.ApiError(c, err)
 		return
 	}
-	params["name"] = cleanToken.Name
-	previous := *cleanToken
-	if token.Status == common.TokenStatusEnabled {
-		if cleanToken.Status == common.TokenStatusExpired && cleanToken.ExpiredTime <= common.GetTimestamp() && cleanToken.ExpiredTime != -1 {
-			common.ApiErrorI18n(c, i18n.MsgTokenExpiredCannotEnable)
+	params["name"] = current.Name
+	next := *current
+	if statusOnly {
+		if !validateTokenStatus(c, current, request.Status) {
 			return
 		}
-		if cleanToken.Status == common.TokenStatusExhausted && cleanToken.RemainQuota <= 0 && !cleanToken.UnlimitedQuota {
-			common.ApiErrorI18n(c, i18n.MsgTokenExhaustedCannotEable)
-			return
-		}
-	}
-	if statusOnly != "" {
-		cleanToken.Status = token.Status
+		next.Status = request.Status
+		err = next.UpdateStatus()
 	} else {
-		// If you add more fields, please also update token.Update()
-		cleanToken.Name = token.Name
-		cleanToken.ExpiredTime = token.ExpiredTime
-		cleanToken.RemainQuota = token.RemainQuota
-		cleanToken.UnlimitedQuota = token.UnlimitedQuota
-		cleanToken.ModelLimitsEnabled = token.ModelLimitsEnabled
-		cleanToken.ModelLimits = token.ModelLimits
-		cleanToken.AllowIps = token.AllowIps
-		cleanToken.Group = token.Group
-		cleanToken.CrossGroupRetry = token.CrossGroupRetry
-		if token.Group != "auto" {
-			cleanToken.CrossGroupRetry = false
-			_ = cleanToken.SetAutoGroups(nil)
-		} else if request.AutoGroups.Set {
-			if !setTokenAutoGroups(c, cleanToken, request.AutoGroups.Groups) {
-				return
-			}
+		if !applyTokenSettings(c, &next, request, false) {
+			return
 		}
+		err = model.UpdateTokenConfiguration(c.Request.Context(), &next, current.RemainQuota)
 	}
-	err = cleanToken.Update()
 	if err != nil {
 		common.ApiError(c, err)
 		return
 	}
-	params["name"] = cleanToken.Name
-	if statusOnly != "" {
-		params["from"], params["to"] = previous.Status, cleanToken.Status
+	params["name"] = next.Name
+	if statusOnly {
+		params["from"], params["to"] = current.Status, next.Status
 	} else {
-		changedFields := []string{}
-		for _, field := range []struct {
-			name    string
-			changed bool
-		}{
-			{"name", previous.Name != cleanToken.Name},
-			{"expired_time", previous.ExpiredTime != cleanToken.ExpiredTime},
-			{"remain_quota", previous.RemainQuota != cleanToken.RemainQuota},
-			{"unlimited_quota", previous.UnlimitedQuota != cleanToken.UnlimitedQuota},
-			{"model_limits_enabled", previous.ModelLimitsEnabled != cleanToken.ModelLimitsEnabled},
-			{"model_limits", previous.ModelLimits != cleanToken.ModelLimits},
-			{"allow_ips", (previous.AllowIps == nil) != (cleanToken.AllowIps == nil) ||
-				(previous.AllowIps != nil && cleanToken.AllowIps != nil && *previous.AllowIps != *cleanToken.AllowIps)},
-			{"group", previous.Group != cleanToken.Group},
-			{"cross_group_retry", previous.CrossGroupRetry != cleanToken.CrossGroupRetry},
-			{"auto_groups", previous.AutoGroups != cleanToken.AutoGroups},
-		} {
-			if field.changed {
-				changedFields = append(changedFields, field.name)
-			}
-		}
-		params["changed_fields"] = changedFields
+		params["changed_fields"] = tokenChangedFields(current, &next)
 	}
 	common.SetContextKey(c, constant.ContextKeyTokenAuditSucceeded, true)
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    buildMaskedTokenResponse(cleanToken),
+		"data":    buildMaskedTokenResponse(&next),
 	})
 }
 
@@ -493,17 +521,36 @@ type TokenBatch struct {
 	Ids []int `json:"ids"`
 }
 
+func bindTokenBatch(c *gin.Context, maxCount int) (*TokenBatch, bool) {
+	var batch *TokenBatch
+	if err := c.ShouldBindJSON(&batch); err != nil || batch == nil {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return nil, false
+	}
+	tokenBatchAuditParams(c, batch.Ids)
+	if len(batch.Ids) == 0 {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+		return nil, false
+	}
+	if maxCount > 0 && len(batch.Ids) > maxCount {
+		common.ApiErrorI18n(c, i18n.MsgBatchTooMany, map[string]any{"Max": maxCount})
+		return nil, false
+	}
+	for _, id := range batch.Ids {
+		if id <= 0 {
+			common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+			return nil, false
+		}
+	}
+	return batch, true
+}
+
 func DeleteTokenBatch(c *gin.Context) {
-	tokenBatch := TokenBatch{}
-	if err := c.ShouldBindJSON(&tokenBatch); err != nil {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+	tokenBatch, ok := bindTokenBatch(c, 0)
+	if !ok {
 		return
 	}
-	params := tokenBatchAuditParams(c, tokenBatch.Ids)
-	if len(tokenBatch.Ids) == 0 {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
-		return
-	}
+	params := tokenAuditParams(c)
 	userId := c.GetInt("id")
 	count, err := model.BatchDeleteTokens(tokenBatch.Ids, userId)
 	if err != nil {
@@ -520,20 +567,11 @@ func DeleteTokenBatch(c *gin.Context) {
 }
 
 func GetTokenKeysBatch(c *gin.Context) {
-	tokenBatch := TokenBatch{}
-	if err := c.ShouldBindJSON(&tokenBatch); err != nil {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+	tokenBatch, ok := bindTokenBatch(c, 100)
+	if !ok {
 		return
 	}
-	params := tokenBatchAuditParams(c, tokenBatch.Ids)
-	if len(tokenBatch.Ids) == 0 {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
-		return
-	}
-	if len(tokenBatch.Ids) > 100 {
-		common.ApiErrorI18n(c, i18n.MsgBatchTooMany, map[string]any{"Max": 100})
-		return
-	}
+	params := tokenAuditParams(c)
 	userId := c.GetInt("id")
 	tokens, err := model.GetTokenKeysByIds(tokenBatch.Ids, userId)
 	if err != nil {

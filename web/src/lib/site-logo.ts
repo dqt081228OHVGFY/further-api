@@ -13,12 +13,25 @@ export function loadSiteLogo(value: string): Promise<string> {
   if (existing) return existing
   const pending = new Promise<string>((resolve) => {
     const image = new Image()
-    image.onload = () => resolve(url)
-    image.onerror = () => resolve(DEFAULT_LOGO)
+    const cleanup = () => {
+      image.removeEventListener('load', loaded)
+      image.removeEventListener('error', failed)
+    }
+    const loaded = () => { cleanup(); resolve(url) }
+    const failed = () => { cleanup(); resolve(DEFAULT_LOGO) }
+    image.addEventListener('load', loaded, { once: true })
+    image.addEventListener('error', failed, { once: true })
     image.src = url
   })
   logoLoads.set(url, pending)
   return pending
+}
+
+function restoreBundledLogo(event: Event): void {
+  const image = event.currentTarget
+  if (image instanceof HTMLImageElement && image.getAttribute('src') !== DEFAULT_LOGO) {
+    image.src = DEFAULT_LOGO
+  }
 }
 
 export async function applySiteLogoToDom(value: string): Promise<void> {
@@ -37,9 +50,8 @@ export async function applySiteLogoToDom(value: string): Promise<void> {
       element.replaceChildren(image)
     }
     if (image.getAttribute('src') !== resolved) image.src = resolved
-    image.onerror = () => {
-      if (image.getAttribute('src') !== DEFAULT_LOGO) image.src = DEFAULT_LOGO
-    }
+    image.removeEventListener('error', restoreBundledLogo)
+    image.addEventListener('error', restoreBundledLogo, { once: true })
   })
   applyFaviconToDom(resolved)
 }

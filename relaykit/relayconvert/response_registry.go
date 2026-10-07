@@ -8,15 +8,14 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	claudemessages "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/claude_messages"
-	geminichat "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/gemini_chat"
-	oaichat "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/oai_chat"
-	oairesponses "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/oai_responses"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/toolconv"
-	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	claudemessages "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/claude_messages"
+	geminichat "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/gemini_chat"
+	oaichat "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/oai_chat"
+	oairesponses "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/oai_responses"
+	kitutil "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 )
 
 type ResponseConverterFunc func(c context.Context, info convmeta.Meta, response any) (any, *dto.Usage, error)
@@ -93,6 +92,9 @@ type conversionDiagnosticKey struct {
 }
 
 type ResponseStreamState struct {
+	mu        sync.Mutex
+	closed    bool
+	failed    error
 	From      types.RelayFormat
 	To        types.RelayFormat
 	Converter string
@@ -228,72 +230,6 @@ func LookupResponseConverter(converter string) (ResponseConverterSpec, bool) {
 	return cloneResponseConverterSpec(spec), true
 }
 
-func ConvertResponse(c context.Context, info convmeta.Meta, target types.RelayFormat, response any) (*ResponseResult, error) {
-	from, err := inferResponseRelayFormat(response)
-	if err != nil {
-		return nil, err
-	}
-	if target == "" {
-		return nil, errors.New("target relay format is required")
-	}
-	if from == target {
-		return &ResponseResult{
-			Value:  response,
-			Usage:  canonicalUsageFromResponse(response),
-			From:   from,
-			To:     target,
-			Stream: false,
-		}, nil
-	}
-
-	spec, ok := lookupResponseRoute(from, target)
-	if !ok {
-		return nil, fmt.Errorf("response converter from %s to %s is not registered", from, target)
-	}
-	return executeResponseSpec(c, info, from, target, response, spec)
-}
-
-func ConvertResponseByID(c context.Context, info convmeta.Meta, converter string, response any) (*ResponseResult, error) {
-	from, err := inferResponseRelayFormat(response)
-	if err != nil {
-		return nil, err
-	}
-
-	spec, ok := LookupResponseConverter(converter)
-	if !ok {
-		return nil, fmt.Errorf("response converter %q is not registered", strings.TrimSpace(converter))
-	}
-	if spec.From != "" && spec.From != from {
-		return nil, fmt.Errorf("response converter %q expects %s response, got %s", spec.ID, spec.From, from)
-	}
-	return executeResponseSpec(c, info, from, spec.To, response, spec)
-}
-
-func ConvertStreamResponse(c context.Context, info convmeta.Meta, target types.RelayFormat, response any) (*ResponseResult, error) {
-	from, err := inferResponseRelayFormat(response)
-	if err != nil {
-		return nil, err
-	}
-	if target == "" {
-		return nil, errors.New("target relay format is required")
-	}
-	if from == target {
-		return &ResponseResult{
-			Value:  response,
-			Usage:  canonicalUsageFromResponse(response),
-			From:   from,
-			To:     target,
-			Stream: true,
-		}, nil
-	}
-
-	spec, ok := lookupResponseRoute(from, target)
-	if !ok {
-		return nil, fmt.Errorf("response converter from %s to %s is not registered", from, target)
-	}
-	return executeStatelessStreamResponseSpec(c, info, from, target, response, spec)
-}
-
 func NewResponseStreamState(from types.RelayFormat, target types.RelayFormat, options ResponseStreamOptions) (*ResponseStreamState, error) {
 	if from == "" {
 		return nil, errors.New("source relay format is required")
@@ -321,259 +257,6 @@ func NewResponseStreamStateByID(converter string, options ResponseStreamOptions)
 		return nil, fmt.Errorf("response converter %q is not registered", strings.TrimSpace(converter))
 	}
 	return newResponseStreamStateFromSpec(spec.From, spec.To, options, spec)
-}
-
-func ConvertStreamResponseChunk(c context.Context, info convmeta.Meta, state *ResponseStreamState, response any) ([]ResponseResult, error) {
-	if state == nil {
-		return nil, errors.New("response stream state is required")
-	}
-	if info == nil {
-		if state.fallbackInfo == nil {
-			state.fallbackInfo = &convmeta.Values{}
-		}
-		info = state.fallbackInfo
-	}
-	from, err := inferResponseRelayFormat(response)
-	if err != nil {
-		return nil, err
-	}
-	if from != state.From {
-		return nil, fmt.Errorf("response stream converter %q expects %s response, got %s", state.Converter, state.From, from)
-	}
-	diagnostics := toolconv.InspectStreamResponse(state.From, state.To, response)
-	state.rememberDiagnostics(diagnostics)
-	if state.From == state.To {
-		usage := canonicalUsageFromResponse(response)
-		state.rememberUsage(usage)
-		values := streamValuesFromAny(response)
-		return responseStreamResults(state, values, usage, state.takeDiagnostics(len(values) > 0)), nil
-	}
-
-	values, usage, err := executeResponseStreamSteps(c, info, state, []any{response}, 0)
-	if err != nil {
-		return nil, err
-	}
-	state.rememberUsage(usage)
-	return responseStreamResults(state, values, usage, state.takeDiagnostics(len(values) > 0)), nil
-}
-
-func FinalizeStreamResponse(c context.Context, info convmeta.Meta, state *ResponseStreamState) ([]ResponseResult, error) {
-	if state == nil {
-		return nil, errors.New("response stream state is required")
-	}
-	if info == nil && state.fallbackInfo != nil {
-		info = state.fallbackInfo
-	}
-	if state.From == state.To {
-		return nil, nil
-	}
-
-	if state.To == types.RelayFormatClaude && info != nil {
-		claudeInfo := info.EnsureClaudeConvertInfo()
-		if claudeInfo.Usage == nil {
-			claudeInfo.Usage = state.Usage()
-		}
-	}
-
-	values := make([]any, 0)
-	var usage *dto.Usage
-	for i, spec := range state.specs {
-		finalValues, stepUsage, err := finalizeResponseStreamStep(c, info, spec, state.stepStates[i])
-		if err != nil {
-			return nil, err
-		}
-		if stepUsage != nil {
-			usage = stepUsage
-			state.rememberUsage(stepUsage)
-		}
-		if len(finalValues) == 0 {
-			continue
-		}
-		current, currentUsage, err := executeResponseStreamSteps(c, info, state, finalValues, i+1)
-		if err != nil {
-			return nil, err
-		}
-		if currentUsage != nil {
-			usage = currentUsage
-			state.rememberUsage(currentUsage)
-		}
-		values = append(values, current...)
-	}
-	return responseStreamResults(state, values, usage, state.takeDiagnostics(len(values) > 0)), nil
-}
-
-func (s *ResponseStreamState) Usage() *dto.Usage {
-	if s == nil {
-		return nil
-	}
-	if s.usage != nil {
-		return s.usage
-	}
-	for _, state := range s.stepStates {
-		carrier, ok := state.(responseStreamUsageCarrier)
-		if !ok {
-			continue
-		}
-		if usage := carrier.StreamUsage(); usage != nil {
-			return usage
-		}
-	}
-	return nil
-}
-
-func (s *ResponseStreamState) SetUsage(usage *dto.Usage) {
-	if s == nil || usage == nil {
-		return
-	}
-	s.usage = usage
-	for _, state := range s.stepStates {
-		if carrier, ok := state.(responseStreamUsageCarrier); ok {
-			carrier.SetStreamUsage(usage)
-		}
-	}
-}
-
-// FailResponsesStream emits protocol-native terminal error events when the
-// target is OpenAI Responses. It returns handled=false for other targets.
-func (s *ResponseStreamState) FailResponsesStream(code string, message string, param string) ([]ResponseResult, bool) {
-	if s == nil || s.To != types.RelayFormatOpenAIResponses {
-		return nil, false
-	}
-	for _, state := range s.stepStates {
-		if streamState, ok := state.(*ChatToResponsesStreamState); ok {
-			events := streamState.Fail(code, message, param)
-			return responseStreamResults(s, streamValuesFromAny(events), s.Usage(), s.takeDiagnostics(len(events) > 0)), true
-		}
-	}
-	return nil, false
-}
-
-func (s *ResponseStreamState) UsageText() string {
-	if s == nil {
-		return ""
-	}
-	for _, state := range s.stepStates {
-		switch typed := state.(type) {
-		case interface{ UsageText() string }:
-			if text := typed.UsageText(); text != "" {
-				return text
-			}
-		}
-	}
-	return ""
-}
-
-// Diagnostics returns every conversion-loss diagnostic observed so far. This
-// remains available even when a source event produces no target stream chunk.
-func (s *ResponseStreamState) Diagnostics() []types.ConversionDiagnostic {
-	if s == nil || len(s.diagnostics) == 0 {
-		return nil
-	}
-	return append([]types.ConversionDiagnostic{}, s.diagnostics...)
-}
-
-func executeResponseSpec(c context.Context, info convmeta.Meta, from types.RelayFormat, target types.RelayFormat, response any, spec ResponseConverterSpec) (*ResponseResult, error) {
-	steps, err := expandResponseConverterSteps(spec)
-	if err != nil {
-		return nil, err
-	}
-	return executeResponseSteps(c, info, from, target, response, spec.ID, spec.Quality, steps)
-}
-
-func executeResponseSteps(c context.Context, info convmeta.Meta, from types.RelayFormat, target types.RelayFormat, response any, converter string, quality ResponseConverterQuality, specs []ResponseConverterSpec) (*ResponseResult, error) {
-	diagnostics := toolconv.InspectResponse(from, target, response)
-	current, hostedResponse, err := toolconv.ExtractHostedResponse(from, response)
-	if err != nil {
-		return nil, err
-	}
-	var usage *dto.Usage
-	steps := make([]ResponseStep, 0, len(specs))
-	for _, spec := range specs {
-		var step ResponseStep
-		var err error
-		current, usage, step, err = executeResponseStep(c, info, spec, current)
-		if err != nil {
-			return nil, err
-		}
-		steps = append(steps, step)
-	}
-	current, hostedDiagnostics, err := toolconv.AttachHostedResponse(target, current, hostedResponse, convmeta.OptionsOf(info))
-	if err != nil {
-		return nil, err
-	}
-	diagnostics = append(diagnostics, hostedDiagnostics...)
-
-	converters := make([]string, 0, len(steps))
-	for _, step := range steps {
-		converters = append(converters, step.Converter)
-	}
-	if converter == "" {
-		converter = strings.Join(converters, ",")
-	}
-	return &ResponseResult{
-		Value:       current,
-		Usage:       usage,
-		From:        from,
-		To:          target,
-		Converter:   converter,
-		Quality:     quality,
-		Steps:       steps,
-		Stream:      false,
-		Diagnostics: diagnostics,
-	}, nil
-}
-
-func executeResponseStep(c context.Context, info convmeta.Meta, spec ResponseConverterSpec, response any) (any, *dto.Usage, ResponseStep, error) {
-	if spec.Convert == nil {
-		return nil, nil, ResponseStep{}, fmt.Errorf("response converter %q has no non-stream implementation", spec.ID)
-	}
-
-	value, usage, err := spec.Convert(c, info, response)
-	if err != nil {
-		return nil, nil, ResponseStep{}, err
-	}
-	return value, usage, ResponseStep{
-		Converter: spec.ID,
-		From:      spec.From,
-		To:        spec.To,
-	}, nil
-}
-
-func executeStatelessStreamResponseSpec(c context.Context, info convmeta.Meta, from types.RelayFormat, target types.RelayFormat, response any, spec ResponseConverterSpec) (*ResponseResult, error) {
-	diagnostics := toolconv.InspectStreamResponse(from, target, response)
-	steps, err := expandResponseConverterSteps(spec)
-	if err != nil {
-		return nil, err
-	}
-	current := response
-	var usage *dto.Usage
-	resultSteps := make([]ResponseStep, 0, len(steps))
-	for _, step := range steps {
-		if step.ConvertStream == nil {
-			return nil, fmt.Errorf("response converter %q has no stream implementation", step.ID)
-		}
-		var err error
-		current, usage, err = step.ConvertStream(c, info, current)
-		if err != nil {
-			return nil, err
-		}
-		resultSteps = append(resultSteps, ResponseStep{
-			Converter: step.ID,
-			From:      step.From,
-			To:        step.To,
-		})
-	}
-	return &ResponseResult{
-		Value:       current,
-		Usage:       usage,
-		From:        from,
-		To:          target,
-		Converter:   spec.ID,
-		Quality:     spec.Quality,
-		Steps:       resultSteps,
-		Stream:      true,
-		Diagnostics: diagnostics,
-	}, nil
 }
 
 func newResponseStreamStateFromSpec(from types.RelayFormat, target types.RelayFormat, options ResponseStreamOptions, spec ResponseConverterSpec) (*ResponseStreamState, error) {
@@ -604,32 +287,6 @@ func newResponseStreamStateFromSpec(from types.RelayFormat, target types.RelayFo
 	}, nil
 }
 
-func executeResponseStreamSteps(c context.Context, info convmeta.Meta, state *ResponseStreamState, values []any, start int) ([]any, *dto.Usage, error) {
-	current := values
-	var usage *dto.Usage
-	for i := start; i < len(state.specs); i++ {
-		spec := state.specs[i]
-		next := make([]any, 0)
-		for _, value := range current {
-			prepareResponseStreamInfo(info, spec)
-			stepValues, stepUsage, err := executeResponseStreamStep(c, info, spec, state.stepStates[i], value)
-			if err != nil {
-				return nil, nil, err
-			}
-			if stepUsage != nil {
-				usage = stepUsage
-				state.rememberUsage(stepUsage)
-			}
-			next = append(next, stepValues...)
-		}
-		current = next
-		if len(current) == 0 {
-			return nil, usage, nil
-		}
-	}
-	return current, usage, nil
-}
-
 func prepareResponseStreamInfo(info convmeta.Meta, spec ResponseConverterSpec) {
 	if info == nil {
 		return
@@ -643,30 +300,9 @@ func prepareResponseStreamInfo(info convmeta.Meta, spec ResponseConverterSpec) {
 	info.IncrSendResponseCount()
 }
 
-func executeResponseStreamStep(c context.Context, info convmeta.Meta, spec ResponseConverterSpec, state any, response any) ([]any, *dto.Usage, error) {
-	if spec.ConvertStreamChunk != nil {
-		return spec.ConvertStreamChunk(c, info, response, state)
-	}
-	if spec.ConvertStream == nil {
-		return nil, nil, fmt.Errorf("response converter %q has no stream implementation", spec.ID)
-	}
-	value, usage, err := spec.ConvertStream(c, info, response)
-	if err != nil {
-		return nil, nil, err
-	}
-	return streamValuesFromAny(value), usage, nil
-}
-
-func finalizeResponseStreamStep(c context.Context, info convmeta.Meta, spec ResponseConverterSpec, state any) ([]any, *dto.Usage, error) {
-	if spec.FinalizeStream == nil {
-		return nil, nil, nil
-	}
-	return spec.FinalizeStream(c, info, state)
-}
-
 func (s *ResponseStreamState) rememberUsage(usage *dto.Usage) {
 	if s != nil && usage != nil {
-		s.usage = dto.MergeUsageNonZero(s.usage, usage)
+		s.usage = dto.MergeUsageNonZero(s.usage, snapshotUsage(usage))
 	}
 }
 
@@ -701,31 +337,6 @@ func (s *ResponseStreamState) takeDiagnostics(hasOutput bool) []types.Conversion
 	diagnostics := append([]types.ConversionDiagnostic{}, s.pendingDiagnostics...)
 	s.pendingDiagnostics = nil
 	return diagnostics
-}
-
-func responseStreamResults(state *ResponseStreamState, values []any, usage *dto.Usage, diagnostics []types.ConversionDiagnostic) []ResponseResult {
-	if state == nil || len(values) == 0 {
-		return nil
-	}
-	results := make([]ResponseResult, 0, len(values))
-	for index, value := range values {
-		var resultDiagnostics []types.ConversionDiagnostic
-		if index == 0 {
-			resultDiagnostics = append(resultDiagnostics, diagnostics...)
-		}
-		results = append(results, ResponseResult{
-			Value:       value,
-			Usage:       usage,
-			From:        state.From,
-			To:          state.To,
-			Converter:   state.Converter,
-			Quality:     state.Quality,
-			Steps:       append([]ResponseStep{}, state.Steps...),
-			Stream:      true,
-			Diagnostics: resultDiagnostics,
-		})
-	}
-	return results
 }
 
 func streamValuesFromAny(value any) []any {

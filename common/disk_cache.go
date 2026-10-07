@@ -18,7 +18,7 @@ const (
 )
 
 // 统一的缓存目录名
-const diskCacheDir = "new-api-body-cache"
+const diskCacheDir = "further-api-body-cache"
 
 // GetDiskCacheDir 获取统一的磁盘缓存目录
 // 注意：每次调用都会重新计算，以响应配置变化
@@ -33,7 +33,20 @@ func GetDiskCacheDir() string {
 // EnsureDiskCacheDir 确保缓存目录存在
 func EnsureDiskCacheDir() error {
 	dir := GetDiskCacheDir()
-	return os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+	info, err := os.Lstat(dir)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("cache directory must be a real private directory")
+	}
+	if err := validateCacheDirectoryOwner(info); err != nil {
+		return err
+	}
+	return os.Chmod(dir, 0700)
 }
 
 // CreateDiskCacheFile 创建磁盘缓存文件

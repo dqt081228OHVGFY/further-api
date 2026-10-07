@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
+	"github.com/dqt081228OHVGFY/further-api/common"
 	"gorm.io/gorm"
 )
 
 const (
 	optionPrimaryKeyTmpTable = "options_pk_tmp"
-	optionPrimaryKeyLockName = "new_api_options_pk"
+	optionPrimaryKeyLockName = "further_api_options_pk"
 	optionPrimaryKeyLockID   = 75820193
 	optionLegacyTablePrefix  = "options_legacy_"
 )

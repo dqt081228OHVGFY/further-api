@@ -19,14 +19,18 @@ For commercial licensing, please contact support@quantumnous.com
 import { THEME_STORAGE_KEYS } from '@/lib/theme-storage'
 
 const FRONTEND_CACHE_VERSION = 'default-v1'
-const FRONTEND_CACHE_VERSION_KEY = 'newapi:default:cache-version'
+const FRONTEND_CACHE_VERSION_KEY = 'further-api:default:cache-version'
 const PRESERVED_LOCAL_STORAGE_KEYS = new Set([
   FRONTEND_CACHE_VERSION_KEY,
   ...Object.values(THEME_STORAGE_KEYS),
+  'further-api:theme:v2:palette',
   'user',
   'uid',
   'aff',
   'oauth:binding:result',
+  'further-motion',
+  'further_user_preferences',
+  'further_admin_list_preferences',
 ])
 
 export function initializeFrontendCache(): void {

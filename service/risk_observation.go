@@ -1,13 +1,14 @@
 package service
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/model"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 // RiskObservationInput contains only the metadata needed for risk scoring.
@@ -29,9 +30,10 @@ type RiskObservationInput struct {
 }
 
 const (
-	riskScoreRefreshInterval = 5 * time.Minute
-	riskMaintenanceInterval  = time.Minute
-	riskRefreshUserLimit     = 10000
+	riskScoreRefreshInterval    = 5 * time.Minute
+	riskMaintenanceInterval     = time.Minute
+	riskRefreshUserLimit        = 10000
+	riskObservationFlushTimeout = 5 * time.Second
 )
 
 var (
@@ -50,6 +52,9 @@ func RecordRiskObservation(input RiskObservationInput) {
 		return
 	}
 	StartRiskObservationWorkers()
+	if common.BackgroundContext().Err() != nil {
+		return
+	}
 	select {
 	case riskObservationQueue <- input:
 	default:
@@ -63,9 +68,9 @@ func RecordRiskObservation(input RiskObservationInput) {
 // retention continues to run after a restart even when no requests arrive.
 func StartRiskObservationWorkers() {
 	riskObservationWorkerOnce.Do(func() {
-		go writeRiskObservations()
-		go refreshRiskScores()
-		go maintainRiskObservations()
+		common.StartBackgroundTask("risk observation writer", func(context.Context) { writeRiskObservations() })
+		common.StartBackgroundTask("risk score refresh", func(context.Context) { refreshRiskScores() })
+		common.StartBackgroundTask("risk retention", func(context.Context) { maintainRiskObservations() })
 	})
 }
 
@@ -124,23 +129,20 @@ func isRiskDigest(value string) bool {
 }
 
 func writeRiskObservations() {
-	for input := range riskObservationQueue {
-		event := &model.RiskEvent{
-			UserID:             input.UserID,
-			TokenID:            input.TokenID,
-			OccurredAt:         input.OccurredAt.UTC().Unix(),
-			Model:              input.Model,
-			Stream:             input.Stream,
-			PromptTokens:       input.PromptTokens,
-			StatusCode:         input.StatusCode,
-			QuotaExhausted:     input.QuotaExhausted,
-			ChannelUnavailable: input.ChannelUnavailable,
-			LivenessKeywordHit: input.LivenessKeywordHit,
-			IPFingerprint:      input.IPFingerprint,
-			InputSignature:     input.InputSignature,
-			RequestID:          input.RequestID,
+	ctx := common.BackgroundContext()
+	for {
+		var input RiskObservationInput
+		select {
+		case <-ctx.Done():
+			flushRiskObservationQueue(riskObservationQueue)
+			return
+		case input = <-riskObservationQueue:
 		}
-		if err := model.CreateRiskEvent(event); err != nil {
+		// Accepted events finish their bounded write even when shutdown starts.
+		writeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), riskObservationFlushTimeout)
+		err := persistRiskObservation(writeCtx, input)
+		cancel()
+		if err != nil {
 			common.SysError("risk observation write failed")
 			continue
 		}
@@ -152,12 +154,65 @@ func writeRiskObservations() {
 	}
 }
 
+func persistRiskObservation(ctx context.Context, input RiskObservationInput) error {
+	event := &model.RiskEvent{
+		UserID:             input.UserID,
+		TokenID:            input.TokenID,
+		OccurredAt:         input.OccurredAt.UTC().Unix(),
+		Model:              input.Model,
+		Stream:             input.Stream,
+		PromptTokens:       input.PromptTokens,
+		StatusCode:         input.StatusCode,
+		QuotaExhausted:     input.QuotaExhausted,
+		ChannelUnavailable: input.ChannelUnavailable,
+		LivenessKeywordHit: input.LivenessKeywordHit,
+		IPFingerprint:      input.IPFingerprint,
+		InputSignature:     input.InputSignature,
+		RequestID:          input.RequestID,
+	}
+	return model.CreateRiskEventContext(ctx, event)
+}
+
+// The HTTP server drains before workers are cancelled, so this queue is finite.
+// A separate deadline bounds final writes while shared resources remain open.
+func flushRiskObservationQueue(queue <-chan RiskObservationInput) {
+	ctx, cancel := context.WithTimeout(context.Background(), riskObservationFlushTimeout)
+	defer cancel()
+	users := make(map[int]struct{})
+	for ctx.Err() == nil {
+		select {
+		case input := <-queue:
+			if err := persistRiskObservation(ctx, input); err != nil {
+				common.SysError("risk observation final write failed")
+			} else {
+				users[input.UserID] = struct{}{}
+			}
+		default:
+			for userID := range users {
+				if ctx.Err() != nil {
+					return
+				}
+				if err := refreshRiskScoresForUserContext(ctx, userID); err != nil && ctx.Err() == nil {
+					common.SysError("risk score final refresh failed")
+				}
+			}
+			return
+		}
+	}
+	common.SysError("risk observation final flush timed out")
+}
+
 func refreshRiskScores() {
+	ctx := common.BackgroundContext()
 	ticker := time.NewTicker(riskMaintenanceInterval)
 	defer ticker.Stop()
-	scheduler := riskRefreshScheduler{users: make(map[int]riskRefreshState), refresh: RefreshRiskScoresForUser}
+	scheduler := riskRefreshScheduler{ctx: ctx, users: make(map[int]riskRefreshState), refresh: func(userID int) error {
+		return refreshRiskScoresForUserContext(ctx, userID)
+	}}
 	for {
 		select {
+		case <-ctx.Done():
+			return
 		case userID := <-riskScoreRefreshQueue:
 			scheduler.observe(userID, time.Now())
 		case now := <-ticker.C:
@@ -175,11 +230,15 @@ type riskRefreshState struct {
 // requests arrive after the cooldown. Both user state and transport queues
 // have hard bounds; quiet user entries are removed on the maintenance tick.
 type riskRefreshScheduler struct {
+	ctx     context.Context
 	users   map[int]riskRefreshState
 	refresh func(int) error
 }
 
 func (s *riskRefreshScheduler) observe(userID int, now time.Time) {
+	if s.ctx != nil && s.ctx.Err() != nil {
+		return
+	}
 	state, exists := s.users[userID]
 	if !exists && len(s.users) >= riskRefreshUserLimit {
 		return
@@ -193,7 +252,9 @@ func (s *riskRefreshScheduler) observe(userID int, now time.Time) {
 
 func (s *riskRefreshScheduler) refreshUser(userID int, now time.Time) riskRefreshState {
 	if err := s.refresh(userID); err != nil {
-		common.SysError("risk score refresh failed")
+		if s.ctx == nil || s.ctx.Err() == nil {
+			common.SysError("risk score refresh failed")
+		}
 		return riskRefreshState{nextRefresh: now.Add(riskMaintenanceInterval), pending: true}
 	}
 	return riskRefreshState{nextRefresh: now.Add(riskScoreRefreshInterval)}
@@ -201,6 +262,9 @@ func (s *riskRefreshScheduler) refreshUser(userID int, now time.Time) riskRefres
 
 func (s *riskRefreshScheduler) flush(now time.Time) {
 	for userID, state := range s.users {
+		if s.ctx != nil && s.ctx.Err() != nil {
+			return
+		}
 		if state.nextRefresh.After(now) {
 			continue
 		}
@@ -213,13 +277,20 @@ func (s *riskRefreshScheduler) flush(now time.Time) {
 }
 
 func maintainRiskObservations() {
+	ctx := common.BackgroundContext()
 	ticker := time.NewTicker(riskMaintenanceInterval)
 	defer ticker.Stop()
-	for now := range ticker.C {
+	for {
+		var now time.Time
+		select {
+		case <-ctx.Done():
+			return
+		case now = <-ticker.C:
+		}
 		if riskObservationDrops.Swap(0) > 0 {
 			common.SysError("risk observation queue full; events dropped")
 		}
-		if err := PruneExpiredRiskEvents(now.UTC()); err != nil {
+		if err := pruneExpiredRiskEventsContext(ctx, now.UTC()); err != nil && ctx.Err() == nil {
 			common.SysError("risk observation retention cleanup failed")
 		}
 	}

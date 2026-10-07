@@ -1,7 +1,7 @@
 package vertex
 
 import (
-	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -12,10 +12,9 @@ const (
 	PublisherAnthropic   = "anthropic"
 )
 
-func normalizeVertexBaseURL(baseURL string) string {
-	return strings.TrimRight(strings.TrimSpace(baseURL), "/")
+func normalizeVertexBaseURL(base string) string {
+	return strings.TrimRight(strings.TrimSpace(base), "/")
 }
-
 func normalizeVertexRegion(region string) string {
 	region = strings.TrimSpace(region)
 	if region == "" {
@@ -23,64 +22,81 @@ func normalizeVertexRegion(region string) string {
 	}
 	return region
 }
-
-func appendVertexAPIVersion(baseURL, version string) string {
+func appendVertexAPIVersion(base, version string) string {
 	version = strings.Trim(strings.TrimSpace(version), "/")
-	if version == "" {
-		return baseURL
+	if version == "" || strings.HasSuffix(base, "/"+version) {
+		return base
 	}
-	if strings.HasSuffix(baseURL, "/"+version) {
-		return baseURL
-	}
-	return baseURL + "/" + version
+	return base + "/" + version
 }
 
-func BuildAPIBaseURL(baseURL, version, projectID, region string) string {
-	if normalized := normalizeVertexBaseURL(baseURL); normalized != "" {
-		normalized = appendVertexAPIVersion(normalized, version)
-
-		region = normalizeVertexRegion(region)
-		if strings.TrimSpace(projectID) != "" {
-			normalized = fmt.Sprintf("%s/projects/%s/locations/%s", normalized, projectID, region)
-		}
-		return normalized
+func appendResource(endpoint *url.URL, segments ...string) {
+	plain, encoded := strings.TrimRight(endpoint.Path, "/"), strings.TrimRight(endpoint.EscapedPath(), "/")
+	for _, segment := range segments {
+		plain += "/" + segment
+		encoded += "/" + url.PathEscape(segment)
 	}
+	endpoint.Path, endpoint.RawPath = plain, encoded
+	if plain == encoded {
+		endpoint.RawPath = ""
+	}
+}
 
+func BuildAPIBaseURL(base, version, project, region string) string {
 	region = normalizeVertexRegion(region)
-	if strings.TrimSpace(projectID) == "" {
-		if region == "global" {
-			return fmt.Sprintf("https://aiplatform.googleapis.com/%s", version)
+	base = normalizeVertexBaseURL(base)
+	if base == "" {
+		host := "aiplatform.googleapis.com"
+		if region != "global" {
+			host = region + "-" + host
 		}
-		return fmt.Sprintf("https://%s-aiplatform.googleapis.com/%s", region, version)
+		base = "https://" + host
 	}
-
-	if region == "global" {
-		return fmt.Sprintf("https://aiplatform.googleapis.com/%s/projects/%s/locations/global", version, projectID)
+	endpoint, err := url.Parse(base)
+	if err != nil || endpoint.Host == "" || (endpoint.Scheme != "http" && endpoint.Scheme != "https") {
+		return ""
 	}
-	return fmt.Sprintf("https://%s-aiplatform.googleapis.com/%s/projects/%s/locations/%s", region, version, projectID, region)
+	version = strings.Trim(strings.TrimSpace(version), "/")
+	if version != "" && !strings.HasSuffix(strings.TrimRight(endpoint.Path, "/"), "/"+version) {
+		appendResource(endpoint, version)
+	}
+	if strings.TrimSpace(project) != "" {
+		appendResource(endpoint, "projects", project, "locations", region)
+	}
+	return endpoint.String()
 }
 
-func BuildPublisherModelURL(baseURL, version, projectID, region, publisher, modelName, action string) string {
-	return fmt.Sprintf(
-		"%s/publishers/%s/models/%s:%s",
-		BuildAPIBaseURL(baseURL, version, projectID, region),
-		publisher,
-		modelName,
-		action,
-	)
+func BuildPublisherModelURL(base, version, project, region, publisher, model, action string) string {
+	endpoint, err := url.Parse(BuildAPIBaseURL(base, version, project, region))
+	if err != nil || endpoint.Host == "" {
+		return ""
+	}
+	actionURL, err := url.Parse(action)
+	if err != nil {
+		return ""
+	}
+	appendResource(endpoint, "publishers", publisher, "models", model)
+	escapedPath := endpoint.EscapedPath()
+	endpoint.Path += ":" + actionURL.Path
+	endpoint.RawPath = escapedPath + ":" + actionURL.EscapedPath()
+	query := endpoint.Query()
+	for key, values := range actionURL.Query() {
+		query[key] = values
+	}
+	endpoint.RawQuery = query.Encode()
+	return endpoint.String()
 }
-
-func BuildGoogleModelURL(baseURL, version, projectID, region, modelName, action string) string {
-	return BuildPublisherModelURL(baseURL, version, projectID, region, PublisherGoogle, modelName, action)
+func BuildGoogleModelURL(base, version, project, region, model, action string) string {
+	return BuildPublisherModelURL(base, version, project, region, PublisherGoogle, model, action)
 }
-
-func BuildAnthropicModelURL(baseURL, version, projectID, region, modelName, action string) string {
-	return BuildPublisherModelURL(baseURL, version, projectID, region, PublisherAnthropic, modelName, action)
+func BuildAnthropicModelURL(base, version, project, region, model, action string) string {
+	return BuildPublisherModelURL(base, version, project, region, PublisherAnthropic, model, action)
 }
-
-func BuildOpenSourceChatCompletionsURL(baseURL, projectID, region string) string {
-	return fmt.Sprintf(
-		"%s/endpoints/openapi/chat/completions",
-		BuildAPIBaseURL(baseURL, OpenSourceAPIVersion, projectID, region),
-	)
+func BuildOpenSourceChatCompletionsURL(base, project, region string) string {
+	endpoint, err := url.Parse(BuildAPIBaseURL(base, OpenSourceAPIVersion, project, region))
+	if err != nil || endpoint.Host == "" {
+		return ""
+	}
+	appendResource(endpoint, "endpoints", "openapi", "chat", "completions")
+	return endpoint.String()
 }

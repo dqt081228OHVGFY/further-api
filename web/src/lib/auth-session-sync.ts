@@ -24,8 +24,8 @@ export type AuthSessionSyncEvent = {
   timestamp: number
 }
 
-const AUTH_SYNC_CHANNEL = 'new-api:auth-session'
-const AUTH_SYNC_STORAGE_KEY = 'new-api:auth-session:event'
+const AUTH_SYNC_CHANNEL = 'further-api:auth-session'
+const AUTH_SYNC_STORAGE_KEY = 'further-api:auth-session:event'
 
 function randomIdentifier(): string {
   if (typeof globalThis.crypto?.randomUUID === 'function') {

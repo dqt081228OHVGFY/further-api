@@ -2,55 +2,52 @@ package controller
 
 import (
 	"errors"
-	"fmt"
-
-	"github.com/QuantumNous/new-api/middleware"
-	"github.com/QuantumNous/new-api/model"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/types"
-
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/middleware"
+	"github.com/dqt081228OHVGFY/further-api/model"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func Playground(c *gin.Context) {
-	var newAPIError *types.NewAPIError
-
-	defer func() {
-		if newAPIError != nil {
-			c.JSON(newAPIError.StatusCode, gin.H{
-				"error": newAPIError.ToOpenAIError(),
-			})
-		}
-	}()
-
-	useAccessToken := c.GetBool("use_access_token")
-	if useAccessToken {
-		newAPIError = types.NewError(errors.New("暂不支持使用 access token"), types.ErrorCodeAccessDenied, types.ErrOptionWithSkipRetry())
+	fail := func(status int, code types.ErrorCode, err error) {
+		classified := types.NewErrorWithStatusCode(err, code, status, types.ErrOptionWithSkipRetry())
+		c.JSON(status, gin.H{"error": classified.ToOpenAIError()})
+	}
+	if c.GetBool("use_access_token") {
+		fail(http.StatusForbidden, types.ErrorCodeAccessDenied, errors.New("请使用账户会话打开在线调试。"))
 		return
 	}
-
-	relayInfo, err := relaycommon.GenRelayInfo(c, types.RelayFormatOpenAI, nil, nil)
+	if err := c.Request.Context().Err(); err != nil {
+		fail(http.StatusRequestTimeout, types.ErrorCodeInvalidRequest, err)
+		return
+	}
+	userID := c.GetInt("id")
+	if userID <= 0 {
+		fail(http.StatusUnauthorized, types.ErrorCodeAccessDenied, errors.New("请先登录账户。"))
+		return
+	}
+	owner, err := model.GetUserCacheContext(c.Request.Context(), userID)
 	if err != nil {
-		newAPIError = types.NewError(err, types.ErrorCodeInvalidRequest, types.ErrOptionWithSkipRetry())
+		fail(http.StatusInternalServerError, types.ErrorCodeQueryDataError, err)
 		return
 	}
-
-	userId := c.GetInt("id")
-
-	// Write user context to ensure acceptUnsetRatio is available
-	userCache, err := model.GetUserCache(userId)
-	if err != nil {
-		newAPIError = types.NewError(err, types.ErrorCodeQueryDataError, types.ErrOptionWithSkipRetry())
+	if owner.Status != common.UserStatusEnabled {
+		fail(http.StatusForbidden, types.ErrorCodeAccessDenied, errors.New("当前账户不可用。"))
 		return
 	}
-	userCache.WriteContext(c)
-
-	tempToken := &model.Token{
-		UserId: userId,
-		Name:   fmt.Sprintf("playground-%s", relayInfo.UsingGroup),
-		Group:  relayInfo.UsingGroup,
+	selected := common.GetContextKeyString(c, constant.ContextKeyUsingGroup)
+	if selected == "" {
+		selected = owner.Group
 	}
-	_ = middleware.SetupContextForToken(c, tempToken)
-
+	owner.WriteContext(c)
+	common.SetContextKey(c, constant.ContextKeyUsingGroup, selected)
+	transient := &model.Token{UserId: userID, Name: "在线调试 · " + selected, Group: selected, UnlimitedQuota: true}
+	if err := middleware.SetupContextForToken(c, transient); err != nil {
+		fail(http.StatusBadRequest, types.ErrorCodeInvalidRequest, err)
+		return
+	}
 	Relay(c, types.RelayFormatOpenAI)
 }

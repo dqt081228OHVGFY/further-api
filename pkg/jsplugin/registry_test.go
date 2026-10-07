@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -589,7 +589,7 @@ func TestRegistryValidatesChannelTypes(t *testing.T) {
 		{name: "zero rejected", channelTypes: []int{0}, wantErr: "positive channel types"},
 		{name: "negative rejected", channelTypes: []int{-1}, wantErr: "positive channel types"},
 		{name: "task plugin type rejected", channelTypes: []int{constant.ChannelTypeTaskPlugin}, wantErr: "task plugin channel type"},
-		{name: "new api type rejected", channelTypes: []int{constant.ChannelTypeNewAPI}, wantErr: "New API channel type"},
+		{name: "gateway type rejected", channelTypes: []int{constant.ChannelTypeGateway}, wantErr: "gateway channel type"},
 		{name: "duplicates rejected", channelTypes: []int{1, 1}, wantErr: "must be unique"},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -949,6 +949,9 @@ func TestRegistryNormalizesBaseURL(t *testing.T) {
 		{name: "query rejected", input: "https://api.example.com/?x=1", wantError: "query or fragment"},
 		{name: "fragment rejected", input: "https://api.example.com/#x", wantError: "query or fragment"},
 		{name: "non-http scheme rejected", input: "ftp://api.example.com", wantError: "http or https"},
+		{name: "empty port rejected", input: "https://api.example.com:", wantError: "invalid port"},
+		{name: "port zero rejected", input: "https://api.example.com:0", wantError: "invalid port"},
+		{name: "port overflow rejected", input: "https://api.example.com:65536", wantError: "invalid port"},
 		{name: "relative value rejected", input: "/v1", wantError: "absolute"},
 		{name: "non-ascii host rejected", input: "https://例子.com", wantError: "ASCII"},
 		{name: "embedded whitespace rejected", input: "https://api.example.com/a b", wantError: "whitespace"},
@@ -976,6 +979,7 @@ func TestRegistryNormalizesAllowedHosts(t *testing.T) {
 	}{
 		{name: "hostname lowercased", hosts: `["Upload.Example.com"]`, want: []string{"upload.example.com"}},
 		{name: "host with port accepted", hosts: `["upload.example.com:8443"]`, want: []string{"upload.example.com:8443"}},
+		{name: "host port normalized", hosts: `["upload.example.com:08443"]`, want: []string{"upload.example.com:8443"}},
 		{name: "bracketed ipv6 with port accepted", hosts: `["[::1]:8080"]`, want: []string{"[::1]:8080"}},
 		{name: "bracketed ipv6 accepted", hosts: `["[::1]"]`, want: []string{"[::1]"}},
 		{name: "bare ipv6 normalized to brackets", hosts: `["::1"]`, want: []string{"[::1]"}},
@@ -983,7 +987,9 @@ func TestRegistryNormalizesAllowedHosts(t *testing.T) {
 		{name: "path rejected", hosts: `["upload.example.com/v1"]`, wantError: "without schemes"},
 		{name: "credentials rejected", hosts: `["user@upload.example.com"]`, wantError: "without schemes"},
 		{name: "port out of range rejected", hosts: `["upload.example.com:99999"]`, wantError: "between 1 and 65535"},
+		{name: "empty port rejected", hosts: `["upload.example.com:"]`, wantError: "between 1 and 65535"},
 		{name: "non-numeric port rejected", hosts: `["upload.example.com:abc"]`, wantError: "between 1 and 65535"},
+		{name: "duplicate after port normalization rejected", hosts: `["upload.example.com:8443", "upload.example.com:08443"]`, wantError: "unique"},
 		{name: "malformed ipv6 rejected", hosts: `["fe80::1::2"]`, wantError: "bracketed"},
 		{name: "duplicate after normalization rejected", hosts: `["a.example.com", "A.example.com"]`, wantError: "unique"},
 	}
@@ -1212,14 +1218,14 @@ usageProfiles: [{models:["image"], schema:{tokens:{type:"number", unit:"token"}}
 func TestUpstreamsManifestContract(t *testing.T) {
 	for _, tc := range []struct {
 		name, metadata string
-		valid, newAPI  bool
+		valid, gateway bool
 	}{
 		{"omitted implies vendor", "", true, false},
 		{"vendor only", `upstreams:["vendor"],`, true, false},
-		{"vendor and new api", `upstreams:["vendor","new_api"],`, true, true},
-		{"new api only still serves its vendor", `upstreams:["new_api"],`, true, true},
-		{"unknown kind", `upstreams:["gateway"],`, false, false},
-		{"duplicate", `upstreams:["new_api","new_api"],`, false, false},
+		{"vendor and new api", `upstreams:["vendor","gateway"],`, true, true},
+		{"new api only still serves its vendor", `upstreams:["gateway"],`, true, true},
+		{"unknown kind", `upstreams:["unsupported"],`, false, false},
+		{"duplicate", `upstreams:["gateway","gateway"],`, false, false},
 		{"null", `upstreams:null,`, false, false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -1231,7 +1237,7 @@ func TestUpstreamsManifestContract(t *testing.T) {
 			require.NoError(t, err)
 			require.NoError(t, ValidateV1Meta(plugin.Meta))
 			assert.True(t, plugin.Meta.SupportsUpstream(UpstreamKindVendor))
-			assert.Equal(t, tc.newAPI, plugin.Meta.SupportsUpstream(UpstreamKindNewAPI))
+			assert.Equal(t, tc.gateway, plugin.Meta.SupportsUpstream(UpstreamKindGateway))
 		})
 	}
 }

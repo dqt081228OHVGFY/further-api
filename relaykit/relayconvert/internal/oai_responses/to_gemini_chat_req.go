@@ -6,13 +6,12 @@ import (
 
 	"context"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/internal/convdiag"
-	relaymedia "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/media"
-	sharedgemini "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/gemini"
-	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/convdiag"
+	sharedgemini "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/internal/shared/gemini"
+	kitutil "github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/kitutil"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/reasoning"
 )
 
 func convertOpenAIResponsesRequestToGeminiChat(c context.Context, info convmeta.Meta, request any) (any, error) {
@@ -239,21 +238,11 @@ func responsesContentPartToGeminiParts(c context.Context, part map[string]any) (
 		if source == nil {
 			return nil, nil
 		}
-		base64Data, mimeType, err := relaymedia.ResolveBase64Data(c, source, "formatting Responses input for Gemini")
+		mediaPart, err := sharedgemini.ResolveMediaPart(c, source, "formatting Responses input for Gemini")
 		if err != nil {
-			return nil, fmt.Errorf("get file data from '%s' failed: %w", source.GetIdentifier(), err)
+			return nil, err
 		}
-		if _, ok := sharedgemini.SupportedMimeTypes[strings.ToLower(mimeType)]; !ok {
-			return nil, fmt.Errorf("mime type is not supported by Gemini: '%s', url: '%s', supported types are: %v", mimeType, source.GetIdentifier(), sharedgemini.SupportedMimeTypesList())
-		}
-		return []dto.GeminiPart{
-			{
-				InlineData: &dto.GeminiInlineData{
-					MimeType: mimeType,
-					Data:     base64Data,
-				},
-			},
-		}, nil
+		return []dto.GeminiPart{mediaPart}, nil
 	default:
 		return nil, nil
 	}

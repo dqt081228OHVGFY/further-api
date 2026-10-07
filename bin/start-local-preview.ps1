@@ -10,8 +10,8 @@ $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $runtimeRoot = Join-Path $projectRoot '.agent-work\local-preview'
 $webRoot = Join-Path $projectRoot 'web'
 $buildId = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
-$nextBinary = Join-Path $runtimeRoot "new-api-building-$buildId.exe"
-$binaryName = "new-api-preview-$buildId.exe"
+$nextBinary = Join-Path $runtimeRoot "further-api-building-$buildId.exe"
+$binaryName = "further-api-preview-$buildId.exe"
 $previewBinary = Join-Path $runtimeRoot $binaryName
 
 $npm = Get-Command npm.cmd -ErrorAction Stop
@@ -20,7 +20,15 @@ if ($goCommand) {
   $goPath = $goCommand.Source
 } else {
   $goPath = Join-Path (Split-Path $projectRoot -Parent) '.toolchains\go\bin\go.exe'
-  if (-not (Test-Path -LiteralPath $goPath -PathType Leaf)) { throw 'Go 1.25.1+ is required to build the preview.' }
+  if (-not (Test-Path -LiteralPath $goPath -PathType Leaf)) {
+    $previewToolchainRoot = Join-Path $env:USERPROFILE 'go\pkg\mod\golang.org'
+    $previewToolchain = Get-ChildItem -LiteralPath $previewToolchainRoot -Directory -Filter 'toolchain@*-go*.windows-amd64' -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -match '-go(\d+\.\d+\.\d+)\.windows-amd64$' -and [version]$Matches[1] -ge [version]'1.27.1' } |
+      Sort-Object @{ Expression = { [version]([regex]::Match($_.Name, '-go(\d+\.\d+\.\d+)').Groups[1].Value) }; Descending = $true } |
+      Select-Object -First 1
+    if ($previewToolchain) { $goPath = Join-Path $previewToolchain.FullName 'bin\go.exe' }
+  }
+  if (-not (Test-Path -LiteralPath $goPath -PathType Leaf)) { throw 'Go 1.27.1+ is required to build the preview.' }
 }
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
 

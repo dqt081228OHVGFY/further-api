@@ -1,6 +1,6 @@
 package common
 
-import "github.com/QuantumNous/new-api/constant"
+import "github.com/dqt081228OHVGFY/further-api/constant"
 
 func ChannelType2APIType(channelType int) (int, bool) {
 	apiType := -1
@@ -79,8 +79,8 @@ func ChannelType2APIType(channelType int) (int, bool) {
 		apiType = constant.APITypeAdvancedCustom
 	case constant.ChannelTypeSub2API:
 		apiType = constant.APITypeSub2API
-	case constant.ChannelTypeNewAPI:
-		apiType = constant.APITypeNewAPI
+	case constant.ChannelTypeGateway:
+		apiType = constant.APITypeGateway
 	}
 	if apiType == -1 {
 		// Task plugin channels are served by the task relay and must never
@@ -99,7 +99,7 @@ func SupportsResponsesCompact(channelType, apiType int) bool {
 		constant.APITypeCodex,
 		constant.APITypeAdvancedCustom,
 		constant.APITypeSub2API,
-		constant.APITypeNewAPI:
+		constant.APITypeGateway:
 		return true
 	default:
 		return false

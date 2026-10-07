@@ -16,26 +16,28 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/relayconvert/convmeta"
-	"github.com/QuantumNous/new-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/relayconvert/convmeta"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
 	"github.com/stretchr/testify/require"
 )
 
 var updateGolden = flag.Bool("update", false, "update golden files")
 
+var goldenMediaResolver = MediaResolver{
+	GetBase64Data: func(c context.Context, source types.FileSource, reason ...string) (string, string, error) {
+		return "aGVsbG8=", "image/png", nil
+	},
+	DecodeBase64FileData: func(base64String string) (string, string, error) {
+		return "aGVsbG8=", "image/png", nil
+	},
+}
+
 // TestMain installs a deterministic media resolver so image-bearing fixtures
 // convert without network access.
 func TestMain(m *testing.M) {
 	flag.Parse()
-	SetMediaResolver(MediaResolver{
-		GetBase64Data: func(c context.Context, source types.FileSource, reason ...string) (string, string, error) {
-			return "aGVsbG8=", "image/png", nil
-		},
-		DecodeBase64FileData: func(base64String string) (string, string, error) {
-			return "aGVsbG8=", "image/png", nil
-		},
-	})
+	SetMediaResolver(goldenMediaResolver)
 	os.Exit(m.Run())
 }
 
@@ -92,7 +94,7 @@ func checkStreamEventsGolden(t *testing.T, name string, events []any) {
 	require.Equal(t, string(want), string(got), "conversion events drifted from golden snapshot %s", path)
 }
 
-// goldenInfo mirrors the host's default converter options (new-api's
+// goldenInfo mirrors the host's default converter options (further-api's
 // model_setting defaults at the time the snapshots were recorded) so the
 // golden files stay comparable across the extraction.
 func goldenInfo() convmeta.Meta {

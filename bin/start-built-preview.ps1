@@ -19,8 +19,8 @@ if ($BinaryName) {
   }
 } else {
   # Select the latest completed build instead of a filename tied to a past date.
-  $relayBuild = Get-ChildItem -LiteralPath $relayRuntime -Filter 'new-api*.exe' -File -ErrorAction SilentlyContinue |
-    Where-Object { $_.Length -gt 0 -and $_.Name -notlike 'new-api-building-*' -and $_.Name -ne 'new-api-next.exe' } |
+  $relayBuild = Get-ChildItem -LiteralPath $relayRuntime -Filter 'further-api*.exe' -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Length -gt 0 -and $_.Name -notlike 'further-api-building-*' -and $_.Name -ne 'further-api-next.exe' } |
     Sort-Object LastWriteTimeUtc, Name -Descending | Select-Object -First 1
   if (-not $relayBuild) { throw 'No built gateway is available. Run bin/start-local-preview.ps1 first.' }
   $relayBinary = $relayBuild.FullName
@@ -48,7 +48,7 @@ if ([string]::IsNullOrWhiteSpace($relaySecret) -or $relaySecret -eq 'random_stri
 foreach ($relayOwner in (Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique)) {
   $relayProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$relayOwner"
   $relayExe = if ($relayProcess.ExecutablePath) { [IO.Path]::GetFullPath($relayProcess.ExecutablePath) } else { '' }
-  if ($relayProcess.Name -notlike 'new-api*.exe' -or -not $relayExe.StartsWith($relayRuntimePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+  if ($relayProcess.Name -notlike 'further-api*.exe' -or -not $relayExe.StartsWith($relayRuntimePrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Port $Port belongs to another application (PID $relayOwner)."
   }
   Stop-Process -Id $relayOwner -Force
@@ -65,7 +65,7 @@ $relayEnvironment = @{
   SQL_DSN = ''
   LOG_SQL_DSN = ''
   REDIS_CONN_STRING = ''
-  SQLITE_PATH = (Join-Path $relayData 'one-api.db').Replace('\', '/') + '?_pragma=busy_timeout(30000)&_pragma=journal_mode(WAL)&_txlock=immediate'
+  SQLITE_PATH = (Join-Path $relayData 'further-api.db').Replace('\', '/') + '?_pragma=busy_timeout(30000)&_pragma=journal_mode(WAL)&_txlock=immediate'
   SESSION_SECRET = $relaySecret
   CRYPTO_SECRET = $relaySecret
   TRUSTED_PROXIES = 'none'
@@ -118,7 +118,7 @@ if (-not $relayReady) {
   throw "The gateway did not become ready on port $Port. Check $relayOutLog and $relayErrLog."
 }
 $relayServerId = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction Stop | Select-Object -ExpandProperty OwningProcess -First 1
-Write-Output "RelayFor preview ready: http://127.0.0.1:$Port/ (PID $relayServerId, binary $([IO.Path]::GetFileName($relayBinary)))"
+Write-Output "further-api preview ready: http://127.0.0.1:$Port/ (PID $relayServerId, binary $([IO.Path]::GetFileName($relayBinary)))"
 if ($Foreground) {
   $relayServer.WaitForExit()
   if ($relayServer.ExitCode -ne 0) { throw "The gateway exited with code $($relayServer.ExitCode). Check $relayErrLog." }

@@ -7,11 +7,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
-	"github.com/QuantumNous/new-api/model"
-
-	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/logger"
+	"github.com/dqt081228OHVGFY/further-api/model"
 )
 
 const (
@@ -31,15 +29,9 @@ func StartSubscriptionQuotaResetTask() {
 		if !common.IsMasterNode {
 			return
 		}
-		gopool.Go(func() {
-			logger.LogInfo(context.Background(), fmt.Sprintf("subscription quota reset task started: tick=%s", subscriptionResetTickInterval))
-			ticker := time.NewTicker(subscriptionResetTickInterval)
-			defer ticker.Stop()
-
+		logger.LogInfo(common.BackgroundContext(), fmt.Sprintf("subscription quota reset task started: tick=%s", subscriptionResetTickInterval))
+		startPeriodicTask("subscription quota reset", subscriptionResetTickInterval, true, func(context.Context) {
 			runSubscriptionQuotaResetOnce()
-			for range ticker.C {
-				runSubscriptionQuotaResetOnce()
-			}
 		})
 	})
 }
@@ -50,11 +42,14 @@ func runSubscriptionQuotaResetOnce() {
 	}
 	defer subscriptionResetRunning.Store(false)
 
-	ctx := context.Background()
+	ctx := common.BackgroundContext()
 	totalReset := 0
 	totalExpired := 0
 	for {
-		n, err := model.ExpireDueSubscriptions(subscriptionResetBatchSize)
+		if ctx.Err() != nil {
+			return
+		}
+		n, err := model.ExpireDueSubscriptionsContext(ctx, subscriptionResetBatchSize)
 		if err != nil {
 			logger.LogWarn(ctx, fmt.Sprintf("subscription expire task failed: %v", err))
 			return
@@ -68,7 +63,10 @@ func runSubscriptionQuotaResetOnce() {
 		}
 	}
 	for {
-		n, err := model.ResetDueSubscriptions(subscriptionResetBatchSize)
+		if ctx.Err() != nil {
+			return
+		}
+		n, err := model.ResetDueSubscriptionsContext(ctx, subscriptionResetBatchSize)
 		if err != nil {
 			logger.LogWarn(ctx, fmt.Sprintf("subscription quota reset task failed: %v", err))
 			return
@@ -82,8 +80,8 @@ func runSubscriptionQuotaResetOnce() {
 		}
 	}
 	lastCleanup := time.Unix(subscriptionCleanupLast.Load(), 0)
-	if time.Since(lastCleanup) >= subscriptionCleanupInterval {
-		if _, err := model.CleanupSubscriptionPreConsumeRecords(7 * 24 * 3600); err == nil {
+	if ctx.Err() == nil && time.Since(lastCleanup) >= subscriptionCleanupInterval {
+		if _, err := model.CleanupSubscriptionPreConsumeRecordsContext(ctx, 7*24*3600); err == nil {
 			subscriptionCleanupLast.Store(time.Now().Unix())
 		}
 	}

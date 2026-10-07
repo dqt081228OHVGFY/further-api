@@ -1,20 +1,19 @@
 package aws
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
+	"sort"
 
-	"github.com/QuantumNous/new-api/relay/channel"
-	"github.com/QuantumNous/new-api/relay/channel/claude"
-	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relaykit/dto"
-	"github.com/QuantumNous/new-api/relaykit/types"
-	"github.com/QuantumNous/new-api/service"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
-	"github.com/pkg/errors"
-
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/claude"
+	"github.com/dqt081228OHVGFY/further-api/relay/channel/openai"
+	relaycommon "github.com/dqt081228OHVGFY/further-api/relay/common"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/dto"
+	"github.com/dqt081228OHVGFY/further-api/relaykit/types"
+	"github.com/dqt081228OHVGFY/further-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,160 +32,163 @@ type Adaptor struct {
 	IsNova     bool
 }
 
-func (a *Adaptor) ConvertGeminiRequest(*gin.Context, *relaycommon.RelayInfo, *dto.GeminiChatRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
-	claudeAdaptor := claude.Adaptor{}
-	if _, err := claudeAdaptor.ConvertClaudeRequest(c, info, request); err != nil {
-		return nil, err
-	}
-	for i, message := range request.Messages {
-		updated := false
-		if !message.IsStringContent() {
-			content, err := message.ParseContent()
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to parse message content")
-			}
-			for i2, mediaMessage := range content {
-				if mediaMessage.Source != nil {
-					if mediaMessage.Source.Type == "url" {
-						// 使用统一的文件服务获取图片数据
-						source := types.NewURLFileSource(mediaMessage.Source.Url)
-						base64Data, mimeType, err := service.GetBase64Data(c, source, "formatting image for Claude")
-						if err != nil {
-							return nil, fmt.Errorf("get file base64 from url failed: %s", err.Error())
-						}
-						mediaMessage.Source.MediaType = mimeType
-						mediaMessage.Source.Data = base64Data
-						mediaMessage.Source.Url = ""
-						mediaMessage.Source.Type = "base64"
-						content[i2] = mediaMessage
-						updated = true
-					}
-				}
-			}
-			if updated {
-				message.SetContent(content)
-			}
-		}
-		if updated {
-			request.Messages[i] = message
-		}
-	}
-	return request, nil
-}
-
-func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.AudioRequest) (io.Reader, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
-}
-
-func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	if info.ChannelOtherSettings.AwsKeyType == dto.AwsKeyTypeApiKey {
-		awsModelId := getAwsModelID(info.UpstreamModelName)
-		a.ClientMode = ClientModeApiKey
-		awsSecret := strings.Split(info.ApiKey, "|")
-		if len(awsSecret) != 2 {
-			return "", errors.New("invalid aws api key, should be in format of <api-key>|<region>")
+	*a = Adaptor{ClientMode: ClientModeAKSK}
+	if info != nil && info.HasChannelMeta() {
+		if identity, err := bedrockIdentityFrom(info.ApiKey); err == nil && identity.bearerToken != "" {
+			a.ClientMode = ClientModeApiKey
 		}
-		return fmt.Sprintf("https://bedrock-runtime.%s.amazonaws.com/model/%s/converse", awsModelId, awsSecret[1]), nil
-	} else {
-		a.ClientMode = ClientModeAKSK
-		return "", nil
 	}
 }
-
-func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error {
-	claude.CommonClaudeHeadersOperation(c, req, info)
-	if a.ClientMode == ClientModeApiKey {
-		req.Set("Authorization", "Bearer "+info.ApiKey)
+func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
+	return bedrockInvokeEndpoint(info)
+}
+func (a *Adaptor) SetupRequestHeader(c *gin.Context, headers *http.Header, info *relaycommon.RelayInfo) error {
+	if info == nil || !info.HasChannelMeta() || headers == nil {
+		return errors.New("Bedrock headers require provider configuration")
+	}
+	if *headers == nil {
+		*headers = make(http.Header)
+	}
+	claude.CommonClaudeHeadersOperation(c, headers, info)
+	identity, err := bedrockIdentityFrom(info.ApiKey)
+	if err != nil {
+		return err
+	}
+	if identity.bearerToken != "" {
+		headers.Set("Authorization", "Bearer "+identity.bearerToken)
 	}
 	return nil
 }
-
-func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
-	if request == nil {
-		return nil, errors.New("request is nil")
+func (a *Adaptor) ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error) {
+	if info != nil && info.HasChannelMeta() && isNovaModel(getAwsModelID(info.UpstreamModelName)) {
+		chat, err := openai.ChatFrom(c, info, request)
+		if err != nil {
+			return nil, err
+		}
+		return a.ConvertOpenAIRequest(c, info, chat)
 	}
-	// 检查是否为Nova模型
-	if isNovaModel(request.Model) {
-		novaReq := convertToNovaRequest(request)
-		a.IsNova = true
-		return novaReq, nil
-	}
-
-	// 原有的Claude模型处理逻辑
-	result, err := service.ConvertRequest(c, info, types.RelayFormatClaude, request)
+	native, err := claude.NativeMessages(c, info, request)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert openai request to claude request")
+		return nil, err
 	}
-	claudeReq, ok := result.Value.(*dto.ClaudeRequest)
-	if !ok {
-		return nil, fmt.Errorf("expected Anthropic Messages request, got %T", result.Value)
-	}
-	info.UpstreamModelName = claudeReq.Model
-	return claudeReq, err
-}
-
-func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
-	return nil, nil
-}
-
-func (a *Adaptor) ConvertEmbeddingRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.EmbeddingRequest) (any, error) {
-	//TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
-	// TODO implement me
-	return nil, errors.New("not implemented")
-}
-
-func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	if a.ClientMode == ClientModeApiKey {
-		return channel.DoApiRequest(a, c, info, requestBody)
-	} else {
-		return doAwsClientRequest(c, info, a, requestBody)
-	}
-}
-
-func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
-	if a.ClientMode == ClientModeApiKey {
-		claudeAdaptor := claude.Adaptor{}
-		usage, err = claudeAdaptor.DoResponse(c, resp, info)
-	} else {
-		if a.IsNova {
-			err, usage = handleNovaRequest(c, info, a)
-		} else {
-			if info.IsStream {
-				err, usage = awsStreamHandler(c, info, a)
-			} else {
-				err, usage = awsHandler(c, info, a)
+	// Bedrock Messages consumes inline media. Fetches use the gateway's file
+	// service so retrying does not bypass its request policy or media cache.
+	for index := range native.Messages {
+		message := &native.Messages[index]
+		if message.IsStringContent() {
+			continue
+		}
+		blocks, err := message.ParseContent()
+		if err != nil {
+			return nil, err
+		}
+		changed := false
+		for i := range blocks {
+			source := blocks[i].Source
+			if source == nil || source.Type != "url" {
+				continue
 			}
+			data, mediaType, err := service.GetBase64Data(c, types.NewURLFileSource(source.Url), "Bedrock inline media")
+			if err != nil {
+				return nil, fmt.Errorf("prepare Bedrock media: %w", err)
+			}
+			source.Type, source.MediaType, source.Data, source.Url = "base64", mediaType, data, ""
+			changed = true
+		}
+		if changed {
+			message.SetContent(blocks)
 		}
 	}
-	return
+	return native, nil
 }
-
-func (a *Adaptor) GetModelList() (models []string) {
-	for n := range awsModelIDMap {
-		models = append(models, n)
+func (a *Adaptor) bedrockMessages(c *gin.Context, info *relaycommon.RelayInfo, source any) (any, error) {
+	request, err := claude.MessagesFrom(c, info, source)
+	if err != nil {
+		return nil, err
 	}
-
-	return
+	return a.ConvertClaudeRequest(c, info, request)
 }
-
-func (a *Adaptor) GetChannelName() string {
-	return ChannelName
+func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
+	if request == nil {
+		return nil, errors.New("Bedrock chat request is missing")
+	}
+	if info == nil || !info.HasChannelMeta() {
+		return nil, errors.New("Bedrock provider configuration is missing")
+	}
+	if isNovaModel(getAwsModelID(info.UpstreamModelName)) {
+		converted, err := novaRequest(c, request)
+		if err == nil {
+			a.IsNova = true
+		}
+		return converted, err
+	}
+	return a.bedrockMessages(c, info, request)
 }
+func (a *Adaptor) ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error) {
+	if request == nil {
+		return nil, errors.New("Gemini request is missing")
+	}
+	if info != nil && info.HasChannelMeta() && isNovaModel(getAwsModelID(info.UpstreamModelName)) {
+		chat, err := openai.ChatFrom(c, info, request)
+		if err != nil {
+			return nil, err
+		}
+		return a.ConvertOpenAIRequest(c, info, chat)
+	}
+	return a.bedrockMessages(c, info, request)
+}
+func (a *Adaptor) ConvertOpenAIResponsesRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.OpenAIResponsesRequest) (any, error) {
+	if info != nil && info.HasChannelMeta() && isNovaModel(getAwsModelID(info.UpstreamModelName)) {
+		converted, err := openai.ChatFrom(c, info, &request)
+		if err != nil {
+			return nil, err
+		}
+		return a.ConvertOpenAIRequest(c, info, converted)
+	}
+	return a.bedrockMessages(c, info, &request)
+}
+func unsupportedBedrock(operation string) error {
+	return openai.UnsupportedOperation("this Bedrock model", operation)
+}
+func (a *Adaptor) ConvertAudioRequest(*gin.Context, *relaycommon.RelayInfo, dto.AudioRequest) (io.Reader, error) {
+	return nil, unsupportedBedrock("audio operations")
+}
+func (a *Adaptor) ConvertImageRequest(*gin.Context, *relaycommon.RelayInfo, dto.ImageRequest) (any, error) {
+	return nil, unsupportedBedrock("image generation")
+}
+func (a *Adaptor) ConvertRerankRequest(*gin.Context, int, dto.RerankRequest) (any, error) {
+	return nil, unsupportedBedrock("reranking")
+}
+func (a *Adaptor) ConvertEmbeddingRequest(*gin.Context, *relaycommon.RelayInfo, dto.EmbeddingRequest) (any, error) {
+	return nil, unsupportedBedrock("embeddings")
+}
+func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, body io.Reader) (any, error) {
+	return doAwsClientRequest(c, info, a, body)
+}
+func (a *Adaptor) DoResponse(c *gin.Context, _ *http.Response, info *relaycommon.RelayInfo) (any, *types.GatewayError) {
+	if info == nil {
+		return nil, invalidAwsOperation(errors.New("Bedrock response context is missing"))
+	}
+	var failure *types.GatewayError
+	var usage *dto.Usage
+	if a.IsNova {
+		failure, usage = handleNovaRequest(c, info, a)
+	} else if info.IsStream && info.RelayFormat == types.RelayFormatOpenAIResponses {
+		failure, usage = awsResponsesStream(c, info, a)
+	} else if info.IsStream {
+		failure, usage = awsStreamHandler(c, info, a)
+	} else {
+		failure, usage = awsHandler(c, info, a)
+	}
+	return usage, failure
+}
+func (a *Adaptor) GetModelList() []string {
+	models := make([]string, 0, len(awsModelIDMap))
+	for model := range awsModelIDMap {
+		models = append(models, model)
+	}
+	sort.Strings(models)
+	return models
+}
+func (a *Adaptor) GetChannelName() string { return ChannelName }

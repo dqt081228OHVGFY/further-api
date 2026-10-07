@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -8,8 +9,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/constant"
+	"github.com/dqt081228OHVGFY/further-api/common"
+	"github.com/dqt081228OHVGFY/further-api/constant"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -23,7 +24,7 @@ type TaskPluginChannelRef struct {
 
 func GetTaskPluginUsage(key string) ([]TaskPluginChannelRef, int64, error) {
 	var channels []Channel
-	boundTypes := []int{constant.ChannelTypeTaskPlugin, constant.ChannelTypeNewAPI}
+	boundTypes := []int{constant.ChannelTypeTaskPlugin, constant.ChannelTypeGateway}
 	if err := DB.Where("type IN ? AND status = ?", boundTypes, common.ChannelStatusEnabled).Find(&channels).Error; err != nil {
 		return nil, 0, err
 	}
@@ -39,7 +40,7 @@ func GetTaskPluginUsage(key string) ([]TaskPluginChannelRef, int64, error) {
 }
 
 // UnbindTaskPlugin removes one plugin from a channel's bindings and reports
-// whether the channel changed. A New API gateway channel keeps serving its other
+// whether the channel changed. A further-api gateway channel keeps serving its other
 // plugins and its ordinary traffic.
 func UnbindTaskPlugin(channelID int, key string) (bool, error) {
 	channel, err := GetChannelById(channelID, false)
@@ -184,8 +185,12 @@ type TaskPluginSyncSnapshot struct {
 // The query skips the source and icon columns: every node polls this every
 // 30 seconds, and plugin sources may be several MiB each.
 func GetTaskPluginSyncSnapshot() (TaskPluginSyncSnapshot, error) {
+	return GetTaskPluginSyncSnapshotContext(context.Background())
+}
+
+func GetTaskPluginSyncSnapshotContext(ctx context.Context) (TaskPluginSyncSnapshot, error) {
 	var activePlugins []TaskPlugin
-	if err := DB.Omit("source", "icon").Where(&TaskPlugin{Active: true}).
+	if err := DB.WithContext(ctx).Omit("source", "icon").Where(&TaskPlugin{Active: true}).
 		Order(clause.OrderByColumn{Column: clause.Column{Name: "key"}}).
 		Order(clause.OrderByColumn{Column: clause.Column{Name: "version"}}).
 		Order(clause.OrderByColumn{Column: clause.Column{Name: "id"}}).
@@ -236,8 +241,12 @@ func GetTaskPluginSyncSnapshot() (TaskPluginSyncSnapshot, error) {
 // same key and version), so the id from a sync snapshot identifies exactly the
 // text whose SourceHash that snapshot reported.
 func GetTaskPluginSource(id int64) (LongText, error) {
+	return GetTaskPluginSourceContext(context.Background(), id)
+}
+
+func GetTaskPluginSourceContext(ctx context.Context, id int64) (LongText, error) {
 	var plugin TaskPlugin
-	err := DB.Select("source").Where(&TaskPlugin{Id: id}).Take(&plugin).Error
+	err := DB.WithContext(ctx).Select("source").Where(&TaskPlugin{Id: id}).Take(&plugin).Error
 	return plugin.Source, err
 }
 

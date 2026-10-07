@@ -6,9 +6,33 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dqt081228OHVGFY/further-api/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestRiskObservationFinalFlushPersistsAcceptedEventsAndRefreshesScores(t *testing.T) {
+	truncate(t)
+	require.NoError(t, model.DB.AutoMigrate(&model.RiskEvent{}, &model.RiskSnapshot{}))
+	t.Cleanup(func() {
+		model.DB.Where("user_id = ?", 901).Delete(&model.RiskEvent{})
+		model.DB.Where("user_id = ?", 901).Delete(&model.RiskSnapshot{})
+	})
+	queue := make(chan RiskObservationInput, 2)
+	now := time.Now().UTC()
+	queue <- RiskObservationInput{UserID: 901, OccurredAt: now, Model: "model", RequestID: "shutdown_1"}
+	queue <- RiskObservationInput{UserID: 901, OccurredAt: now.Add(-time.Minute), Model: "model", RequestID: "shutdown_2"}
+	flushRiskObservationQueue(queue)
+	require.Empty(t, queue)
+	events, err := model.ListRiskEvents(901, now.Add(-time.Hour).Unix(), 10)
+	require.NoError(t, err)
+	require.Len(t, events, 2)
+	for _, window := range []int{3, 7} {
+		snapshot, err := model.GetRiskSnapshot(901, window)
+		require.NoError(t, err)
+		require.Equal(t, 2, snapshot.RequestCount)
+	}
+}
 
 func TestNormalizeRiskObservationRejectsRawSensitiveMetadata(t *testing.T) {
 	input, valid := normalizeRiskObservation(RiskObservationInput{

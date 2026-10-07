@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#005ac1">
+  <title>额度卡兑换 · further-api</title>
+  <link rel="icon" type="image/svg+xml" href="/further-api-logo.svg?v=handshake-20261004">
+  <link rel="stylesheet" href="/further-assets/app.css">
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/material-icons.js"></script>
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/app.js"></script>
+  <script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/prepaid.js"></script>
+  <link rel="stylesheet" href="/further-assets/gateway-theme.css"><link rel="stylesheet" href="/further-assets/material.css"><link rel="stylesheet" href="/further-assets/prepaid-workspace.css"><script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/lunar-schedule.js"></script>
+<script type="application/x-further-workspace" data-further-source-only="true" defer src="/further-assets/activities.js"></script>
+<link rel="stylesheet" href="/further-assets/activities.css">
+<link rel="stylesheet" href="/further-assets/workspace-colors.css">
+</head>
+<body data-page="prepaid" data-further-api-ui="workspace-v2" class="auth-page prepaid-page">
+  <div class="auth-shell">
+    <header class="auth-header"><a class="auth-brand" href="/"><span class="rail-logo"><img src="/further-api-logo.svg?v=handshake-20261004" width="40" height="40" alt=""></span><span><strong>further-api</strong><small>AI API 网关</small></span></a></header>
+    <main class="prepaid-workspace" id="further-prepaid-main"><section class="prepaid-story"><h2>额度卡兑换</h2><p>使用已绑定 Linux DO 的账户兑换额度。</p><div class="prepaid-step-box"><span class="material-symbol" aria-hidden="true">confirmation_number</span><div><b>兑换额度</b><p>输入额度卡卡号，完成身份验证后领取对应额度。</p></div></div><div class="prepaid-step-box"><span class="material-symbol" aria-hidden="true">schedule</span><div><b>查看有效期</b><p>在兑换结果与管理页面查看限时额度和到期时间。</p></div></div><div class="prepaid-step-box"><span class="material-symbol" aria-hidden="true">key</span><div><b>保存 API Key</b><p>兑换完成后保存 API Key。</p></div></div></section><section class="md-card auth-card prepaid-card" aria-label="额度卡兑换与查询">
+      <div data-prepaid-form-view>
+        <h1>兑换额度卡</h1>
+        <p>使用已绑定 LinuxDO 的账户兑换额度卡。</p>
+		<div class="prepaid-disclaimer"><span class="material-symbol" aria-hidden="true">warning</span><div><b>安全保存 API Key</b><span>完整 API Key 只在兑换成功后展示，请立即保存到安全的位置。</span></div></div>
+        <div class="status-err hidden" data-prepaid-error></div>
+        <form data-prepaid-form>
+          <div class="md-textfield"><input id="further-prepaid-code" class="md-input" name="code" autocomplete="one-time-code" placeholder=" " required><label class="md-input-label" for="further-prepaid-code">额度卡卡号</label></div>
+          <button class="md-btn md-btn-filled auth-submit" type="submit">登录并兑换额度卡</button>
+        </form>
+		<button type="button" class="md-btn md-btn-outlined auth-submit" data-prepaid-balance-login><span class="material-symbol" aria-hidden="true">person</span>登录查询额度卡余额</button>
+      </div>
+      <div class="hidden" data-prepaid-result>
+        <span class="prepaid-success-icon material-symbol" aria-hidden="true">check_circle</span>
+        <h1 data-prepaid-result-title>兑换成功</h1>
+        <p data-prepaid-result-detail></p><p class="field-hint">额度卡作为限时额度使用，到期自动失效。可在管理页面的账户设置中开启「优先使用限时额度」。</p>
+        <div class="prepaid-key-box hidden" data-prepaid-key-box><span>API Key</span><code data-prepaid-key></code><button type="button" class="md-btn md-btn-outlined" data-copy-prepaid-key>复制 Key</button></div>
+		<div class="prepaid-disclaimer hidden" data-prepaid-key-disclaimer><span class="material-symbol" aria-hidden="true">warning</span><div><b>请立即妥善保存 Key</b><span>因 API Key 丢失导致的问题不提供售后支持，请自行尝试解决。</span></div></div>
+        <div class="settings-meta-grid prepaid-meta"><div class="settings-meta"><span>本次增加</span><b data-prepaid-quota>—</b></div><div class="settings-meta"><span>本卡额度到期</span><b data-prepaid-expiry>—</b></div></div>
+        <div class="auth-links"><a class="md-btn md-btn-filled" href="/prepaid/">继续合并额度卡</a><a class="md-btn md-btn-text" href="/">返回首页</a></div>
+      </div>
+	  <div class="hidden" data-prepaid-balance-result>
+		<span class="prepaid-success-icon material-symbol" aria-hidden="true">data_usage</span>
+		<h1>额度卡余额</h1>
+		<p>当前账户的额度卡额度。</p><p class="field-hint" data-prepaid-billing-hint></p>
+		<div class="settings-meta-grid prepaid-meta"><div class="settings-meta"><span>可用余额</span><b data-prepaid-balance-total>—</b></div><div class="settings-meta"><span>Key 最晚有效期</span><b data-prepaid-balance-expiry>—</b></div></div>
+		<div class="prepaid-key-box"><span>API Key（脱敏）</span><code data-prepaid-balance-key>—</code><small data-prepaid-balance-key-status>—</small></div>
+		<div class="prepaid-balance-buckets" data-prepaid-balance-buckets></div>
+		<div class="prepaid-disclaimer"><span class="material-symbol" aria-hidden="true">warning</span><div><b>Key 保管声明</b><span>因 API Key 丢失导致的问题不提供售后支持，请自行尝试解决。</span></div></div>
+		<div class="auth-links"><a class="md-btn md-btn-filled" href="/prepaid/">兑换或合并额度卡</a><a class="md-btn md-btn-text" href="/">返回首页</a></div>
+	  </div>
+      <div class="auth-links" data-prepaid-footer><a class="md-btn md-btn-text" href="/auth/?mode=login&amp;redirect=%2Fprepaid%2F">已有账号登录</a><a class="md-btn md-btn-text" href="/">返回首页</a></div>
+    </section></main>
+  </div>
+<noscript>请启用 JavaScript 后使用 further-api。</noscript>
+</body>
+</html>
